@@ -39,7 +39,8 @@ dependencies {
     // testImplementation(libs.azure.storageblob)
     testImplementation("com.azure:azure-storage-blob:12.0.0")
     
-    testImplementation(libs.restAssured)
+    // testImplementation(libs.restAssured)
+    testImplementation("io.rest-assured:rest-assured:4.4.0")
     // testImplementation(libs.awaitility)
     testImplementation("org.awaitility:awaitility:4.0.3")
     // testImplementation(libs.okhttp)
