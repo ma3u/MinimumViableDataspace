@@ -36,13 +36,19 @@ dependencies {
 
     testImplementation(edc.ext.azure.blob.core)
     testImplementation(edc.util)
-    testImplementation(libs.azure.storageblob)
+    // testImplementation(libs.azure.storageblob)
+    testImplementation("com.azure:azure-storage-blob:12.0.0"
+    
     testImplementation(libs.restAssured)
-    testImplementation(libs.awaitility)
-    testImplementation(libs.okhttp)
+    // testImplementation(libs.awaitility)
+    testImplementation('org.awaitility:awaitility:4.0.3')
+    // testImplementation(libs.okhttp)
+    testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
 
-    testImplementation(libs.azure.identity)
-    testImplementation(libs.azure.keyvault)
+    // testImplementation(libs.azure.identity)
+    // testImplementation(libs.azure.keyvault)
+    testImplementation("com.azure:azure-identity:1.4.2")
+    testImplementation("com.azure:azure-keyvault-secrets:4.2.0")
     testImplementation(edc.spi.contract)
     testImplementation(fcc.spi)
     testImplementation(edc.policy.evaluator)
