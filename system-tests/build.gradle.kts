@@ -37,11 +37,11 @@ dependencies {
     testImplementation(edc.ext.azure.blob.core)
     testImplementation(edc.util)
     // testImplementation(libs.azure.storageblob)
-    testImplementation("com.azure:azure-storage-blob:12.0.0"
+    testImplementation("com.azure:azure-storage-blob:12.0.0")
     
     testImplementation(libs.restAssured)
     // testImplementation(libs.awaitility)
-    testImplementation('org.awaitility:awaitility:4.0.3')
+    testImplementation("org.awaitility:awaitility:4.0.3")
     // testImplementation(libs.okhttp)
     testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
 
