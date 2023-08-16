@@ -24,7 +24,7 @@ variable "github_repo" {
 }
 # name of the storage account that'll hold the Terraform State for MVD deployments
 variable "tf_state_storageaccount" {
-  default = "ma3umvdtfstate"
+  default = "arnabma3umvdtfstate"
 }
 # name of the storage container that'll hold the Terraform State for MVD deployments
 variable "tf_state_container" {
@@ -32,11 +32,11 @@ variable "tf_state_container" {
 }
 # RG location
 variable "common_resourcegroup_location" {
-  default = "northeurope"
+  default = "westeurope"
 }
 # Resource group that'll contain common resources, such as the ACR
 variable "common_resourcegroup" {
-  default = "mvd-common"
+  default = "mvd-resources"
 }
 
 # Name of the Azure Container Registry that'll hold all docker images
