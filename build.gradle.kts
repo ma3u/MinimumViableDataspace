@@ -23,10 +23,6 @@ dependencies {
     downloadArtifact("org.eclipse.edc:registration-service-cli:${registrationServiceVersion}:all")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
 // task that downloads the RegSrv CLI and IH CLI
 val getJarsForLocalTest by tasks.registering(Copy::class) {
     outputs.upToDateWhen { false } //always download
@@ -90,6 +86,10 @@ allprojects {
             println(sourceSets["main"].runtimeClasspath.asPath)
         }
     }
+
+    // tasks.withType("KotlinCompile") {
+    //     kotlinOptions.jvmTarget = "1.8"
+    // }
 }
 
 buildscript {
