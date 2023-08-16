@@ -1,6 +1,7 @@
 plugins {
     java
     `java-library`
+    kotlin("jvm") version "1.9.0" apply false
 }
 
 val downloadArtifact: Configuration by configurations.creating {
@@ -20,6 +21,10 @@ val actualVersion: String = project.findProperty("version") as String
 dependencies {
     downloadArtifact("org.eclipse.edc:identity-hub-cli:${identityHubVersion}:all")
     downloadArtifact("org.eclipse.edc:registration-service-cli:${registrationServiceVersion}:all")
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 // task that downloads the RegSrv CLI and IH CLI
