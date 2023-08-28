@@ -24,7 +24,7 @@ variable "github_repo" {
 }
 # name of the storage account that'll hold the Terraform State for MVD deployments
 variable "tf_state_storageaccount" {
-  default = "mvdtfstate"
+  default = "mvdtfstatearnab"
 }
 # name of the storage container that'll hold the Terraform State for MVD deployments
 variable "tf_state_container" {
