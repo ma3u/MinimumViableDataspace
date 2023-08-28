@@ -15,6 +15,7 @@ runs:
   steps:
     - name: 'Generate key'
       run: |
+        mkdir -p ${{ inputs.directory }}
         openssl ecparam -name prime256v1 -genkey -noout -out ${{ inputs.keyFileNamePrefix }}.pem
         openssl ec -in ${{ inputs.keyFileNamePrefix }}.pem -pubout -out ${{ inputs.keyFileNamePrefix }}.public.pem
         docker run -i danedmunds/pem-to-jwk:1.2.1 --public --pretty < ${{ inputs.keyFileNamePrefix }}.public.pem > ${{ inputs.keyFileNamePrefix }}.public.jwk
