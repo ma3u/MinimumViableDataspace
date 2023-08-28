@@ -46,7 +46,3 @@ output "ARM_CLIENT_SECRET" {
   sensitive = true
   value     = azuread_application_password.gh-actions-mvd-pwd.value
 }
-
-output "ACR_NAME" {
-  value = azurerm_container_registry.acr.name
-}

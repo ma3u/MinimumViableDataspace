@@ -1,6 +1,6 @@
 # supply the tenant ID for your Azure Tenant here
 variable "tenant_id" {
-  default = "1b4bb737-2084-4b98-994b-cd2a6d7777c8"
+  default = "<YOUR_TENANT_ID>"
 }
 # App registration name for the Federated Credential for GH Actions
 variable "gh_actions_appname" {
@@ -20,26 +20,21 @@ variable "application_fc_pr_name" {
 }
 # name of your fork of MVD
 variable "github_repo" {
-  default = "arnabdevops/MinimumViableDataspace"
+  default = "<YOUR_FORK>/MinimumViableDataspace"
 }
 # name of the storage account that'll hold the Terraform State for MVD deployments
 variable "tf_state_storageaccount" {
-  default = "arnabma3umvdtfstate"
+  default = "mvdtfstate"
 }
 # name of the storage container that'll hold the Terraform State for MVD deployments
 variable "tf_state_container" {
-  default = "ma3umvdtfstate"
+  default = "mvdtfstate"
 }
 # RG location
 variable "common_resourcegroup_location" {
-  default = "westeurope"
+  default = "northeurope"
 }
-# Resource group that'll contain common resources, such as the ACR
+# Resource group that'll contain common resources, such as the Storage account
 variable "common_resourcegroup" {
-  default = "mvd-resources"
-}
-
-# Name of the Azure Container Registry that'll hold all docker images
-variable "acr_name" {
-    default = "acrmvd1706"
+  default = "mvd-common"
 }

@@ -39,13 +39,7 @@ From the `MVD` root folder, execute the following command to build the connector
 Then, to bring up the dataspace, please execute the following command from the `MVD` root folder:
 
 ```bash
-docker-compose -f system-tests/docker-compose.yml up --build
-```
-
-_Note for Windows PowerShell, the following commands should be used from the `MVD` project root:_
-
-```powershell
-docker-compose -f system-tests/docker-compose.yml up --build
+docker compose -f system-tests/docker-compose.yml up --build
 ```
 
 Once completed, following services will start within their docker containers:
@@ -69,13 +63,13 @@ Sample for confirming successful run of container `cli-tools`.
 
 Command:
 
-```powershell
+```bash
 docker ps -a
 ```
 
 Output:
 
-```powershell
+```bash
 CONTAINER ID   IMAGE                                     COMMAND                   CREATED              STATUS                        PORTS                                                                              NAMES
 22345bf0c595   system-tests_cli-tools                    "/bin/sh -c \"/app/en…"   About a minute ago   Up About a minute (healthy)                                                                                      cli-tools
 ```
@@ -86,13 +80,6 @@ test using the following command:
 ```bash
 export TEST_ENVIRONMENT=local
 ./gradlew :system-tests:test -DincludeTags="ComponentTest,EndToEndTest"
-```
-
-_Note for Windows PowerShell, the following commands should be used:_
-
-```powershell
-$Env:TEST_ENVIRONMENT = "local"
-./gradlew :system-tests:test
 ```
 
 > [Storage Explorer](https://azure.microsoft.com/features/storage-explorer/) can be used to connect to the `Azurite`
@@ -125,7 +112,8 @@ openssl req -new -x509 -key private-key.pem -out cert.pem -days 360
 Generated keys are imported to keystores e.g. `system-tests/resources/vault/company1/company1-keystore.jks`. Each
 keystore has password `test123`.
 
-> [KeyStore Explorer](https://keystore-explorer.org/) can be used to manage keystores from UI.
+> [KeyStore Explorer](https://keystore-explorer.org/) should be used to manage keystores (from UI).
+> Using `openssl` combined with `keytool` to obtain a `JKS` keystore will result in a keystore the EDC cannot read (incompatible inclusion of key parameters).
 
 `MVD` local instances use a file-system based vault and its keys are managed using a java properties file
 e.g.`system-tests/resources/vault/company[1,2,3]/company[1,2,3]-vault.properties`.
@@ -209,12 +197,12 @@ The script will perform these essential steps:
 ### Running the dataspace + tests
 
 Just like in the [previous chapter](README.md#test-execution-using-embedded-services) we start up our dataspace
-using `docker-compose`. One small difference is that seeding is now done with a separate script instead of inside
+using `docker compose`. One small difference is that seeding is now done with a separate script instead of inside
 another docker container. The reason for this is easier traceability and debuggability.
 
 ```shell
 cd <project-root>/deployment/azure
-docker-compose docker/docker-compose.yaml --build --wait
+docker compose docker/docker-compose.yaml --build --wait
 ./seed_dataspace.sh
 ```
 
@@ -237,7 +225,7 @@ not the case simply re-run the `setup_azure_dataspace.sh` script again. If all t
 won't create new ones.
 To stop the docker containers and destroy all cloud resources, simply execute:
 
-```shell
+```bash
 cd <project-root>/deployment/azure
 ./shutdown_azure_dataspace.sh
 ```
@@ -251,7 +239,7 @@ cd <project-root>/deployment/azure
 ## Debugging MVD locally
 
 Follow the instructions in the previous sections to run an MVD with a consumer (`company2`) and provider (`company1`)
-locally using docker-compose.
+locally using `docker compose`.
 
 Once running, you can use a Java debugger to connect to the consumer (`company2`, port 5006) and provider (`company1`,
 port 5005) instances. If you are using IntelliJ you can use the provided "EDC company1", "EDC company2" or "EDC
