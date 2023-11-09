@@ -24,3 +24,7 @@ Closes # <-- _insert Issue number if one exists_
 - [ ] added/updated relevant documentation?
 - [ ] added relevant details to the changelog? (_skip with label `no-changelog`_)
 - [ ] formatted title correctly?
+
+## Added Tests
+- [ ] Yes : _Details of the test added in short_
+- [ ] No, Not Required : _Optional details_
