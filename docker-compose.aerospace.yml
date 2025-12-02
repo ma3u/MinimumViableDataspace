@@ -1,0 +1,59 @@
+#
+#  Copyright (c) 2024 Aerospace DPP Demo
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+version: '3.8'
+
+services:
+  # Aerospace DPP Frontend
+  aerospace-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aerospace-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - dpp-backend
+    networks:
+      - aerospace-network
+    restart: unless-stopped
+
+  # DPP Backend Mock Service (Rolls-Royce data)
+  dpp-backend:
+    build:
+      context: ./backend-mock
+      dockerfile: Dockerfile
+    container_name: dpp-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    networks:
+      - aerospace-network
+    restart: unless-stopped
+
+networks:
+  aerospace-network:
+    driver: bridge
+
+# Note: This docker-compose is for the aerospace demo components only.
+# The MVD infrastructure (EDC connectors, IdentityHubs, etc.) should be 
+# started separately using the IntelliJ run configs or Kubernetes deployment.
+#
+# To use with IntelliJ deployment:
+#   1. Start NGINX for issuer DID
+#   2. Start the 'dataspace' compound run config in IntelliJ
+#   3. Run ./seed.sh
+#   4. Run DPP_BACKEND_URL=http://host.docker.internal:3001 ./seed-aerospace.sh
+#   5. docker-compose -f docker-compose.aerospace.yml up --build
+#   6. Open http://localhost:3000
+#
+# For standalone development (frontend only):
+#   cd frontend && npm install && npm run dev
