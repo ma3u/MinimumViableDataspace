@@ -364,14 +364,7 @@ docker run -d --name nginx -p 9876:80 --rm \
 1. Open the project in IntelliJ IDEA
 2. Navigate to `.run/` directory
 3. Run the `dataspace` compound run configuration
-4. Wait for all 8 runtimes to start:
-   - consumer
-   - consumer-identityhub
-   - provider-qna
-   - provider-manufacturing
-   - provider-catalog-server
-   - provider-identityhub
-   - issuerservice
+4. Wait for all 8 runtimes to start: consumer, consumer-identityhub, provider-qna, provider-manufacturing, provider-catalog-server, provider-identityhub, issuerservice
 
 **Option B: Kubernetes (Production-like)**
 
@@ -559,29 +552,16 @@ flowchart LR
 - View asset details including description and properties
 
 **Step 4: Negotiate Contract**
-- Click "Negotiate Contract"
-- The system automatically:
-  - Requests the asset's policy
-  - Presents required credentials (MembershipCredential, DataProcessorCredential)
-  - Completes the negotiation
-- Wait for status: "FINALIZED"
+
+Click "Negotiate Contract". The system automatically requests the asset's policy, presents required credentials (MembershipCredential, DataProcessorCredential), and completes the negotiation. Wait for status: "FINALIZED".
 
 **Step 5: Transfer Data**
-- Click "Start Transfer"
-- The system:
-  - Initiates an HTTP-PULL transfer
-  - Receives an Endpoint Data Reference (EDR)
-  - Fetches the DPP data
-- Wait for status: "STARTED"
+
+Click "Start Transfer". The system initiates an HTTP-PULL transfer, receives an Endpoint Data Reference (EDR), and fetches the DPP data. Wait for status: "STARTED".
 
 **Step 6: View DPP**
-- The Digital Product Passport is displayed
-- Navigate through sections:
-  - **Identity**: Part number, serial number, manufacturer
-  - **Airworthiness**: EASA Form 1 status, certifications
-  - **Sustainability**: PCF value, material composition
-  - **Operational**: Flight hours, cycles
-  - **Technical**: Specifications, dimensions
+
+The Digital Product Passport is displayed. Navigate through sections: **Identity** (Part number, serial number, manufacturer), **Airworthiness** (EASA Form 1 status, certifications), **Sustainability** (PCF value, material composition), **Operational** (Flight hours, cycles), and **Technical** (Specifications, dimensions).
 
 ### 5.3 Provider Workflow (Rolls-Royce)
 
@@ -764,12 +744,8 @@ The demo uses two types of credentials:
 - Required for: Catalog access
 
 **DataProcessorCredential**
-- Issued by: Dataspace Issuer
-- Purpose: Proves authorization to process certain data types
-- Levels:
-  - `processing`: Can access standard DPP data
-  - `sensitive`: Can access restricted data (not used in demo)
-- Required for: Contract negotiation
+
+Issued by: Dataspace Issuer. Purpose: Proves authorization to process certain data types. Levels: `processing` (can access standard DPP data) and `sensitive` (can access restricted data, not used in demo). Required for: Contract negotiation.
 
 ### 7.2 Policy Evaluation Flow
 
