@@ -69,18 +69,18 @@ The demo simulates a real-world aerospace supply chain data exchange:
 
 ```mermaid
 flowchart LR
-    subgraph Provider["Rolls-Royce (Provider)"]
+    subgraph Provider["Rolls-Royce - Provider"]
         RR["Engine OEM"]
-        DPP["Digital Product\nPassports"]
+        DPP["Digital Product Passports"]
     end
     
-    subgraph Consumer["Airbus (Consumer)"]
+    subgraph Consumer["Airbus - Consumer"]
         AB["Airframe OEM"]
-        SKY["Skywise\nPlatform"]
+        SKY["Skywise Platform"]
     end
     
     RR --> |"Manufactures"| DPP
-    DPP --> |"Dataspace\nProtocol"| AB
+    DPP --> |"DSP"| AB
     AB --> |"Integrates"| SKY
 ```
 
@@ -105,30 +105,30 @@ The demo architecture consists of three layers:
 ```mermaid
 flowchart TB
     subgraph Presentation["Presentation Layer"]
-        FE["React Frontend\n:3000"]
+        FE["React Frontend :3000"]
     end
     
-    subgraph Dataspace["Dataspace Layer (MVD)"]
-        subgraph Consumer["Consumer (Airbus)"]
-            CC["Consumer\nControlplane\n:8081"]
-            CD["Consumer\nDataplane\n:11001"]
-            CIH["Consumer\nIdentityHub\n:7082"]
+    subgraph Dataspace["Dataspace Layer - MVD"]
+        subgraph Consumer["Consumer - Airbus"]
+            CC["Consumer Controlplane :8081"]
+            CD["Consumer Dataplane :11001"]
+            CIH["Consumer IdentityHub :7082"]
         end
         
-        subgraph Provider["Provider (Rolls-Royce)"]
-            PC["Provider QNA\nControlplane\n:8191"]
-            PD["Provider QNA\nDataplane\n:11002"]
-            PIH["Provider\nIdentityHub\n:7092"]
+        subgraph Provider["Provider - Rolls-Royce"]
+            PC["Provider Controlplane :8191"]
+            PD["Provider Dataplane :11002"]
+            PIH["Provider IdentityHub :7092"]
         end
         
         subgraph Trust["Trust Anchor"]
-            ISS["Issuer Service\n:10016"]
-            NGINX["DID Server\n:9876"]
+            ISS["Issuer Service :10016"]
+            NGINX["DID Server :9876"]
         end
     end
     
     subgraph Data["Data Layer"]
-        BE["DPP Backend\n(Mock)\n:3001"]
+        BE["DPP Backend :3001"]
     end
     
     FE --> CC
@@ -202,24 +202,24 @@ sequenceDiagram
 flowchart LR
     subgraph External["External Data Sources"]
         ERP["ERP Systems"]
-        MES["Manufacturing\nExecution"]
+        MES["Manufacturing Execution"]
         PLM["PLM Systems"]
     end
     
     subgraph Backend["DPP Backend"]
-        AGG["Data\nAggregator"]
-        JSONLD["JSON-LD\nSerializer"]
+        AGG["Data Aggregator"]
+        JSONLD["JSON-LD Serializer"]
     end
     
     subgraph EDC["Eclipse Dataspace"]
-        ASSET["Asset\nRegistry"]
-        POLICY["Policy\nEngine"]
-        TRANSFER["Transfer\nManager"]
+        ASSET["Asset Registry"]
+        POLICY["Policy Engine"]
+        TRANSFER["Transfer Manager"]
     end
     
     subgraph Consumer["Consumer Systems"]
-        CATALOG["Catalog\nBrowser"]
-        VIEWER["DPP\nViewer"]
+        CATALOG["Catalog Browser"]
+        VIEWER["DPP Viewer"]
     end
     
     ERP --> AGG
@@ -238,9 +238,9 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph DID["Decentralized Identifiers"]
-        CDID["did:web:localhost:7083\n(Consumer)"]
-        PDID["did:web:localhost:7093\n(Provider)"]
-        IDID["did:web:localhost:9876\n(Issuer)"]
+        CDID["Consumer DID"]
+        PDID["Provider DID"]
+        IDID["Issuer DID"]
     end
     
     subgraph VC["Verifiable Credentials"]
@@ -249,8 +249,8 @@ flowchart TB
     end
     
     subgraph IH["IdentityHubs"]
-        CIH["Consumer\nIdentityHub"]
-        PIH["Provider\nIdentityHub"]
+        CIH["Consumer IdentityHub"]
+        PIH["Provider IdentityHub"]
     end
     
     IDID --> |issues| MC
@@ -408,19 +408,19 @@ This critical step creates participant contexts in the IdentityHubs and issues V
 ```mermaid
 flowchart TB
     subgraph Seed["seed.sh Execution"]
-        S1["1. Seed Assets\nto Providers"]
-        S2["2. Seed Catalog\nServer Links"]
-        S3["3. Create Consumer\nParticipant Context"]
-        S4["4. Create Provider\nParticipant Context"]
-        S5["5. Create Issuer\nParticipant"]
-        S6["6. Issue Credentials\nto Participants"]
+        S1["1. Seed Assets to Providers"]
+        S2["2. Seed Catalog Server Links"]
+        S3["3. Create Consumer Context"]
+        S4["4. Create Provider Context"]
+        S5["5. Create Issuer Participant"]
+        S6["6. Issue Credentials"]
     end
     
     S1 --> S2 --> S3 --> S4 --> S5 --> S6
     
     subgraph Result["Result"]
-        R1["Consumer has:\n- DID\n- MembershipCredential\n- DataProcessorCredential"]
-        R2["Provider has:\n- DID\n- MembershipCredential\n- DataProcessorCredential"]
+        R1["Consumer: DID + Credentials"]
+        R2["Provider: DID + Credentials"]
     end
     
     S6 --> R1
@@ -531,11 +531,11 @@ The interface allows switching between Consumer (Airbus) and Provider (Rolls-Roy
 
 ```mermaid
 flowchart LR
-    A["1. Select\nConsumer Role"] --> B["2. Browse\nCatalog"]
-    B --> C["3. Select\nAsset"]
-    C --> D["4. Negotiate\nContract"]
-    D --> E["5. Transfer\nData"]
-    E --> F["6. View\nDPP"]
+    A["1. Select Role"] --> B["2. Browse Catalog"]
+    B --> C["3. Select Asset"]
+    C --> D["4. Negotiate"]
+    D --> E["5. Transfer"]
+    E --> F["6. View DPP"]
 ```
 
 **Step 1: Select Consumer Role**
@@ -752,19 +752,19 @@ Issued by: Dataspace Issuer. Purpose: Proves authorization to process certain da
 ```mermaid
 flowchart TB
     subgraph Request["Incoming Request"]
-        REQ["DSP Message\n+ Verifiable Presentation"]
+        REQ["DSP Message + VP"]
     end
     
     subgraph Eval["Policy Evaluation"]
         VP["Extract VP"]
-        VC["Verify Credential\nSignatures"]
-        CHAIN["Verify Issuer\nTrust Chain"]
-        POLICY["Evaluate Policy\nConstraints"]
+        VC["Verify Signatures"]
+        CHAIN["Verify Trust Chain"]
+        POLICY["Evaluate Constraints"]
     end
     
     subgraph Result["Decision"]
-        ALLOW["✓ Allow"]
-        DENY["✗ Deny"]
+        ALLOW["Allow"]
+        DENY["Deny"]
     end
     
     REQ --> VP --> VC --> CHAIN --> POLICY
