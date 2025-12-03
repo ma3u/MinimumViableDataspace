@@ -12,13 +12,14 @@
 
 ## This script seeds the Aerospace Digital Product Passport demo data
 ## Run this AFTER running the standard seed.sh script
+## Seeds 20 Rolls-Royce Trent XWB engine spare parts
 
 echo ""
-echo "╔═══════════════════════════════════════════════════════════════╗"
-echo "║     Aerospace Digital Product Passport - Data Seeding         ║"
-echo "║                                                               ║"
-echo "║  Seeding Rolls-Royce DPP Assets to Provider                   ║"
-echo "╚═══════════════════════════════════════════════════════════════╝"
+echo "╔════════════════════════════════════════════════════════════════════╗"
+echo "║     Aerospace Digital Product Passport - Data Seeding              ║"
+echo "║                                                                    ║"
+echo "║  Seeding 20 Rolls-Royce Trent XWB Spare Parts                      ║"
+echo "╚════════════════════════════════════════════════════════════════════╝"
 echo ""
 
 # Provider QNA endpoint (where we'll seed the aerospace assets)
@@ -30,93 +31,207 @@ echo "Provider Host: $PROVIDER_HOST"
 echo "DPP Backend URL: $BACKEND_URL"
 echo ""
 
-# Create the HPT Blade DPP Asset
-echo "Creating Asset: Trent XWB HPT Blade (asset:propulsion:blade:98765)..."
-curl -s --location "$PROVIDER_HOST/api/management/v3/assets" \
---header 'Content-Type: application/json' \
---data '{
-    "@context": [
-        "https://w3id.org/edc/connector/management/v0.0.1"
-    ],
-    "@id": "asset:propulsion:blade:98765",
-    "@type": "Asset",
-    "properties": {
-        "name": "Trent XWB HPT Blade - Digital Product Passport",
-        "description": "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Turbine Blade SN:HPT998877",
-        "contenttype": "application/ld+json",
-        "dct:type": "ids:DigitalProductPassport",
-        "version": "1.0",
-        "aerospace:partType": "HighPressureTurbineBlade",
-        "aerospace:manufacturer": "Rolls-Royce plc",
-        "aerospace:serialNumber": "HPT998877"
-    },
-    "dataAddress": {
-        "@type": "DataAddress",
-        "type": "HttpData",
-        "baseUrl": "'"$BACKEND_URL"'/api/parts/98765",
-        "proxyPath": "false",
-        "proxyQueryParams": "false"
-    }
-}' > /dev/null && echo "  ✓ HPT Blade asset created"
+# Function to create an asset
+create_asset() {
+    local ID=$1
+    local NAME=$2
+    local DESC=$3
+    local PART_TYPE=$4
+    local SERIAL=$5
+    local STATUS=${6:-NEW}
+    
+    echo "Creating Asset: $NAME ($ID)..."
+    curl -s --location "$PROVIDER_HOST/api/management/v3/assets" \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "@context": [
+            "https://w3id.org/edc/connector/management/v0.0.1"
+        ],
+        "@id": "'"$ID"'",
+        "@type": "Asset",
+        "properties": {
+            "name": "'"$NAME"'",
+            "description": "'"$DESC"'",
+            "contenttype": "application/ld+json",
+            "dct:type": "ids:DigitalProductPassport",
+            "version": "1.0",
+            "aerospace:partType": "'"$PART_TYPE"'",
+            "aerospace:manufacturer": "Rolls-Royce plc",
+            "aerospace:serialNumber": "'"$SERIAL"'",
+            "aerospace:status": "'"$STATUS"'"
+        },
+        "dataAddress": {
+            "@type": "DataAddress",
+            "type": "HttpData",
+            "baseUrl": "'"$BACKEND_URL"'/api/parts/'"${ID##*:}"'",
+            "proxyPath": "false",
+            "proxyQueryParams": "false"
+        }
+    }' > /dev/null && echo "  ✓ Created"
+}
 
-# Create the Compressor Blade DPP Asset
-echo "Creating Asset: Compressor Blade (asset:propulsion:blade:98766)..."
-curl -s --location "$PROVIDER_HOST/api/management/v3/assets" \
---header 'Content-Type: application/json' \
---data '{
-    "@context": [
-        "https://w3id.org/edc/connector/management/v0.0.1"
-    ],
-    "@id": "asset:propulsion:blade:98766",
-    "@type": "Asset",
-    "properties": {
-        "name": "Trent XWB Compressor Blade - Digital Product Passport",
-        "description": "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Compressor Blade SN:HPC112233",
-        "contenttype": "application/ld+json",
-        "dct:type": "ids:DigitalProductPassport",
-        "version": "1.0",
-        "aerospace:partType": "CompressorBlade",
-        "aerospace:manufacturer": "Rolls-Royce plc",
-        "aerospace:serialNumber": "HPC112233"
-    },
-    "dataAddress": {
-        "@type": "DataAddress",
-        "type": "HttpData",
-        "baseUrl": "'"$BACKEND_URL"'/api/parts/98766",
-        "proxyPath": "false",
-        "proxyQueryParams": "false"
-    }
-}' > /dev/null && echo "  ✓ Compressor Blade asset created"
+echo "Creating 20 Trent XWB Spare Part Assets..."
+echo ""
 
-# Create the Combustor Liner DPP Asset
-echo "Creating Asset: Combustor Liner (asset:propulsion:combustor:98767)..."
-curl -s --location "$PROVIDER_HOST/api/management/v3/assets" \
---header 'Content-Type: application/json' \
---data '{
-    "@context": [
-        "https://w3id.org/edc/connector/management/v0.0.1"
-    ],
-    "@id": "asset:propulsion:combustor:98767",
-    "@type": "Asset",
-    "properties": {
-        "name": "Trent XWB Combustor Liner - Digital Product Passport",
-        "description": "Digital Product Passport for Rolls-Royce Trent XWB Combustor Liner SN:COMB445566 (Overhauled)",
-        "contenttype": "application/ld+json",
-        "dct:type": "ids:DigitalProductPassport",
-        "version": "1.0",
-        "aerospace:partType": "CombustorLiner",
-        "aerospace:manufacturer": "Rolls-Royce plc",
-        "aerospace:serialNumber": "COMB445566",
-        "aerospace:status": "OVERHAULED"
-    },
-    "dataAddress": {
-        "@type": "DataAddress",
-        "type": "HttpData",
-        "baseUrl": "'"$BACKEND_URL"'/api/parts/98767",
-        "proxyPath": "false",
-        "proxyQueryParams": "false"
-    }
-}' > /dev/null && echo "  ✓ Combustor Liner asset created"
+# 1. HP Turbine Blade
+create_asset "asset:dpp:RR001" \
+    "HP Turbine Blade DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Turbine Blade" \
+    "HighPressureTurbineBlade" \
+    "SN-HPT-78001" \
+    "NEW"
+
+# 2. HP Compressor Blade
+create_asset "asset:dpp:RR002" \
+    "HP Compressor Blade DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Compressor Blade" \
+    "HighPressureCompressorBlade" \
+    "SN-HPC-78002" \
+    "NEW"
+
+# 3. Combustor Liner
+create_asset "asset:dpp:RR003" \
+    "Combustor Liner DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Combustor Liner" \
+    "CombustorLiner" \
+    "SN-CMB-78003" \
+    "OVERHAULED"
+
+# 4. Fan Blade
+create_asset "asset:dpp:RR004" \
+    "Fan Blade DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Carbon Fiber Fan Blade" \
+    "FanBlade" \
+    "SN-FAN-78004" \
+    "NEW"
+
+# 5. LP Turbine Blade
+create_asset "asset:dpp:RR005" \
+    "LP Turbine Blade DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Low-Pressure Turbine Blade" \
+    "LowPressureTurbineBlade" \
+    "SN-LPT-78005" \
+    "NEW"
+
+# 6. HP Turbine Disk
+create_asset "asset:dpp:RR006" \
+    "HP Turbine Disk DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Turbine Disk" \
+    "HighPressureTurbineDisk" \
+    "SN-HPTD-78006" \
+    "NEW"
+
+# 7. Fuel Nozzle
+create_asset "asset:dpp:RR007" \
+    "Fuel Nozzle DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Fuel Nozzle" \
+    "FuelNozzle" \
+    "SN-FN-78007" \
+    "NEW"
+
+# 8. Main Shaft Bearing
+create_asset "asset:dpp:RR008" \
+    "Main Shaft Bearing DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Main Shaft Bearing Assembly" \
+    "MainShaftBearing" \
+    "SN-BRG-78008" \
+    "SERVICEABLE"
+
+# 9. Nozzle Guide Vane
+create_asset "asset:dpp:RR009" \
+    "Nozzle Guide Vane DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB HP Turbine Nozzle Guide Vane" \
+    "NozzleGuideVane" \
+    "SN-NGV-78009" \
+    "NEW"
+
+# 10. Compressor Stator Vane
+create_asset "asset:dpp:RR010" \
+    "Compressor Stator Vane DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB HP Compressor Stator Vane" \
+    "CompressorStatorVane" \
+    "SN-CSV-78010" \
+    "NEW"
+
+# 11. Oil Pump
+create_asset "asset:dpp:RR011" \
+    "Oil Pump DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Oil Pump Assembly" \
+    "OilPump" \
+    "SN-OLP-78011" \
+    "NEW"
+
+# 12. Starter Generator
+create_asset "asset:dpp:RR012" \
+    "Starter Generator DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Starter Generator" \
+    "StarterGenerator" \
+    "SN-SG-78012" \
+    "OVERHAULED"
+
+# 13. Thrust Reverser Actuator
+create_asset "asset:dpp:RR013" \
+    "Thrust Reverser Actuator DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Thrust Reverser Actuator" \
+    "ThrustReverserActuator" \
+    "SN-TRA-78013" \
+    "NEW"
+
+# 14. FADEC Controller
+create_asset "asset:dpp:RR014" \
+    "FADEC Controller DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Full Authority Digital Engine Control" \
+    "FADECController" \
+    "SN-FADEC-78014" \
+    "NEW"
+
+# 15. Exhaust Mixer
+create_asset "asset:dpp:RR015" \
+    "Exhaust Mixer DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Exhaust Mixer" \
+    "ExhaustMixer" \
+    "SN-EXM-78015" \
+    "NEW"
+
+# 16. IP Compressor Disk
+create_asset "asset:dpp:RR016" \
+    "IP Compressor Disk DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Intermediate Pressure Compressor Disk" \
+    "IPCompressorDisk" \
+    "SN-IPCD-78016" \
+    "NEW"
+
+# 17. Accessory Gearbox
+create_asset "asset:dpp:RR017" \
+    "Accessory Gearbox DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Accessory Gearbox Assembly" \
+    "AccessoryGearbox" \
+    "SN-AGB-78017" \
+    "SERVICEABLE"
+
+# 18. Turbine Shroud Segment
+create_asset "asset:dpp:RR018" \
+    "Turbine Shroud Segment DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB HP Turbine Shroud Segment" \
+    "TurbineShroudSegment" \
+    "SN-TSS-78018" \
+    "NEW"
+
+# 19. Compressor Bleed Valve
+create_asset "asset:dpp:RR019" \
+    "Compressor Bleed Valve DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB HP Compressor Bleed Valve" \
+    "CompressorBleedValve" \
+    "SN-CBV-78019" \
+    "NEW"
+
+# 20. Fan Containment Case
+create_asset "asset:dpp:RR020" \
+    "Fan Containment Case DPP" \
+    "Digital Product Passport for Rolls-Royce Trent XWB Fan Containment Case" \
+    "FanContainmentCase" \
+    "SN-FCC-78020" \
+    "NEW"
 
 echo ""
 echo "Creating Aerospace-specific Policies..."
@@ -174,7 +289,7 @@ curl -s --location "$PROVIDER_HOST/api/management/v3/policydefinitions" \
 echo ""
 echo "Creating Contract Definitions..."
 
-# Create Contract Definition for DPP assets
+# Create Contract Definition for all DPP assets (using wildcard pattern)
 echo "Creating Contract Definition: aerospace-dpp-contract..."
 curl -s --location "$PROVIDER_HOST/api/management/v3/contractdefinitions" \
 --header 'Content-Type: application/json' \
@@ -191,27 +306,51 @@ curl -s --location "$PROVIDER_HOST/api/management/v3/contractdefinitions" \
         "operandLeft": "https://w3id.org/edc/v0.0.1/ns/id",
         "operator": "in",
         "operandRight": [
-            "asset:propulsion:blade:98765",
-            "asset:propulsion:blade:98766",
-            "asset:propulsion:combustor:98767"
+            "asset:dpp:RR001",
+            "asset:dpp:RR002",
+            "asset:dpp:RR003",
+            "asset:dpp:RR004",
+            "asset:dpp:RR005",
+            "asset:dpp:RR006",
+            "asset:dpp:RR007",
+            "asset:dpp:RR008",
+            "asset:dpp:RR009",
+            "asset:dpp:RR010",
+            "asset:dpp:RR011",
+            "asset:dpp:RR012",
+            "asset:dpp:RR013",
+            "asset:dpp:RR014",
+            "asset:dpp:RR015",
+            "asset:dpp:RR016",
+            "asset:dpp:RR017",
+            "asset:dpp:RR018",
+            "asset:dpp:RR019",
+            "asset:dpp:RR020"
         ]
     }
 }' > /dev/null && echo "  ✓ Contract definition created"
 
 echo ""
-echo "╔═══════════════════════════════════════════════════════════════╗"
-echo "║                    Seeding Complete!                          ║"
-echo "║                                                               ║"
-echo "║  Assets Created:                                              ║"
-echo "║    - asset:propulsion:blade:98765 (HPT Blade)                 ║"
-echo "║    - asset:propulsion:blade:98766 (Compressor Blade)          ║"
-echo "║    - asset:propulsion:combustor:98767 (Combustor Liner)       ║"
-echo "║                                                               ║"
-echo "║  Policies Created:                                            ║"
-echo "║    - aerospace-membership-required                            ║"
-echo "║    - aerospace-dpp-access                                     ║"
-echo "║                                                               ║"
-echo "║  Contract Definitions Created:                                ║"
-echo "║    - aerospace-dpp-contract                                   ║"
-echo "╚═══════════════════════════════════════════════════════════════╝"
+echo "╔════════════════════════════════════════════════════════════════════╗"
+echo "║                      Seeding Complete!                             ║"
+echo "║                                                                    ║"
+echo "║  Assets Created: 20 Trent XWB Spare Parts                          ║"
+echo "║    RR001: HP Turbine Blade        RR011: Oil Pump                  ║"
+echo "║    RR002: HP Compressor Blade     RR012: Starter Generator         ║"
+echo "║    RR003: Combustor Liner         RR013: Thrust Reverser Actuator  ║"
+echo "║    RR004: Fan Blade               RR014: FADEC Controller          ║"
+echo "║    RR005: LP Turbine Blade        RR015: Exhaust Mixer             ║"
+echo "║    RR006: HP Turbine Disk         RR016: IP Compressor Disk        ║"
+echo "║    RR007: Fuel Nozzle             RR017: Accessory Gearbox         ║"
+echo "║    RR008: Main Shaft Bearing      RR018: Turbine Shroud Segment    ║"
+echo "║    RR009: Nozzle Guide Vane       RR019: Compressor Bleed Valve    ║"
+echo "║    RR010: Compressor Stator Vane  RR020: Fan Containment Case      ║"
+echo "║                                                                    ║"
+echo "║  Policies Created:                                                 ║"
+echo "║    - aerospace-membership-required                                 ║"
+echo "║    - aerospace-dpp-access                                          ║"
+echo "║                                                                    ║"
+echo "║  Contract Definitions Created:                                     ║"
+echo "║    - aerospace-dpp-contract (covers all 20 assets)                 ║"
+echo "╚════════════════════════════════════════════════════════════════════╝"
 echo ""
