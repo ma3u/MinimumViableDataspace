@@ -65,7 +65,7 @@ DECADE-X (Decentralized European Collaborative Aerospace Data Exchange) represen
 
 ### 1.3 Demo Scenario
 
-The demo simulates a real-world aerospace supply chain data exchange:
+The demo simulates a real-world aerospace supply chain data exchange. This diagram shows how Rolls-Royce manufactures engine components and creates Digital Product Passports, which are then shared with Airbus via the Dataspace Protocol (DSP). Airbus integrates this data into their Skywise fleet management platform.
 
 ```mermaid
 flowchart LR
@@ -100,7 +100,7 @@ flowchart LR
 
 ### 2.1 System Components
 
-The demo architecture consists of three layers:
+The demo architecture consists of three layers. The Presentation Layer contains the React frontend, the Dataspace Layer hosts the EDC connectors and IdentityHubs for both Consumer (Airbus) and Provider (Rolls-Royce), plus a Trust Anchor with the Issuer Service. The Data Layer contains the DPP Backend that serves the actual product passport data.
 
 ```mermaid
 flowchart TB
@@ -143,7 +143,7 @@ flowchart TB
 
 ### 2.2 Component Interaction Diagram
 
-The following diagram shows the complete data exchange flow:
+The following diagram shows the complete data exchange flow. It illustrates the three main phases: Catalog Discovery (where credentials are verified to access the catalog), Contract Negotiation (where policies are evaluated against presented credentials), and Data Transfer (where the actual DPP data is fetched using the negotiated access token).
 
 ```mermaid
 sequenceDiagram
@@ -198,6 +198,8 @@ sequenceDiagram
 
 ### 2.3 Data Flow Architecture
 
+This diagram shows how DPP data flows from source systems to consumers. External data sources (ERP, MES, PLM) feed into the DPP Backend where data is aggregated and serialized to JSON-LD. The Eclipse Dataspace manages assets, policies, and transfers, ultimately delivering the data to the Consumer's catalog browser and DPP viewer.
+
 ```mermaid
 flowchart LR
     subgraph External["External Data Sources"]
@@ -234,6 +236,8 @@ flowchart LR
 ```
 
 ### 2.4 Identity & Trust Framework
+
+This diagram illustrates the decentralized identity infrastructure. The Issuer DID issues Verifiable Credentials (MembershipCredential and DataProcessorCredential) to both Consumer and Provider. These credentials are stored in the respective IdentityHubs and presented during DSP message exchanges to prove authorization.
 
 ```mermaid
 flowchart TB
@@ -405,6 +409,8 @@ This critical step creates participant contexts in the IdentityHubs and issues V
 
 **What seed.sh does:**
 
+This diagram shows the six steps executed by the seed script. It seeds test assets and catalog links, creates participant contexts for Consumer and Provider in their IdentityHubs, registers the Issuer, and finally issues the required credentials to both participants.
+
 ```mermaid
 flowchart TB
     subgraph Seed["seed.sh Execution"]
@@ -529,9 +535,11 @@ The interface allows switching between Consumer (Airbus) and Provider (Rolls-Roy
 
 ### 5.2 Consumer Workflow (Airbus)
 
+This diagram shows the six-step workflow for consuming DPP data. Users select their role, browse the provider's catalog, select an asset, negotiate a contract based on their credentials, initiate the data transfer, and finally view the complete Digital Product Passport.
+
 ```mermaid
 flowchart LR
-    A[Select Role] --> B[Browse Catalog]
+    A[Select Role]
     B --> C[Select Asset]
     C --> D[Negotiate]
     D --> E[Transfer]
@@ -748,6 +756,8 @@ The demo uses two types of credentials:
 Issued by: Dataspace Issuer. Purpose: Proves authorization to process certain data types. Levels: `processing` (can access standard DPP data) and `sensitive` (can access restricted data, not used in demo). Required for: Contract negotiation.
 
 ### 7.2 Policy Evaluation Flow
+
+This diagram shows how access decisions are made. When a DSP message with a Verifiable Presentation arrives, the system extracts the VP, verifies credential signatures, validates the issuer trust chain, and evaluates policy constraints. The request is allowed only if all checks pass.
 
 ```mermaid
 flowchart TB
