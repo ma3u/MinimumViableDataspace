@@ -1,942 +1,878 @@
-# Minimum Viable Dataspace Demo
+# DECADE-X Aerospace Digital Product Passport Demo
 
-<!-- TOC -->
+A comprehensive demonstration of sovereign data exchange for aerospace Digital Product Passports (DPP) using Eclipse Dataspace Components within the DECADE-X initiative.
 
-* [Minimum Viable Dataspace Demo](#minimum-viable-dataspace-demo)
-    * [1. Introduction](#1-introduction)
-    * [2. Purpose of this Demo](#2-purpose-of-this-demo)
-        * [2.1 Which version should I use?](#21-which-version-should-i-use)
-    * [3. The Scenario](#3-the-scenario)
-        * [3.1 Participants](#31-participants)
-        * [3.2 Data setup](#32-data-setup)
-        * [3.3 Access control](#33-access-control)
-        * [3.4 DIDs, participant lists and VerifiableCredentials](#34-dids-participant-lists-and-verifiablecredentials)
-    * [4. Running the demo (inside IntelliJ)](#4-running-the-demo-inside-intellij)
-        * [4.1 Start NGINX](#41-start-nginx)
-        * [4.2 Starting the runtimes](#42-starting-the-runtimes)
-        * [4.3 Seeding the dataspace](#43-seeding-the-dataspace)
-        * [4.4 Next steps](#44-next-steps)
-    * [5. Running the Demo (Kubernetes)](#5-running-the-demo-kubernetes)
-        * [5.1 Build the runtime images](#51-build-the-runtime-images)
-        * [5.2 Create the K8S cluster](#52-create-the-k8s-cluster)
-        * [5.3 Seed the dataspace](#53-seed-the-dataspace)
-        * [5.4 JVM crashes with `SIGILL` on ARM platforms](#54-jvm-crashes-with-sigill-on-arm-platforms)
-        * [5.5 Debugging MVD in Kubernetes](#55-debugging-mvd-in-kubernetes)
-    * [6. Differences between Kubernetes and IntelliJ](#6-differences-between-kubernetes-and-intellij)
-        * [6.1 In-memory databases](#61-in-memory-databases)
-        * [6.2 Memory-based secret vaults](#62-memory-based-secret-vaults)
-        * [6.3 Embedded vs Remote STS](#63-embedded-vs-remote-sts)
-    * [7. Executing REST requests using Postman](#7-executing-rest-requests-using-postman)
-        * [7.1 Get the catalog](#71-get-the-catalog)
-        * [7.2 Initiate the contract negotiation](#72-initiate-the-contract-negotiation)
-        * [7.3 Query negotiation status](#73-query-negotiation-status)
-        * [7.4 Initiate data transfer](#74-initiate-data-transfer)
-        * [7.5 Query data transfers](#75-query-data-transfers)
-        * [7.6 Get EndpointDataReference](#76-get-endpointdatareference)
-        * [7.7 Get access token for EDR](#77-get-access-token-for-edr)
-        * [7.8 Fetch data](#78-fetch-data)
-    * [8. Custom extensions in MVD](#8-custom-extensions-in-mvd)
-        * [8.1 Catalog Node Resolver](#81-catalog-node-resolver)
-        * [8.2 Default scope mapping function](#82-default-scope-mapping-function)
-        * [8.3 Scope extractor for `DataProcessor` credentials](#83-scope-extractor-for-dataprocessor-credentials)
-        * [8.4 Policy evaluation functions](#84-policy-evaluation-functions)
-            * [8.4.1 Membership evaluation function](#841-membership-evaluation-function)
-            * [8.4.2 DataAccessLevel evaluation function](#842-dataaccesslevel-evaluation-function)
-        * [8.5 Super-user seeding](#85-super-user-seeding)
-    * [9. Advanced topics](#9-advanced-topics)
-        * [9.1 Regenerating issuer keys](#91-regenerating-issuer-keys)
-        * [9.2 Regenerating participant keys](#92-regenerating-participant-keys)
-            * [9.2.1 IntelliJ deployment:](#921-intellij-deployment)
-            * [9.2.2 Kubernetes deployment](#922-kubernetes-deployment)
-    * [10. Other caveats, shortcuts and workarounds](#10-other-caveats-shortcuts-and-workarounds)
-        * [10.1 In-memory stores in local deployment](#101-in-memory-stores-in-local-deployment)
-        * [10.2 DID resolution](#102-did-resolution)
-            * [10.2.1 `did:web` for participants](#1021-didweb-for-participants)
-            * [10.2.2 `did:web` for the dataspace issuer](#1022-didweb-for-the-dataspace-issuer)
-        * [10.3 Credential Issuance](#103-credential-issuance)
-        * [10.4 Default scope-to-criterion transformer](#104-default-scope-to-criterion-transformer)
+---
 
-<!-- TOC -->
+## Table of Contents
+
+1. [Introduction](#1-introduction)
+   - 1.1 [Purpose](#11-purpose)
+   - 1.2 [DECADE-X Context](#12-decade-x-context)
+   - 1.3 [Demo Scenario](#13-demo-scenario)
+2. [Architecture Overview](#2-architecture-overview)
+   - 2.1 [System Components](#21-system-components)
+   - 2.2 [Component Interaction Diagram](#22-component-interaction-diagram)
+   - 2.3 [Data Flow Architecture](#23-data-flow-architecture)
+   - 2.4 [Identity & Trust Framework](#24-identity--trust-framework)
+3. [Technical Components](#3-technical-components)
+   - 3.1 [Eclipse Dataspace Components (EDC)](#31-eclipse-dataspace-components-edc)
+   - 3.2 [IdentityHub & Decentralized Claims Protocol](#32-identityhub--decentralized-claims-protocol)
+   - 3.3 [Demo Application Components](#33-demo-application-components)
+4. [Deployment Manual](#4-deployment-manual)
+   - 4.1 [Prerequisites](#41-prerequisites)
+   - 4.2 [Phase 1: Infrastructure Setup](#42-phase-1-infrastructure-setup)
+   - 4.3 [Phase 2: Start Eclipse Dataspace Components](#43-phase-2-start-eclipse-dataspace-components)
+   - 4.4 [Phase 3: Seed Identities and Credentials](#44-phase-3-seed-identities-and-credentials)
+   - 4.5 [Phase 4: Deploy Demo Application](#45-phase-4-deploy-demo-application)
+   - 4.6 [Phase 5: Seed Aerospace Assets](#46-phase-5-seed-aerospace-assets)
+   - 4.7 [Verification Checklist](#47-verification-checklist)
+5. [User Manual](#5-user-manual)
+   - 5.1 [Accessing the Demo](#51-accessing-the-demo)
+   - 5.2 [Consumer Workflow (Airbus)](#52-consumer-workflow-airbus)
+   - 5.3 [Provider Workflow (Rolls-Royce)](#53-provider-workflow-rolls-royce)
+   - 5.4 [Understanding the DPP Data](#54-understanding-the-dpp-data)
+6. [Data Model Specification](#6-data-model-specification)
+   - 6.1 [Digital Product Passport Structure](#61-digital-product-passport-structure)
+   - 6.2 [EDC Asset Configuration](#62-edc-asset-configuration)
+   - 6.3 [Policy Definitions](#63-policy-definitions)
+7. [Credentials & Access Control](#7-credentials--access-control)
+   - 7.1 [Verifiable Credentials](#71-verifiable-credentials)
+   - 7.2 [Policy Evaluation Flow](#72-policy-evaluation-flow)
+8. [API Reference](#8-api-reference)
+   - 8.1 [EDC Management APIs](#81-edc-management-apis)
+   - 8.2 [DPP Backend APIs](#82-dpp-backend-apis)
+9. [Troubleshooting](#9-troubleshooting)
+10. [Future Extensions](#10-future-extensions)
+
+---
 
 ## 1. Introduction
 
-The Decentralized Claims Protocol defines a secure way how to participants in a dataspace can obtain, exchange and
-present credential information. In particular,
-the [DCP specification](https://github.com/eclipse-tractusx/identity-trust) defines the _Presentation Flow_, which is
-the process of requesting, presenting and verifying Verifiable Credentials and the _Credential Issuance Flow_, which is
-used to request and issue Verifiable Credentials to a dataspace participant.
+### 1.1 Purpose
 
-So in order to get the most out of this demo, a basic understanding of Verifiable Credentials, Verifiable Presentations,
-Decentralized Identifiers (DID) and cryptography is necessary. These concepts will not be explained here further.
+This demonstration showcases the secure, sovereign exchange of aerospace Digital Product Passports between industry participants using Eclipse Dataspace Components. It illustrates how OEMs and suppliers can share critical component data—including airworthiness certificates, sustainability metrics, and operational history—while maintaining full control over their data assets.
 
-The Decentralized Claims Protocol was adopted in the Eclipse Dataspace Components project and is currently implemented
-in modules pertaining to the [Connector](https://github.com/eclipse-edc/connector) as well as
-the [IdentityHub](https://github.com/eclipse-edc/IdentityHub).
+### 1.2 DECADE-X Context
 
-## 2. Purpose of this Demo
+DECADE-X (Decentralized European Collaborative Aerospace Data Exchange) represents a vision for a federated aerospace data ecosystem built on dataspace principles. This demo implements a key DECADE-X use case:
 
-This demo is to demonstrate how two dataspace participants can perform a credential exchange prior to a DSP message
-exchange, for example requesting a catalog or negotiating a contract.
+**Sovereign Data Exchange for Aerospace Supply Chain**
+- **Data Sovereignty**: Each participant maintains control over their data and access policies
+- **Interoperability**: Standardized protocols (DSP) enable seamless B2B data exchange
+- **Trust Framework**: Decentralized identity (DIDs) and Verifiable Credentials establish trust without central authorities
+- **Regulatory Compliance**: Supports EASA requirements for digital documentation and traceability
 
-It must be stated in the strongest terms that this is **NOT** a production grade installation, nor should any
-production-grade developments be based on it. [Shortcuts](#10-other-caveats-shortcuts-and-workarounds) were taken, and
-assumptions were made that are potentially invalid in other scenarios.
+### 1.3 Demo Scenario
 
-It merely is a playground for developers wanting to kick the tires in the EDC and DCP space, and its purpose is to
-demonstrate how DCP works to an otherwise unassuming audience.
+The demo simulates a real-world aerospace supply chain data exchange. This diagram shows how Rolls-Royce manufactures engine components and creates Digital Product Passports, which are then shared with Airbus via the Dataspace Protocol (DSP). Airbus integrates this data into their Skywise fleet management platform.
 
-### 2.1 Version stability and backwards compatibility guarantees
-
-It is important to understand that while we _do_ tag the git tree at certain times, the intention there is to provide
-stable builds for adopters and to avoid randomly breaking builds. MVD releases simply use _release_ versions of upstream
-components, as opposed to the `main` branch, which uses `-SNAPSHOT` versions. The latter case can occasionally lead to
-breaking builds.
-
-However, all of our development work in MVD targets the `main` branch. In other words, we do not backport bugfixes to
-older releases of MVD. If there is a bug or a new feature either in one of the upstream components or MVD, fixes will
-_always_ target `main` and will surface in one of the upcoming MVD releases.
-
-This is yet another reason why MVD should _never_ be used in production scenarios!
-
-Please also note that MVD does not publish any artifacts (Maven, Docker images, ...), adopters have to build from
-source.
-
-TL;DR - there are none. This is a _sample_ project, not a commercial product.
-
-### 2.2 Which version should I use?
-
-The repo's default branch is `main`, which serves as development branch and is checked out by default. If you don't do
-anything, then you'll get the absolute latest version of MVD. This is suitable for anyone who is okay with pulling
-frequently and with the occasional breakage. The upshot is that this branch will always contain the latest features and
-fixes of all upstream components.
-
-> We have monitoring systems im place that inform us about broken builds. No need to raise issues about this.
-
-More conservative developers may fall back
-to [releases of MVD](https://github.com/eclipse-edc/MinimumViableDataspace/releases) that use release versions of all
-upstream components. If this is you, then don't forget to check out the appropriate tag after cloning the repo.
-
-Either download the ZIP file and use sources therein, or check out the corresponding tag.
-
-An MVD release version is typically created shortly after a release of the upstream components was released.
-
-## 3. The Scenario
-
-_In this example, we will see how two companies can share data through federated catalogs using [Management
-Domains](https://github.com/eclipse-edc/Connector/blob/main/docs/developer/management-domains/management-domains.md)._
-
-### 3.1 Participants
-
-There are two fictitious companies, called "Provider Corp" and "Consumer Corp". "Consumer Corp" wants to consume data
-from "Provider Corp". Provider Corp has two departments "Q&A" and "Manufacturing". Both are independent and host their
-own EDC connectors, named "provider-qna" and "provider-manufacturing". Both are administered individually, but don't
-expose their data catalog directly to the internet.
-
-To make the catalogs available, Provider Corp also hosts a catalog server that is shared between the catalog server,
-"provider-qna"" and "provider-manufacturing".
-
-Both Consumer Corp and Provider Corp each operate an IdentityHub. Note that on the provider side, three runtimes
-share the same `participantId`, and thus, the same set of credentials, and by extension, the same identity. So the
-IdentityHub represents "identities" rather than individual runtimes. A catalog server is a stripped-down EDC runtime,
-that only contains modules for servicing catalog requests.
-
-Consumer Corp has a connector plus its own IdentityHub.
-
-![](./resources/participants.png)
-
-### 3.2 Data setup
-
-"provider-qna" and "provider-manufacturing" both have two data assets each, named `"asset-1"` and `"asset-2"` but
-neither "provider-qna" nor "provider-manufacturing" expose their catalog endpoint directly to the internet. Instead, the
-catalog server (of the Provider Corp) provides a catalog that contains special assets (think: pointers) to both "
-provider-qna"'s and "provider-manufacturing"'s connectors, specifically, their DSP endpoints.
-
-We call this a "root catalog", and the pointers are called "catalog assets". This means, that by resolving the root
-catalog, and by following the links therein, "Consumer Corp" can resolve the actual asset from "provider-qna" and
-"provider-manufacturing".
-
-![](./resources/data_setup.png)
-
-Linked assets, or `CatalogAsset` objects are easily recognizable by the `"isCatalog": true` property. They do not
-contain any metadata, only a link to service URL, where the actual asset is available.
-
-Note that the consumer connector does not contain any data assets in this scenario.
-
-### 3.3 Access control
-
-In this fictitious dataspace there are two types of VerifiableCredentials:
-
-- `MembershipCredential`: contains information about the holder's membership in the dataspace as well as some holder
-  information
-- `DataProcessorCredential`: contains the version of the "Data Organization and Processing Edict (DOPE)" the holder has
-  signed and it attests to the "ability of the holder to process data at a certain level". The following levels exist:
-    - `"processing"`: means, the holder can process non-sensitive data
-    - `"sensitive"`: means, the holder has undergone "some very highly secure vetting process" and can process sensitive
-      data
-
-  The information about the level of data a holder can process is stored in the `credentialSubject` of the
-  DataProcessorCredential.
-
-Both assets of "provider-qna" and "provider-manufacturing" have some access restrictions on their assets:
-
-- `asset-1`: requires a MembershipCredential to view and a DataProcessorCredential with `"level": "processing"` to
-  negotiate a contract and transfer data
-- `asset-2`: requires a MembershipCredential to view and a DataProcessorCredential with a `"level": "sensitive"` to
-  negotiate a contract
-
-These requirements are formulated as EDC policies:
-
-```json
-{
-  "policy": {
-    "@type": "Set",
-    "obligation": [
-      {
-        "action": "use",
-        "constraint": {
-          "leftOperand": "DataAccess.level",
-          "operator": "eq",
-          "rightOperand": "processing"
-        }
-      }
-    ]
-  }
-}
+```mermaid
+flowchart LR
+    subgraph Provider["Rolls-Royce - Provider"]
+        RR["Engine OEM"]
+        DPP["Digital Product Passports"]
+    end
+    
+    subgraph Consumer["Airbus - Consumer"]
+        AB["Airframe OEM"]
+        SKY["Skywise Platform"]
+    end
+    
+    RR --> |"Manufactures"| DPP
+    DPP --> |"DSP"| AB
+    AB --> |"Integrates"| SKY
 ```
 
-In addition, it is a dataspace rule that the `MembershipCredential` must be presented in _every_ DSP request. This
-credential attests that the holder is a member of the dataspace.
+**Participants:**
+- **Rolls-Royce** (Provider): Manufactures Trent XWB engine components and provides Digital Product Passports
+- **Airbus** (Consumer): Procures engine components and requires DPP data for fleet management
 
-All participants of the dataspace are in possession of the `MembershipCredential` as well as a `DataProcessorCredential`
-with level `"processing"`.
+**Data Exchanged:**
+- Airworthiness certificates (EASA Form 1)
+- Product Carbon Footprint (PCF) data
+- Operational metrics (flight hours, cycles)
+- Technical specifications
 
-> None possess the `DataProcessorCredential` with level="sensitive".
+---
 
-That means that no contract for `asset-2` can be negotiated by anyone. For the purposes of this demo the
-VerifiableCredentials are pre-created and are seeded directly to the participants' credential storage ([no
-issuance](#103-no-issuance-yet)) via a dedicated
-[extension](launchers/identity-hub/src/main/java/org/eclipse/edc/demo/dcp/ih/IdentityHubExtension.java).
+## 2. Architecture Overview
 
-When the consumer wants to inspect the consolidated catalog (containing assets from both the provider's Q&A and
-manufacturing departments), then negotiate a contract for an asset, and then transfer the asset, several credentials
-need to be presented:
+### 2.1 System Components
 
-- catalog request: present `MembershipCredential`
-- contract negotiation: `MembershipCredential` and `DataProcessorCredential(level=processing)` or
-  `DataProcessorCredential(level=sensitive)`, respectively
-- transfer process: `MembershipCredential`
+The demo architecture consists of three layers. The Presentation Layer contains the React frontend, the Dataspace Layer hosts the EDC connectors and IdentityHubs for both Consumer (Airbus) and Provider (Rolls-Royce), plus a Trust Anchor with the Issuer Service. The Data Layer contains the DPP Backend that serves the actual product passport data.
 
-### 3.4 DIDs, participant lists and VerifiableCredentials
+```mermaid
+flowchart TB
+    subgraph Presentation["Presentation Layer"]
+        FE["React Frontend :3000"]
+    end
+    
+    subgraph Dataspace["Dataspace Layer - MVD"]
+        subgraph Consumer["Consumer - Airbus"]
+            CC["Consumer Controlplane :8081"]
+            CD["Consumer Dataplane :11001"]
+            CIH["Consumer IdentityHub :7082"]
+        end
+        
+        subgraph Provider["Provider - Rolls-Royce"]
+            PC["Provider Controlplane :8191"]
+            PD["Provider Dataplane :11002"]
+            PIH["Provider IdentityHub :7092"]
+        end
+        
+        subgraph Trust["Trust Anchor"]
+            ISS["Issuer Service :10016"]
+            NGINX["DID Server :9876"]
+        end
+    end
+    
+    subgraph Data["Data Layer"]
+        BE["DPP Backend :3001"]
+    end
+    
+    FE --> CC
+    FE --> PC
+    CC <--> |DSP| PC
+    CC --> CIH
+    PC --> PIH
+    CIH --> ISS
+    PIH --> ISS
+    PC --> BE
+```
 
-Participant Identifiers in MVD are Web-DIDs. They are used to identify the holder of a VC, to reference public key
-material and to tell the FederatedCatalog Crawlers whom to crawl. DID documents contain important endpoint information,
-namely the connector's DSP endpoint and it's CredentialService endpoint. That means that all relevant information about
-participants can be gathered simply by resolving and inspecting its DID document.
+### 2.2 Component Interaction Diagram
 
-One caveat is that with `did:web` DIDs there is a direct coupling between the identifier and the URL. The `did:web:xyz`
-identifier directly translates to the URL where the document is resolvable.
+The following diagram shows the complete data exchange flow. It illustrates the three main phases: Catalog Discovery (where credentials are verified to access the catalog), Contract Negotiation (where policies are evaluated against presented credentials), and Data Transfer (where the actual DPP data is fetched using the negotiated access token).
 
-In the context of MVD this means that different DIDs have to be used when running from within IntelliJ versus running in
-Kubernetes, since the URLs are different. As a consequence, for every VerifiableCredential there are two variants, one
-that contains the "localhost" DID and one that contains the DID with the Kubernetes service URL. Also, the participant
-lists are different between those two.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as Airbus User
+    participant FE as Frontend
+    participant CC as Consumer<br/>Controlplane
+    participant CIH as Consumer<br/>IdentityHub
+    participant PIH as Provider<br/>IdentityHub
+    participant PC as Provider<br/>Controlplane
+    participant PD as Provider<br/>Dataplane
+    participant BE as DPP Backend
+    participant ISS as Issuer Service
 
-## 4. Running the demo (inside IntelliJ)
+    Note over User,ISS: Phase 1: Catalog Discovery
+    User->>FE: Browse Catalog
+    FE->>CC: POST /catalog/request
+    CC->>CIH: Get Credentials
+    CIH-->>CC: MembershipCredential VP
+    CC->>PC: DSP: CatalogRequest + VP
+    PC->>PIH: Verify Credential
+    PIH-->>PC: Credential Valid
+    PC-->>CC: Catalog Response
+    CC-->>FE: Asset List
+    FE-->>User: Display DPP Assets
 
-> Please note that due to the way how Windows handles file paths, running the IntelliJ Run Configs on Windows can
-> sometimes cause problems. We recommend either running this from within WSL or on a Linux machine. Alternatively, paths
-> could be corrected manually. Running MVD natively on Windows is not supported!
+    Note over User,ISS: Phase 2: Contract Negotiation
+    User->>FE: Select Asset
+    FE->>CC: POST /contractnegotiations
+    CC->>CIH: Get DataProcessor Credential
+    CIH-->>CC: DataProcessorCredential VP
+    CC->>PC: DSP: ContractRequest + VP
+    PC->>PIH: Evaluate Policy
+    PIH->>ISS: Verify Credential Chain
+    ISS-->>PIH: Valid
+    PIH-->>PC: Policy Satisfied
+    PC-->>CC: ContractAgreement
+    CC-->>FE: Negotiation Complete
 
-There are several run configurations for IntelliJ in the `.run/` folder. One each for the consumer and provider
-connectors runtimes and IdentityHub runtimes plus one for the provider catalog server, and one named "dataspace". The
-latter is a compound run config an brings up all other runtimes together.
+    Note over User,ISS: Phase 3: Data Transfer
+    User->>FE: Request Transfer
+    FE->>CC: POST /transferprocesses
+    CC->>PC: DSP: TransferRequest
+    PC-->>CC: EndpointDataReference (EDR)
+    CC-->>FE: EDR with Token
+    FE->>PD: GET /public + Token
+    PD->>BE: Fetch DPP Data
+    BE-->>PD: JSON-LD DPP
+    PD-->>FE: DPP Data
+    FE-->>User: Display DPP Viewer
+```
 
-### 4.1 Start NGINX
+### 2.3 Data Flow Architecture
 
-The issuer's DID document is hosted on NGINX, so the easiest way of running NGINX is with a docker container:
+This diagram shows how DPP data flows from source systems to consumers. External data sources (ERP, MES, PLM) feed into the DPP Backend where data is aggregated and serialized to JSON-LD. The Eclipse Dataspace manages assets, policies, and transfers, ultimately delivering the data to the Consumer's catalog browser and DPP viewer.
 
-```shell
+```mermaid
+flowchart LR
+    subgraph External["External Data Sources"]
+        ERP["ERP Systems"]
+        MES["Manufacturing Execution"]
+        PLM["PLM Systems"]
+    end
+    
+    subgraph Backend["DPP Backend"]
+        AGG["Data Aggregator"]
+        JSONLD["JSON-LD Serializer"]
+    end
+    
+    subgraph EDC["Eclipse Dataspace"]
+        ASSET["Asset Registry"]
+        POLICY["Policy Engine"]
+        TRANSFER["Transfer Manager"]
+    end
+    
+    subgraph Consumer["Consumer Systems"]
+        CATALOG["Catalog Browser"]
+        VIEWER["DPP Viewer"]
+    end
+    
+    ERP --> AGG
+    MES --> AGG
+    PLM --> AGG
+    AGG --> JSONLD
+    JSONLD --> ASSET
+    ASSET --> POLICY
+    POLICY --> TRANSFER
+    TRANSFER --> CATALOG
+    CATALOG --> VIEWER
+```
+
+### 2.4 Identity & Trust Framework
+
+This diagram illustrates the decentralized identity infrastructure. The Issuer DID issues Verifiable Credentials (MembershipCredential and DataProcessorCredential) to both Consumer and Provider. These credentials are stored in the respective IdentityHubs and presented during DSP message exchanges to prove authorization.
+
+```mermaid
+flowchart TB
+    subgraph DID["Decentralized Identifiers"]
+        CDID["Consumer DID"]
+        PDID["Provider DID"]
+        IDID["Issuer DID"]
+    end
+    
+    subgraph VC["Verifiable Credentials"]
+        MC["MembershipCredential"]
+        DPC["DataProcessorCredential"]
+    end
+    
+    subgraph IH["IdentityHubs"]
+        CIH["Consumer IdentityHub"]
+        PIH["Provider IdentityHub"]
+    end
+    
+    IDID --> |issues| MC
+    IDID --> |issues| DPC
+    MC --> CIH
+    MC --> PIH
+    DPC --> CIH
+    DPC --> PIH
+    CDID --> CIH
+    PDID --> PIH
+```
+
+---
+
+## 3. Technical Components
+
+### 3.1 Eclipse Dataspace Components (EDC)
+
+The EDC provides the core dataspace functionality:
+
+**Controlplane** - Handles protocol messages, contract negotiation, and policy enforcement
+- Consumer Controlplane: `http://localhost:8081`
+- Provider QNA Controlplane: `http://localhost:8191`
+
+**Dataplane** - Executes actual data transfers
+- Consumer Dataplane: `http://localhost:11001`
+- Provider QNA Dataplane: `http://localhost:11002`
+
+**Catalog Server** - Federated catalog for asset discovery
+- Provider Catalog Server: `http://localhost:8091`
+
+### 3.2 IdentityHub & Decentralized Claims Protocol
+
+The IdentityHub manages participant identities and credentials:
+
+**Consumer IdentityHub**: `http://localhost:7082`
+- Stores Consumer's DID document
+- Holds MembershipCredential and DataProcessorCredential
+- Issues Verifiable Presentations for DSP messages
+
+**Provider IdentityHub**: `http://localhost:7092`
+- Stores Provider's DID document
+- Verifies incoming credential presentations
+- Manages provider's own credentials
+
+**Issuer Service**: `http://localhost:10016`
+- Trusted third party issuing credentials
+- Signs credentials with issuer's private key
+- DID: `did:web:localhost%3A9876:issuer`
+
+### 3.3 Demo Application Components
+
+**Frontend** (React/TypeScript)
+- URL: `http://localhost:3000`
+- Features: Catalog browser, contract negotiation UI, DPP viewer
+- Technology: Vite, React 18, TailwindCSS
+
+**DPP Backend** (Node.js/Express)
+- URL: `http://localhost:3001`
+- Serves mock DPP data in JSON-LD format
+- Simulates Rolls-Royce internal systems
+
+---
+
+## 4. Deployment Manual
+
+### 4.1 Prerequisites
+
+Ensure the following are installed:
+
+| Software | Version | Purpose |
+|----------|---------|--------|
+| Java | 17+ (temurin-22 recommended) | EDC runtimes |
+| Node.js | 18+ or 20+ | Frontend & backend |
+| Docker | Latest | Container runtime |
+| Docker Compose | Latest | Container orchestration |
+| Newman | Latest | Postman CLI for seeding |
+| jq | Latest | JSON processing |
+| IntelliJ IDEA | 2023+ (recommended) | IDE with run configurations |
+
+**Install Newman (if not present):**
+```bash
+npm install -g newman
+```
+
+### 4.2 Phase 1: Infrastructure Setup
+
+**Step 1.1: Clone and Build MVD**
+```bash
+cd /path/to/MinimumViableDataspace
+./gradlew build
+```
+
+**Step 1.2: Start NGINX for Issuer DID Document**
+
+The issuer's DID document must be accessible via HTTP:
+
+```bash
 docker run -d --name nginx -p 9876:80 --rm \
   -v "$PWD"/deployment/assets/issuer/nginx.conf:/etc/nginx/nginx.conf:ro \
   -v "$PWD"/deployment/assets/issuer/did.docker.json:/var/www/.well-known/did.json:ro \
   nginx
 ```
 
-To verify that it worked, please execute `curl -X GET http://localhost:9876/.well-known/did.json` and see if it returns
-a
-DID document as JSON structure:
+**Verify:** `curl http://localhost:9876/.well-known/did.json` should return the issuer's DID document.
 
-```json
-{
-  "service": [],
-  "verificationMethod": [
-    {
-      "id": "did:web:localhost%3A9876#key-1",
-      "type": "JsonWebKey2020",
-      "controller": "did:web:localhost%3A9876",
-      "publicKeyMultibase": null,
-      "publicKeyJwk": {
-        "kty": "OKP",
-        "crv": "Ed25519",
-        "x": "Hsq2QXPbbsU7j6JwXstbpxGSgliI04g_fU3z2nwkuVc"
-      }
-    }
-  ],
-  "authentication": [
-    "key-1"
-  ],
-  "id": "did:web:localhost%3A9876",
-  "@context": [
-    "https://www.w3.org/ns/did/v1",
-    {
-      "@base": "did:web:localhost%3A9876"
-    }
-  ]
-}
-```
+### 4.3 Phase 2: Start Eclipse Dataspace Components
 
-The port mapping is **important**, because it influences the DID of the issuer: with a host port of
-`9876` the issuer DID resolves to `did:web:localhost%3A9876`. Changing the port mapping changes the DID, soif you change
-the port mapping, be sure to execute a search-and-replace!
+**Option A: IntelliJ IDEA (Recommended for Development)**
 
-Naturally, you are free to install NGINX natively on your computer or use any other webserver altogether, but this won't
-be supported by us.
+1. Open the project in IntelliJ IDEA
+2. Navigate to `.run/` directory
+3. Run the `dataspace` compound run configuration
+4. Wait for all 8 runtimes to start: consumer, consumer-identityhub, provider-qna, provider-manufacturing, provider-catalog-server, provider-identityhub, issuerservice
 
-### 4.2 Starting the runtimes
+**Option B: Kubernetes (Production-like)**
 
-The connector runtimes contain both the controlplane and the dataplane. Note that in a real-world scenario those would
-likely be separate runtimes to be able to scale and deploy them individually. Note also, that the Kubernetes deployment
-(next chapter) does indeed run them as separate pods.
-
-The run configs use the `temurin-22` JDK. If you don't have it installed already, you can choose to install it (IntelliJ
-makes this really easy), or to select whatever JDK you have available in each run config.
-
-All run configs take their configuration from `*.env` files which are located in `deployment/assets/env`.
-
-### 4.3 Seeding the dataspace
-
-DID documents are dynamically generated when "seeding" the data, specifically when creating the `ParticipantContext`
-objects in IdentityHub. This is automatically being done by a script `seed.sh`.
-
-After executing the `dataspace` run config in Intellij, be sure to **execute the `seed.sh` script after all the runtimes
-have started**. Omitting to do so will leave the dataspace in an uninitialized state and cause all
-connector-to-connector communication to fail.
-
-### 4.4 Next steps
-
-All REST requests made from the script are available in the [Postman
-collection](./deployment/postman/MVD.postman_collection.json). With the [HTTP
-Client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) and [Import from Postman
-Collections](https://plugins.jetbrains.com/plugin/22438-import-from-postman-collections) plugins, the Postman collection
-can be imported and then executed by means of the [environment file](./deployment/postman/http-client.env.json),
-selecting the "Local" environment.
-
-Please read [chapter 7](#7-executing-rest-requests-using-postman) for details.
-
-## 5. Running the Demo (Kubernetes)
-
-For this section a basic understanding of Kubernetes, Docker, Gradle and Terraform is required. It is assumed that the
-following tools are installed and readily available:
-
-- Docker
-- KinD (other cluster engines may work as well - not tested!)
-- Terraform
-- JDK 17+
-- Git
-- a POSIX compliant shell
-- Postman (to comfortably execute REST requests)
-- `openssl`, optional, but required to [regenerate keys](#91-regenerating-issuer-keys)
-- `newman` (to run Postman collections from the command line)
-- not needed, but recommended: Kubernetes monitoring tools like K9s
-
-All commands are executed from the **repository's root folder** unless stated otherwise via `cd` commands.
-
-> Since this is not a production deployment, all applications are deployed _in the same cluster_ and in the same
-> namespace, plainly for the sake of simplicity.
-
-### 5.1 Build the runtime images
-
-```shell
-./gradlew build
+```bash
+# Build with persistence
+./gradlew -Ppersistence=true build
 ./gradlew -Ppersistence=true dockerize
-```
 
-this builds the runtime images and creates the following docker images: `controlplane:latest`, `dataplane:latest`,
-`catalog-server:latest` and `identity-hub:latest` in the local docker image cache. Note the `-Ppersistence` flag which
-puts the HashiCorp Vault module and PostgreSQL persistence modules on the runtime classpath.
-
-> This demo will not work properly, if the `-Ppersistence=true` flag is omitted!
-
-PostgreSQL and Hashicorp Vault obviously require additional configuration, which is handled by the Terraform scripts.
-
-### 5.2 Create the K8S cluster
-
-After the runtime images are built, we bring up and configure the Kubernetes cluster. We are using KinD here, but this
-should work similarly well on other cluster runtimes, such as MicroK8s, K3s or Minikube. Please refer to the respective
-documentation for more information.
-
-```shell
-# Create the cluster
+# Create KinD cluster
 kind create cluster -n mvd --config deployment/kind.config.yaml
 
-# Load docker images into KinD
-kind load docker-image controlplane:latest dataplane:latest identity-hub:latest catalog-server:latest issuerservice:latest -n mvd
+# Load images
+kind load docker-image controlplane:latest dataplane:latest \
+  identity-hub:latest catalog-server:latest issuerservice:latest -n mvd
 
-# Deploy an NGINX ingress
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-
-# Wait for the ingress controller to become available
-kubectl wait --namespace ingress-nginx \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/component=controller \
-  --timeout=90s
-
-# Deploy the dataspace, type 'yes' when prompted
+# Deploy with Terraform
 cd deployment
 terraform init
 terraform apply
 ```
 
-Once Terraform has completed the deployment, type `kubectl get pods` and verify the output:
+**Verify EDC is running:**
+```bash
+# Consumer health check
+curl http://localhost:8081/api/check/health
 
-```shell
-❯ kubectl get pods --namespace mvd
-NAME                                                  READY   STATUS    RESTARTS   AGE
-consumer-controlplane-5854f6f4d7-pk4lm                1/1     Running   0          24s
-consumer-dataplane-64c59668fb-w66vz                   1/1     Running   0          17s
-consumer-identityhub-57465876c5-9hdhj                 1/1     Running   0          24s
-consumer-postgres-6978d86b59-8zbps                    1/1     Running   0          40s
-consumer-vault-0                                      1/1     Running   0          37s
-provider-catalog-server-7f78cf6875-bxc5p              1/1     Running   0          24s
-provider-identityhub-f9d8d4446-nz7k7                  1/1     Running   0          24s
-provider-manufacturing-controlplane-d74946b69-rdqnz   1/1     Running   0          24s
-provider-manufacturing-dataplane-546956b4f8-hkx85     1/1     Running   0          17s
-provider-postgres-75d64bb9fc-drf84                    1/1     Running   0          40s
-provider-qna-controlplane-6cd65bf6f7-fpt7h            1/1     Running   0          24s
-provider-qna-dataplane-5dc5fc4c7d-k4qh4               1/1     Running   0          17s
-provider-vault-0                                      1/1     Running   0          36s
+# Provider health check  
+curl http://localhost:8191/api/check/health
 ```
 
-The consumer company has a controlplane, a dataplane, an IdentityHub, a postgres database and a vault to store secrets.
-The provider company has a catalog server, a "provider-qna" and a "provider-manufacturing" controlplane/dataplane combo
-plus an IdentityHub, a postgres database and a vault.
+### 4.4 Phase 3: Seed Identities and Credentials
 
-It is possible that pods need to restart a number of time before the cluster becomes stable. This is normal and
-expected. If pods _don't_ come up after a reasonable amount of time, it is time to look at the logs and investigate.
+This critical step creates participant contexts in the IdentityHubs and issues Verifiable Credentials.
 
-Remote Debugging is possible, but Kubernetes port-forwards are necessary.
-
-### 5.3 Seed the dataspace
-
-Once all the deployments are up-and-running, the seed script needs to be executed which should produce command line
-output similar to this:
-
-```shell
-./seed-k8s.sh
-
-
-Seed data to "provider-qna" and "provider-manufacturing"
-(node:545000) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-(node:545154) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-
-
-Create linked assets on the Catalog Server
-(node:545270) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-
-
-Create consumer participant
-ZGlkOndlYjphbGljZS1pZGVudGl0eWh1YiUzQTcwODM6YWxpY2U=.KPHR02XRnn+uT7vrpCIu8jJUADTBHKrterGq0PZTRJgzbzvgCXINcMWM3WBraG0aV/NxdJdl3RH3cqgyt+b5Lg==
-
-Create provider participant
-ZGlkOndlYjpib2ItaWRlbnRpdHlodWIlM0E3MDgzOmJvYg==.wBgVb44W6oi3lXlmeYsH6Xt3FAVO1g295W734jivUo5PKop6fpFsdXO4vC9D4I0WvqfB/cARJ+FVjjyFSIewew==%
+```bash
+./seed.sh
 ```
 
-_the `node` warnings are harmless and can be ignored_
+**What seed.sh does:**
 
-> Failing to run the seed script will leave the dataspace in an uninitialized state and cause all connector-to-connector
-> communication to fail.
->
+This diagram shows the six steps executed by the seed script. It seeds test assets and catalog links, creates participant contexts for Consumer and Provider in their IdentityHubs, registers the Issuer, and finally issues the required credentials to both participants.
 
-### 5.4 JVM crashes with `SIGILL` on ARM platforms
-
-We have noticed, that the JVM inside the Docker container sometimes crashes with a `SIGILL` signal right
-away without even starting the runtime. So far we've only seen this on ARM platforms such as Apple Silicon. The `UseSVE`
-option seems to [mitigate this](https://github.com/corretto/corretto-21/issues/85). If you are affected by this, please
-try enabling the `useSVE` switch:
-
-```
-terraform apply -var="useSVE=true"
-```
-
-This will add the `-XX:UseSVE=0` switch to the `JAVA_TOOL_OPTIONS` in all runtimes, enabling the Scalable Vector
-Extensions that are available on ARM processors. Alternatively, you can also set the `useSVE = true` variable in a
-`*.tfvars` file, cf. [documentation](https://developer.hashicorp.com/terraform/language/values/variables).
-
-_Important note: on non-ARM platforms, the `-XX:UseSVE=0` VM option is not recognized and will crash the JVM!_
-
-### 5.5 Debugging MVD in Kubernetes
-
-All of MVD's runtime images come with remote JVM debugging enabled by default. This is configured by setting an
-environment variable
-
-```
-JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=<DEBUG_PORT>"
+```mermaid
+flowchart TB
+    subgraph Seed["seed.sh Execution"]
+        S1[Seed Assets]
+        S2[Seed Catalog Links]
+        S3[Create Consumer Context]
+        S4[Create Provider Context]
+        S5[Create Issuer]
+        S6[Issue Credentials]
+    end
+    
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    
+    subgraph Result["Result"]
+        R1[Consumer DID + Credentials]
+        R2[Provider DID + Credentials]
+    end
+    
+    S6 --> R1
+    S6 --> R2
 ```
 
-All runtimes use port **1044** for debugging, unless configured otherwise in terraform. The only thing left to do for
-you is to create a Kubernetes port-forwarding:
-
-```shell
-kubectl port-forward -n mvd service/consumer-controlplane 1044:1044
+**Expected Output:**
+```
+Create consumer participant context in IdentityHub
+Create provider participant context in IdentityHub
+Create dataspace issuer
 ```
 
-This assumes the default Kubernetes namespace `mvd`. Note that the port-forward targets a `service` to have it
-consistent across pod restarts, but targeting a specific pod is also possible. Please refer to the official
-documentation for details.
-
-The host port (the value after the `:`) is completely arbitrary, and should be altered if multiple runtimes are debugged
-in parallel.
-
-When creating a "Remote JVM Debug" run configuration in IntelliJ it is important to select the appropriate module
-classpath. Those are generally located in the `launchers/` directory.
-
-Please also refer to the [official IntelliJ tutorial](https://www.jetbrains.com/help/idea/tutorial-remote-debug.html) on
-how to do remote debugging.
-
-## 6. Differences between Kubernetes and IntelliJ
-
-The focus with the Kubernetes deployment is to achieve a "one-click-deployment" (don't count them, it's more than 1)
-with minimum hassle for people who don't necessarily have developer tools installed on their computers. Conversely, the
-deployment with IntelliJ is intended to give developers an easy way to debug and trace the code base, and to extend and
-play with MVD without having to do the entire rebuild-docker-image-redeploy loop every time. Also, debugging is much
-easier.
-
-However, to keep the IntelliJ setup as simple as possible, a few shortcuts were taken:
-
-### 6.1 In-memory databases
-
-No persistent storage is available, because that would have meant manually setting up and
-populating several PostgreSQL databases. Everytime a runtime (re-)starts, it starts with a clean slate. This can cause
-some inconsistencies, e.g. when consumer and provider have negotiated a contract, and the provider restarts, the
-contract will be missing from its database. Keep that in mind. It is recommended to always restart the _entire_
-dataspace with the included composite run config.
-
-### 6.2 Memory-based secret vaults
-
-This is the big one. Since the memory-vault is compiled into the runtime, components of one
-participant (e.g. controlplane and identityhub) _do not share_ vault secrets, because their vaults are different. Thus,
-all secrets that need to be accessed by multiple components must be pre-populated.
-
-### 6.3 Embedded vs Remote STS
-
-While in the Kubernetes deployment the SecureTokenService (S)S is a stand-alone component, in the IntelliJ
-deployment it is embedded into the controlplane. The reason for this is, that during seeding a participant context and
-an STS Account is created. This includes a (generated) client secret, that gets stored in the vault.
-
-In the IntelliJ case that vault is purely in-memory and is isolated in IdentityHub, with no way to access it from the
-connector's controlplane. So the connector's controlplane and IdentityHub physically cannot share any secrets. To
-overcome this, STS is simply embedded in the controlplane directly.
-
-In the Kubernetes deployment this limitation goes away, because a dedicated vault service (HashiCorp Vault) is used,
-which is accessible from either component.
-
-## 7. Executing REST requests using Postman
-
-This demo comes with a Postman collection located in `deployment/postman`. Be aware that the collection has different
-sets of variables in different environments, "MVD local development" and "MVD K8S". These are located in the same
-directory and must be imported into Postman too.
-
-The collection itself is pretty self-explanatory, it allows you to request a catalog, perform a contract negotiation and
-execute a data transfer.
-
-The following sequence must be observed:
-
-### 7.1 Get the catalog
-
-to get the dataspace catalog across all participants, execute `ControlPlane Management/Get Cached Catalog`. Note that it
-takes a few seconds for the consumer connector to collect all entries. Watch out for a dataset entry named `asset-1`
-similar to this:
-
-```json
-                  {
-  "@id": "asset-1",
-  "@type": "dcat:Dataset",
-  "odrl:hasPolicy": {
-    "@id": "bWVtYmVyLWFuZC1wY2YtZGVm:YXNzZXQtMQ==:MThhNTgwMzEtNjE3Zi00N2U2LWFlNjMtMTlkZmZlMjA5NDE4",
-    "@type": "odrl:Offer",
-    "odrl:permission": [],
-    "odrl:prohibition": [],
-    "odrl:obligation": {
-      "odrl:action": {
-        "@id": "use"
-      },
-      "odrl:constraint": {
-        "odrl:leftOperand": {
-          "@id": "DataAccess.level"
-        },
-        "odrl:operator": {
-          "@id": "odrl:eq"
-        },
-        "odrl:rightOperand": "processing"
-      }
-    }
-  },
-  "dcat:distribution": [
-    //...
-  ],
-  "description": "This asset requires Membership to view and negotiate.",
-  "id": "asset-1"
-},
+**Verify credentials were issued:**
+```bash
+# Check consumer credentials
+curl -s http://localhost:7082/api/identity/v1alpha/participants/ \
+  -H "x-api-key: c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo=" | jq
 ```
 
-for the purposes of this tutorial we'll focus on the offers from the Provider's Q&A department, so the associated
-service entry should be:
+### 4.5 Phase 4: Deploy Demo Application
+
+**Step 4.1: Start DPP Backend**
+
+```bash
+cd backend-mock
+npm install
+npm run dev
+```
+
+The backend starts on port 3001 and serves DPP data.
+
+**Verify:** `curl http://localhost:3001/health`
+
+**Step 4.2: Start Frontend**
+
+**Option A: Development Mode**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**Option B: Docker Compose**
+```bash
+docker-compose -f docker-compose.aerospace.yml up --build
+```
+
+This starts both the frontend (port 3000) and backend (port 3001).
+
+### 4.6 Phase 5: Seed Aerospace Assets
+
+After the dataspace is running and seeded, add the aerospace-specific assets:
+
+```bash
+# For local development
+DPP_BACKEND_URL=http://localhost:3001 ./seed-aerospace.sh
+
+# For Docker deployment
+DPP_BACKEND_URL=http://host.docker.internal:3001 ./seed-aerospace.sh
+```
+
+**What seed-aerospace.sh creates:**
+
+| Entity | ID | Description |
+|--------|-----|-------------|
+| Asset | `asset:propulsion:blade:98765` | HPT Blade DPP |
+| Asset | `asset:propulsion:blade:98766` | Compressor Blade DPP |
+| Asset | `asset:propulsion:combustor:98767` | Combustor Liner DPP |
+| Policy | `aerospace-membership-required` | Requires MembershipCredential |
+| Policy | `aerospace-dpp-access` | Requires DataProcessorCredential |
+| Contract | `aerospace-dpp-contract` | Links assets to policies |
+
+### 4.7 Verification Checklist
+
+Use this checklist to verify the deployment:
+
+| Check | Command | Expected Result |
+|-------|---------|----------------|
+| NGINX running | `curl http://localhost:9876/.well-known/did.json` | DID document JSON |
+| Consumer EDC | `curl http://localhost:8081/api/check/health` | `{"isSystemHealthy":true}` |
+| Provider EDC | `curl http://localhost:8191/api/check/health` | `{"isSystemHealthy":true}` |
+| DPP Backend | `curl http://localhost:3001/health` | `{"status":"healthy"}` |
+| Frontend | Open `http://localhost:3000` | React app loads |
+| Catalog Query | See API test below | Assets returned |
+
+**Test Catalog Query:**
+```bash
+curl -X POST http://localhost:8081/api/catalog/v1alpha/catalog/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "@context": {"edc": "https://w3id.org/edc/v0.0.1/ns/"},
+    "@type": "QuerySpec"
+  }'
+```
+
+---
+
+## 5. User Manual
+
+### 5.1 Accessing the Demo
+
+Open your browser and navigate to: **http://localhost:3000**
+
+The interface allows switching between Consumer (Airbus) and Provider (Rolls-Royce) perspectives.
+
+### 5.2 Consumer Workflow (Airbus)
+
+This diagram shows the six-step workflow for consuming DPP data. Users select their role, browse the provider's catalog, select an asset, negotiate a contract based on their credentials, initiate the data transfer, and finally view the complete Digital Product Passport.
+
+```mermaid
+flowchart LR
+    A[Select Role]
+    B --> C[Select Asset]
+    C --> D[Negotiate]
+    D --> E[Transfer]
+    E --> F[View DPP]
+```
+
+**Step 1: Select Consumer Role**
+- Click "Consumer (Airbus)" in the role switcher
+- The interface shows the consumer perspective
+
+**Step 2: Browse Catalog**
+- Click "Refresh Catalog" to fetch available DPPs
+- The catalog shows assets from Rolls-Royce
+- Each asset displays: Name, Part Type, Serial Number
+
+**Step 3: Select Asset**
+- Click on an asset card to select it
+- View asset details including description and properties
+
+**Step 4: Negotiate Contract**
+
+Click "Negotiate Contract". The system automatically requests the asset's policy, presents required credentials (MembershipCredential, DataProcessorCredential), and completes the negotiation. Wait for status: "FINALIZED".
+
+**Step 5: Transfer Data**
+
+Click "Start Transfer". The system initiates an HTTP-PULL transfer, receives an Endpoint Data Reference (EDR), and fetches the DPP data. Wait for status: "STARTED".
+
+**Step 6: View DPP**
+
+The Digital Product Passport is displayed. Navigate through sections: **Identity** (Part number, serial number, manufacturer), **Airworthiness** (EASA Form 1 status, certifications), **Sustainability** (PCF value, material composition), **Operational** (Flight hours, cycles), and **Technical** (Specifications, dimensions).
+
+### 5.3 Provider Workflow (Rolls-Royce)
+
+**Step 1: Select Provider Role**
+- Click "Provider (Rolls-Royce)" in the role switcher
+
+**Step 2: View Registered Assets**
+- See all DPP assets registered in the provider's EDC
+- View asset metadata and data addresses
+
+**Step 3: Monitor Activity**
+- Check the backend logs for incoming requests:
+  ```bash
+  docker logs dpp-backend -f
+  ```
+
+### 5.4 Understanding the DPP Data
+
+The Digital Product Passport contains structured data following aerospace standards:
+
+**Identity Node** - Part identification per ATA Spec 2000
+- Manufacturer Name, CAGE Code
+- Part Number, Serial Number
+- Manufacturing Date & Location
+
+**Airworthiness Node** - Certification data per EASA regulations
+- Form Type (EASA Form 1)
+- Status: NEW, OVERHAULED, SERVICEABLE
+- Certification Authority, Approval Date
+
+**Sustainability Node** - Environmental data per IPC-1754
+- Product Carbon Footprint (PCF) in kgCO2e
+- Scope: Cradle-to-Gate
+- Material Composition percentages
+
+**Operational Node** - Lifecycle data per S5000F
+- Time Since New (hours)
+- Cycles Since New
+- Time/Cycles Since Overhaul
+
+---
+
+## 6. Data Model Specification
+
+### 6.1 Digital Product Passport Structure
+
+The DPP follows a JSON-LD Verifiable Credential format:
 
 ```json
 {
-  "dcat:service": {
-    // ...
-    "dcat:endpointUrl": "http://provider-qna-controlplane:8082/api/dsp",
-    "dcat:endpointDescription": "dspace:connector"
-    // ...
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://w3id.org/aerospace/dpp/v1"
+  ],
+  "id": "did:web:rolls-royce.com:parts:serial:98765-XYZ-123",
+  "type": ["VerifiableCredential", "AerospacePartPassport"],
+  "issuer": "did:web:rolls-royce.com",
+  "issuanceDate": "2025-10-27T10:00:00Z",
+  "credentialSubject": {
+    "id": "did:web:rolls-royce.com:parts:serial:98765-XYZ-123",
+    "partType": "HighPressureTurbineBlade",
+    "sku": "RR-TrentXWB-HPT-Blade-001",
+    "identityNode": {
+      "manufacturerName": "Rolls-Royce plc",
+      "cageCode": "K1039",
+      "partNumber": "FW12345",
+      "serialNumber": "HPT998877",
+      "batchNumber": "BATCH-2025-001",
+      "manufacturingDate": "2025-09-15",
+      "manufacturingLocation": "Derby, United Kingdom"
+    },
+    "airworthinessNode": {
+      "formType": "EASA_FORM_1",
+      "formTrackingNumber": "RR-DERBY-2025-00451",
+      "status": "NEW",
+      "certificationAuthority": "EASA",
+      "qualityStandards": ["AS9100D", "ISO9001:2015"]
+    },
+    "sustainabilityNode": {
+      "pcfValue": 45.2,
+      "pcfUnit": "kgCO2e",
+      "scope": "Cradle-to-Gate",
+      "recyclableContent": 15,
+      "materialComposition": [
+        { "material": "Nickel Superalloy", "percentage": 85 },
+        { "material": "Thermal Barrier Coating", "percentage": 10 }
+      ]
+    },
+    "operationalNode": {
+      "timeSinceNew": 0,
+      "cyclesSinceNew": 0,
+      "maximumOperatingHours": 25000,
+      "maximumCycles": 15000
+    },
+    "technicalSpecifications": {
+      "engineModel": "Trent XWB-97",
+      "stage": "HP Turbine Stage 1",
+      "weight": { "value": 0.85, "unit": "kg" },
+      "operatingTemperature": { "max": 1700, "unit": "°C" }
+    }
   }
 }
 ```
 
-Important: copy the `@id` value of the `odrl:hasPolicy`, we'll need that to initiate the negotiation!
+### 6.2 EDC Asset Configuration
 
-### 7.2 Initiate the contract negotiation
-
-From the previous step we have the `odrl:hasPolicy.@id` value, that should look something like
-`bWVtYmVyLWFuZC1wY2YtZGVm:YXNzZXQtMQ==:MThhNTgwMzEtNjE3Zi00N2U2LWFlNjMtMTlkZmZlMjA5NDE4`. This value must now be copied
-into the `policy.@id` field of the `ControlPlane Management/Initiate Negotiation` request of the Postman collection:
-
-```json
-//...
-"counterPartyId": "{{PROVIDER_ID}}",
-"protocol": "dataspace-protocol-http",
-"policy": {
-"@type": "Offer",
-"@id": "bWVtYmVyLWFuZC1wY2YtZGVm:YXNzZXQtMQ==:MThhNTgwMzEtNjE3Zi00N2U2LWFlNjMtMTlkZmZlMjA5NDE4",
-//...
-```
-
-You will receive a response immediately, but that only means that the request has been received. In order to get the
-current status of the negotiation, we'll have to inquire periodically.
-
-### 7.3 Query negotiation status
-
-With the `ControlPlane Management/Get Contract Negotiations` request we can periodically query the status of all our
-contract negotiations. Once the state shows `FINALIZED`, we copy the value of the `contractAgreementId`:
+Assets are registered with the following structure:
 
 ```json
 {
-  //...
-  "state": "FINALIZED",
-  "contractAgreementId": "3fb08a81-62b4-46fb-9a40-c574ec437759"
-  //...
-}
-```
-
-### 7.4 Initiate data transfer
-
-From the previous step we have the `contractAgreementId` value `3fb08a81-62b4-46fb-9a40-c574ec437759`. In the
-`ControlPlane Management/Initiate Transfer` request we will paste that into the `contractId` field:
-
-```json
-{
-  //...
-  "contractId": "3fb08a81-62b4-46fb-9a40-c574ec437759",
-  "dataDestination": {
-    "type": "HttpProxy"
+  "@context": ["https://w3id.org/edc/connector/management/v0.0.1"],
+  "@id": "asset:propulsion:blade:98765",
+  "@type": "Asset",
+  "properties": {
+    "name": "Trent XWB HPT Blade - Digital Product Passport",
+    "description": "DPP for HPT Blade SN:HPT998877",
+    "contenttype": "application/ld+json",
+    "dct:type": "ids:DigitalProductPassport",
+    "aerospace:partType": "HighPressureTurbineBlade",
+    "aerospace:manufacturer": "Rolls-Royce plc",
+    "aerospace:serialNumber": "HPT998877"
   },
-  "protocol": "dataspace-protocol-http",
-  "transferType": "HttpData-PULL"
+  "dataAddress": {
+    "@type": "DataAddress",
+    "type": "HttpData",
+    "baseUrl": "http://localhost:3001/api/parts/98765"
+  }
 }
 ```
 
-### 7.5 Query data transfers
+### 6.3 Policy Definitions
 
-Like with contract negotiations, data transfers are asynchronous processes so we need to periodically query their status
-using the `ControlPlane Management/Get transfer processes` request. Once we find a `"state": "STARTED"` field in the
-response, we can move on.
-
-The type of data transfer that we are using here (`HttpData-PULL`) means that we can fetch data from the provider
-dataplane's public endpoint, as we would query any other REST API. However, an access token is needed to authenticate
-the request. This access token is provided to the consumer in the form of an EndpointDataReference (EDR). We must thus
-query the consumer's EDR endpoint to obtain the token.
-
-### 7.6 Get EndpointDataReference
-
-Using the `ControlPlane Management/Get Cached EDRs` request, we fetch the EDR and note down the value of the `@id`
-field, for example `392d1767-e546-4b54-ab6e-6fb20a3dc12a`. This should be identical to the value of the
-`transferProcessId` field.
-
-With that value, we can obtain the access token for this particular EDR.
-
-### 7.7 Get access token for EDR
-
-In the `ControlPlane Management/Get EDR DataAddress for TransferId` request we have to paste the `transferProcessId`
-value from the previous step in the URL path, for example:
-
-```
-{{HOST}}/api/management/v3/edrs/392d1767-e546-4b54-ab6e-6fb20a3dc12a/dataaddress
-```
-
-Executing this request produces a response that contains both the endpoint where we can fetch the data, and the
-authorization token:
-
+**Access Policy (aerospace-membership-required):**
 ```json
 {
-  //...
-  "endpoint": "http://provider-qna-dataplane:11002/api/public",
-  "authType": "bearer",
-  "endpointType": "https://w3id.org/idsa/v4.1/HTTP",
-  "authorization": "eyJra.....PbovoypJGtWJst30vD9zy5w"
-  //...
+  "@id": "aerospace-membership-required",
+  "policy": {
+    "@type": "Set",
+    "permission": [{
+      "action": "use",
+      "constraint": {
+        "leftOperand": "MembershipCredential",
+        "operator": "eq",
+        "rightOperand": "active"
+      }
+    }]
+  }
 }
 ```
 
-Note that the token was abbreviated for legibility.
-
-### 7.8 Fetch data
-
-Using the endpoint and the authorization token from the previous step, we can then download data using the `ControlPlane
-Management/Download Data from Public API` request. To do that, the token must be copied into the request's
-`Authorization` header.
-
-Important: do not prepend a `bearer` prefix!
-
-This will return some dummy JSON data.
-
-## 8. Custom extensions in MVD
-
-EDC is not a turn-key application, rather it is a set of modules, that have to be configured, customized and extended to
-fit the needs of any particular dataspace.
-
-For our demo dataspace there are a several extensions that are required. These can generally be found in the
-`extensions/` directory, or directly in the `src/main/java` folder of the launcher module.
-
-### 8.1 Catalog Node Resolver
-
-Out-of-the-box the FederatedCatalog comes with an in-memory implementation of the `TargetNodeDirectory`. A
-`TargetNodeDirectory` is a high-level list of participants of the dataspace, a "phone book" if you will. In MVD that
-phone book is constituted by a hard-coded [file](./deployment/assets/participants), where every participant is listed
-with their DID.
-
-To keep things simple, MVD comes with a custom
-[implementation](extensions/catalog-node-resolver/src/main/java/org/eclipse/edc/demo/participants/resolver/LazyLoadNodeDirectory.java)
-for those participant directory files.
-
-Everything we need such as DSP URLs, public keys, CredentialService URLs is resolved from the DID document.
-
-### 8.2 Default scope mapping function
-
-As per our [dataspace rules](#33-access-control), every DSP request has to be secured by presenting the Membership
-credential, even the Catalog request. In detail, this means, that every DSP request that the consumer sends, must carry
-a token in the Authorization header, which authorizes the verifier to obtain the MembershipCredential from the
-consumer's IdentityHub.
-
-We achieve this by intercepting the DSP request and adding the correct scope - here:
-`"org.eclipse.edc.vc.type:MembershipCredential:read"` - to the request builder. Technically, this is achieved by
-registering a `postValidator` function for the relevant policy scopes, check out the
-[DcpPatchExtension.java](extensions/dcp-impl/src/main/java/org/eclipse/edc/demo/dcp/core/DcpPatchExtension.java) class.
-
-### 8.3 Scope extractor for `DataProcessor` credentials
-
-When the consumer wants to negotiate a contract for an offer, that has a `DataAccess.level` constraint, it must add the
-relevant scope string to the access token upon DSP egress. A policy, that requires the consumer to present a
-`DataProcessorCredential`, where the access level is `processing` would look like this:
-
+**Contract Policy (aerospace-dpp-access):**
 ```json
 {
-  "@type": "Set",
-  "obligation": [
-    {
+  "@id": "aerospace-dpp-access",
+  "policy": {
+    "@type": "Set",
+    "obligation": [{
       "action": "use",
       "constraint": {
         "leftOperand": "DataAccess.level",
         "operator": "eq",
         "rightOperand": "processing"
       }
-    }
-  ]
+    }]
+  }
 }
 ```
 
-The
-[DataAccessCredentialScopeExtractor.java](extensions/dcp-impl/src/main/java/org/eclipse/edc/demo/dcp/core/DataAccessCredentialScopeExtractor.java)
-class would convert this into a scope string `org.eclipse.edc.vc.type:DataProcessorCredential:read` and add it to the
-consumer's access token.
+---
 
-### 8.4 Policy evaluation functions
+## 7. Credentials & Access Control
 
-Being able to express a constraint in ODRL gets us only halfway there, we also need some code to evaluate that
-expression. In EDC, we do this by registering policy evaluation functions with the policy engine.
+### 7.1 Verifiable Credentials
 
-Since our dataspace defines two credential types, which can be used in policies, we also need two evaluation functions.
+The demo uses two types of credentials:
 
-#### 8.4.1 Membership evaluation function
+**MembershipCredential**
+- Issued by: Dataspace Issuer
+- Purpose: Proves membership in the aerospace dataspace
+- Required for: Catalog access
 
-This function is used to evaluate Membership constraints in policies by asserting that the Membership credential is
-present, is not expired and the membership is in force. This is implemented in the
-[MembershipCredentialEvaluationFunction.java](extensions/dcp-impl/src/main/java/org/eclipse/edc/demo/dcp/policy/MembershipCredentialEvaluationFunction.java).
+**DataProcessorCredential**
 
-#### 8.4.2 DataAccessLevel evaluation function
+Issued by: Dataspace Issuer. Purpose: Proves authorization to process certain data types. Levels: `processing` (can access standard DPP data) and `sensitive` (can access restricted data, not used in demo). Required for: Contract negotiation.
 
-Similarly, to evaluate `DataAccess.level` constraints, there is a
-[DataAccessLevelFunction.java](extensions/dcp-impl/src/main/java/org/eclipse/edc/demo/dcp/policy/DataAccessLevelFunction.java)
-class, that asserts that a DataProcessor credential is present, and that the level is appropriate. Note that to do that,
-the function implementation needs to have knowledge about the shape and schema of the `credentialSubject` of the
-DataProcessor VC.
+### 7.2 Policy Evaluation Flow
 
-> Hint: all credentials, where the `credentialSubject` has the same shape/schema can be evaluated by the same function!
+This diagram shows how access decisions are made. When a DSP message with a Verifiable Presentation arrives, the system extracts the VP, verifies credential signatures, validates the issuer trust chain, and evaluates policy constraints. The request is allowed only if all checks pass.
 
-### 8.5 Super-user seeding
-
-IdentityHub's [Identity
-API](https://github.com/eclipse-edc/IdentityHub/blob/main/docs/developer/architecture/identityhub-apis.md#identity-api)
-is secured with a basic RBAC system. For this, there is a special role called the `"super-user"`. Creating participants
-must be done using this role, but unless this role exists, we can't create any participants... so we are facing a bit of
-a chicken-and-egg problem.
-
-This is why seeding the "super-user" is done directly from code using the
-[ParticipantContextSeedExtension.java](extensions/superuser-seed/src/main/java/org/eclipse/edc/identityhub/seed/ParticipantContextSeedExtension.java).
-
-If a "super-user" does not already exist, one is created in the database using defaults. Feel free to override the
-defaults and customize your "super-user" and find out what breaks :)
-
-> NB: doing this in anything but a demo installation is **not** recommended, as it poses significant security risks!
-
-## 9. Advanced topics
-
-### 9.1 Regenerating issuer keys
-
-The dataspace issuer is the authoritative entity that can issue Verifiable Credentials to participants. For that, two
-things are needed: a private/public key pair to sign credentials, and a DID document for verifiers to obtain the
-dataspace issuer's public key.
-
-Consequently, when the dataspace issuer's keys should be updated, these aforementioned places are relevant.
-
-The first step is to create a new key pair:
-
-```shell
-openssl genpkey -algorithm ed25519 -out deployment/assets/issuer_private.pem
-openssl pkey -in assets/issuer_private.pem -pubout -out assets/issuer_public.pem
+```mermaid
+flowchart TB
+    subgraph Request["Incoming Request"]
+        REQ["DSP Message + VP"]
+    end
+    
+    subgraph Eval["Policy Evaluation"]
+        VP["Extract VP"]
+        VC["Verify Signatures"]
+        CHAIN["Verify Trust Chain"]
+        POLICY["Evaluate Constraints"]
+    end
+    
+    subgraph Result["Decision"]
+        ALLOW["Allow"]
+        DENY["Deny"]
+    end
+    
+    REQ --> VP --> VC --> CHAIN --> POLICY
+    POLICY --> |Satisfied| ALLOW
+    POLICY --> |Not Satisfied| DENY
 ```
 
-These puts a new key pair in `deployment/assets/`. Note that the path is arbitrary, but needs to be consistent with
-subsequent steps.
-Next, we need to re-sign the participants' credentials, update the database seed data and update the issuer's DID
-document.
+---
 
-There is no easy or convenient way to do this natively on the command line, so we created a test
-named [JwtSigner.java](launchers/identity-hub/src/test/java/org/eclipse/edc/demo/dcp/JwtSigner.java) that does all that.
-Simply executing the test performs all these steps, updates files etc.
+## 8. API Reference
 
-The only thing left to do is to clean-rebuild-restart the applications (IntelliJ) or rebuild and redeploy (Kubernetes).
+### 8.1 EDC Management APIs
 
-> We strongly encourage readers to closely inspect the `JwtSigner` code, because it shows how key conversion, document
-> handling etc. can be done in EDC!
+**Consumer Endpoints (port 8081):**
 
-### 9.2 Regenerating participant keys
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/management/v3/catalog/request` | POST | Request remote catalog |
+| `/api/catalog/v1alpha/catalog/query` | POST | Query cached catalog |
+| `/api/management/v3/contractnegotiations` | POST | Start negotiation |
+| `/api/management/v3/contractnegotiations/{id}` | GET | Get negotiation status |
+| `/api/management/v3/transferprocesses` | POST | Start transfer |
+| `/api/management/v3/edrs/{id}/dataaddress` | GET | Get data address |
 
-#### 9.2.1 IntelliJ deployment:
+**Provider Endpoints (port 8191):**
 
-keys must be seeded at startup time (due to [this limitation](#62-memory-based-secret-vaults)).
-In addition, if consumer and provider have the same key, that makes things a bit easier, because it removes the need to
-seed the keys via config or commandline argument. That said, the process is similar to the dataspace issuer:
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/management/v3/assets` | POST | Create asset |
+| `/api/management/v3/assets/request` | POST | List assets |
+| `/api/management/v3/policydefinitions` | POST | Create policy |
+| `/api/management/v3/contractdefinitions` | POST | Create contract def |
 
-```shell
-openssl genpkey -algorithm ed25519 -out deployment/assets/consumer_private.pem
-openssl pkey -in deployment/assets/consumer_private.pem -pubout -out deployment/assets/consumer_public.pem
+### 8.2 DPP Backend APIs
 
-# use the same key for provider:
-cp  deployment/assets/consumer_private.pem  deployment/assets/provider_private.pem
-cp  deployment/assets/consumer_public.pem  deployment/assets/provider_public.pem
-```
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/parts` | GET | List all DPPs |
+| `/api/parts/98765` | GET | HPT Blade DPP |
+| `/api/parts/98766` | GET | Compressor Blade DPP |
+| `/api/parts/98767` | GET | Combustor Liner DPP |
+| `/health` | GET | Health check |
 
-Now comes the hacky part, reader discretion is advised.
-In [SecretsExtension.java](extensions/did-example-resolver/src/main/java/org/eclipse/edc/iam/identitytrust/core/SecretsExtension.java)
-replace the String block for the private and public key with the contents of the newly created `*.pem` files.
+---
 
-Clean-rebuild-restart the applications. Don't forget to [seed](#43-seeding-the-dataspace). Done.
+## 9. Troubleshooting
 
-#### 9.2.2 Kubernetes deployment
+**Problem: "No DPP assets found in catalog"**
+- Ensure MVD runtimes are running
+- Run `./seed.sh` first
+- Run `./seed-aerospace.sh` after seed.sh
+- Wait 5-10 seconds for catalog sync
 
-Here, participant keys are dynamically generated by IdentityHub, so there is no need to pre-generate them. In fact,
-everytime the dataspace is re-deployed and the [seed script](#53-seed-the-dataspace) is executed, a new key pair is
-generated for each participant.
-To be extra-precise, the keys are regenerated when a new `ParticipantContext` is created.
+**Problem: "Contract negotiation TERMINATED"**
+- Check that credentials are properly issued
+- Verify the provider is healthy: `curl http://localhost:8191/api/check/health`
+- Check provider logs for policy evaluation errors
 
-## 10. Other caveats, shortcuts and workarounds
+**Problem: "Frontend can't reach APIs"**
+- In dev mode: Verify Vite proxy configuration
+- In Docker: Ensure `host.docker.internal` resolves correctly
+- Check CORS headers in responses
 
-It must be emphasized that this is a **DEMO**, it does not come with any guarantee w.r.t. operational readiness and
-comes with a few significant shortcuts affecting security amongst other things, for the sake of simplicity. These are:
+**Problem: "Credential verification failed"**
+- Verify NGINX is serving the issuer DID: `curl http://localhost:9876/.well-known/did.json`
+- Re-run `./seed.sh` to re-issue credentials
+- Check IdentityHub logs for signature verification errors
 
-### 10.1 In-memory stores in local deployment
+**Problem: "Transfer stuck in STARTED"**
+- This is normal - HTTP-PULL transfers remain in STARTED state
+- Check if EDR was returned
+- Try fetching data directly using the EDR token
 
-When running the MVD from IntelliJ, the runtimes exclusively use in-memory stores and in-memory vaults. We opted for
-this to avoid having to either provide (and maintain) a docker-compose file for those services, or to put users through
-an arduous amount of setup and configuration.
+---
 
-The Kubernetes deployment uses both persistent storage (PostgreSQL) and secure vaults (Hashicorp Vault).
+## 10. Future Extensions
 
-### 10.2 DID resolution
+**Phase 2 Enhancements:**
+- Usage control policies (time-limited access)
+- Push transfers to cloud storage (S3, Azure Blob)
+- Real-time data updates via WebSocket
 
-#### 10.2.1 `did:web` for participants
+**Phase 3 Enhancements:**
+- Multi-tier supply chain (sub-supplier DPPs)
+- Digital twin integration
+- Blockchain anchoring for audit trails
 
-Participants hosts their DIDs in their IdentityHubs, which means, that the HTTP-URL that the DID maps to must be
-accessible for all other participants. For example, every participant pod in the cluster must be able to resolve a DID
-from every other participant. For access to pods from outside the cluster we would be using an ingress controller, but
-then the other pods in the cluster cannot access it, due to missing DNS entries. That means, that the DID cannot use the
-_ingress URL_, but must use the _service's_ URL. A service in turn is not accessible from outside the cluster, so DIDs
-are only resolvable from _inside_ the cluster. Unfortunately, there is no way around this, unless we put DIDs on a
-publicly resolvable CDN or webserver.
+**Phase 4 Enhancements:**
+- AI-powered anomaly detection
+- Predictive maintenance integration
+- Full EASA compliance validation
 
-#### 10.2.2 `did:web` for the dataspace issuer
+---
 
-The "dataspace issuer" does not exist as participant yet, so instead of deploying a fake IdentityHub, we opted for
-simply hosting the dataspace issuer's DID as static file with NGINX.
+## License
 
-### 10.3 Credential Issuance
+Apache License 2.0 - see LICENSE file
 
-Even though the DCP Credential Issuance Protocol is now supported, credentials are pre-generated manually and
-distributed to the participants during deployment. Credentials are put into the stores by an extension called
-`IdentityHubExtension.java` and are **different** for local deployments and Kubernetes deployments.
+---
 
-The [JwtSigner.java](launchers/identity-hub/src/test/java/org/eclipse/edc/demo/dcp/JwtSigner.java) test class can be
-used to re-generate and sign all credentials.
-
-Additional credentials can be requested from the dataspace issuer using the `MVD/IdentityHub/Make Credential Request`
-Postman request or by executing on a shell:
-
-```shell
-curl --location 'http://localhost/consumer/cs//api/identity/v1alpha/participants/ZGlkOndlYjpjb25zdW1lci1pZGVudGl0eWh1YiUzQTcwODM6Y29uc3VtZXI=/credentials/request' \
---header 'Content-Type: application/json' \
---header 'X-Api-Key: c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo=' \
---data '{
-    "issuerDid": "did:web:dataspace-issuer-service%3A10016:issuer",
-    "holderPid": "credential-request-1",
-    "credentials": [{
-        "format": "VC1_0_JWT",
-        "credentialType": "DemoCredential"
-    }]
-}'
-```
-
-Note that the example assumes a Kubernetes deployment. This will cause the `dataspace-issuer-service` to generate and
-deliver a credential of type `DemoCredential` to the consumer's IdentityHub.
-
-### 10.4 Default scope-to-criterion transformer
-
-When IdentityHub receives a Presentation query, that carries an access token, it must be able to convert a scope string
-into a filter expression, for example `org.eclipse.edc.vc.type:DataProcessorCredential:read` is converted into
-`verifiableCredential.credential.type = DataProcessorCredential`. This filter expression is then used by IdentityHub to
-query for `DataProcessorCredentials` in the database.
-
-The MVD uses the default `EdcScopeToCriterionTransformer` to achieve this. It is recommended to implement a custom
-`ScopeToCriterionTransformer` for an actual production scenario.
+*This demo is part of the DECADE-X initiative for sovereign aerospace data exchange.*
