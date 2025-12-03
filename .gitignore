@@ -9,3 +9,38 @@ out/
 
 .terraform*
 *terraform.tfstate*
+
+# OS
+.DS_Store
+.Thumbs.db
+
+# IDE
+.vscode/
+*.iml
+*.classpath
+*.project
+*.settings/
+
+# Secrets and Credentials
+*.pem
+*.key
+*.p12
+*.jks
+*.env
+deployment/assets/credentials/
+deployment/assets/env/
+
+# Terraform
+*.tfvars
+.terraform.lock.hcl
+
+# Logs
+*.log
+
+# Node
+node_modules/
+dist/
+
+
+# Ignore Coding Agents
+WARP.md
