@@ -408,19 +408,19 @@ This critical step creates participant contexts in the IdentityHubs and issues V
 ```mermaid
 flowchart TB
     subgraph Seed["seed.sh Execution"]
-        S1["1. Seed Assets to Providers"]
-        S2["2. Seed Catalog Server Links"]
-        S3["3. Create Consumer Context"]
-        S4["4. Create Provider Context"]
-        S5["5. Create Issuer Participant"]
-        S6["6. Issue Credentials"]
+        S1[Seed Assets]
+        S2[Seed Catalog Links]
+        S3[Create Consumer Context]
+        S4[Create Provider Context]
+        S5[Create Issuer]
+        S6[Issue Credentials]
     end
     
     S1 --> S2 --> S3 --> S4 --> S5 --> S6
     
     subgraph Result["Result"]
-        R1["Consumer: DID + Credentials"]
-        R2["Provider: DID + Credentials"]
+        R1[Consumer DID + Credentials]
+        R2[Provider DID + Credentials]
     end
     
     S6 --> R1
@@ -531,11 +531,11 @@ The interface allows switching between Consumer (Airbus) and Provider (Rolls-Roy
 
 ```mermaid
 flowchart LR
-    A["1. Select Role"] --> B["2. Browse Catalog"]
-    B --> C["3. Select Asset"]
-    C --> D["4. Negotiate"]
-    D --> E["5. Transfer"]
-    E --> F["6. View DPP"]
+    A[Select Role] --> B[Browse Catalog]
+    B --> C[Select Asset]
+    C --> D[Negotiate]
+    D --> E[Transfer]
+    E --> F[View DPP]
 ```
 
 **Step 1: Select Consumer Role**
