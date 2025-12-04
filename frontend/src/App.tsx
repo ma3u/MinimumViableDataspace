@@ -8,496 +8,718 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
-  Plane, 
-  Building2, 
-  RefreshCw, 
   Database, 
-  FileCheck, 
   ArrowRight,
+  ArrowLeftRight,
   CheckCircle,
   Loader2,
-  AlertCircle,
-  Package
+  Package,
+  BookOpen,
+  ExternalLink,
+  ChevronRight,
+  Play,
+  RotateCcw,
+  Code,
+  Shield,
+  Handshake,
+  Send
 } from 'lucide-react';
 import { DPPViewer } from './components/DPPViewer';
 import { 
-  getCachedCatalog, 
-  executeCompleteTransfer,
-  getProviderAssets
-} from './services/edcApi';
-import type { UserRole, DigitalProductPassport, CatalogDataset, Asset } from './types';
+  mockCatalogAssets, 
+  mockDPPData, 
+  dspPhases,
+  dspMessages,
+  participants,
+  mockNegotiationFlow,
+  mockTransferFlow
+} from './services/mockData';
+import type { DigitalProductPassport } from './types';
 
-type DemoStep = 'catalog' | 'select' | 'negotiate' | 'transfer' | 'view';
+type DemoPhase = 'intro' | 'catalog' | 'negotiation' | 'transfer' | 'complete';
 
-interface ProgressState {
-  negotiation: string;
-  transfer: string;
-  data: string;
+interface MockAsset {
+  '@id': string;
+  'dct:title': string;
+  'dct:description': string;
+  'aerospace:partType': string;
+  'aerospace:serialNumber': string;
+  'aerospace:status': string;
+  'odrl:hasPolicy': {
+    '@id': string;
+  };
 }
 
 function App() {
-  const [role, setRole] = useState<UserRole>('consumer');
-  const [step, setStep] = useState<DemoStep>('catalog');
-  const [catalog, setCatalog] = useState<unknown[]>([]);
-  const [providerAssets, setProviderAssets] = useState<Asset[]>([]);
-  const [selectedAsset, setSelectedAsset] = useState<CatalogDataset | null>(null);
+  const [phase, setPhase] = useState<DemoPhase>('intro');
+  const [selectedAsset, setSelectedAsset] = useState<MockAsset | null>(null);
+  const [negotiationStep, setNegotiationStep] = useState(0);
+  const [transferStep, setTransferStep] = useState(0);
   const [dppData, setDppData] = useState<DigitalProductPassport | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [progress, setProgress] = useState<ProgressState>({
-    negotiation: '',
-    transfer: '',
-    data: ''
-  });
-
-  // Load catalog on mount
-  useEffect(() => {
-    if (role === 'consumer') {
-      loadCatalog();
-    } else {
-      loadProviderAssets();
-    }
-  }, [role]);
-
-  const loadCatalog = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getCachedCatalog();
-      setCatalog(data);
-    } catch (err) {
-      setError('Failed to load catalog. Make sure the MVD is running and seeded.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadProviderAssets = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const assets = await getProviderAssets();
-      setProviderAssets(assets);
-    } catch (err) {
-      setError('Failed to load provider assets. Make sure the MVD is running.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAssetSelect = (asset: CatalogDataset) => {
-    setSelectedAsset(asset);
-    setStep('select');
-  };
-
-  const handleNegotiateAndTransfer = async () => {
-    if (!selectedAsset) return;
-
-    setStep('negotiate');
-    setLoading(true);
-    setError(null);
-    setProgress({ negotiation: '', transfer: '', data: '' });
-
-    try {
-      const policy = selectedAsset['odrl:hasPolicy'];
-      const obligation = policy['odrl:obligation'];
-
-      const result = await executeCompleteTransfer(
-        selectedAsset['@id'],
-        policy['@id'],
-        obligation,
-        (stepName, status) => {
-          setProgress(prev => ({ ...prev, [stepName]: status }));
-          if (stepName === 'transfer' && status === 'initiated') {
-            setStep('transfer');
-          }
-        }
-      );
-
-      setDppData(result.data);
-      setStep('view');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Transfer failed');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showJson, setShowJson] = useState(false);
 
   const resetDemo = () => {
-    setStep('catalog');
+    setPhase('intro');
     setSelectedAsset(null);
+    setNegotiationStep(0);
+    setTransferStep(0);
     setDppData(null);
-    setError(null);
-    setProgress({ negotiation: '', transfer: '', data: '' });
-    loadCatalog();
+    setIsAnimating(false);
+    setShowJson(false);
   };
 
-  // Extract datasets from catalog
-  const getDatasets = (): CatalogDataset[] => {
-    if (!catalog.length) return [];
-    
-    try {
-      // Navigate through the nested catalog structure
-      const catalogs = catalog[0] as { 'dcat:catalog'?: unknown[] };
-      if (!catalogs['dcat:catalog']) return [];
-      
-      const datasets: CatalogDataset[] = [];
-      for (const cat of catalogs['dcat:catalog']) {
-        const catObj = cat as { 'dcat:dataset'?: CatalogDataset[] };
-        if (catObj['dcat:dataset']) {
-          datasets.push(...catObj['dcat:dataset']);
-        }
-      }
-      
-      // Filter for aerospace DPP assets (using asset:dpp: prefix from seed-aerospace.sh)
-      return datasets.filter(d => 
-        d['@id']?.startsWith('asset:dpp:') ||
-        d['@id']?.includes('RR0')
-      );
-    } catch {
-      return [];
+  const simulateNegotiation = async () => {
+    setIsAnimating(true);
+    for (let i = 0; i < mockNegotiationFlow.length; i++) {
+      setNegotiationStep(i);
+      await new Promise(resolve => setTimeout(resolve, 800));
     }
+    setIsAnimating(false);
+    setPhase('transfer');
   };
 
-  const datasets = getDatasets();
+  const simulateTransfer = async () => {
+    setIsAnimating(true);
+    for (let i = 0; i < mockTransferFlow.length; i++) {
+      setTransferStep(i);
+      await new Promise(resolve => setTimeout(resolve, 800));
+    }
+    // Load the DPP data
+    if (selectedAsset) {
+      setDppData(mockDPPData[selectedAsset['@id']]);
+    }
+    setIsAnimating(false);
+    setPhase('complete');
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <Plane className="w-8 h-8 text-rr-blue" />
+              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-2 rounded-lg">
+                <ArrowLeftRight className="w-6 h-6 text-white" />
+              </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  Aerospace Digital Product Passport
+                  Dataspace Protocol Demo
                 </h1>
-                <p className="text-sm text-gray-500">Eclipse Dataspace Connector Demo</p>
+                <p className="text-sm text-gray-500">Digital Product Passport Exchange</p>
               </div>
             </div>
             
-            {/* Role Switcher */}
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">View as:</span>
-              <div className="flex rounded-lg overflow-hidden border border-gray-300">
+              <a 
+                href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <BookOpen className="w-4 h-4" />
+                DSP 2025-1 Specification
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              {phase !== 'intro' && (
                 <button
-                  onClick={() => setRole('provider')}
-                  className={`px-4 py-2 text-sm font-medium flex items-center gap-2 ${
-                    role === 'provider' 
-                      ? 'bg-rr-blue text-white' 
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
+                  onClick={resetDemo}
+                  className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  <Building2 className="w-4 h-4" />
-                  Rolls-Royce
+                  <RotateCcw className="w-4 h-4" />
+                  Restart Demo
                 </button>
-                <button
-                  onClick={() => setRole('consumer')}
-                  className={`px-4 py-2 text-sm font-medium flex items-center gap-2 ${
-                    role === 'consumer' 
-                      ? 'bg-airbus-blue text-white' 
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <Plane className="w-4 h-4" />
-                  Airbus
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {role === 'provider' ? (
-          /* Provider View */
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Provider Dashboard - Rolls-Royce
-              </h2>
-              <button
-                onClick={loadProviderAssets}
-                disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-rr-blue text-white rounded-lg hover:bg-blue-800 disabled:opacity-50"
-              >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh Assets
-              </button>
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-                {error}
-              </div>
-            )}
-
-            <div className="grid gap-4">
-              {providerAssets.map(asset => (
-                <div 
-                  key={asset['@id']} 
-                  className="bg-white rounded-lg shadow p-6"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {asset.properties.name || asset['@id']}
-                      </h3>
-                      <p className="text-gray-600 mt-1">
-                        {asset.properties.description}
-                      </p>
-                      <div className="mt-3 flex gap-2">
-                        {asset.properties['aerospace:partType'] && (
-                          <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
-                            {asset.properties['aerospace:partType']}
-                          </span>
-                        )}
-                        {asset.properties['aerospace:serialNumber'] && (
-                          <span className="inline-block px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-mono">
-                            S/N: {asset.properties['aerospace:serialNumber']}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <Package className="w-8 h-8 text-rr-blue" />
+      {/* Progress Bar */}
+      {phase !== 'intro' && (
+        <div className="bg-white border-b">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              {[
+                { id: 'catalog', label: 'Catalog Protocol', icon: Database },
+                { id: 'negotiation', label: 'Contract Negotiation', icon: Handshake },
+                { id: 'transfer', label: 'Transfer Process', icon: Send },
+                { id: 'complete', label: 'Data Received', icon: CheckCircle },
+              ].map((step, i, arr) => (
+                <div key={step.id} className="flex items-center flex-1">
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                    phase === step.id 
+                      ? 'bg-blue-600 text-white shadow-lg' 
+                      : arr.findIndex(x => x.id === phase) > i
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-400'
+                  }`}>
+                    <step.icon className="w-5 h-5" />
+                    <span className="font-medium text-sm hidden md:block">{step.label}</span>
                   </div>
+                  {i < arr.length - 1 && (
+                    <ChevronRight className={`w-5 h-5 mx-2 ${
+                      arr.findIndex(x => x.id === phase) > i ? 'text-green-500' : 'text-gray-300'
+                    }`} />
+                  )}
                 </div>
               ))}
-              {providerAssets.length === 0 && !loading && (
-                <div className="text-center py-12 text-gray-500">
-                  No assets found. Run the seed-aerospace.sh script to add DPP assets.
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* INTRO PHASE */}
+        {phase === 'intro' && (
+          <div className="space-y-8">
+            {/* Hero Section */}
+            <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl p-8 text-white">
+              <div className="max-w-3xl">
+                <h2 className="text-3xl font-bold mb-4">
+                  Eclipse Dataspace Protocol
+                </h2>
+                <p className="text-blue-100 text-lg mb-6">
+                  This interactive demo showcases how the Dataspace Protocol (DSP) 2025-1 enables 
+                  secure, sovereign data exchange between organizations. Experience the complete 
+                  flow of discovering, negotiating, and transferring a Digital Product Passport.
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setPhase('catalog')}
+                    className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                  >
+                    <Play className="w-5 h-5" />
+                    Start Demo
+                  </button>
+                  <a
+                    href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-6 py-3 border border-white/30 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    Read Specification
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Participants */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="text-4xl">{participants.provider.logo}</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">{participants.provider.name}</h3>
+                    <p className="text-blue-600 font-medium">{participants.provider.role}</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">{participants.provider.description}</p>
+                <div className="bg-gray-50 rounded-lg p-3 font-mono text-sm text-gray-600">
+                  DID: {participants.provider.did}
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="text-4xl">{participants.consumer.logo}</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">{participants.consumer.name}</h3>
+                    <p className="text-green-600 font-medium">{participants.consumer.role}</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">{participants.consumer.description}</p>
+                <div className="bg-gray-50 rounded-lg p-3 font-mono text-sm text-gray-600">
+                  DID: {participants.consumer.did}
+                </div>
+              </div>
+            </div>
+
+            {/* Protocol Overview */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Protocol Phases</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {Object.entries(dspPhases).map(([key, phaseData]) => (
+                  <div key={key} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-2 mb-3">
+                      {key === 'catalog' && <Database className="w-5 h-5 text-blue-600" />}
+                      {key === 'negotiation' && <Handshake className="w-5 h-5 text-purple-600" />}
+                      {key === 'transfer' && <Send className="w-5 h-5 text-green-600" />}
+                      <h4 className="font-semibold text-gray-900">{phaseData.title}</h4>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">{phaseData.description}</p>
+                    <a
+                      href={phaseData.specLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                    >
+                      View specification <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CATALOG PHASE */}
+        {phase === 'catalog' && (
+          <div className="space-y-6">
+            <PhaseHeader 
+              phase={dspPhases.catalog}
+              icon={<Database className="w-6 h-6" />}
+            />
+
+            {/* Protocol Flow */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-semibold text-gray-900">Protocol Flow</h3>
+                <button
+                  onClick={() => setShowJson(!showJson)}
+                  className="flex items-center gap-2 text-sm text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-lg"
+                >
+                  <Code className="w-4 h-4" />
+                  {showJson ? 'Hide' : 'Show'} JSON Messages
+                </button>
+              </div>
+              
+              <div className="flex items-center justify-between bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4">
+                <div className="text-center">
+                  <div className="text-2xl mb-1">{participants.consumer.logo}</div>
+                  <div className="font-medium text-sm">Consumer</div>
+                </div>
+                <div className="flex-1 px-4">
+                  <div className="flex items-center justify-center gap-2 text-sm mb-2">
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">CatalogRequestMessage</span>
+                    <ArrowRight className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <ArrowRight className="w-4 h-4 text-blue-600 rotate-180" />
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">dcat:Catalog</span>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl mb-1">{participants.provider.logo}</div>
+                  <div className="font-medium text-sm">Provider</div>
+                </div>
+              </div>
+
+              {showJson && (
+                <div className="mt-4 grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Request Message</h4>
+                    <pre className="bg-gray-900 text-green-400 p-4 rounded-lg text-xs overflow-auto max-h-48">
+                      {JSON.stringify(dspMessages.catalogRequest, null, 2)}
+                    </pre>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Response (Catalog)</h4>
+                    <pre className="bg-gray-900 text-blue-400 p-4 rounded-lg text-xs overflow-auto max-h-48">
+                      {JSON.stringify(dspMessages.catalogResponse, null, 2)}
+                    </pre>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        ) : (
-          /* Consumer View */
-          <div>
-            {/* Progress Steps */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between">
-                {[
-                  { id: 'catalog', label: 'Browse Catalog', icon: Database },
-                  { id: 'select', label: 'Select Asset', icon: FileCheck },
-                  { id: 'negotiate', label: 'Negotiate Contract', icon: ArrowRight },
-                  { id: 'transfer', label: 'Transfer Data', icon: ArrowRight },
-                  { id: 'view', label: 'View DPP', icon: CheckCircle },
-                ].map((s, i, arr) => (
-                  <div key={s.id} className="flex items-center">
-                    <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                      step === s.id 
-                        ? 'bg-airbus-blue text-white' 
-                        : arr.findIndex(x => x.id === step) > i
+
+            {/* Catalog Results */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Available Datasets (dcat:Dataset)</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {mockCatalogAssets.map(asset => (
+                  <div 
+                    key={asset['@id']}
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                      selectedAsset?.['@id'] === asset['@id']
+                        ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
+                        : 'hover:border-blue-300 hover:shadow-md'
+                    }`}
+                    onClick={() => setSelectedAsset(asset as MockAsset)}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <Package className="w-8 h-8 text-blue-600" />
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        asset['aerospace:status'] === 'NEW' 
                           ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      <s.icon className="w-5 h-5" />
-                      <span className="font-medium">{s.label}</span>
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {asset['aerospace:status']}
+                      </span>
                     </div>
-                    {i < arr.length - 1 && (
-                      <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
+                    <h4 className="font-semibold text-gray-900 mb-1">{asset['dct:title']}</h4>
+                    <p className="text-sm text-gray-600 mb-3">{asset['dct:description']}</p>
+                    <div className="flex gap-2 flex-wrap">
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                        {asset['aerospace:partType']}
+                      </span>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">
+                        {asset['aerospace:serialNumber']}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Continue Button */}
+            {selectedAsset && (
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setPhase('negotiation')}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Request Contract for "{selectedAsset['dct:title']}"
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* NEGOTIATION PHASE */}
+        {phase === 'negotiation' && selectedAsset && (
+          <div className="space-y-6">
+            <PhaseHeader 
+              phase={dspPhases.negotiation}
+              icon={<Handshake className="w-6 h-6" />}
+            />
+
+            {/* State Machine Visualization */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Contract Negotiation State Machine</h3>
+              <div className="flex items-center justify-between overflow-x-auto pb-4">
+                {mockNegotiationFlow.map((state, i) => (
+                  <div key={i} className="flex items-center">
+                    <div className={`flex flex-col items-center px-4 py-2 rounded-lg transition-all ${
+                      i < negotiationStep 
+                        ? 'bg-green-100 text-green-800'
+                        : i === negotiationStep
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      {i < negotiationStep ? (
+                        <CheckCircle className="w-6 h-6 mb-1" />
+                      ) : i === negotiationStep && isAnimating ? (
+                        <Loader2 className="w-6 h-6 mb-1 animate-spin" />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full border-2 mb-1" />
+                      )}
+                      <span className="text-xs font-medium whitespace-nowrap">
+                        {state['dspace:state']}
+                      </span>
+                    </div>
+                    {i < mockNegotiationFlow.length - 1 && (
+                      <ArrowRight className={`w-5 h-5 mx-1 ${
+                        i < negotiationStep ? 'text-green-500' : 'text-gray-300'
+                      }`} />
                     )}
                   </div>
                 ))}
               </div>
             </div>
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5" />
-                {error}
-              </div>
-            )}
-
-            {/* Step Content */}
-            {step === 'catalog' && (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Data Catalog - Available DPPs
-                  </h2>
-                  <button
-                    onClick={loadCatalog}
-                    disabled={loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-airbus-blue text-white rounded-lg hover:bg-blue-900 disabled:opacity-50"
+            {/* Message Sequence */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Protocol Messages</h3>
+              <div className="space-y-3">
+                {dspPhases.negotiation.steps.map((step, i) => (
+                  <div 
+                    key={i}
+                    className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
+                      i <= negotiationStep
+                        ? 'bg-blue-50 border border-blue-200'
+                        : 'bg-gray-50 border border-gray-200 opacity-50'
+                    }`}
                   >
-                    <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    Refresh Catalog
-                  </button>
-                </div>
-
-                {loading ? (
-                  <div className="text-center py-12">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-airbus-blue" />
-                    <p className="mt-2 text-gray-600">Loading catalog...</p>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      i < negotiationStep
+                        ? 'bg-green-500 text-white'
+                        : i === negotiationStep
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-300 text-gray-600'
+                    }`}>
+                      {i < negotiationStep ? <CheckCircle className="w-4 h-4" /> : i + 1}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">{step.name}</div>
+                      <div className="text-sm text-gray-600">{step.description}</div>
+                    </div>
+                    <div className="text-sm text-blue-600 font-mono">{step.direction}</div>
                   </div>
-                ) : datasets.length > 0 ? (
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {datasets.map(dataset => (
-                      <div 
-                        key={dataset['@id']}
-                        className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer p-6"
-                        onClick={() => handleAssetSelect(dataset)}
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <Package className="w-10 h-10 text-rr-blue" />
-                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
-                            Available
-                          </span>
-                        </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">
-                          {dataset['@id']}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {dataset.description || 'Digital Product Passport'}
-                        </p>
-                        <button className="mt-4 w-full py-2 bg-airbus-cyan text-white rounded-lg hover:bg-cyan-600 transition-colors">
-                          Request Access
-                        </button>
-                      </div>
-                    ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Policy Display */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-purple-600" />
+                Usage Policy (ODRL)
+              </h3>
+              <div className="bg-purple-50 rounded-lg p-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-purple-800 mb-2">Permission</h4>
+                    <div className="bg-white rounded p-3 text-sm">
+                      <code>MembershipCredential = active</code>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-12 bg-white rounded-lg shadow">
-                    <Database className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">
-                      No DPP assets found in the catalog.
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Make sure the MVD is running, seeded, and the aerospace seed script has been executed.
-                    </p>
+                  <div>
+                    <h4 className="text-sm font-medium text-purple-800 mb-2">Obligation</h4>
+                    <div className="bg-white rounded p-3 text-sm">
+                      <code>DataAccess.level = processing</code>
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
-            )}
+            </div>
 
-            {step === 'select' && selectedAsset && (
-              <div className="bg-white rounded-lg shadow p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Confirm Data Request
-                </h2>
-                <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                  <h3 className="font-semibold text-lg mb-4">Asset Details</h3>
-                  <dl className="grid grid-cols-2 gap-4">
-                    <div>
-                      <dt className="text-sm text-gray-600">Asset ID</dt>
-                      <dd className="font-mono text-sm">{selectedAsset['@id']}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-600">Provider</dt>
-                      <dd>Rolls-Royce plc</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-600">Policy</dt>
-                      <dd className="text-sm">Membership Required + Data Processing Level</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-gray-600">Transfer Type</dt>
-                      <dd>HTTP Pull (Synchronous)</dd>
-                    </div>
-                  </dl>
-                </div>
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => setStep('catalog')}
-                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                  >
-                    Back to Catalog
-                  </button>
-                  <button
-                    onClick={handleNegotiateAndTransfer}
-                    className="flex-1 px-6 py-3 bg-airbus-blue text-white rounded-lg hover:bg-blue-900 flex items-center justify-center gap-2"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                    Initiate Contract Negotiation
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Action Button */}
+            <div className="flex justify-end">
+              {negotiationStep < mockNegotiationFlow.length - 1 ? (
+                <button
+                  onClick={simulateNegotiation}
+                  disabled={isAnimating}
+                  className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50"
+                >
+                  {isAnimating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Negotiating...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5" />
+                      Run Negotiation
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setPhase('transfer')}
+                  className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                >
+                  Contract Agreed - Start Transfer
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
-            {(step === 'negotiate' || step === 'transfer') && (
-              <div className="bg-white rounded-lg shadow p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  {step === 'negotiate' ? 'Contract Negotiation' : 'Data Transfer'}
-                </h2>
-                <div className="space-y-6">
-                  <ProgressItem 
-                    label="Contract Negotiation" 
-                    status={progress.negotiation}
-                    isActive={step === 'negotiate'}
-                  />
-                  <ProgressItem 
-                    label="Data Transfer" 
-                    status={progress.transfer}
-                    isActive={step === 'transfer' && progress.transfer !== 'complete'}
-                  />
-                  <ProgressItem 
-                    label="Fetch DPP Data" 
-                    status={progress.data}
-                    isActive={progress.data === 'fetching'}
-                  />
-                </div>
-              </div>
-            )}
+        {/* TRANSFER PHASE */}
+        {phase === 'transfer' && selectedAsset && (
+          <div className="space-y-6">
+            <PhaseHeader 
+              phase={dspPhases.transfer}
+              icon={<Send className="w-6 h-6" />}
+            />
 
-            {step === 'view' && dppData && (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Received Digital Product Passport
-                  </h2>
-                  <button
-                    onClick={resetDemo}
-                    className="flex items-center gap-2 px-4 py-2 bg-airbus-blue text-white rounded-lg hover:bg-blue-900"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Start New Transfer
-                  </button>
-                </div>
-                <DPPViewer dpp={dppData} />
+            {/* Transfer State Machine */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Transfer Process State Machine</h3>
+              <div className="flex items-center justify-center gap-4 overflow-x-auto pb-4">
+                {mockTransferFlow.map((state, i) => (
+                  <div key={i} className="flex items-center">
+                    <div className={`flex flex-col items-center px-6 py-3 rounded-lg transition-all ${
+                      i < transferStep 
+                        ? 'bg-green-100 text-green-800'
+                        : i === transferStep
+                          ? 'bg-green-600 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      {i < transferStep ? (
+                        <CheckCircle className="w-8 h-8 mb-1" />
+                      ) : i === transferStep && isAnimating ? (
+                        <Loader2 className="w-8 h-8 mb-1 animate-spin" />
+                      ) : (
+                        <Send className="w-8 h-8 mb-1" />
+                      )}
+                      <span className="text-sm font-medium whitespace-nowrap">
+                        {state['dspace:state']}
+                      </span>
+                    </div>
+                    {i < mockTransferFlow.length - 1 && (
+                      <ArrowRight className={`w-6 h-6 mx-2 ${
+                        i < transferStep ? 'text-green-500' : 'text-gray-300'
+                      }`} />
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+
+            {/* Transfer Details */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Transfer Configuration</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-green-50 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-green-800 mb-2">Transfer Type</h4>
+                  <div className="bg-white rounded p-3">
+                    <code className="text-sm">HttpData-PULL</code>
+                  </div>
+                  <p className="text-xs text-green-700 mt-2">
+                    Consumer pulls data from Provider&apos;s data plane endpoint
+                  </p>
+                </div>
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-blue-800 mb-2">Data Address</h4>
+                  <div className="bg-white rounded p-3 font-mono text-xs break-all">
+                    https://provider.rolls-royce.com/public/data/{selectedAsset['@id'].split(':').pop()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="flex justify-end">
+              {transferStep < mockTransferFlow.length - 1 ? (
+                <button
+                  onClick={simulateTransfer}
+                  disabled={isAnimating}
+                  className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {isAnimating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Transferring...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5" />
+                      Start Transfer
+                    </>
+                  )}
+                </button>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        {/* COMPLETE PHASE */}
+        {phase === 'complete' && dppData && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-6 text-white">
+              <div className="flex items-center gap-4">
+                <CheckCircle className="w-12 h-12" />
+                <div>
+                  <h2 className="text-2xl font-bold">Data Transfer Complete!</h2>
+                  <p className="text-green-100">
+                    The Digital Product Passport has been successfully received via the Dataspace Protocol.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Protocol Summary</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-blue-50 rounded-lg p-4 text-center">
+                  <Database className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                  <div className="font-semibold">Catalog Protocol</div>
+                  <div className="text-sm text-gray-600">Asset discovered</div>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-4 text-center">
+                  <Handshake className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                  <div className="font-semibold">Contract Negotiation</div>
+                  <div className="text-sm text-gray-600">Agreement finalized</div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4 text-center">
+                  <Send className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                  <div className="font-semibold">Transfer Process</div>
+                  <div className="text-sm text-gray-600">Data received</div>
+                </div>
+              </div>
+            </div>
+
+            {/* DPP Viewer */}
+            <DPPViewer dpp={dppData} />
+
+            {/* Restart */}
+            <div className="flex justify-center">
+              <button
+                onClick={resetDemo}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Try Another Asset
+              </button>
+            </div>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-auto">
-        <div className="max-w-7xl mx-auto px-4 py-4 text-center text-sm text-gray-500">
-          Eclipse Dataspace Connector - Minimum Viable Dataspace Demo
+      <footer className="bg-white border-t mt-12">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-sm text-gray-500">
+              Demo based on Eclipse Dataspace Protocol 2025-1 Specification
+            </div>
+            <div className="flex items-center gap-4">
+              <a 
+                href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+              >
+                DSP Specification <ExternalLink className="w-3 h-3" />
+              </a>
+              <a 
+                href="https://github.com/eclipse-edc/MinimumViableDataspace"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+              >
+                MVD Repository <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
   );
 }
 
-function ProgressItem({ label, status, isActive }: { label: string; status: string; isActive: boolean }) {
-  const getStatusIcon = () => {
-    if (status === 'complete' || status === 'FINALIZED' || status === 'STARTED') {
-      return <CheckCircle className="w-6 h-6 text-green-500" />;
-    }
-    if (isActive || status) {
-      return <Loader2 className="w-6 h-6 text-airbus-blue animate-spin" />;
-    }
-    return <div className="w-6 h-6 rounded-full border-2 border-gray-300" />;
+// Phase Header Component
+interface PhaseHeaderProps {
+  phase: {
+    title: string;
+    description: string;
+    specLink: string;
   };
+  icon: React.ReactNode;
+}
 
+function PhaseHeader({ phase, icon }: PhaseHeaderProps) {
   return (
-    <div className="flex items-center gap-4">
-      {getStatusIcon()}
-      <div className="flex-1">
-        <div className="font-medium text-gray-900">{label}</div>
-        {status && (
-          <div className="text-sm text-gray-500">
-            Status: {status}
+    <div className="bg-white rounded-xl p-6 shadow-sm border">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
+            {icon}
           </div>
-        )}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{phase.title}</h2>
+            <p className="text-gray-600 max-w-2xl">{phase.description}</p>
+          </div>
+        </div>
+        <a
+          href={phase.specLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors whitespace-nowrap"
+        >
+          <BookOpen className="w-4 h-4" />
+          View Spec
+          <ExternalLink className="w-3 h-3" />
+        </a>
       </div>
     </div>
   );
