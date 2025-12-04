@@ -154,11 +154,10 @@ function App() {
         }
       }
       
-      // Filter for aerospace DPP assets
+      // Filter for aerospace DPP assets (using asset:dpp: prefix from seed-aerospace.sh)
       return datasets.filter(d => 
-        d['@id']?.includes('propulsion') || 
-        d['@id']?.includes('blade') ||
-        d['@id']?.includes('combustor')
+        d['@id']?.startsWith('asset:dpp:') ||
+        d['@id']?.includes('RR0')
       );
     } catch {
       return [];
