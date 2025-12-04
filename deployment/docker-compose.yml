@@ -1,0 +1,340 @@
+version: '3.8'
+
+services:
+  # -----------------------------------------------------------------------------------------------
+  # INFRASTRUCTURE
+  # -----------------------------------------------------------------------------------------------
+  postgres:
+    image: postgres:16
+    container_name: mvd-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mvd-network
+
+  vault:
+    image: hashicorp/vault:latest
+    container_name: mvd-vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - mvd-network
+
+  nginx:
+    image: nginx
+    container_name: mvd-nginx
+    ports:
+      - "9876:80"
+    volumes:
+      - ./assets/issuer/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./assets/issuer/did.docker.json:/var/www/.well-known/did.json:ro
+    networks:
+      - mvd-network
+
+  # -----------------------------------------------------------------------------------------------
+  # CONSUMER
+  # -----------------------------------------------------------------------------------------------
+  consumer-controlplane:
+    image: controlplane:latest
+    container_name: consumer-controlplane
+    env_file:
+      - ./assets/env/consumer_connector.env
+    environment:
+      # DB Configuration
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/consumer
+      EDC_DATASOURCE_DEFAULT_USER: consumer
+      EDC_DATASOURCE_DEFAULT_PASSWORD: consumer
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      # Vault Configuration
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "8084:8084"
+      - "8085:8085"
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  consumer-dataplane:
+    image: dataplane:latest
+    container_name: consumer-dataplane
+    env_file:
+      - ./assets/env/consumer_connector.env
+    environment:
+      EDC_RUNTIME_ID: consumer-dataplane
+      # Port Overrides
+      WEB_HTTP_PORT: 9080
+      WEB_HTTP_CONTROL_PORT: 9083
+      WEB_HTTP_PUBLIC_PORT: 11001
+      # DB Configuration
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/consumer
+      EDC_DATASOURCE_DEFAULT_USER: consumer
+      EDC_DATASOURCE_DEFAULT_PASSWORD: consumer
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      # Vault Configuration
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+      # Hostname
+      EDC_HOSTNAME: localhost
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "11000:9080" # Web/Health
+      - "11002:9083" # Control
+      - "11001:11001" # Public
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  consumer-identityhub:
+    image: identity-hub:latest
+    container_name: consumer-identityhub
+    env_file:
+      - ./assets/env/consumer_identityhub.env
+    environment:
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/consumer
+      EDC_DATASOURCE_DEFAULT_USER: consumer
+      EDC_DATASOURCE_DEFAULT_PASSWORD: consumer
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "7080:7080"
+      - "7081:7081"
+      - "7082:7082"
+      - "7083:7083"
+      - "7085:7085"
+      - "7086:7086"
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  # -----------------------------------------------------------------------------------------------
+  # PROVIDER (Shared Components)
+  # -----------------------------------------------------------------------------------------------
+  provider-identityhub:
+    image: identity-hub:latest
+    container_name: provider-identityhub
+    env_file:
+      - ./assets/env/provider_identityhub.env
+    environment:
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/identity
+      EDC_DATASOURCE_DEFAULT_USER: identity
+      EDC_DATASOURCE_DEFAULT_PASSWORD: identity
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "7090:7090"
+      - "7091:7091"
+      - "7092:7092"
+      - "7093:7093"
+      - "7095:7095"
+      - "7096:7096"
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  provider-catalog-server:
+    image: catalog-server:latest
+    container_name: provider-catalog-server
+    env_file:
+      - ./assets/env/provider_catalogserver.env
+    environment:
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/catalog_server
+      EDC_DATASOURCE_DEFAULT_USER: catalog_server
+      EDC_DATASOURCE_DEFAULT_PASSWORD: catalog_server
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "8090:8090"
+      - "8091:8091"
+      - "8092:8092"
+      - "8093:8093"
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  # -----------------------------------------------------------------------------------------------
+  # PROVIDER QnA
+  # -----------------------------------------------------------------------------------------------
+  provider-qna-controlplane:
+    image: controlplane:latest
+    container_name: provider-qna-controlplane
+    env_file:
+      - ./assets/env/provider_connector_qna.env
+    environment:
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_qna
+      EDC_DATASOURCE_DEFAULT_USER: qna
+      EDC_DATASOURCE_DEFAULT_PASSWORD: provider-qna
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "8190:8190"
+      - "8191:8191"
+      - "8192:8192"
+      - "8193:8193"
+      - "8194:8194"
+      - "8195:8195"
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  provider-qna-dataplane:
+    image: dataplane:latest
+    container_name: provider-qna-dataplane
+    env_file:
+      - ./assets/env/provider_connector_qna.env
+    environment:
+      EDC_RUNTIME_ID: provider-qna-dataplane
+      WEB_HTTP_PORT: 9080
+      WEB_HTTP_CONTROL_PORT: 9083
+      WEB_HTTP_PUBLIC_PORT: 12001
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_qna
+      EDC_DATASOURCE_DEFAULT_USER: qna
+      EDC_DATASOURCE_DEFAULT_PASSWORD: provider-qna
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+      EDC_HOSTNAME: localhost
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "12000:9080" # Web/Health
+      - "12003:9083" # Control
+      - "12001:12001" # Public
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  # -----------------------------------------------------------------------------------------------
+  # PROVIDER MANUFACTURING
+  # -----------------------------------------------------------------------------------------------
+  provider-manufacturing-controlplane:
+    image: controlplane:latest
+    container_name: provider-manufacturing-controlplane
+    env_file:
+      - ./assets/env/provider_connector_manufacturing.env
+    environment:
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_manufacturing
+      EDC_DATASOURCE_DEFAULT_USER: manufacturing
+      EDC_DATASOURCE_DEFAULT_PASSWORD: provider-manufacturing
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "8290:8290"
+      - "8291:8291"
+      - "8292:8292"
+      - "8293:8293"
+      - "8294:8294"
+      - "8295:8295"
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  provider-manufacturing-dataplane:
+    image: dataplane:latest
+    container_name: provider-manufacturing-dataplane
+    env_file:
+      - ./assets/env/provider_connector_manufacturing.env
+    environment:
+      EDC_RUNTIME_ID: provider-manufacturing-dataplane
+      WEB_HTTP_PORT: 9080
+      WEB_HTTP_CONTROL_PORT: 9083
+      WEB_HTTP_PUBLIC_PORT: 12002
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_manufacturing
+      EDC_DATASOURCE_DEFAULT_USER: manufacturing
+      EDC_DATASOURCE_DEFAULT_PASSWORD: provider-manufacturing
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+      EDC_HOSTNAME: localhost
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "12005:9080" # Web/Health
+      - "12006:9083" # Control
+      - "12002:12002" # Public
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+  # -----------------------------------------------------------------------------------------------
+  # ISSUER
+  # -----------------------------------------------------------------------------------------------
+  dataspace-issuer:
+    image: issuerservice:latest
+    container_name: dataspace-issuer
+    env_file:
+      - ./assets/env/issuerservice.env
+    environment:
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/issuer
+      EDC_DATASOURCE_DEFAULT_USER: issuer
+      EDC_DATASOURCE_DEFAULT_PASSWORD: issuer
+      EDC_SQL_SCHEMA_AUTOCREATE: "true"
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: root
+    extra_hosts:
+      - "localhost:host-gateway"
+    ports:
+      - "10010:10010"
+      - "10011:10011"
+      - "10012:10012"
+      - "10013:10013"
+      - "10014:10014"
+      - "10015:10015"
+    networks:
+      - mvd-network
+    depends_on:
+      - postgres
+      - vault
+
+networks:
+  mvd-network:
+    driver: bridge

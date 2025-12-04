@@ -23,10 +23,15 @@ import {
   RotateCcw,
   Code,
   Shield,
-  Handshake,
-  Send
+  FileCheck2,
+  Send,
+  Github
 } from 'lucide-react';
 import { DPPViewer } from './components/DPPViewer';
+import hpTurbineBladeImg from './images/HP_TURBO_BLADE.png';
+import hpCompressorBladeImg from './images/HP_COMPRESSOR_BLADE.png';
+import combustorLinerImg from './images/HP_COMBUSTER_LINER.png';
+import fanBladeImg from './images/DPP_FAN_BLADE.png';
 import { 
   mockCatalogAssets, 
   mockDPPData, 
@@ -60,6 +65,13 @@ function App() {
   const [dppData, setDppData] = useState<DigitalProductPassport | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showJson, setShowJson] = useState(false);
+
+  const assetImages: Record<string, string> = {
+    'asset:dpp:RR001': hpTurbineBladeImg,
+    'asset:dpp:RR002': hpCompressorBladeImg,
+    'asset:dpp:RR003': combustorLinerImg,
+    'asset:dpp:RR004': fanBladeImg,
+  };
 
   const resetDemo = () => {
     setPhase('intro');
@@ -107,7 +119,7 @@ function App() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  Dataspace Protocol Demo
+                  DECADE-X - Digital Passport (DPP) Demo
                 </h1>
                 <p className="text-sm text-gray-500">Digital Product Passport Exchange</p>
               </div>
@@ -145,7 +157,7 @@ function App() {
             <div className="flex items-center justify-between">
               {[
                 { id: 'catalog', label: 'Catalog Protocol', icon: Database },
-                { id: 'negotiation', label: 'Contract Negotiation', icon: Handshake },
+                { id: 'negotiation', label: 'Contract Negotiation', icon: FileCheck2 },
                 { id: 'transfer', label: 'Transfer Process', icon: Send },
                 { id: 'complete', label: 'Data Received', icon: CheckCircle },
               ].map((step, i, arr) => (
@@ -180,14 +192,14 @@ function App() {
             <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl p-8 text-white">
               <div className="max-w-3xl">
                 <h2 className="text-3xl font-bold mb-4">
-                  Eclipse Dataspace Protocol
+                  Sovereign Data Exchange via Dataspace Protocol
                 </h2>
                 <p className="text-blue-100 text-lg mb-6">
-                  This interactive demo showcases how the Dataspace Protocol (DSP) 2025-1 enables 
-                  secure, sovereign data exchange between organizations. Experience the complete 
-                  flow of discovering, negotiating, and transferring a Digital Product Passport.
+                  This interactive demo illustrates the secure exchange of Digital Product Passports (DPP) 
+                  using the Dataspace Protocol (DSP). It demonstrates how organizations can maintain data sovereignty 
+                  while sharing critical aerospace data through a standardized, federated infrastructure.
                 </p>
-                <div className="flex gap-4">
+                <div className="flex gap-4 flex-wrap">
                   <button
                     onClick={() => setPhase('catalog')}
                     className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
@@ -195,6 +207,15 @@ function App() {
                     <Play className="w-5 h-5" />
                     Start Demo
                   </button>
+                  <a
+                    href="https://github.com/ma3u/MinimumViableDataspace"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-6 py-3 bg-blue-500/20 border border-white/30 rounded-lg font-semibold hover:bg-blue-500/30 text-white transition-colors"
+                  >
+                    <Github className="w-5 h-5" />
+                    View Code on GitHub
+                  </a>
                   <a
                     href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
                     target="_blank"
@@ -247,7 +268,7 @@ function App() {
                   <div key={key} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-2 mb-3">
                       {key === 'catalog' && <Database className="w-5 h-5 text-blue-600" />}
-                      {key === 'negotiation' && <Handshake className="w-5 h-5 text-purple-600" />}
+                      {key === 'negotiation' && <FileCheck2 className="w-5 h-5 text-purple-600" />}
                       {key === 'transfer' && <Send className="w-5 h-5 text-green-600" />}
                       <h4 className="font-semibold text-gray-900">{phaseData.title}</h4>
                     </div>
@@ -334,32 +355,44 @@ function App() {
                 {mockCatalogAssets.map(asset => (
                   <div 
                     key={asset['@id']}
-                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                    className={`relative overflow-hidden border rounded-lg p-4 cursor-pointer transition-all group ${
                       selectedAsset?.['@id'] === asset['@id']
-                        ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
+                        ? 'border-blue-500 ring-2 ring-blue-200'
                         : 'hover:border-blue-300 hover:shadow-md'
                     }`}
                     onClick={() => setSelectedAsset(asset as MockAsset)}
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <Package className="w-8 h-8 text-blue-600" />
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        asset['aerospace:status'] === 'NEW' 
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {asset['aerospace:status']}
-                      </span>
+                    {/* Background Image */}
+                    <div className="absolute inset-0 z-0">
+                      <img 
+                        src={assetImages[asset['@id']]} 
+                        alt="" 
+                        className="w-full h-full object-cover opacity-50 group-hover:opacity-100 transition-opacity duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/40 group-hover:from-white/90 group-hover:via-white/70 group-hover:to-white/20 transition-all" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 mb-1">{asset['dct:title']}</h4>
-                    <p className="text-sm text-gray-600 mb-3">{asset['dct:description']}</p>
-                    <div className="flex gap-2 flex-wrap">
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                        {asset['aerospace:partType']}
-                      </span>
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-mono">
-                        {asset['aerospace:serialNumber']}
-                      </span>
+
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between mb-3">
+                        <div /> {/* Spacer for removed icon */}
+                        <span className={`px-2 py-1 rounded text-xs font-medium backdrop-blur-sm shadow-sm ${
+                          asset['aerospace:status'] === 'NEW' 
+                            ? 'bg-green-100/90 text-green-800'
+                            : 'bg-yellow-100/90 text-yellow-800'
+                        }`}>
+                          {asset['aerospace:status']}
+                        </span>
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-1 text-lg">{asset['dct:title']}</h4>
+                      <p className="text-sm text-gray-600 mb-3 font-medium">{asset['dct:description']}</p>
+                      <div className="flex gap-2 flex-wrap">
+                        <span className="px-2 py-1 bg-white/80 backdrop-blur-sm border text-gray-700 rounded text-xs">
+                          {asset['aerospace:partType']}
+                        </span>
+                        <span className="px-2 py-1 bg-white/80 backdrop-blur-sm border text-gray-700 rounded text-xs font-mono">
+                          {asset['aerospace:serialNumber']}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -386,7 +419,7 @@ function App() {
           <div className="space-y-6">
             <PhaseHeader 
               phase={dspPhases.negotiation}
-              icon={<Handshake className="w-6 h-6" />}
+              icon={<FileCheck2 className="w-6 h-6" />}
             />
 
             {/* State Machine Visualization */}
@@ -616,30 +649,12 @@ function App() {
               </div>
             </div>
 
-            {/* Summary */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="font-semibold text-gray-900 mb-4">Protocol Summary</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <Database className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <div className="font-semibold">Catalog Protocol</div>
-                  <div className="text-sm text-gray-600">Asset discovered</div>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4 text-center">
-                  <Handshake className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                  <div className="font-semibold">Contract Negotiation</div>
-                  <div className="text-sm text-gray-600">Agreement finalized</div>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <Send className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                  <div className="font-semibold">Transfer Process</div>
-                  <div className="text-sm text-gray-600">Data received</div>
-                </div>
-              </div>
-            </div>
 
             {/* DPP Viewer */}
-            <DPPViewer dpp={dppData} />
+            <DPPViewer 
+              dpp={dppData} 
+              imageUrl={selectedAsset ? assetImages[selectedAsset['@id']] : undefined}
+            />
 
             {/* Restart */}
             <div className="flex justify-center">
@@ -660,7 +675,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-gray-500">
-              Demo based on Eclipse Dataspace Protocol 2025-1 Specification
+              Demo based on Eclipse Dataspace Protocol 2025-1 Specification and Eclipse Dataspace Components
             </div>
             <div className="flex items-center gap-4">
               <a 
@@ -675,9 +690,19 @@ function App() {
                 href="https://github.com/eclipse-edc/MinimumViableDataspace"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
               >
-                MVD Repository <ExternalLink className="w-3 h-3" />
+                <Github className="w-4 h-4" />
+                EDC MVD
+              </a>
+              <a 
+                href="https://github.com/ma3u/MinimumViableDataspace"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                <Github className="w-4 h-4" />
+                Decade-X Demo
               </a>
             </div>
           </div>

@@ -18,12 +18,14 @@ import {
   AlertCircle
 } from 'lucide-react';
 import type { DigitalProductPassport } from '../types';
+import { SimpleLineChart } from './SimpleLineChart';
 
 interface DPPViewerProps {
   dpp: DigitalProductPassport;
+  imageUrl?: string;
 }
 
-export function DPPViewer({ dpp }: DPPViewerProps) {
+export function DPPViewer({ dpp, imageUrl }: DPPViewerProps) {
   const subject = dpp.credentialSubject;
   
   const getStatusColor = (status: string) => {
@@ -36,9 +38,10 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-rr-blue to-blue-800 text-white p-6">
+    <div className="relative bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-rr-blue to-blue-800/90 text-white p-6 backdrop-blur-sm">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-2xl font-bold">Digital Product Passport</h2>
@@ -62,26 +65,37 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 bg-white/30">
         {/* Identity Node */}
         <section>
           <div className="flex items-center gap-2 mb-4">
             <Building2 className="w-5 h-5 text-rr-blue" />
             <h3 className="text-lg font-semibold text-gray-900">Identity Information</h3>
           </div>
-          <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-2 gap-4">
-            <InfoItem label="Manufacturer" value={subject.identityNode.manufacturerName} />
-            <InfoItem label="CAGE Code" value={subject.identityNode.cageCode} />
-            <InfoItem label="Part Number" value={subject.identityNode.partNumber} />
-            <InfoItem label="Serial Number" value={subject.identityNode.serialNumber} highlight />
-            {subject.identityNode.batchNumber && (
-              <InfoItem label="Batch Number" value={subject.identityNode.batchNumber} />
-            )}
-            {subject.identityNode.manufacturingDate && (
-              <InfoItem label="Manufacturing Date" value={subject.identityNode.manufacturingDate} />
-            )}
-            {subject.identityNode.manufacturingLocation && (
-              <InfoItem label="Location" value={subject.identityNode.manufacturingLocation} />
+          <div className="bg-gray-50/90 backdrop-blur-sm rounded-lg p-4 grid grid-cols-3 gap-4">
+            <div className="col-span-2 grid grid-cols-2 gap-4">
+              <InfoItem label="Manufacturer" value={subject.identityNode.manufacturerName} />
+              <InfoItem label="CAGE Code" value={subject.identityNode.cageCode} />
+              <InfoItem label="Part Number" value={subject.identityNode.partNumber} />
+              <InfoItem label="Serial Number" value={subject.identityNode.serialNumber} highlight />
+              {subject.identityNode.batchNumber && (
+                <InfoItem label="Batch Number" value={subject.identityNode.batchNumber} />
+              )}
+              {subject.identityNode.manufacturingDate && (
+                <InfoItem label="Manufacturing Date" value={subject.identityNode.manufacturingDate} />
+              )}
+              {subject.identityNode.manufacturingLocation && (
+                <InfoItem label="Location" value={subject.identityNode.manufacturingLocation} />
+              )}
+            </div>
+            {imageUrl && (
+              <div className="col-span-1 flex items-center justify-center">
+                <img 
+                  src={imageUrl} 
+                  alt="Part Preview" 
+                  className="w-full h-full object-contain max-h-64 rounded-lg"
+                />
+              </div>
             )}
           </div>
         </section>
@@ -92,7 +106,7 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
             <Shield className="w-5 h-5 text-green-600" />
             <h3 className="text-lg font-semibold text-gray-900">Airworthiness Certification</h3>
           </div>
-          <div className="bg-green-50 rounded-lg p-4">
+          <div className="bg-green-50/80 backdrop-blur-sm rounded-lg p-4">
             <div className="grid grid-cols-2 gap-4">
               <InfoItem label="Form Type" value={subject.airworthinessNode.formType} />
               <InfoItem label="Tracking Number" value={subject.airworthinessNode.formTrackingNumber} />
@@ -128,9 +142,9 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
             <Leaf className="w-5 h-5 text-emerald-600" />
             <h3 className="text-lg font-semibold text-gray-900">Sustainability Metrics</h3>
           </div>
-          <div className="bg-emerald-50 rounded-lg p-4">
+          <div className="bg-emerald-50/80 backdrop-blur-sm rounded-lg p-4">
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+              <div className="text-center p-4 bg-white/80 rounded-lg shadow-sm">
                 <div className="text-3xl font-bold text-emerald-600">
                   {subject.sustainabilityNode.pcfValue}
                 </div>
@@ -142,7 +156,7 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
                 </div>
               </div>
               {subject.sustainabilityNode.recyclableContent && (
-                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                <div className="text-center p-4 bg-white/80 rounded-lg shadow-sm">
                   <div className="text-3xl font-bold text-emerald-600">
                     {subject.sustainabilityNode.recyclableContent}%
                   </div>
@@ -150,7 +164,7 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
                 </div>
               )}
               {subject.sustainabilityNode.energyConsumption && (
-                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                <div className="text-center p-4 bg-white/80 rounded-lg shadow-sm">
                   <div className="text-3xl font-bold text-emerald-600">
                     {subject.sustainabilityNode.energyConsumption.value}
                   </div>
@@ -189,7 +203,7 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
             <Settings className="w-5 h-5 text-orange-600" />
             <h3 className="text-lg font-semibold text-gray-900">Operational Data</h3>
           </div>
-          <div className="bg-orange-50 rounded-lg p-4 grid grid-cols-2 gap-4">
+          <div className="bg-orange-50/80 backdrop-blur-sm rounded-lg p-4 grid grid-cols-2 gap-4">
             <MetricCard 
               label="Time Since New" 
               value={subject.operationalNode.timeSinceNew} 
@@ -216,6 +230,14 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
                 unit="cycles"
               />
             )}
+            
+            {/* Operational History Chart */}
+            {subject.operationalNode.history && (
+              <div className="col-span-2 bg-white/80 rounded-lg p-4 shadow-sm mt-2">
+                <div className="text-sm text-gray-600 mb-4 font-medium">Operational History (2025)</div>
+                <SimpleLineChart data={subject.operationalNode.history} />
+              </div>
+            )}
           </div>
         </section>
 
@@ -226,7 +248,7 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
               <Cpu className="w-5 h-5 text-purple-600" />
               <h3 className="text-lg font-semibold text-gray-900">Technical Specifications</h3>
             </div>
-            <div className="bg-purple-50 rounded-lg p-4 grid grid-cols-2 gap-4">
+            <div className="bg-purple-50/80 backdrop-blur-sm rounded-lg p-4 grid grid-cols-2 gap-4">
               <InfoItem label="Engine Model" value={subject.technicalSpecifications.engineModel} />
               <InfoItem label="Stage" value={subject.technicalSpecifications.stage} />
               {subject.technicalSpecifications.weight && (
@@ -261,6 +283,7 @@ export function DPPViewer({ dpp }: DPPViewerProps) {
             ID: {dpp.id}
           </div>
         </section>
+        </div>
       </div>
     </div>
   );
@@ -281,7 +304,7 @@ function MetricCard({ label, value, unit, max }: { label: string; value: number;
   const percentage = max ? (value / max) * 100 : 0;
   
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm">
+    <div className="bg-white/80 rounded-lg p-4 shadow-sm">
       <div className="text-sm text-gray-600 mb-1">{label}</div>
       <div className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</div>
       <div className="text-sm text-gray-500">{unit}</div>

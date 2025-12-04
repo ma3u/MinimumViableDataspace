@@ -18,7 +18,7 @@ export const mockCatalogAssets = [
   {
     '@id': 'asset:dpp:RR001',
     '@type': 'dcat:Dataset',
-    'dct:title': 'HP Turbine Blade DPP',
+    'dct:title': 'HP Turbine Blade',
     'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Turbine Blade',
     'dcat:keyword': ['turbine', 'blade', 'aerospace', 'DPP'],
     'dct:creator': 'did:web:rolls-royce.com',
@@ -49,7 +49,7 @@ export const mockCatalogAssets = [
   {
     '@id': 'asset:dpp:RR002',
     '@type': 'dcat:Dataset',
-    'dct:title': 'HP Compressor Blade DPP',
+    'dct:title': 'HP Compressor Blade',
     'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Compressor Blade',
     'dcat:keyword': ['compressor', 'blade', 'aerospace', 'DPP'],
     'dct:creator': 'did:web:rolls-royce.com',
@@ -80,7 +80,7 @@ export const mockCatalogAssets = [
   {
     '@id': 'asset:dpp:RR003',
     '@type': 'dcat:Dataset',
-    'dct:title': 'Combustor Liner DPP',
+    'dct:title': 'Combustor Liner',
     'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB Combustor Liner',
     'dcat:keyword': ['combustor', 'liner', 'aerospace', 'DPP'],
     'dct:creator': 'did:web:rolls-royce.com',
@@ -111,7 +111,7 @@ export const mockCatalogAssets = [
   {
     '@id': 'asset:dpp:RR004',
     '@type': 'dcat:Dataset',
-    'dct:title': 'Fan Blade DPP',
+    'dct:title': 'Fan Blade',
     'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB Carbon Fiber Fan Blade',
     'dcat:keyword': ['fan', 'blade', 'carbon fiber', 'aerospace', 'DPP'],
     'dct:creator': 'did:web:rolls-royce.com',
@@ -287,10 +287,19 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
         ]
       },
       operationalNode: {
-        timeSinceNew: 0,
-        cyclesSinceNew: 0,
+        timeSinceNew: 1250,
+        cyclesSinceNew: 450,
         maximumOperatingHours: 25000,
-        maximumCycles: 15000
+        maximumCycles: 15000,
+        history: [
+          { date: '2025-01', hours: 100, cycles: 40 },
+          { date: '2025-02', hours: 250, cycles: 90 },
+          { date: '2025-03', hours: 400, cycles: 150 },
+          { date: '2025-04', hours: 600, cycles: 220 },
+          { date: '2025-05', hours: 850, cycles: 310 },
+          { date: '2025-06', hours: 1050, cycles: 380 },
+          { date: '2025-07', hours: 1250, cycles: 450 }
+        ]
       },
       technicalSpecifications: {
         engineModel: 'Trent XWB-97',
@@ -334,10 +343,19 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
         ]
       },
       operationalNode: {
-        timeSinceNew: 0,
-        cyclesSinceNew: 0,
+        timeSinceNew: 3400,
+        cyclesSinceNew: 1200,
         maximumOperatingHours: 30000,
-        maximumCycles: 20000
+        maximumCycles: 20000,
+        history: [
+          { date: '2025-01', hours: 500, cycles: 180 },
+          { date: '2025-02', hours: 950, cycles: 340 },
+          { date: '2025-03', hours: 1400, cycles: 500 },
+          { date: '2025-04', hours: 1900, cycles: 680 },
+          { date: '2025-05', hours: 2400, cycles: 850 },
+          { date: '2025-06', hours: 2900, cycles: 1020 },
+          { date: '2025-07', hours: 3400, cycles: 1200 }
+        ]
       },
       technicalSpecifications: {
         engineModel: 'Trent XWB-97',
@@ -382,10 +400,19 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
       operationalNode: {
         timeSinceNew: 5000,
         cyclesSinceNew: 2500,
-        timeSinceOverhaul: 0,
-        cyclesSinceOverhaul: 0,
+        timeSinceOverhaul: 1500,
+        cyclesSinceOverhaul: 600,
         maximumOperatingHours: 20000,
-        maximumCycles: 10000
+        maximumCycles: 10000,
+        history: [
+          { date: '2025-01', hours: 3500, cycles: 1900 },
+          { date: '2025-02', hours: 3800, cycles: 2000 },
+          { date: '2025-03', hours: 4100, cycles: 2150 },
+          { date: '2025-04', hours: 4400, cycles: 2280 },
+          { date: '2025-05', hours: 4700, cycles: 2390 },
+          { date: '2025-06', hours: 4900, cycles: 2450 },
+          { date: '2025-07', hours: 5000, cycles: 2500 }
+        ]
       },
       technicalSpecifications: {
         engineModel: 'Trent XWB-97',
@@ -429,10 +456,19 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
         ]
       },
       operationalNode: {
-        timeSinceNew: 0,
-        cyclesSinceNew: 0,
+        timeSinceNew: 850,
+        cyclesSinceNew: 180,
         maximumOperatingHours: 40000,
-        maximumCycles: 25000
+        maximumCycles: 25000,
+        history: [
+          { date: '2025-01', hours: 120, cycles: 25 },
+          { date: '2025-02', hours: 250, cycles: 50 },
+          { date: '2025-03', hours: 380, cycles: 80 },
+          { date: '2025-04', hours: 510, cycles: 110 },
+          { date: '2025-05', hours: 640, cycles: 135 },
+          { date: '2025-06', hours: 750, cycles: 160 },
+          { date: '2025-07', hours: 850, cycles: 180 }
+        ]
       },
       technicalSpecifications: {
         engineModel: 'Trent XWB-97',
@@ -562,7 +598,7 @@ export const dspPhases = {
   catalog: {
     title: 'Catalog Protocol',
     description: 'The Catalog Protocol defines how a Consumer discovers data offerings from a Provider. The Consumer sends a CatalogRequestMessage and receives a DCAT Catalog containing available datasets and their usage policies.',
-    specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/catalog/catalog.protocol.html',
+    specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#catalog-protocol',
     steps: [
       { name: 'CatalogRequestMessage', direction: 'Consumer → Provider', description: 'Consumer requests the catalog' },
       { name: 'dcat:Catalog', direction: 'Provider → Consumer', description: 'Provider responds with available datasets' }
@@ -571,7 +607,7 @@ export const dspPhases = {
   negotiation: {
     title: 'Contract Negotiation Protocol',
     description: 'The Contract Negotiation Protocol defines how a Consumer and Provider negotiate a usage agreement. The protocol uses a state machine with states: REQUESTED, OFFERED, ACCEPTED, AGREED, VERIFIED, and FINALIZED.',
-    specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/negotiation/contract.negotiation.protocol.html',
+    specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#negotiation-protocol',
     steps: [
       { name: 'ContractRequestMessage', direction: 'Consumer → Provider', description: 'Consumer requests contract based on offer' },
       { name: 'ContractOfferMessage', direction: 'Provider → Consumer', description: 'Provider sends formal offer' },
@@ -584,7 +620,7 @@ export const dspPhases = {
   transfer: {
     title: 'Transfer Process Protocol',
     description: 'The Transfer Process Protocol defines how data is transferred after a contract is agreed. It supports both PUSH and PULL transfer types. The protocol uses states: REQUESTED, STARTED, SUSPENDED, COMPLETED, and TERMINATED.',
-    specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/transfer/transfer.process.protocol.html',
+    specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#transfer-protocol',
     steps: [
       { name: 'TransferRequestMessage', direction: 'Consumer → Provider', description: 'Consumer requests data transfer' },
       { name: 'TransferStartMessage', direction: 'Provider → Consumer', description: 'Provider starts transfer with data address' },

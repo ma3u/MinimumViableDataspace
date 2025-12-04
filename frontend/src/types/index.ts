@@ -181,6 +181,11 @@ export interface OperationalNode {
   maximumOperatingHours?: number;
   maximumCycles?: number;
   maintenanceSchedule?: string;
+  history?: {
+    date: string;
+    hours: number;
+    cycles: number;
+  }[];
 }
 
 export interface TechnicalSpecifications {
