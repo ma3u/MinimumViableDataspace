@@ -17,6 +17,7 @@ import {
   BookOpen,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   Play,
   RotateCcw,
   Code,
@@ -25,7 +26,8 @@ import {
   Github,
   Lock,
   Stethoscope,
-  Search
+  Search,
+  FileJson
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
 import { 
@@ -79,6 +81,7 @@ function AppHealth() {
   const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFhirJson, setShowFhirJson] = useState(false);
 
   // Filter assets based on category and search
   const filteredAssets = mockEHRCatalogAssets.filter(asset => {
@@ -1066,6 +1069,37 @@ function AppHealth() {
               </div>
             )}
 
+            {/* Collapsible FHIR JSON Viewer */}
+            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+              <button
+                onClick={() => setShowFhirJson(!showFhirJson)}
+                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-slate-100 rounded-lg">
+                    <FileJson className="w-5 h-5 text-slate-600" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-semibold text-gray-900">FHIR Bundle (JSON-LD)</h3>
+                    <p className="text-sm text-gray-500">View raw de-identified health record data</p>
+                  </div>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showFhirJson ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showFhirJson && (
+                <div className="border-t">
+                  <div className="p-4 bg-slate-900 overflow-auto max-h-[600px]">
+                    <pre className="text-sm font-mono">
+                      <FhirJsonHighlighter 
+                        data={ehrData || generateFhirBundle(selectedAsset)} 
+                      />
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Restart */}
             <div className="flex justify-center">
               <button
@@ -1158,6 +1192,133 @@ function PhaseHeader({ phase, icon }: PhaseHeaderProps) {
       </div>
     </div>
   );
+}
+
+// Generate FHIR Bundle from catalog asset when detailed data not available
+function generateFhirBundle(asset: MockEHRAsset) {
+  const pseudonymId = asset['health:consent']?.grantor.match(/[A-Z0-9]+\)?$/)?.[0]?.replace(')', '') || 'ANON-' + asset['@id'].split(':').pop();
+  
+  return {
+    '@context': [
+      'https://www.w3.org/2018/credentials/v1',
+      'https://w3id.org/ehds/ehr/v1',
+      'http://hl7.org/fhir'
+    ],
+    id: `did:web:rheinland-uklinikum.de:ehr:${asset['@id'].split(':').pop()}`,
+    type: ['VerifiableCredential', 'ElectronicHealthRecord', 'FHIRBundle'],
+    issuer: 'did:web:rheinland-uklinikum.de',
+    issuanceDate: new Date().toISOString(),
+    credentialSubject: {
+      id: `did:web:rheinland-uklinikum.de:patient:pseudonym:${pseudonymId}`,
+      resourceType: 'Bundle',
+      studyEligibility: [
+        `EHR-TO-EDC-${asset['health:category'].toUpperCase()}-2025`,
+        `REGISTRY-${asset['health:icdCode'].split('.')[0]}-2025`
+      ],
+      consentScope: {
+        purposes: asset['health:consent']?.purposes || ['clinical-research'],
+        dataCategories: ['demographics', 'conditions', 'observations', 'medications'],
+        retentionPeriod: '10-years',
+        jurisdiction: 'DE-NW',
+        restrictions: asset['health:consent']?.restrictions || ['no-reidentification'],
+        validUntil: asset['health:consent']?.validUntil || '2027-12-31'
+      },
+      demographicsNode: {
+        pseudonymId: pseudonymId,
+        ageBand: asset['health:ageBand'],
+        biologicalSex: asset['health:biologicalSex'],
+        region: 'Nordrhein-Westfalen',
+        enrollmentPeriod: '2024-Q4'
+      },
+      conditionsNode: {
+        primaryDiagnosis: {
+          code: asset['health:icdCode'],
+          system: 'ICD-10-GM',
+          display: asset['health:diagnosis'],
+          clinicalStatus: 'active'
+        },
+        comorbidities: []
+      },
+      observationsNode: {
+        latestVitals: {
+          recordPeriod: new Date().toISOString().slice(0, 7).replace('-', '-Q'),
+          bmiCategory: 'normal',
+          bloodPressureCategory: 'normal'
+        },
+        labResults: []
+      },
+      medicationsNode: {
+        activeTherapies: []
+      },
+      provenanceNode: {
+        sourceSystem: 'Rheinland-UK-EHR-v4',
+        extractionDate: new Date().toISOString().slice(0, 7),
+        deIdentificationMethod: 'k-anonymity-k5',
+        qualityScore: 0.94
+      }
+    }
+  };
+}
+
+// FHIR JSON Syntax Highlighter Component
+function FhirJsonHighlighter({ data }: { data: unknown }) {
+  const colorize = (json: string): JSX.Element[] => {
+    const lines = json.split('\n');
+    
+    return lines.map((line, lineIndex) => {
+      // Colorize the line
+      let coloredLine = line;
+      
+      // Keys (property names)
+      coloredLine = coloredLine.replace(/"(@?[\w:]+)"(?=\s*:)/g, 
+        '<span class="text-cyan-400">"$1"</span>');
+      
+      // String values (after colon)
+      coloredLine = coloredLine.replace(/:(?:\s*)"([^"]*)"/g, 
+        ': <span class="text-green-400">"$1"</span>');
+      
+      // Numbers
+      coloredLine = coloredLine.replace(/:(?:\s*)(\d+\.?\d*)(?=[,\s\n\]])/g, 
+        ': <span class="text-amber-400">$1</span>');
+      
+      // Booleans
+      coloredLine = coloredLine.replace(/:(?:\s*)(true|false)/g, 
+        ': <span class="text-purple-400">$1</span>');
+      
+      // Brackets and braces
+      coloredLine = coloredLine.replace(/([\[\]{}])/g, 
+        '<span class="text-slate-500">$1</span>');
+      
+      // Special FHIR/VC keywords highlighting
+      const specialKeys = ['@context', '@id', '@type', 'resourceType', 'credentialSubject', 'issuer', 'type'];
+      specialKeys.forEach(key => {
+        coloredLine = coloredLine.replace(
+          new RegExp(`"(${key})"`, 'g'),
+          '<span class="text-pink-400">"$1"</span>'
+        );
+      });
+      
+      // Health-specific keys
+      const healthKeys = ['consentScope', 'demographicsNode', 'conditionsNode', 'observationsNode', 'medicationsNode', 'provenanceNode'];
+      healthKeys.forEach(key => {
+        coloredLine = coloredLine.replace(
+          new RegExp(`"(${key})"`, 'g'),
+          '<span class="text-blue-400 font-semibold">"$1"</span>'
+        );
+      });
+      
+      return (
+        <div key={lineIndex} className="hover:bg-slate-800/50 px-2 -mx-2">
+          <span className="text-slate-600 select-none w-8 inline-block text-right mr-4">{lineIndex + 1}</span>
+          <span dangerouslySetInnerHTML={{ __html: coloredLine }} />
+        </div>
+      );
+    });
+  };
+  
+  const jsonString = JSON.stringify(data, null, 2);
+  
+  return <>{colorize(jsonString)}</>;
 }
 
 export default AppHealth;
