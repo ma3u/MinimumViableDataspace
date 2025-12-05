@@ -1,12 +1,14 @@
 {
-  "name": "aerospace-dpp-backend",
+  "name": "health-ehr-backend",
   "version": "1.0.0",
-  "description": "Mock backend service serving Aerospace Digital Product Passport data",
+  "description": "Mock backend service serving Electronic Health Record data for EHR2EDC demo",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "ts-node src/server.ts"
+    "dev": "ts-node src/server.ts",
+    "dev:health": "ts-node src/server-health.ts",
+    "start:health": "node dist/server-health.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

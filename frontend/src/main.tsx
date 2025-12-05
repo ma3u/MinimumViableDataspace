@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2024 Aerospace DPP Demo
+ *  Copyright (c) 2025 Health Dataspace Demo - EHR2EDC
  *
  *  This program and the accompanying materials are made available under the
  *  terms of the Apache License, Version 2.0 which is available at
@@ -10,11 +10,11 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
+import AppHealth from './App-health.tsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <AppHealth />
   </React.StrictMode>,
 )
