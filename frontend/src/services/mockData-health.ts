@@ -42,6 +42,24 @@ export const categoryBackgrounds: Record<string, string> = {
   'infectious': 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=400&h=300&fit=crop', // virus
 };
 
+// Consent purpose definitions aligned with EHDS and German GDNG
+export const consentPurposes = {
+  'clinical-research': { label: 'Clinical Research', icon: '🔬', description: 'Use in clinical trials and studies' },
+  'registry-participation': { label: 'Registry Participation', icon: '📊', description: 'Inclusion in disease registries' },
+  'real-world-evidence': { label: 'Real-World Evidence', icon: '🌍', description: 'RWE studies and health analytics' },
+  'ai-training': { label: 'AI/ML Training', icon: '🤖', description: 'Training machine learning models' },
+  'public-health': { label: 'Public Health', icon: '🏥', description: 'Public health monitoring and surveillance' },
+  'academic-research': { label: 'Academic Research', icon: '🎓', description: 'Non-commercial academic studies' },
+};
+
+export const consentRestrictions = {
+  'no-commercial': { label: 'No Commercial Use', icon: '🚫💰', description: 'Data may not be used for commercial purposes' },
+  'no-genetic': { label: 'No Genetic Analysis', icon: '🧬❌', description: 'Genetic/genomic analysis not permitted' },
+  'no-reidentification': { label: 'No Re-identification', icon: '🔒', description: 'Attempts to re-identify are prohibited' },
+  'no-third-party': { label: 'No Third-Party Sharing', icon: '🚫↗️', description: 'Data may not be shared outside the study' },
+  'no-indefinite-storage': { label: 'Time-Limited Storage', icon: '⏰', description: 'Data must be deleted after study completion' },
+};
+
 export const mockEHRCatalogAssets = [
   {
     '@id': 'asset:ehr:EHR001',
@@ -56,6 +74,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '55-64',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'real-world-evidence'],
+      restrictions: ['no-reidentification'],
+      validUntil: '2027-12-31',
+      grantor: 'Patient (Pseudonym: A7X9K2)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR002',
@@ -70,6 +94,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'public-health'],
+      restrictions: ['no-reidentification', 'no-commercial'],
+      validUntil: '2028-06-30',
+      grantor: 'Patient (Pseudonym: B8Y3L5)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR003',
@@ -84,6 +114,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '45-54',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'academic-research'],
+      restrictions: ['no-reidentification', 'no-genetic'],
+      validUntil: '2026-12-31',
+      grantor: 'Patient (Pseudonym: C2Z4M7)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR004',
@@ -98,6 +134,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation'],
+      restrictions: ['no-reidentification', 'no-third-party'],
+      validUntil: '2027-03-31',
+      grantor: 'Patient (Pseudonym: D5N8P2)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR005',
@@ -112,6 +154,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '55-64',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'real-world-evidence', 'public-health'],
+      restrictions: ['no-reidentification'],
+      validUntil: '2028-12-31',
+      grantor: 'Patient (Pseudonym: E9Q1R4)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR006',
@@ -126,6 +174,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '25-34',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'ai-training'],
+      restrictions: ['no-reidentification', 'no-commercial'],
+      validUntil: '2029-06-30',
+      grantor: 'Patient (Pseudonym: F3S6T8)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR007',
@@ -140,6 +194,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '45-54',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'academic-research'],
+      restrictions: ['no-reidentification', 'no-indefinite-storage'],
+      validUntil: '2026-09-30',
+      grantor: 'Patient (Pseudonym: G7U2V9)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR008',
@@ -154,6 +214,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'real-world-evidence'],
+      restrictions: ['no-reidentification'],
+      validUntil: '2027-12-31',
+      grantor: 'Patient (Pseudonym: H1W5X3)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR009',
@@ -169,6 +235,12 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'mental-health',
+    'health:consent': {
+      purposes: ['academic-research'],
+      restrictions: ['no-reidentification', 'no-commercial', 'no-third-party', 'no-indefinite-storage'],
+      validUntil: '2026-06-30',
+      grantor: 'Patient (Pseudonym: I4Y8Z1)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR010',
@@ -183,6 +255,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '55-64',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'ai-training'],
+      restrictions: ['no-reidentification'],
+      validUntil: '2028-12-31',
+      grantor: 'Patient (Pseudonym: J6A2B4)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR011',
@@ -197,6 +275,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '25-34',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'real-world-evidence'],
+      restrictions: ['no-reidentification', 'no-genetic'],
+      validUntil: '2027-09-30',
+      grantor: 'Patient (Pseudonym: K8C5D7)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR012',
@@ -211,6 +295,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '18-24',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'academic-research'],
+      restrictions: ['no-reidentification', 'no-commercial'],
+      validUntil: '2028-03-31',
+      grantor: 'Patient (Pseudonym: L2E9F1)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR013',
@@ -225,6 +315,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '35-44',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'academic-research'],
+      restrictions: ['no-reidentification', 'no-genetic'],
+      validUntil: '2027-12-31',
+      grantor: 'Patient (Pseudonym: M3G6H8)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR014',
@@ -239,6 +335,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '75-84',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'public-health', 'real-world-evidence'],
+      restrictions: ['no-reidentification'],
+      validUntil: '2028-06-30',
+      grantor: 'Patient (Pseudonym: N5I9J2)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR015',
@@ -253,6 +355,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '35-44',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'real-world-evidence'],
+      restrictions: ['no-reidentification', 'no-commercial'],
+      validUntil: '2027-09-30',
+      grantor: 'Patient (Pseudonym: O7K1L4)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR016',
@@ -267,6 +375,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '25-34',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'ai-training', 'real-world-evidence'],
+      restrictions: ['no-reidentification'],
+      validUntil: '2029-12-31',
+      grantor: 'Patient (Pseudonym: P2M5N7)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR017',
@@ -281,6 +395,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'public-health'],
+      restrictions: ['no-reidentification', 'no-indefinite-storage'],
+      validUntil: '2026-12-31',
+      grantor: 'Patient (Pseudonym: Q4O8P1)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR018',
@@ -296,6 +416,12 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'infectious-disease',
+    'health:consent': {
+      purposes: ['clinical-research', 'public-health'],
+      restrictions: ['no-reidentification', 'no-third-party', 'no-indefinite-storage'],
+      validUntil: '2027-06-30',
+      grantor: 'Patient (Pseudonym: R6Q2S3)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR019',
@@ -310,6 +436,12 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '35-44',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:consent': {
+      purposes: ['clinical-research', 'registry-participation', 'academic-research'],
+      restrictions: ['no-reidentification'],
+      validUntil: '2028-03-31',
+      grantor: 'Patient (Pseudonym: S8T4U6)',
+    },
   },
   {
     '@id': 'asset:ehr:EHR020',
@@ -325,6 +457,12 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'infectious-disease',
+    'health:consent': {
+      purposes: ['academic-research'],
+      restrictions: ['no-reidentification', 'no-commercial', 'no-third-party', 'no-indefinite-storage'],
+      validUntil: '2026-12-31',
+      grantor: 'Patient (Pseudonym: T1V7W9)',
+    },
   },
 ];
 

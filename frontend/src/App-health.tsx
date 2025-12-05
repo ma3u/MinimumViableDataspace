@@ -37,7 +37,9 @@ import {
   mockNegotiationFlow,
   mockTransferFlow,
   medicalCategories,
-  categoryBackgrounds
+  categoryBackgrounds,
+  consentPurposes,
+  consentRestrictions
 } from './services/mockData-health';
 import { fetchEHRById, checkBackendHealth } from './services/ehrApi';
 import type { ElectronicHealthRecord } from './types/health';
@@ -58,6 +60,12 @@ interface MockEHRAsset {
   'health:biologicalSex': string;
   'health:consentStatus': string;
   'health:sensitiveCategory'?: string;
+  'health:consent'?: {
+    purposes: string[];
+    restrictions: string[];
+    validUntil: string;
+    grantor: string;
+  };
 }
 
 function AppHealth() {
@@ -620,11 +628,80 @@ function AppHealth() {
               </div>
             </div>
 
-            {/* Policy Display */}
+            {/* Patient Consent Display */}
+            {selectedAsset['health:consent'] && (
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-green-600" />
+                  Patient Consent Declaration
+                </h3>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">✅</span>
+                      <div>
+                        <div className="font-medium text-green-800">Consent Active</div>
+                        <div className="text-sm text-green-600">Granted by: {selectedAsset['health:consent'].grantor}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-500">Valid Until</div>
+                      <div className="font-medium text-green-800">{selectedAsset['health:consent'].validUntil}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Permitted Purposes */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-green-800 mb-3 flex items-center gap-2">
+                      ✓ Permitted Data Use Purposes
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedAsset['health:consent'].purposes.map((purpose) => {
+                        const purposeInfo = consentPurposes[purpose as keyof typeof consentPurposes];
+                        return purposeInfo ? (
+                          <div key={purpose} className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
+                            <span className="text-xl">{purposeInfo.icon}</span>
+                            <div>
+                              <div className="font-medium text-green-800">{purposeInfo.label}</div>
+                              <div className="text-xs text-green-600">{purposeInfo.description}</div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Restrictions */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-red-800 mb-3 flex items-center gap-2">
+                      ✗ Consent Restrictions
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedAsset['health:consent'].restrictions.map((restriction) => {
+                        const restrictionInfo = consentRestrictions[restriction as keyof typeof consentRestrictions];
+                        return restrictionInfo ? (
+                          <div key={restriction} className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-lg p-3">
+                            <span className="text-xl">{restrictionInfo.icon}</span>
+                            <div>
+                              <div className="font-medium text-red-800">{restrictionInfo.label}</div>
+                              <div className="text-xs text-red-600">{restrictionInfo.description}</div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Technical Policy (ODRL) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border">
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-purple-600" />
-                Consent-Based Usage Policy (ODRL)
+                <Code className="w-5 h-5 text-purple-600" />
+                Technical Policy Enforcement (ODRL)
               </h3>
               <div className="bg-purple-50 rounded-lg p-4">
                 <div className="grid md:grid-cols-3 gap-4">
