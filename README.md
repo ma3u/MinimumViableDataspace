@@ -1,6 +1,6 @@
-# Aerospace Supply Chain Digital Product Passport Demo
+# EHR2EDC with High Privacy and Consent Management Demo
 
-A comprehensive demonstration of sovereign data exchange for aerospace Digital Product Passports (DPP) using Eclipse Dataspace Components within the Aerospace Supply Chain initiative.
+A comprehensive demonstration of secure, interoperable, and consent-managed access to health data for research (secondary use), aligned with the European Health Data Space (EHDS) and German Health Data Use Act (GDNG).
 
 ---
 
@@ -8,888 +8,146 @@ A comprehensive demonstration of sovereign data exchange for aerospace Digital P
 
 1. [Introduction](#1-introduction)
    - 1.1 [Purpose](#11-purpose)
-   - 1.2 [Aerospace Supply Chain Context](#12-aerospace-supply-chain-context)
+   - 1.2 [Context & Initiatives](#12-context--initiatives)
    - 1.3 [Demo Scenario](#13-demo-scenario)
-2. [Architecture Overview](#2-architecture-overview)
-   - 2.1 [System Components](#21-system-components)
-   - 2.2 [Component Interaction Diagram](#22-component-interaction-diagram)
-   - 2.3 [Data Flow Architecture](#23-data-flow-architecture)
-   - 2.4 [Identity & Trust Framework](#24-identity--trust-framework)
-3. [Technical Components](#3-technical-components)
-   - 3.1 [Eclipse Dataspace Components (EDC)](#31-eclipse-dataspace-components-edc)
-   - 3.2 [IdentityHub & Decentralized Claims Protocol](#32-identityhub--decentralized-claims-protocol)
-   - 3.3 [Demo Application Components](#33-demo-application-components)
+2. [User Journey](#2-user-journey)
+   - 2.1 [Pre-Enrollment](#21-pre-enrollment-patient-onboarding)
+   - 2.2 [Study Enrollment](#22-study-enrollment-and-consent-capture)
+   - 2.3 [Consent Verification](#23-consent-verification-and-policy-provisioning)
+   - 2.4 [Data Discovery](#24-ehr-data-discovery-and-eligibility-screening)
+   - 2.5 [Contract Negotiation](#25-contract-negotiation-and-data-transfer-setup)
+   - 2.6 [De-identification](#26-de-identification-and-provenance)
+   - 2.7 [EDC Ingestion](#27-edc-ingestion-and-study-data-lock)
+   - 2.8 [Re-consent & Revocation](#28-re-consent-and-revocation)
+3. [Architecture Overview](#3-architecture-overview)
 4. [Deployment Manual](#4-deployment-manual)
-   - 4.1 [Prerequisites](#41-prerequisites)
-   - 4.2 [Phase 1: Infrastructure Setup](#42-phase-1-infrastructure-setup)
-   - 4.3 [Phase 2: Start Eclipse Dataspace Components](#43-phase-2-start-eclipse-dataspace-components)
-   - 4.4 [Phase 3: Seed Identities and Credentials](#44-phase-3-seed-identities-and-credentials)
-   - 4.5 [Phase 4: Deploy Demo Application](#45-phase-4-deploy-demo-application)
-   - 4.6 [Phase 5: Seed Aerospace Assets](#46-phase-5-seed-aerospace-assets)
-   - 4.7 [Verification Checklist](#47-verification-checklist)
 5. [User Manual](#5-user-manual)
-   - 5.1 [Accessing the Demo](#51-accessing-the-demo)
-   - 5.2 [Consumer Workflow (Horizon Aviation Group)](#52-consumer-workflow-horizon-aviation-group)
-   - 5.3 [Provider Workflow (ApexPropulsion Systems)](#53-provider-workflow-apexpropulsion-systems)
-   - 5.4 [Understanding the DPP Data](#54-understanding-the-dpp-data)
-6. [Data Model Specification](#6-data-model-specification)
-   - 6.1 [Digital Product Passport Structure](#61-digital-product-passport-structure)
-   - 6.2 [EDC Asset Configuration](#62-edc-asset-configuration)
-   - 6.3 [Policy Definitions](#63-policy-definitions)
-7. [Credentials & Access Control](#7-credentials--access-control)
-   - 7.1 [Verifiable Credentials](#71-verifiable-credentials)
-   - 7.2 [Policy Evaluation Flow](#72-policy-evaluation-flow)
-8. [API Reference](#8-api-reference)
-   - 8.1 [EDC Management APIs](#81-edc-management-apis)
-   - 8.2 [DPP Backend APIs](#82-dpp-backend-apis)
-9. [Troubleshooting](#9-troubleshooting)
-10. [Future Extensions](#10-future-extensions)
 
 ---
 
 ## 1. Introduction
 
 ### 1.1 Purpose
+This demonstration showcases the extraction of consent-gated Electronic Health Records (EHR) into an Electronic Data Capture (EDC) system for clinical research (EHR2EDC). It emphasizes strong privacy, granular consent management, and data sovereignty using Eclipse Dataspace Components.
 
-This demonstration showcases the secure, sovereign exchange of aerospace Digital Product Passports between industry participants using Eclipse Dataspace Components. It illustrates how OEMs and suppliers can share critical component data—including airworthiness certificates, sustainability metrics, and operational history—while maintaining full control over their data assets.
-
-### 1.2 Aerospace Supply Chain Context
-
-The Aerospace Supply Chain initiative represents a vision for a federated aerospace data ecosystem built on dataspace principles. This demo implements a key use case:
-
-**Sovereign Data Exchange for Aerospace Supply Chain**
-- **Data Sovereignty**: Each participant maintains control over their data and access policies
-- **Interoperability**: Standardized protocols (DSP) enable seamless B2B data exchange
-- **Trust Framework**: Decentralized identity (DIDs) and Verifiable Credentials establish trust without central authorities
-- **Regulatory Compliance**: Supports EASA requirements for digital documentation and traceability
+### 1.2 Context & Initiatives
+- **European Health Data Space (EHDS)**: Mandates secure secondary use of health data ("HealthData@EU").
+- **Sphin-X & GDNG**: Focus on decentralized access and "Data Visiting" (Compute-to-Data) to minimize privacy risks.
+- **Prometheus-X**: Provides architectural blueprints for consent and contract negotiation.
 
 ### 1.3 Demo Scenario
-
-The demo simulates a real-world aerospace supply chain data exchange. This diagram shows how ApexPropulsion Systems manufactures engine components and creates Digital Product Passports, which are then shared with Horizon Aviation Group via the Dataspace Protocol (DSP). Horizon Aviation Group integrates this data into their fleet management platform.
-
-```mermaid
-flowchart LR
-    subgraph Provider["ApexPropulsion Systems - Provider"]
-        RR["Engine OEM"]
-        DPP["Digital Product Passports"]
-    end
-    
-    subgraph Consumer["Horizon Aviation Group - Consumer"]
-        AB["Airframe OEM"]
-        SKY["Fleet Management Platform"]
-    end
-    
-    RR --> |"Manufactures"| DPP
-    DPP --> |"DSP"| AB
-    AB --> |"Integrates"| SKY
-```
+The demo simulates a clinical research study where a Contract Research Organization (CRO) requests access to patient data held by a Healthcare Provider.
 
 **Participants:**
-- **ApexPropulsion Systems** (Provider): Manufactures Trent XWB engine components and provides Digital Product Passports
-- **Horizon Aviation Group** (Consumer): Procures engine components and requires DPP data for fleet management
-
-**Data Exchanged:**
-- Airworthiness certificates (EASA Form 1)
-- Product Carbon Footprint (PCF) data
-- Operational metrics (flight hours, cycles)
-- Technical specifications
-
-### 1.4 Demo User Journey
-
-![alt text](dpp-frontend1.png)
-Frontend interface showing catalog of DPP assets and detailed passport view.
-
-![choose a asset from the data catalog](demo-step1.png)
-In the first step the suer choose a asset from the data catalog to view its Digital Product Passport.
-
-![user negotiates a contract to access the DPP](demo-step2.png)
-In step 2 the user negotiates a contract to access the DPP data by presenting their Verifiable Credentials under one data access policy.
-
-![Start the transfer](demo-step3.png)
-In step 3 the user starts the data transfer to fetch the DPP data over HTTP-PULL.
-
-![Finally the DPP from the supplier will be displayed](demo-step4.png)
-Finally the DPP from the supplier will be displayed in a structured viewer format.
-
----
-
-## 2. Architecture Overview
-
-### 2.1 System Components
-
-The demo architecture consists of three layers. The Presentation Layer contains the React frontend, the Dataspace Layer hosts the EDC connectors and IdentityHubs for both Consumer (Horizon Aviation Group) and Provider (ApexPropulsion Systems), plus a Trust Anchor with the Issuer Service. The Data Layer contains the DPP Backend that serves the actual product passport data.
-
-```mermaid
-flowchart TB
-    subgraph Presentation["Presentation Layer"]
-        FE["React Frontend :3000"]
-    end
-    
-    subgraph Dataspace["Dataspace Layer - MVD"]
-        subgraph Consumer["Consumer - Horizon Aviation Group"]
-            CC["Consumer Controlplane :8081"]
-            CD["Consumer Dataplane :11001"]
-            CIH["Consumer IdentityHub :7082"]
-        end
-        
-        subgraph Provider["Provider - ApexPropulsion Systems"]
-            PC["Provider Controlplane :8191"]
-            PD["Provider Dataplane :11002"]
-            PIH["Provider IdentityHub :7092"]
-        end
-        
-        subgraph Trust["Trust Anchor"]
-            ISS["Issuer Service :10016"]
-            NGINX["DID Server :9876"]
-        end
-    end
-    
-    subgraph Data["Data Layer"]
-        BE["DPP Backend :3001"]
-    end
-    
-    FE --> CC
-    FE --> PC
-    CC <--> |DSP| PC
-    CC --> CIH
-    PC --> PIH
-    CIH --> ISS
-    PIH --> ISS
-    PC --> BE
-```
-
-### 2.2 Component Interaction Diagram
-
-The following diagram shows the complete data exchange flow. It illustrates the three main phases: Catalog Discovery (where credentials are verified to access the catalog), Contract Negotiation (where policies are evaluated against presented credentials), and Data Transfer (where the actual DPP data is fetched using the negotiated access token).
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant User as Horizon Aviation Group User
-    participant FE as Frontend
-    participant CC as Consumer<br/>Controlplane
-    participant CIH as Consumer<br/>IdentityHub
-    participant PIH as Provider<br/>IdentityHub
-    participant PC as Provider<br/>Controlplane
-    participant PD as Provider<br/>Dataplane
-    participant BE as DPP Backend
-    participant ISS as Issuer Service
-
-    Note over User,ISS: Phase 1: Catalog Discovery
-    User->>FE: Browse Catalog
-    FE->>CC: POST /catalog/request
-    CC->>CIH: Get Credentials
-    CIH-->>CC: MembershipCredential VP
-    CC->>PC: DSP: CatalogRequest + VP
-    PC->>PIH: Verify Credential
-    PIH-->>PC: Credential Valid
-    PC-->>CC: Catalog Response
-    CC-->>FE: Asset List
-    FE-->>User: Display DPP Assets
-
-    Note over User,ISS: Phase 2: Contract Negotiation
-    User->>FE: Select Asset
-    FE->>CC: POST /contractnegotiations
-    CC->>CIH: Get DataProcessor Credential
-    CIH-->>CC: DataProcessorCredential VP
-    CC->>PC: DSP: ContractRequest + VP
-    PC->>PIH: Evaluate Policy
-    PIH->>ISS: Verify Credential Chain
-    ISS-->>PIH: Valid
-    PIH-->>PC: Policy Satisfied
-    PC-->>CC: ContractAgreement
-    CC-->>FE: Negotiation Complete
-
-    Note over User,ISS: Phase 3: Data Transfer
-    User->>FE: Request Transfer
-    FE->>CC: POST /transferprocesses
-    CC->>PC: DSP: TransferRequest
-    PC-->>CC: EndpointDataReference (EDR)
-    CC-->>FE: EDR with Token
-    FE->>PD: GET /public + Token
-    PD->>BE: Fetch DPP Data
-    BE-->>PD: JSON-LD DPP
-    PD-->>FE: DPP Data
-    FE-->>User: Display DPP Viewer
-```
-
-### 2.3 Data Flow Architecture
-
-This diagram shows how DPP data flows from source systems to consumers. External data sources (ERP, MES, PLM) feed into the DPP Backend where data is aggregated and serialized to JSON-LD. The Eclipse Dataspace manages assets, policies, and transfers, ultimately delivering the data to the Consumer's catalog browser and DPP viewer.
+- **Rheinland Universitätsklinikum** (Provider): A hospital holding patient EHR data.
+- **Nordstein Research Institute** (Consumer): A CRO conducting a clinical study.
+- **Patient**: The data subject who grants consent.
 
 ```mermaid
 flowchart LR
-    subgraph External["External Data Sources"]
-        ERP["ERP Systems"]
-        MES["Manufacturing Execution"]
-        PLM["PLM Systems"]
+    subgraph Provider["Rheinland Universitätsklinikum - Provider"]
+        EHR["EHR System (FHIR)"]
+        DeID["De-Identification Service"]
     end
     
-    subgraph Backend["DPP Backend"]
-        AGG["Data Aggregator"]
-        JSONLD["JSON-LD Serializer"]
+    subgraph Consumer["Nordstein Research Institute - Consumer"]
+        EDC_C["EDC Consumer"]
+        StudyDB["Study Database (EDC)"]
     end
     
-    subgraph EDC["Eclipse Dataspace"]
-        ASSET["Asset Registry"]
-        POLICY["Policy Engine"]
-        TRANSFER["Transfer Manager"]
-    end
-    
-    subgraph Consumer["Consumer Systems"]
-        CATALOG["Catalog Browser"]
-        VIEWER["DPP Viewer"]
-    end
-    
-    ERP --> AGG
-    MES --> AGG
-    PLM --> AGG
-    AGG --> JSONLD
-    JSONLD --> ASSET
-    ASSET --> POLICY
-    POLICY --> TRANSFER
-    TRANSFER --> CATALOG
-    CATALOG --> VIEWER
+    EHR --> DeID
+    DeID --> |"DSP (Consent Gated)"| EDC_C
+    EDC_C --> StudyDB
 ```
 
-### 2.4 Identity & Trust Framework
+## 2. User Journey
 
-This diagram illustrates the decentralized identity infrastructure. The Issuer DID issues Verifiable Credentials (MembershipCredential and DataProcessorCredential) to both Consumer and Provider. These credentials are stored in the respective IdentityHubs and presented during DSP message exchanges to prove authorization.
+This section outlines the step-by-step process of the EHR2EDC use case.
 
-```mermaid
-flowchart TB
-    subgraph DID["Decentralized Identifiers"]
-        CDID["Consumer DID"]
-        PDID["Provider DID"]
-        IDID["Issuer DID"]
-    end
-    
-    subgraph VC["Verifiable Credentials"]
-        MC["MembershipCredential"]
-        DPC["DataProcessorCredential"]
-    end
-    
-    subgraph IH["IdentityHubs"]
-        CIH["Consumer IdentityHub"]
-        PIH["Provider IdentityHub"]
-    end
-    
-    IDID --> |issues| MC
-    IDID --> |issues| DPC
-    MC --> CIH
-    MC --> PIH
-    DPC --> CIH
-    DPC --> PIH
-    CDID --> CIH
-    PDID --> PIH
-```
+### 2.1 Pre-Enrollment (Patient Onboarding)
+The patient receives study information and a DID wallet link. They verify the Issuer DID and obtain Membership credentials to the healthcare network.
 
----
+![Pre-Enrollment Screenshot](placeholder-pre-enrollment.svg)
 
-## 3. Technical Components
+### 2.2 Study Enrollment and Consent Capture
+The patient reviews the protocol-specific consent. Upon agreement, the Issuer issues a **ConsentCredential** to the Patient's DID, which can be presented to the provider.
 
-### 3.1 Eclipse Dataspace Components (EDC)
+![Study Enrollment Screenshot](placeholder-study-enrollment.svg)
 
-The EDC provides the core dataspace functionality:
+### 2.3 Consent Verification and Policy Provisioning
+The Consumer (CRO) queries the catalog. The Provider evaluates access policies using the IdentityHub. Access is granted only if the **ConsentCredential** matches the study purpose and validity period.
 
-**Controlplane** - Handles protocol messages, contract negotiation, and policy enforcement
-- Consumer Controlplane: `http://localhost:8081`
-- Provider QNA Controlplane: `http://localhost:8191`
+![Consent Verification Screenshot](placeholder-consent-verification.svg)
 
-**Dataplane** - Executes actual data transfers
-- Consumer Dataplane: `http://localhost:11001`
-- Provider QNA Dataplane: `http://localhost:11002`
+### 2.4 EHR Data Discovery and Eligibility Screening
+The Consumer submits criteria (e.g., ICD-10 codes, age range) to discover eligible data. The Provider responds with aggregate counts (preserving privacy) to aid in feasibility analysis without revealing raw data.
 
-**Catalog Server** - Federated catalog for asset discovery
-- Provider Catalog Server: `http://localhost:8091`
+![Data Discovery Screenshot](placeholder-data-discovery.svg)
 
-### 3.2 IdentityHub & Decentralized Claims Protocol
+### 2.5 Contract Negotiation and Data Transfer Setup
+The Consumer requests a contract, presenting their **MembershipCredential** and **DataProcessorCredential**. The Provider returns a ContractAgreement and an EndpointDataReference (EDR) for the scoped FHIR bundle.
 
-The IdentityHub manages participant identities and credentials:
+![Contract Negotiation Screenshot](placeholder-contract-negotiation.svg)
 
-**Consumer IdentityHub**: `http://localhost:7082`
-- Stores Consumer's DID document
-- Holds MembershipCredential and DataProcessorCredential
-- Issues Verifiable Presentations for DSP messages
+### 2.6 De-identification and Provenance
+Before transfer, the Provider's dataplane runs a de-identification pipeline (removing direct identifiers, pseudonymizing). A **Provenance VC** is attached to record the transformation steps.
 
-**Provider IdentityHub**: `http://localhost:7092`
-- Stores Provider's DID document
-- Verifies incoming credential presentations
-- Manages provider's own credentials
+![De-identification Screenshot](placeholder-de-identification.svg)
 
-**Issuer Service**: `http://localhost:10016`
-- Trusted third party issuing credentials
-- Signs credentials with issuer's private key
-- DID: `did:web:localhost%3A9876:issuer`
+### 2.7 EDC Ingestion and Study Data Lock
+The Consumer fetches the de-identified FHIR Bundle, transforms it to CDISC SDTM/ODM standards, and loads it into their EDC system. The data is locked and an audit trail is maintained.
 
-### 3.3 Demo Application Components
+![EDC Ingestion Screenshot](placeholder-edc-ingestion.svg)
 
-**Frontend** (React/TypeScript)
-- URL: `http://localhost:3000`
-- Features: Catalog browser, contract negotiation UI, DPP viewer
-- Technology: Vite, React 18, TailwindCSS
+### 2.8 Re-consent and Revocation
+If the protocol changes, the patient is notified to re-consent. If the patient revokes consent, the ConsentCredential status is updated, and the Provider enforces recall obligations.
 
-**DPP Backend** (Node.js/Express)
-- URL: `http://localhost:3001`
-- Serves mock DPP data in JSON-LD format
-- Simulates ApexPropulsion Systems internal systems
+![Re-consent Screenshot](placeholder-re-consent.svg)
 
----
+## 3. Architecture Overview
+
+The solution leverages the **Eclipse Dataspace Components (EDC)** for sovereign data exchange and **IdentityHub** for managing Verifiable Credentials.
+
+*   **Provider Side**: EHR Adapter → De-ID Service → Provider Controlplane/Dataplane → IdentityHub.
+*   **Consumer Side**: EDC Consumer → EDC-to-EDC (EDC) → Study EDC System.
+*   **Trust**: Issuer Service issues MembershipCredential and DataProcessorCredential.
 
 ## 4. Deployment Manual
 
 ### 4.1 Prerequisites
+*   Java 17+
+*   Docker & Docker Compose
+*   Kind (Kubernetes in Docker) - Optional for K8s deployment
 
-Ensure the following are installed:
+### 4.2 Setup Steps
 
-| Software | Version | Purpose |
-|----------|---------|--------|
-| Java | 17+ (temurin-22 recommended) | EDC runtimes |
-| Node.js | 18+ or 20+ | Frontend & backend |
-| Docker | Latest | Container runtime |
-| Docker Compose | Latest | Container orchestration |
-| Newman | Latest | Postman CLI for seeding |
-| jq | Latest | JSON processing |
-| IntelliJ IDEA | 2023+ (recommended) | IDE with run configurations |
+1.  **Infrastructure Setup**:
+    Start the MVD infrastructure (EDC connectors, IdentityHubs) using your preferred method (Gradle or Kubernetes).
 
-**Install Newman (if not present):**
-```bash
-npm install -g newman
-```
+2.  **Seed Identities**:
+    Initialize the basic identities and credentials.
+    ```bash
+    ./seed.sh
+    ```
 
-### 4.2 Phase 1: Infrastructure Setup
+3.  **Seed Health Data**:
+    This script seeds the Rheinland Universitätsklinikum with anonymized EHR records.
+    ```bash
+    ./seed-health.sh
+    ```
 
-**Step 1.1: Clone and Build MVD**
-```bash
-cd /path/to/MinimumViableDataspace
-./gradlew build
-```
-
-**Step 1.2: Start NGINX for Issuer DID Document**
-
-The issuer's DID document must be accessible via HTTP:
-
-```bash
-docker run -d --name nginx -p 9876:80 --rm \
-  -v "$PWD"/deployment/assets/issuer/nginx.conf:/etc/nginx/nginx.conf:ro \
-  -v "$PWD"/deployment/assets/issuer/did.docker.json:/var/www/.well-known/did.json:ro \
-  nginx
-```
-
-**Verify:** `curl http://localhost:9876/.well-known/did.json` should return the issuer's DID document.
-
-### 4.3 Phase 2: Start Eclipse Dataspace Components
-
-**Option A: IntelliJ IDEA (Recommended for Development)**
-
-1. Open the project in IntelliJ IDEA
-2. Navigate to `.run/` directory
-3. Run the `dataspace` compound run configuration
-4. Wait for all 8 runtimes to start: consumer, consumer-identityhub, provider-qna, provider-manufacturing, provider-catalog-server, provider-identityhub, issuerservice
-
-**Option B: Kubernetes (Production-like)**
-
-```bash
-# Build with persistence
-./gradlew -Ppersistence=true build
-./gradlew -Ppersistence=true dockerize
-
-# Create KinD cluster
-kind create cluster -n mvd --config deployment/kind.config.yaml
-
-# Load images
-kind load docker-image controlplane:latest dataplane:latest \
-  identity-hub:latest catalog-server:latest issuerservice:latest -n mvd
-
-# Deploy with Terraform
-cd deployment
-terraform init
-terraform apply
-```
-
-**Verify EDC is running:**
-```bash
-# Consumer health check
-curl http://localhost:8081/api/check/health
-
-# Provider health check  
-curl http://localhost:8191/api/check/health
-```
-
-### 4.4 Phase 3: Seed Identities and Credentials
-
-This critical step creates participant contexts in the IdentityHubs and issues Verifiable Credentials.
-
-```bash
-./seed.sh
-```
-
-**What seed.sh does:**
-
-This diagram shows the six steps executed by the seed script. It seeds test assets and catalog links, creates participant contexts for Consumer and Provider in their IdentityHubs, registers the Issuer, and finally issues the required credentials to both participants.
-
-```mermaid
-flowchart TB
-    subgraph Seed["seed.sh Execution"]
-        S1[Seed Assets]
-        S2[Seed Catalog Links]
-        S3[Create Consumer Context]
-        S4[Create Provider Context]
-        S5[Create Issuer]
-        S6[Issue Credentials]
-    end
-    
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
-    
-    subgraph Result["Result"]
-        R1[Consumer DID + Credentials]
-        R2[Provider DID + Credentials]
-    end
-    
-    S6 --> R1
-    S6 --> R2
-```
-
-**Expected Output:**
-```
-Create consumer participant context in IdentityHub
-Create provider participant context in IdentityHub
-Create dataspace issuer
-```
-
-**Verify credentials were issued:**
-```bash
-# Check consumer credentials
-curl -s http://localhost:7082/api/identity/v1alpha/participants/ \
-  -H "x-api-key: c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo=" | jq
-```
-
-### 4.5 Phase 4: Deploy Demo Application
-
-**Step 4.1: Start DPP Backend**
-
-```bash
-cd backend-mock
-npm install
-npm run dev
-```
-
-The backend starts on port 3001 and serves DPP data.
-
-**Verify:** `curl http://localhost:3001/health`
-
-**Step 4.2: Start Frontend**
-
-**Option A: Development Mode**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-**Option B: Docker Compose**
-```bash
-docker-compose -f docker-compose.aerospace.yml up --build
-```
-
-This starts both the frontend (port 3000) and backend (port 3001).
-
-### 4.6 Phase 5: Seed Aerospace Assets
-
-After the dataspace is running and seeded, add the aerospace-specific assets:
-
-```bash
-# For local development
-DPP_BACKEND_URL=http://localhost:3001 ./seed-aerospace.sh
-
-# For Docker deployment
-DPP_BACKEND_URL=http://host.docker.internal:3001 ./seed-aerospace.sh
-```
-
-**What seed-aerospace.sh creates:**
-
-| Entity | ID | Description |
-|--------|-----|-------------|
-| Asset | `asset:propulsion:blade:98765` | HPT Blade DPP |
-| Asset | `asset:propulsion:blade:98766` | Compressor Blade DPP |
-| Asset | `asset:propulsion:combustor:98767` | Combustor Liner DPP |
-| Policy | `aerospace-membership-required` | Requires MembershipCredential |
-| Policy | `aerospace-dpp-access` | Requires DataProcessorCredential |
-| Contract | `aerospace-dpp-contract` | Links assets to policies |
-
-### 4.7 Verification Checklist
-
-Use this checklist to verify the deployment:
-
-| Check | Command | Expected Result |
-|-------|---------|----------------|
-| NGINX running | `curl http://localhost:9876/.well-known/did.json` | DID document JSON |
-| Consumer EDC | `curl http://localhost:8081/api/check/health` | `{"isSystemHealthy":true}` |
-| Provider EDC | `curl http://localhost:8191/api/check/health` | `{"isSystemHealthy":true}` |
-| DPP Backend | `curl http://localhost:3001/health` | `{"status":"healthy"}` |
-| Frontend | Open `http://localhost:3000` | React app loads |
-| Catalog Query | See API test below | Assets returned |
-
-**Test Catalog Query:**
-```bash
-curl -X POST http://localhost:8081/api/catalog/v1alpha/catalog/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "@context": {"edc": "https://w3id.org/edc/v0.0.1/ns/"},
-    "@type": "QuerySpec"
-  }'
-```
-
----
+4.  **Deploy Demo Application**:
+    Start the frontend and backend mock services.
+    ```bash
+    docker-compose -f docker-compose.health.yml up -d
+    ```
 
 ## 5. User Manual
 
 ### 5.1 Accessing the Demo
-
-Open your browser and navigate to: **http://localhost:3000**
-
-The interface allows switching between Consumer (Horizon Aviation Group) and Provider (ApexPropulsion Systems) perspectives.
-
-### 5.2 Consumer Workflow (Horizon Aviation Group)
-
-This diagram shows the six-step workflow for consuming DPP data. Users select their role, browse the provider's catalog, select an asset, negotiate a contract based on their credentials, initiate the data transfer, and finally view the complete Digital Product Passport.
-
-```mermaid
-flowchart LR
-    A[Select Role]
-    B --> C[Select Asset]
-    C --> D[Negotiate]
-    D --> E[Transfer]
-    E --> F[View DPP]
-```
-
-**Step 1: Select Consumer Role**
-- Click "Consumer (Horizon Aviation Group)" in the role switcher
-- The interface shows the consumer perspective
-
-**Step 2: Browse Catalog**
-- Click "Refresh Catalog" to fetch available DPPs
-- The catalog shows assets from ApexPropulsion Systems
-- Each asset displays: Name, Part Type, Serial Number
-
-**Step 3: Select Asset**
-- Click on an asset card to select it
-- View asset details including description and properties
-
-**Step 4: Negotiate Contract**
-
-Click "Negotiate Contract". The system automatically requests the asset's policy, presents required credentials (MembershipCredential, DataProcessorCredential), and completes the negotiation. Wait for status: "FINALIZED".
-
-**Step 5: Transfer Data**
-
-Click "Start Transfer". The system initiates an HTTP-PULL transfer, receives an Endpoint Data Reference (EDR), and fetches the DPP data. Wait for status: "STARTED".
-
-**Step 6: View DPP**
-
-The Digital Product Passport is displayed. Navigate through sections: **Identity** (Part number, serial number, manufacturer), **Airworthiness** (EASA Form 1 status, certifications), **Sustainability** (PCF value, material composition), **Operational** (Flight hours, cycles), and **Technical** (Specifications, dimensions).
-
-### 5.3 Provider Workflow (ApexPropulsion Systems)
-
-**Step 1: Select Provider Role**
-- Click "Provider (ApexPropulsion Systems)" in the role switcher
-
-**Step 2: View Registered Assets**
-- See all DPP assets registered in the provider's EDC
-- View asset metadata and data addresses
-
-**Step 3: Monitor Activity**
-- Check the backend logs for incoming requests:
-  ```bash
-  docker logs dpp-backend -f
-  ```
-
-### 5.4 Understanding the DPP Data
-
-The Digital Product Passport contains structured data following aerospace standards:
-
-**Identity Node** - Part identification per ATA Spec 2000
-- Manufacturer Name, CAGE Code
-- Part Number, Serial Number
-- Manufacturing Date & Location
-
-**Airworthiness Node** - Certification data per EASA regulations
-- Form Type (EASA Form 1)
-- Status: NEW, OVERHAULED, SERVICEABLE
-- Certification Authority, Approval Date
-
-**Sustainability Node** - Environmental data per IPC-1754
-- Product Carbon Footprint (PCF) in kgCO2e
-- Scope: Cradle-to-Gate
-- Material Composition percentages
-
-**Operational Node** - Lifecycle data per S5000F
-- Time Since New (hours)
-- Cycles Since New
-- Time/Cycles Since Overhaul
-
----
-
-## 6. Data Model Specification
-
-### 6.1 Digital Product Passport Structure
-
-The DPP follows a JSON-LD Verifiable Credential format:
-
-```json
-{
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
-    "https://w3id.org/aerospace/dpp/v1"
-  ],
-  "id": "did:web:apexpropulsion.com:parts:serial:98765-XYZ-123",
-  "type": ["VerifiableCredential", "AerospacePartPassport"],
-  "issuer": "did:web:apexpropulsion.com",
-  "issuanceDate": "2025-10-27T10:00:00Z",
-  "credentialSubject": {
-    "id": "did:web:apexpropulsion.com:parts:serial:98765-XYZ-123",
-    "partType": "HighPressureTurbineBlade",
-    "sku": "APEX-TrentXWB-HPT-Blade-001",
-    "identityNode": {
-      "manufacturerName": "ApexPropulsion Systems",
-      "cageCode": "K1039",
-      "partNumber": "FW12345",
-      "serialNumber": "HPT998877",
-      "batchNumber": "BATCH-2025-001",
-      "manufacturingDate": "2025-09-15",
-      "manufacturingLocation": "Derby, United Kingdom"
-    },
-    "airworthinessNode": {
-      "formType": "EASA_FORM_1",
-      "formTrackingNumber": "APEX-DERBY-2025-00451",
-      "status": "NEW",
-      "certificationAuthority": "EASA",
-      "qualityStandards": ["AS9100D", "ISO9001:2015"]
-    },
-    "sustainabilityNode": {
-      "pcfValue": 45.2,
-      "pcfUnit": "kgCO2e",
-      "scope": "Cradle-to-Gate",
-      "recyclableContent": 15,
-      "materialComposition": [
-        { "material": "Nickel Superalloy", "percentage": 85 },
-        { "material": "Thermal Barrier Coating", "percentage": 10 }
-      ]
-    },
-    "operationalNode": {
-      "timeSinceNew": 0,
-      "cyclesSinceNew": 0,
-      "maximumOperatingHours": 25000,
-      "maximumCycles": 15000
-    },
-    "technicalSpecifications": {
-      "engineModel": "Trent XWB-97",
-      "stage": "HP Turbine Stage 1",
-      "weight": { "value": 0.85, "unit": "kg" },
-      "operatingTemperature": { "max": 1700, "unit": "°C" }
-    }
-  }
-}
-```
-
-### 6.2 EDC Asset Configuration
-
-Assets are registered with the following structure:
-
-```json
-{
-  "@context": ["https://w3id.org/edc/connector/management/v0.0.1"],
-  "@id": "asset:propulsion:blade:98765",
-  "@type": "Asset",
-  "properties": {
-    "name": "Trent XWB HPT Blade - Digital Product Passport",
-    "description": "DPP for HPT Blade SN:HPT998877",
-    "contenttype": "application/ld+json",
-    "dct:type": "ids:DigitalProductPassport",
-    "aerospace:partType": "HighPressureTurbineBlade",
-    "aerospace:manufacturer": "ApexPropulsion Systems",
-    "aerospace:serialNumber": "HPT998877"
-  },
-  "dataAddress": {
-    "@type": "DataAddress",
-    "type": "HttpData",
-    "baseUrl": "http://localhost:3001/api/parts/98765"
-  }
-}
-```
-
-### 6.3 Policy Definitions
-
-**Access Policy (aerospace-membership-required):**
-```json
-{
-  "@id": "aerospace-membership-required",
-  "policy": {
-    "@type": "Set",
-    "permission": [{
-      "action": "use",
-      "constraint": {
-        "leftOperand": "MembershipCredential",
-        "operator": "eq",
-        "rightOperand": "active"
-      }
-    }]
-  }
-}
-```
-
-**Contract Policy (aerospace-dpp-access):**
-```json
-{
-  "@id": "aerospace-dpp-access",
-  "policy": {
-    "@type": "Set",
-    "obligation": [{
-      "action": "use",
-      "constraint": {
-        "leftOperand": "DataAccess.level",
-        "operator": "eq",
-        "rightOperand": "processing"
-      }
-    }]
-  }
-}
-```
-
----
-
-## 7. Credentials & Access Control
-
-### 7.1 Verifiable Credentials
-
-The demo uses two types of credentials:
-
-**MembershipCredential**
-- Issued by: Dataspace Issuer
-- Purpose: Proves membership in the aerospace dataspace
-- Required for: Catalog access
-
-**DataProcessorCredential**
-
-Issued by: Dataspace Issuer. Purpose: Proves authorization to process certain data types. Levels: `processing` (can access standard DPP data) and `sensitive` (can access restricted data, not used in demo). Required for: Contract negotiation.
-
-### 7.2 Policy Evaluation Flow
-
-This diagram shows how access decisions are made. When a DSP message with a Verifiable Presentation arrives, the system extracts the VP, verifies credential signatures, validates the issuer trust chain, and evaluates policy constraints. The request is allowed only if all checks pass.
-
-```mermaid
-flowchart TB
-    subgraph Request["Incoming Request"]
-        REQ["DSP Message + VP"]
-    end
-    
-    subgraph Eval["Policy Evaluation"]
-        VP["Extract VP"]
-        VC["Verify Signatures"]
-        CHAIN["Verify Trust Chain"]
-        POLICY["Evaluate Constraints"]
-    end
-    
-    subgraph Result["Decision"]
-        ALLOW["Allow"]
-        DENY["Deny"]
-    end
-    
-    REQ --> VP --> VC --> CHAIN --> POLICY
-    POLICY --> |Satisfied| ALLOW
-    POLICY --> |Not Satisfied| DENY
-```
-
----
-
-## 8. API Reference
-
-### 8.1 EDC Management APIs
-
-**Consumer Endpoints (port 8081):**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/management/v3/catalog/request` | POST | Request remote catalog |
-| `/api/catalog/v1alpha/catalog/query` | POST | Query cached catalog |
-| `/api/management/v3/contractnegotiations` | POST | Start negotiation |
-| `/api/management/v3/contractnegotiations/{id}` | GET | Get negotiation status |
-| `/api/management/v3/transferprocesses` | POST | Start transfer |
-| `/api/management/v3/edrs/{id}/dataaddress` | GET | Get data address |
-
-**Provider Endpoints (port 8191):**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/management/v3/assets` | POST | Create asset |
-| `/api/management/v3/assets/request` | POST | List assets |
-| `/api/management/v3/policydefinitions` | POST | Create policy |
-| `/api/management/v3/contractdefinitions` | POST | Create contract def |
-
-### 8.2 DPP Backend APIs
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/parts` | GET | List all DPPs |
-| `/api/parts/98765` | GET | HPT Blade DPP |
-| `/api/parts/98766` | GET | Compressor Blade DPP |
-| `/api/parts/98767` | GET | Combustor Liner DPP |
-| `/health` | GET | Health check |
-
----
-
-## 9. Troubleshooting
-
-**Problem: "No DPP assets found in catalog"**
-- Ensure MVD runtimes are running
-- Run `./seed.sh` first
-- Run `./seed-aerospace.sh` after seed.sh
-- Wait 5-10 seconds for catalog sync
-
-**Problem: "Contract negotiation TERMINATED"**
-- Check that credentials are properly issued
-- Verify the provider is healthy: `curl http://localhost:8191/api/check/health`
-- Check provider logs for policy evaluation errors
-
-**Problem: "Frontend can't reach APIs"**
-- In dev mode: Verify Vite proxy configuration
-- In Docker: Ensure `host.docker.internal` resolves correctly
-- Check CORS headers in responses
-
-**Problem: "Credential verification failed"**
-- Verify NGINX is serving the issuer DID: `curl http://localhost:9876/.well-known/did.json`
-- Re-run `./seed.sh` to re-issue credentials
-- Check IdentityHub logs for signature verification errors
-
-**Problem: "Transfer stuck in STARTED"**
-- This is normal - HTTP-PULL transfers remain in STARTED state
-- Check if EDR was returned
-- Try fetching data directly using the EDR token
-
----
-
-## 10. Future Extensions
-
-**Phase 2 Enhancements:**
-- Usage control policies (time-limited access)
-- Push transfers to cloud storage (S3, Azure Blob)
-- Real-time data updates via WebSocket
-
-**Phase 3 Enhancements:**
-- Multi-tier supply chain (sub-supplier DPPs)
-- Digital twin integration
-- Blockchain anchoring for audit trails
-
-**Phase 4 Enhancements:**
-- AI-powered anomaly detection
-- Predictive maintenance integration
-- Full EASA compliance validation
-
----
-
-## License
-
-Apache License 2.0 - see LICENSE file
-
----
-
-*This demo is part of the Aerospace Supply Chain initiative for sovereign aerospace data exchange.*
+*   **Frontend**: http://localhost:3000
+*   **Provider Control Plane**: http://localhost:9191
+*   **Consumer Control Plane**: http://localhost:9192
+
+### 5.2 Workflows
+Follow the steps outlined in the [User Journey](#2-user-journey) section to simulate the interaction between the Patient, Provider, and Consumer.

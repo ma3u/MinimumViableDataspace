@@ -1,12 +1,33 @@
-version: '3.8'
+# =============================================================================
+# EDC-MVD-HealthDemo - Health Dataspace EHR2EDC Demonstration
+# =============================================================================
+# 
+# This docker-compose deploys a complete health dataspace demonstration:
+#
+# PARTICIPANTS:
+#   - Hospital (Provider): Rheinland Universitätsklinikum - provides EHR data
+#   - Research Institute (Consumer): Nordstein Research Institute - consumes EHR for EDC
+#
+# COMPONENTS:
+#   - Infrastructure: PostgreSQL, Vault, NGINX (DID server)
+#   - EDC Connectors: Control planes, data planes, identity hubs
+#   - Application Layer: EHR Backend (FHIR), Health Frontend (React)
+#
+# QUICK START:
+#   docker compose -p edc-mvd-health up -d health-postgres health-vault
+#   docker compose -p edc-mvd-health up -d ehr-backend health-frontend
+#
+# =============================================================================
+
+name: edc-mvd-health
 
 services:
-  # -----------------------------------------------------------------------------------------------
-  # INFRASTRUCTURE
-  # -----------------------------------------------------------------------------------------------
-  postgres:
+  # ===========================================================================
+  # INFRASTRUCTURE LAYER
+  # ===========================================================================
+  health-postgres:
     image: postgres:16
-    container_name: mvd-postgres
+    container_name: health-postgres
     ports:
       - "5432:5432"
     environment:
@@ -14,11 +35,11 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - mvd-network
+      - health-dataspace
 
-  vault:
+  health-vault:
     image: hashicorp/vault:latest
-    container_name: mvd-vault
+    container_name: health-vault
     ports:
       - "8200:8200"
     environment:
@@ -27,35 +48,36 @@ services:
     cap_add:
       - IPC_LOCK
     networks:
-      - mvd-network
+      - health-dataspace
 
-  nginx:
+  health-did-server:
     image: nginx
-    container_name: mvd-nginx
+    container_name: health-did-server
     ports:
       - "9876:80"
     volumes:
       - ./assets/issuer/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./assets/issuer/did.docker.json:/var/www/.well-known/did.json:ro
     networks:
-      - mvd-network
+      - health-dataspace
 
-  # -----------------------------------------------------------------------------------------------
-  # CONSUMER
-  # -----------------------------------------------------------------------------------------------
-  consumer-controlplane:
+  # ===========================================================================
+  # CONSUMER: Nordstein Research Institute (CRO)
+  # Consumes anonymized EHR data for clinical research EDC systems
+  # ===========================================================================
+  cro-controlplane:
     image: controlplane:latest
-    container_name: consumer-controlplane
+    container_name: cro-controlplane
     env_file:
       - ./assets/env/consumer_connector.env
     environment:
       # DB Configuration
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/consumer
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/consumer
       EDC_DATASOURCE_DEFAULT_USER: consumer
       EDC_DATASOURCE_DEFAULT_PASSWORD: consumer
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
       # Vault Configuration
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
     extra_hosts:
       - "localhost:host-gateway"
@@ -67,29 +89,29 @@ services:
       - "8084:8084"
       - "8085:8085"
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  consumer-dataplane:
+  cro-dataplane:
     image: dataplane:latest
-    container_name: consumer-dataplane
+    container_name: cro-dataplane
     env_file:
       - ./assets/env/consumer_connector.env
     environment:
-      EDC_RUNTIME_ID: consumer-dataplane
+      EDC_RUNTIME_ID: cro-dataplane
       # Port Overrides
       WEB_HTTP_PORT: 9080
       WEB_HTTP_CONTROL_PORT: 9083
       WEB_HTTP_PUBLIC_PORT: 11001
       # DB Configuration
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/consumer
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/consumer
       EDC_DATASOURCE_DEFAULT_USER: consumer
       EDC_DATASOURCE_DEFAULT_PASSWORD: consumer
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
       # Vault Configuration
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
       # Hostname
       EDC_HOSTNAME: localhost
@@ -100,22 +122,22 @@ services:
       - "11002:9083" # Control
       - "11001:11001" # Public
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  consumer-identityhub:
+  cro-identityhub:
     image: identity-hub:latest
-    container_name: consumer-identityhub
+    container_name: cro-identityhub
     env_file:
       - ./assets/env/consumer_identityhub.env
     environment:
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/consumer
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/consumer
       EDC_DATASOURCE_DEFAULT_USER: consumer
       EDC_DATASOURCE_DEFAULT_PASSWORD: consumer
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
     extra_hosts:
       - "localhost:host-gateway"
@@ -127,25 +149,26 @@ services:
       - "7085:7085"
       - "7086:7086"
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  # -----------------------------------------------------------------------------------------------
-  # PROVIDER (Shared Components)
-  # -----------------------------------------------------------------------------------------------
-  provider-identityhub:
+  # ===========================================================================
+  # PROVIDER: Rheinland Universitätsklinikum (Hospital)
+  # Provides de-identified EHR data following GDPR/EHDS regulations
+  # ===========================================================================
+  hospital-identityhub:
     image: identity-hub:latest
-    container_name: provider-identityhub
+    container_name: hospital-identityhub
     env_file:
       - ./assets/env/provider_identityhub.env
     environment:
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/identity
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/identity
       EDC_DATASOURCE_DEFAULT_USER: identity
       EDC_DATASOURCE_DEFAULT_PASSWORD: identity
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
     extra_hosts:
       - "localhost:host-gateway"
@@ -157,22 +180,22 @@ services:
       - "7095:7095"
       - "7096:7096"
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  provider-catalog-server:
+  hospital-catalog-server:
     image: catalog-server:latest
-    container_name: provider-catalog-server
+    container_name: hospital-catalog-server
     env_file:
       - ./assets/env/provider_catalogserver.env
     environment:
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/catalog_server
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/catalog_server
       EDC_DATASOURCE_DEFAULT_USER: catalog_server
       EDC_DATASOURCE_DEFAULT_PASSWORD: catalog_server
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
     extra_hosts:
       - "localhost:host-gateway"
@@ -182,25 +205,23 @@ services:
       - "8092:8092"
       - "8093:8093"
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  # -----------------------------------------------------------------------------------------------
-  # PROVIDER QnA
-  # -----------------------------------------------------------------------------------------------
-  provider-qna-controlplane:
+  # Hospital EHR Department Connector
+  hospital-ehr-controlplane:
     image: controlplane:latest
-    container_name: provider-qna-controlplane
+    container_name: hospital-ehr-controlplane
     env_file:
       - ./assets/env/provider_connector_qna.env
     environment:
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_qna
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/provider_qna
       EDC_DATASOURCE_DEFAULT_USER: qna
       EDC_DATASOURCE_DEFAULT_PASSWORD: provider-qna
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
     extra_hosts:
       - "localhost:host-gateway"
@@ -212,26 +233,26 @@ services:
       - "8194:8194"
       - "8195:8195"
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  provider-qna-dataplane:
+  hospital-ehr-dataplane:
     image: dataplane:latest
-    container_name: provider-qna-dataplane
+    container_name: hospital-ehr-dataplane
     env_file:
       - ./assets/env/provider_connector_qna.env
     environment:
-      EDC_RUNTIME_ID: provider-qna-dataplane
+      EDC_RUNTIME_ID: hospital-ehr-dataplane
       WEB_HTTP_PORT: 9080
       WEB_HTTP_CONTROL_PORT: 9083
       WEB_HTTP_PUBLIC_PORT: 12001
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_qna
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/provider_qna
       EDC_DATASOURCE_DEFAULT_USER: qna
       EDC_DATASOURCE_DEFAULT_PASSWORD: provider-qna
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
       EDC_HOSTNAME: localhost
     extra_hosts:
@@ -241,84 +262,87 @@ services:
       - "12003:9083" # Control
       - "12001:12001" # Public
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  # -----------------------------------------------------------------------------------------------
-  # PROVIDER MANUFACTURING
-  # -----------------------------------------------------------------------------------------------
-  provider-manufacturing-controlplane:
-    image: controlplane:latest
-    container_name: provider-manufacturing-controlplane
-    env_file:
-      - ./assets/env/provider_connector_manufacturing.env
-    environment:
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_manufacturing
-      EDC_DATASOURCE_DEFAULT_USER: manufacturing
-      EDC_DATASOURCE_DEFAULT_PASSWORD: provider-manufacturing
-      EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
-      EDC_VAULT_HASHICORP_TOKEN: root
-    extra_hosts:
-      - "localhost:host-gateway"
-    ports:
-      - "8290:8290"
-      - "8291:8291"
-      - "8292:8292"
-      - "8293:8293"
-      - "8294:8294"
-      - "8295:8295"
-    networks:
-      - mvd-network
-    depends_on:
-      - postgres
-      - vault
+  # ===========================================================================
+  # HOSPITAL CLINICAL TRIALS DEPARTMENT (Optional secondary connector)
+  # For hospitals that need separate consent flows for clinical trials vs EHR
+  # ===========================================================================
+  # Disabled by default - uncomment to enable separate clinical trials connector
+  # hospital-trials-controlplane:
+  #   image: controlplane:latest
+  #   container_name: hospital-trials-controlplane
+  #   env_file:
+  #     - ./assets/env/provider_connector_manufacturing.env
+  #   environment:
+  #     EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/provider_manufacturing
+  #     EDC_DATASOURCE_DEFAULT_USER: manufacturing
+  #     EDC_DATASOURCE_DEFAULT_PASSWORD: provider-manufacturing
+  #     EDC_SQL_SCHEMA_AUTOCREATE: "true"
+  #     EDC_VAULT_HASHICORP_URL: http://health-vault:8200
+  #     EDC_VAULT_HASHICORP_TOKEN: root
+  #   extra_hosts:
+  #     - "localhost:host-gateway"
+  #   ports:
+  #     - "8290:8290"
+  #     - "8291:8291"
+  #     - "8292:8292"
+  #     - "8293:8293"
+  #     - "8294:8294"
+  #     - "8295:8295"
+  #   networks:
+  #     - health-dataspace
+  #   depends_on:
+  #     - health-postgres
+  #     - health-vault
 
-  provider-manufacturing-dataplane:
-    image: dataplane:latest
-    container_name: provider-manufacturing-dataplane
-    env_file:
-      - ./assets/env/provider_connector_manufacturing.env
-    environment:
-      EDC_RUNTIME_ID: provider-manufacturing-dataplane
-      WEB_HTTP_PORT: 9080
-      WEB_HTTP_CONTROL_PORT: 9083
-      WEB_HTTP_PUBLIC_PORT: 12002
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/provider_manufacturing
-      EDC_DATASOURCE_DEFAULT_USER: manufacturing
-      EDC_DATASOURCE_DEFAULT_PASSWORD: provider-manufacturing
-      EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
-      EDC_VAULT_HASHICORP_TOKEN: root
-      EDC_HOSTNAME: localhost
-    extra_hosts:
-      - "localhost:host-gateway"
-    ports:
-      - "12005:9080" # Web/Health
-      - "12006:9083" # Control
-      - "12002:12002" # Public
-    networks:
-      - mvd-network
-    depends_on:
-      - postgres
-      - vault
+  # hospital-trials-dataplane:
+  #   image: dataplane:latest
+  #   container_name: hospital-trials-dataplane
+  #   env_file:
+  #     - ./assets/env/provider_connector_manufacturing.env
+  #   environment:
+  #     EDC_RUNTIME_ID: hospital-trials-dataplane
+  #     WEB_HTTP_PORT: 9080
+  #     WEB_HTTP_CONTROL_PORT: 9083
+  #     WEB_HTTP_PUBLIC_PORT: 12002
+  #     EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/provider_manufacturing
+  #     EDC_DATASOURCE_DEFAULT_USER: manufacturing
+  #     EDC_DATASOURCE_DEFAULT_PASSWORD: provider-manufacturing
+  #     EDC_SQL_SCHEMA_AUTOCREATE: "true"
+  #     EDC_VAULT_HASHICORP_URL: http://health-vault:8200
+  #     EDC_VAULT_HASHICORP_TOKEN: root
+  #     EDC_HOSTNAME: localhost
+  #   extra_hosts:
+  #     - "localhost:host-gateway"
+  #   ports:
+  #     - "12005:9080" # Web/Health
+  #     - "12006:9083" # Control
+  #     - "12002:12002" # Public
+  #   networks:
+  #     - health-dataspace
+  #   depends_on:
+  #     - health-postgres
+  #     - health-vault
 
-  # -----------------------------------------------------------------------------------------------
-  # ISSUER
-  # -----------------------------------------------------------------------------------------------
-  dataspace-issuer:
+  # ===========================================================================
+  # TRUST ANCHOR: Health Data Authority Issuer
+  # Issues verifiable credentials for health dataspace membership
+  # ===========================================================================
+  health-authority-issuer:
     image: issuerservice:latest
-    container_name: dataspace-issuer
+    container_name: health-authority-issuer
     env_file:
       - ./assets/env/issuerservice.env
     environment:
-      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgres:5432/issuer
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://health-postgres:5432/issuer
       EDC_DATASOURCE_DEFAULT_USER: issuer
       EDC_DATASOURCE_DEFAULT_PASSWORD: issuer
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
-      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
     extra_hosts:
       - "localhost:host-gateway"
@@ -330,14 +354,14 @@ services:
       - "10014:10014"
       - "10015:10015"
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
-      - postgres
-      - vault
+      - health-postgres
+      - health-vault
 
-  # -----------------------------------------------------------------------------------------------
-  # HEALTH DATASPACE - EHR2EDC APPLICATION LAYER
-  # -----------------------------------------------------------------------------------------------
+  # ===========================================================================
+  # APPLICATION LAYER: EHR2EDC Demo Frontend & Backend
+  # ===========================================================================
   ehr-backend:
     build:
       context: ../backend-mock
@@ -347,7 +371,7 @@ services:
     ports:
       - "3003:3001"  # Host 3003 -> Container 3001
     networks:
-      - mvd-network
+      - health-dataspace
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
       interval: 30s
@@ -364,15 +388,20 @@ services:
     ports:
       - "3010:80"  # Host 3010 -> Container 80 (nginx)
     networks:
-      - mvd-network
+      - health-dataspace
     depends_on:
       ehr-backend:
         condition: service_healthy
-      consumer-controlplane:
-        condition: service_started
-      provider-qna-controlplane:
-        condition: service_started
+      # Note: EDC services are optional - frontend degrades gracefully
+      # cro-controlplane:
+      #   condition: service_started
+      # hospital-ehr-controlplane:
+      #   condition: service_started
 
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
 networks:
-  mvd-network:
+  health-dataspace:
+    name: health-dataspace
     driver: bridge
