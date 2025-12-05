@@ -1266,50 +1266,65 @@ function FhirJsonHighlighter({ data }: { data: unknown }) {
     const lines = json.split('\n');
     
     return lines.map((line, lineIndex) => {
-      // Colorize the line
+      // Colorize the line - order matters!
       let coloredLine = line;
       
-      // Keys (property names)
-      coloredLine = coloredLine.replace(/"(@?[\w:]+)"(?=\s*:)/g, 
-        '<span class="text-cyan-400">"$1"</span>');
+      // First: Escape any HTML in the content
+      coloredLine = coloredLine.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      // Brackets and braces - make them bright
+      coloredLine = coloredLine.replace(/([\[\]{}])/g, 
+        '<span class="text-yellow-300">$1</span>');
+      
+      // Commas - subtle but visible
+      coloredLine = coloredLine.replace(/,$/g, 
+        '<span class="text-gray-400">,</span>');
+      
+      // String values in arrays (no colon before them)
+      coloredLine = coloredLine.replace(/^(\s*)"([^"]+)"(?=[,\]]|$)/gm, 
+        '$1<span class="text-emerald-300">"$2"</span>');
+      
+      // Keys (property names) - before colon
+      coloredLine = coloredLine.replace(/"(@?[\w:]+)"(\s*:)/g, 
+        '<span class="text-sky-300">"$1"</span><span class="text-gray-400">$2</span>');
       
       // String values (after colon)
-      coloredLine = coloredLine.replace(/:(?:\s*)"([^"]*)"/g, 
-        ': <span class="text-green-400">"$1"</span>');
+      coloredLine = coloredLine.replace(/:(\s*)"([^"]*)"/g, 
+        ':<span class="text-gray-400">$1</span><span class="text-emerald-300">"$2"</span>');
       
-      // Numbers
-      coloredLine = coloredLine.replace(/:(?:\s*)(\d+\.?\d*)(?=[,\s\n\]])/g, 
-        ': <span class="text-amber-400">$1</span>');
+      // Numbers - bright orange
+      coloredLine = coloredLine.replace(/:(\s*)(\d+\.?\d*)(?=[,\s\n\]}<]|$)/g, 
+        ':<span class="text-gray-400">$1</span><span class="text-orange-300">$2</span>');
       
-      // Booleans
-      coloredLine = coloredLine.replace(/:(?:\s*)(true|false)/g, 
-        ': <span class="text-purple-400">$1</span>');
+      // Booleans - purple
+      coloredLine = coloredLine.replace(/:(\s*)(true|false)/g, 
+        ':<span class="text-gray-400">$1</span><span class="text-violet-400">$2</span>');
       
-      // Brackets and braces
-      coloredLine = coloredLine.replace(/([\[\]{}])/g, 
-        '<span class="text-slate-500">$1</span>');
+      // null - gray
+      coloredLine = coloredLine.replace(/:(\s*)(null)/g, 
+        ':<span class="text-gray-400">$1</span><span class="text-gray-500">$2</span>');
       
-      // Special FHIR/VC keywords highlighting
-      const specialKeys = ['@context', '@id', '@type', 'resourceType', 'credentialSubject', 'issuer', 'type'];
+      // Special FHIR/VC keywords highlighting - pink/magenta
+      const specialKeys = ['@context', '@id', '@type', 'resourceType', 'credentialSubject', 'issuer', 'type', 'id'];
       specialKeys.forEach(key => {
         coloredLine = coloredLine.replace(
-          new RegExp(`"(${key})"`, 'g'),
-          '<span class="text-pink-400">"$1"</span>'
+          new RegExp(`<span class="text-sky-300">"(${key})"</span>`, 'g'),
+          '<span class="text-pink-300 font-medium">"$1"</span>'
         );
       });
       
-      // Health-specific keys
-      const healthKeys = ['consentScope', 'demographicsNode', 'conditionsNode', 'observationsNode', 'medicationsNode', 'provenanceNode'];
+      // Health-specific keys - bright blue bold
+      const healthKeys = ['consentScope', 'demographicsNode', 'conditionsNode', 'observationsNode', 'medicationsNode', 'provenanceNode', 'studyEligibility'];
       healthKeys.forEach(key => {
         coloredLine = coloredLine.replace(
-          new RegExp(`"(${key})"`, 'g'),
-          '<span class="text-blue-400 font-semibold">"$1"</span>'
+          new RegExp(`<span class="text-sky-300">"(${key})"</span>`, 'g'),
+          '<span class="text-blue-300 font-bold">"$1"</span>'
         );
       });
       
       return (
-        <div key={lineIndex} className="hover:bg-slate-800/50 px-2 -mx-2">
-          <span className="text-slate-600 select-none w-8 inline-block text-right mr-4">{lineIndex + 1}</span>
+        <div key={lineIndex} className="hover:bg-slate-700/50 px-2 -mx-2 leading-relaxed">
+          <span className="text-slate-500 select-none w-10 inline-block text-right mr-4 text-xs">{lineIndex + 1}</span>
           <span dangerouslySetInnerHTML={{ __html: coloredLine }} />
         </div>
       );
@@ -1318,7 +1333,7 @@ function FhirJsonHighlighter({ data }: { data: unknown }) {
   
   const jsonString = JSON.stringify(data, null, 2);
   
-  return <>{colorize(jsonString)}</>;
+  return <div className="text-slate-100">{colorize(jsonString)}</div>;
 }
 
 export default AppHealth;
