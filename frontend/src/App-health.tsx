@@ -23,9 +23,9 @@ import {
   Shield,
   Send,
   Github,
-  Heart,
   Lock,
-  Stethoscope
+  Stethoscope,
+  Search
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
 import { 
@@ -35,7 +35,9 @@ import {
   healthDspMessages,
   healthParticipants,
   mockNegotiationFlow,
-  mockTransferFlow
+  mockTransferFlow,
+  medicalCategories,
+  categoryBackgrounds
 } from './services/mockData-health';
 import { fetchEHRById, checkBackendHealth } from './services/ehrApi';
 import type { ElectronicHealthRecord } from './types/health';
@@ -51,12 +53,11 @@ interface MockEHRAsset {
   'dct:description': string;
   'health:icdCode': string;
   'health:diagnosis': string;
+  'health:category': string;
   'health:ageBand': string;
   'health:biologicalSex': string;
   'health:consentStatus': string;
-  'odrl:hasPolicy': {
-    '@id': string;
-  };
+  'health:sensitiveCategory'?: string;
 }
 
 function AppHealth() {
@@ -68,6 +69,18 @@ function AppHealth() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [showJson, setShowJson] = useState(false);
   const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter assets based on category and search
+  const filteredAssets = mockEHRCatalogAssets.filter(asset => {
+    const matchesCategory = categoryFilter === 'all' || asset['health:category'] === categoryFilter;
+    const matchesSearch = searchTerm === '' || 
+      asset['dct:title'].toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:icdCode'].toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:diagnosis'].toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   // Check backend availability on mount
   useEffect(() => {
@@ -401,46 +414,130 @@ function AppHealth() {
               )}
             </div>
 
+            {/* Filter Bar */}
+            <div className="bg-white rounded-xl p-4 shadow-sm border">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Search */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by diagnosis, ICD code, or title..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                {/* Category Filter */}
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => setCategoryFilter('all')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      categoryFilter === 'all' 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    All ({mockEHRCatalogAssets.length})
+                  </button>
+                  {Object.entries(medicalCategories).map(([key, cat]) => {
+                    const count = mockEHRCatalogAssets.filter(a => a['health:category'] === key).length;
+                    if (count === 0) return null;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setCategoryFilter(key)}
+                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                          categoryFilter === key 
+                            ? cat.color.replace('100', '600').replace('800', 'white') + ' text-white'
+                            : cat.color + ' hover:opacity-80'
+                        }`}
+                      >
+                        {cat.icon} {cat.label} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
             {/* Catalog Results */}
             <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="font-semibold text-gray-900 mb-4">Available EHR Datasets (Anonymized)</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {mockEHRCatalogAssets.map(asset => (
-                  <div 
-                    key={asset['@id']}
-                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                      selectedAsset?.['@id'] === asset['@id']
-                        ? 'border-blue-500 ring-2 ring-blue-200'
-                        : 'hover:border-blue-300 hover:shadow-md'
-                    }`}
-                    onClick={() => setSelectedAsset(asset as MockEHRAsset)}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <Heart className="w-5 h-5 text-red-500" />
-                        <span className="font-mono text-xs text-gray-500">{asset['health:icdCode']}</span>
-                      </div>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        asset['health:consentStatus'] === 'active' 
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        Consent: {asset['health:consentStatus']}
-                      </span>
-                    </div>
-                    <h4 className="font-semibold text-gray-900 mb-1">{asset['dct:title']}</h4>
-                    <p className="text-sm text-gray-600 mb-3">{asset['dct:description']}</p>
-                    <div className="flex gap-2 flex-wrap">
-                      <span className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded text-xs">
-                        Age: {asset['health:ageBand']}
-                      </span>
-                      <span className="px-2 py-1 bg-purple-50 border border-purple-200 text-purple-700 rounded text-xs capitalize">
-                        {asset['health:biologicalSex']}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-gray-900">Available EHR Datasets (Anonymized)</h3>
+                <span className="text-sm text-gray-500">{filteredAssets.length} records found</span>
               </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredAssets.map(asset => {
+                  const category = medicalCategories[asset['health:category'] as keyof typeof medicalCategories];
+                  const bgImage = categoryBackgrounds[asset['health:category']];
+                  return (
+                    <div 
+                      key={asset['@id']}
+                      className={`relative overflow-hidden border rounded-lg cursor-pointer transition-all group ${
+                        selectedAsset?.['@id'] === asset['@id']
+                          ? 'border-blue-500 ring-2 ring-blue-200'
+                          : 'hover:border-blue-300 hover:shadow-lg'
+                      }`}
+                      onClick={() => setSelectedAsset(asset as MockEHRAsset)}
+                    >
+                      {/* Background Image */}
+                      {bgImage && (
+                        <div className="absolute inset-0 z-0">
+                          <img 
+                            src={bgImage} 
+                            alt="" 
+                            className="w-full h-full object-cover opacity-15 group-hover:opacity-25 transition-opacity duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-white/70" />
+                        </div>
+                      )}
+                      
+                      <div className="relative z-10 p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{category?.icon || '📋'}</span>
+                            <span className="font-mono text-xs text-gray-600 bg-white/80 px-1.5 py-0.5 rounded">{asset['health:icdCode']}</span>
+                          </div>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            asset['health:consentStatus'] === 'active' 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            Consent: {asset['health:consentStatus']}
+                          </span>
+                        </div>
+                        <h4 className="font-semibold text-gray-900 mb-1">{asset['dct:title']}</h4>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{asset['dct:description']}</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {category && (
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${category.color}`}>
+                              {category.label}
+                            </span>
+                          )}
+                          <span className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded text-xs">
+                            Age: {asset['health:ageBand']}
+                          </span>
+                          <span className="px-2 py-1 bg-purple-50 border border-purple-200 text-purple-700 rounded text-xs capitalize">
+                            {asset['health:biologicalSex']}
+                          </span>
+                        </div>
+                        {asset['health:sensitiveCategory'] && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-amber-700">
+                            <Shield className="w-3 h-3" />
+                            <span>Sensitive: {asset['health:sensitiveCategory'].replace('-', ' ')}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {filteredAssets.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No EHR records match your filters. Try adjusting your search criteria.
+                </div>
+              )}
             </div>
 
             {/* Continue Button */}

@@ -14,147 +14,318 @@ import type { ElectronicHealthRecord } from '../types/health';
 // MOCK CATALOG DATA - Simulates DSP Catalog Protocol Response for EHR2EDC
 // ============================================================================
 
+// Medical category definitions for filtering and visualization
+export const medicalCategories = {
+  'endocrine': { label: 'Endocrine/Metabolic', color: 'bg-amber-100 text-amber-800', icon: '🔬' },
+  'cardiology': { label: 'Cardiology', color: 'bg-red-100 text-red-800', icon: '❤️' },
+  'oncology': { label: 'Oncology', color: 'bg-pink-100 text-pink-800', icon: '🎗️' },
+  'pulmonology': { label: 'Pulmonology', color: 'bg-sky-100 text-sky-800', icon: '🫁' },
+  'rheumatology': { label: 'Rheumatology', color: 'bg-orange-100 text-orange-800', icon: '🦴' },
+  'neurology': { label: 'Neurology', color: 'bg-purple-100 text-purple-800', icon: '🧠' },
+  'nephrology': { label: 'Nephrology', color: 'bg-yellow-100 text-yellow-800', icon: '🫘' },
+  'psychiatry': { label: 'Psychiatry', color: 'bg-indigo-100 text-indigo-800', icon: '🧠' },
+  'gastroenterology': { label: 'Gastroenterology', color: 'bg-green-100 text-green-800', icon: '🔄' },
+  'infectious': { label: 'Infectious Disease', color: 'bg-rose-100 text-rose-800', icon: '🦠' },
+};
+
+// Background images for medical categories (royalty-free medical illustrations)
+export const categoryBackgrounds: Record<string, string> = {
+  'endocrine': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&h=300&fit=crop', // blood glucose
+  'cardiology': 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=400&h=300&fit=crop', // heart
+  'oncology': 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop', // cells
+  'pulmonology': 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=300&fit=crop', // lungs xray
+  'rheumatology': 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=400&h=300&fit=crop', // joints
+  'neurology': 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop', // brain
+  'nephrology': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop', // medical
+  'psychiatry': 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&h=300&fit=crop', // mental health
+  'gastroenterology': 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=400&h=300&fit=crop', // stomach
+  'infectious': 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=400&h=300&fit=crop', // virus
+};
+
 export const mockEHRCatalogAssets = [
   {
     '@id': 'asset:ehr:EHR001',
     '@type': 'dcat:Dataset',
-    'dct:title': 'EHR - Type 2 Diabetes with CV Risk',
-    'dct:description': 'Anonymized EHR: Type 2 diabetes mellitus with cardiovascular comorbidities',
-    'dcat:keyword': ['diabetes', 'cardiovascular', 'metabolic', 'EHR'],
+    'dct:title': 'Type 2 Diabetes with CV Risk',
+    'dct:description': 'Type 2 diabetes mellitus with cardiovascular comorbidities',
+    'dcat:keyword': ['diabetes', 'cardiovascular', 'metabolic'],
     'dct:creator': 'did:web:rheinland-uklinikum.de',
     'health:icdCode': 'E11.9',
     'health:diagnosis': 'Type 2 diabetes mellitus',
+    'health:category': 'endocrine',
     'health:ageBand': '55-64',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
-    'odrl:hasPolicy': {
-      '@id': 'policy:health-consent-contract:EHR001',
-      '@type': 'odrl:Offer',
-      'odrl:permission': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'MembershipCredential',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'active'
-        }
-      }],
-      'odrl:obligation': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'DataAccess.level',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'processing'
-        }
-      }],
-      'odrl:prohibition': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'DataAccess.reidentification',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'true'
-        }
-      }]
-    }
   },
   {
     '@id': 'asset:ehr:EHR002',
     '@type': 'dcat:Dataset',
-    'dct:title': 'EHR - Chronic Heart Failure',
-    'dct:description': 'Anonymized EHR: Heart failure with reduced ejection fraction',
-    'dcat:keyword': ['heart failure', 'cardiology', 'HFrEF', 'EHR'],
+    'dct:title': 'Chronic Heart Failure (HFrEF)',
+    'dct:description': 'Heart failure with reduced ejection fraction',
+    'dcat:keyword': ['heart failure', 'cardiology', 'HFrEF'],
     'dct:creator': 'did:web:rheinland-uklinikum.de',
     'health:icdCode': 'I50.9',
     'health:diagnosis': 'Heart failure',
+    'health:category': 'cardiology',
     'health:ageBand': '65-74',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
-    'odrl:hasPolicy': {
-      '@id': 'policy:health-consent-contract:EHR002',
-      '@type': 'odrl:Offer',
-      'odrl:permission': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'MembershipCredential',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'active'
-        }
-      }],
-      'odrl:obligation': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'DataAccess.level',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'processing'
-        }
-      }]
-    }
   },
   {
     '@id': 'asset:ehr:EHR003',
     '@type': 'dcat:Dataset',
-    'dct:title': 'EHR - Breast Cancer Survivor',
-    'dct:description': 'Anonymized EHR: Breast cancer in remission post-treatment',
-    'dcat:keyword': ['oncology', 'breast cancer', 'survivor', 'EHR'],
+    'dct:title': 'Breast Cancer (Remission)',
+    'dct:description': 'Breast cancer in remission post-treatment',
+    'dcat:keyword': ['oncology', 'breast cancer', 'survivor'],
     'dct:creator': 'did:web:rheinland-uklinikum.de',
     'health:icdCode': 'C50.9',
     'health:diagnosis': 'Malignant neoplasm of breast',
+    'health:category': 'oncology',
     'health:ageBand': '45-54',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
-    'odrl:hasPolicy': {
-      '@id': 'policy:health-consent-contract:EHR003',
-      '@type': 'odrl:Offer',
-      'odrl:permission': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'MembershipCredential',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'active'
-        }
-      }],
-      'odrl:obligation': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'DataAccess.level',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'processing'
-        }
-      }]
-    }
+  },
+  {
+    '@id': 'asset:ehr:EHR004',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Prostate Cancer (Active Surveillance)',
+    'dct:description': 'Low-grade prostate cancer under surveillance',
+    'dcat:keyword': ['oncology', 'prostate cancer', 'surveillance'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'C61',
+    'health:diagnosis': 'Malignant neoplasm of prostate',
+    'health:category': 'oncology',
+    'health:ageBand': '65-74',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR005',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'COPD with Emphysema',
+    'dct:description': 'Chronic obstructive pulmonary disease with emphysema',
+    'dcat:keyword': ['pulmonology', 'COPD', 'emphysema'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'J44.9',
+    'health:diagnosis': 'COPD',
+    'health:category': 'pulmonology',
+    'health:ageBand': '55-64',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
   },
   {
     '@id': 'asset:ehr:EHR006',
     '@type': 'dcat:Dataset',
-    'dct:title': 'EHR - Multiple Sclerosis (RRMS)',
-    'dct:description': 'Anonymized EHR: Relapsing-remitting multiple sclerosis',
-    'dcat:keyword': ['neurology', 'MS', 'autoimmune', 'EHR'],
+    'dct:title': 'Multiple Sclerosis (RRMS)',
+    'dct:description': 'Relapsing-remitting multiple sclerosis',
+    'dcat:keyword': ['neurology', 'MS', 'autoimmune'],
     'dct:creator': 'did:web:rheinland-uklinikum.de',
     'health:icdCode': 'G35',
     'health:diagnosis': 'Multiple sclerosis',
+    'health:category': 'neurology',
     'health:ageBand': '25-34',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
-    'odrl:hasPolicy': {
-      '@id': 'policy:health-consent-contract:EHR006',
-      '@type': 'odrl:Offer',
-      'odrl:permission': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'MembershipCredential',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'active'
-        }
-      }],
-      'odrl:obligation': [{
-        'odrl:action': 'use',
-        'odrl:constraint': {
-          'odrl:leftOperand': 'DataAccess.level',
-          'odrl:operator': 'eq',
-          'odrl:rightOperand': 'processing'
-        }
-      }]
-    }
-  }
+  },
+  {
+    '@id': 'asset:ehr:EHR007',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Rheumatoid Arthritis',
+    'dct:description': 'Seropositive rheumatoid arthritis',
+    'dcat:keyword': ['rheumatology', 'RA', 'autoimmune'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'M05.9',
+    'health:diagnosis': 'Rheumatoid arthritis',
+    'health:category': 'rheumatology',
+    'health:ageBand': '45-54',
+    'health:biologicalSex': 'female',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR008',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Chronic Kidney Disease Stage 4',
+    'dct:description': 'CKD stage 4 with diabetic nephropathy',
+    'dcat:keyword': ['nephrology', 'CKD', 'diabetic nephropathy'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'N18.4',
+    'health:diagnosis': 'Chronic kidney disease, stage 4',
+    'health:category': 'nephrology',
+    'health:ageBand': '65-74',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR009',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Major Depressive Disorder',
+    'dct:description': 'Recurrent major depressive disorder, moderate',
+    'dcat:keyword': ['psychiatry', 'depression', 'mental health'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'F33.1',
+    'health:diagnosis': 'Major depressive disorder, recurrent',
+    'health:category': 'psychiatry',
+    'health:ageBand': '35-44',
+    'health:biologicalSex': 'female',
+    'health:consentStatus': 'active',
+    'health:sensitiveCategory': 'mental-health',
+  },
+  {
+    '@id': 'asset:ehr:EHR010',
+    '@type': 'dcat:Dataset',
+    'dct:title': "Parkinson's Disease",
+    'dct:description': "Early-stage Parkinson's disease",
+    'dcat:keyword': ['neurology', 'Parkinson', 'movement disorder'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'G20',
+    'health:diagnosis': "Parkinson's disease",
+    'health:category': 'neurology',
+    'health:ageBand': '55-64',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR011',
+    '@type': 'dcat:Dataset',
+    'dct:title': "Crohn's Disease",
+    'dct:description': "Crohn's disease of small intestine",
+    'dcat:keyword': ['gastroenterology', 'IBD', 'Crohn'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'K50.0',
+    'health:diagnosis': "Crohn's disease of small intestine",
+    'health:category': 'gastroenterology',
+    'health:ageBand': '25-34',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR012',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Epilepsy (Focal)',
+    'dct:description': 'Focal epilepsy with impaired awareness',
+    'dcat:keyword': ['neurology', 'epilepsy', 'seizure'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'G40.2',
+    'health:diagnosis': 'Focal epilepsy',
+    'health:category': 'neurology',
+    'health:ageBand': '18-24',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR013',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Systemic Lupus Erythematosus',
+    'dct:description': 'SLE with renal involvement',
+    'dcat:keyword': ['rheumatology', 'lupus', 'autoimmune'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'M32.1',
+    'health:diagnosis': 'Systemic lupus erythematosus',
+    'health:category': 'rheumatology',
+    'health:ageBand': '35-44',
+    'health:biologicalSex': 'female',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR014',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Atrial Fibrillation',
+    'dct:description': 'Persistent atrial fibrillation',
+    'dcat:keyword': ['cardiology', 'arrhythmia', 'AFib'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'I48.1',
+    'health:diagnosis': 'Persistent atrial fibrillation',
+    'health:category': 'cardiology',
+    'health:ageBand': '75-84',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR015',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Severe Asthma',
+    'dct:description': 'Severe persistent asthma with allergic component',
+    'dcat:keyword': ['pulmonology', 'asthma', 'allergic'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'J45.5',
+    'health:diagnosis': 'Severe persistent asthma',
+    'health:category': 'pulmonology',
+    'health:ageBand': '35-44',
+    'health:biologicalSex': 'female',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR016',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Type 1 Diabetes',
+    'dct:description': 'Type 1 diabetes with insulin pump therapy',
+    'dcat:keyword': ['endocrinology', 'T1D', 'insulin'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'E10.9',
+    'health:diagnosis': 'Type 1 diabetes mellitus',
+    'health:category': 'endocrine',
+    'health:ageBand': '25-34',
+    'health:biologicalSex': 'female',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR017',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Osteoporosis with Fracture',
+    'dct:description': 'Postmenopausal osteoporosis with pathological fracture',
+    'dcat:keyword': ['rheumatology', 'osteoporosis', 'fracture'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'M80.0',
+    'health:diagnosis': 'Postmenopausal osteoporosis with fracture',
+    'health:category': 'rheumatology',
+    'health:ageBand': '65-74',
+    'health:biologicalSex': 'female',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR018',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Hepatitis C (Chronic)',
+    'dct:description': 'Chronic viral hepatitis C',
+    'dcat:keyword': ['infectious disease', 'hepatitis', 'viral'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'B18.2',
+    'health:diagnosis': 'Chronic viral hepatitis C',
+    'health:category': 'infectious',
+    'health:ageBand': '45-54',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+    'health:sensitiveCategory': 'infectious-disease',
+  },
+  {
+    '@id': 'asset:ehr:EHR019',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'Chronic Migraine',
+    'dct:description': 'Chronic migraine with aura',
+    'dcat:keyword': ['neurology', 'migraine', 'headache'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'G43.1',
+    'health:diagnosis': 'Migraine with aura',
+    'health:category': 'neurology',
+    'health:ageBand': '35-44',
+    'health:biologicalSex': 'female',
+    'health:consentStatus': 'active',
+  },
+  {
+    '@id': 'asset:ehr:EHR020',
+    '@type': 'dcat:Dataset',
+    'dct:title': 'HIV (Well-Controlled)',
+    'dct:description': 'HIV infection on antiretroviral therapy, undetectable',
+    'dcat:keyword': ['infectious disease', 'HIV', 'antiretroviral'],
+    'dct:creator': 'did:web:rheinland-uklinikum.de',
+    'health:icdCode': 'B20',
+    'health:diagnosis': 'HIV disease',
+    'health:category': 'infectious',
+    'health:ageBand': '35-44',
+    'health:biologicalSex': 'male',
+    'health:consentStatus': 'active',
+    'health:sensitiveCategory': 'infectious-disease',
+  },
 ];
 
 // ============================================================================
