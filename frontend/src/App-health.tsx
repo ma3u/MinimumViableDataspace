@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Database, 
   ArrowRight,
@@ -24,7 +24,8 @@ import {
   Send,
   Github,
   Heart,
-  Lock
+  Lock,
+  Stethoscope
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
 import { 
@@ -36,7 +37,11 @@ import {
   mockNegotiationFlow,
   mockTransferFlow
 } from './services/mockData-health';
+import { fetchEHRById, checkBackendHealth } from './services/ehrApi';
 import type { ElectronicHealthRecord } from './types/health';
+
+// GitHub repository URL
+const GITHUB_REPO_URL = 'https://github.com/ma3u/MinimumViableDataspace/tree/health-demo';
 
 type DemoPhase = 'intro' | 'catalog' | 'negotiation' | 'transfer' | 'complete';
 
@@ -62,6 +67,12 @@ function AppHealth() {
   const [ehrData, setEhrData] = useState<ElectronicHealthRecord | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showJson, setShowJson] = useState(false);
+  const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
+
+  // Check backend availability on mount
+  useEffect(() => {
+    checkBackendHealth().then(setBackendAvailable);
+  }, []);
 
   const resetDemo = () => {
     setPhase('intro');
@@ -85,27 +96,41 @@ function AppHealth() {
 
   const simulateTransfer = async () => {
     setIsAnimating(true);
+    
     for (let i = 0; i < mockTransferFlow.length; i++) {
       setTransferStep(i);
       await new Promise(resolve => setTimeout(resolve, 800));
     }
-    // Load the EHR data
+    
+    // Load the EHR data - try backend first, fall back to mock
     if (selectedAsset) {
-      setEhrData(mockEHRData[selectedAsset['@id']]);
+      try {
+        if (backendAvailable) {
+          const data = await fetchEHRById(selectedAsset['@id']);
+          setEhrData(data);
+        } else {
+          // Use mock data as fallback
+          setEhrData(mockEHRData[selectedAsset['@id']]);
+        }
+      } catch (error) {
+        console.warn('Backend fetch failed, using mock data:', error);
+        setEhrData(mockEHRData[selectedAsset['@id']]);
+      }
     }
+    
     setIsAnimating(false);
     setPhase('complete');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b border-blue-100">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-teal-600 to-cyan-600 p-2 rounded-lg">
-                <Heart className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2 rounded-lg">
+                <Stethoscope className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
@@ -116,11 +141,28 @@ function AppHealth() {
             </div>
             
             <div className="flex items-center gap-4">
+              {/* Backend Status Indicator */}
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+                backendAvailable === null 
+                  ? 'bg-gray-100 text-gray-600'
+                  : backendAvailable 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-yellow-100 text-yellow-700'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  backendAvailable === null 
+                    ? 'bg-gray-400'
+                    : backendAvailable 
+                      ? 'bg-green-500' 
+                      : 'bg-yellow-500'
+                }`} />
+                {backendAvailable === null ? 'Checking...' : backendAvailable ? 'Backend Online' : 'Demo Mode'}
+              </div>
               <a 
                 href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <BookOpen className="w-4 h-4" />
                 DSP 2025-1 Specification
@@ -142,7 +184,7 @@ function AppHealth() {
 
       {/* Progress Bar */}
       {phase !== 'intro' && (
-        <div className="bg-white border-b">
+        <div className="bg-white border-b border-blue-100">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               {[
@@ -154,7 +196,7 @@ function AppHealth() {
                 <div key={step.id} className="flex items-center flex-1">
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                     phase === step.id 
-                      ? 'bg-teal-600 text-white shadow-lg' 
+                      ? 'bg-blue-600 text-white shadow-lg' 
                       : arr.findIndex(x => x.id === phase) > i
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-400'
@@ -179,12 +221,12 @@ function AppHealth() {
         {phase === 'intro' && (
           <div className="space-y-8">
             {/* Hero Section */}
-            <div className="bg-gradient-to-br from-teal-600 to-cyan-700 rounded-2xl p-8 text-white">
+            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl p-8 text-white">
               <div className="max-w-3xl">
                 <h2 className="text-3xl font-bold mb-4">
                   Sovereign Health Data Exchange via Dataspace Protocol
                 </h2>
-                <p className="text-teal-100 text-lg mb-6">
+                <p className="text-blue-100 text-lg mb-6">
                   This demo illustrates how anonymized Electronic Health Records (EHR) can be securely 
                   exchanged between hospitals and research institutes using the Dataspace Protocol (DSP). 
                   It demonstrates consent-based data sharing compliant with GDPR, EHDS, and German health data regulations.
@@ -192,16 +234,16 @@ function AppHealth() {
                 <div className="flex gap-4 flex-wrap">
                   <button
                     onClick={() => setPhase('catalog')}
-                    className="flex items-center gap-2 px-6 py-3 bg-white text-teal-600 rounded-lg font-semibold hover:bg-teal-50 transition-colors"
+                    className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
                   >
                     <Play className="w-5 h-5" />
                     Start Demo
                   </button>
                   <a
-                    href="https://github.com/ma3u/MVD-health"
+                    href={GITHUB_REPO_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-6 py-3 bg-teal-500/20 border border-white/30 rounded-lg font-semibold hover:bg-teal-500/30 text-white transition-colors"
+                    className="flex items-center gap-2 px-6 py-3 bg-white/10 border border-white/30 rounded-lg font-semibold hover:bg-white/20 text-white transition-colors"
                   >
                     <Github className="w-5 h-5" />
                     View Code on GitHub
@@ -221,30 +263,30 @@ function AppHealth() {
 
             {/* Participants */}
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-blue-100">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="text-4xl">{healthParticipants.provider.logo}</div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">{healthParticipants.provider.name}</h3>
-                    <p className="text-teal-600 font-medium">{healthParticipants.provider.role}</p>
+                    <p className="text-blue-600 font-medium">{healthParticipants.provider.role}</p>
                   </div>
                 </div>
                 <p className="text-gray-600 mb-4">{healthParticipants.provider.description}</p>
-                <div className="bg-gray-50 rounded-lg p-3 font-mono text-sm text-gray-600">
+                <div className="bg-blue-50 rounded-lg p-3 font-mono text-sm text-blue-900">
                   DID: {healthParticipants.provider.did}
                 </div>
               </div>
               
-              <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-indigo-100">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="text-4xl">{healthParticipants.consumer.logo}</div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">{healthParticipants.consumer.name}</h3>
-                    <p className="text-cyan-600 font-medium">{healthParticipants.consumer.role}</p>
+                    <p className="text-indigo-600 font-medium">{healthParticipants.consumer.role}</p>
                   </div>
                 </div>
                 <p className="text-gray-600 mb-4">{healthParticipants.consumer.description}</p>
-                <div className="bg-gray-50 rounded-lg p-3 font-mono text-sm text-gray-600">
+                <div className="bg-indigo-50 rounded-lg p-3 font-mono text-sm text-indigo-900">
                   DID: {healthParticipants.consumer.did}
                 </div>
               </div>
@@ -278,7 +320,7 @@ function AppHealth() {
                 {Object.entries(healthDspPhases).map(([key, phaseData]) => (
                   <div key={key} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-2 mb-3">
-                      {key === 'catalog' && <Database className="w-5 h-5 text-teal-600" />}
+                      {key === 'catalog' && <Database className="w-5 h-5 text-blue-600" />}
                       {key === 'negotiation' && <Lock className="w-5 h-5 text-purple-600" />}
                       {key === 'transfer' && <Send className="w-5 h-5 text-green-600" />}
                       <h4 className="font-semibold text-gray-900">{phaseData.title}</h4>
@@ -288,7 +330,7 @@ function AppHealth() {
                       href={phaseData.specLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-teal-600 hover:underline flex items-center gap-1"
+                      className="text-sm text-blue-600 hover:underline flex items-center gap-1"
                     >
                       View specification <ExternalLink className="w-3 h-3" />
                     </a>
@@ -313,26 +355,26 @@ function AppHealth() {
                 <h3 className="font-semibold text-gray-900">Protocol Flow</h3>
                 <button
                   onClick={() => setShowJson(!showJson)}
-                  className="flex items-center gap-2 text-sm text-teal-600 hover:bg-teal-50 px-3 py-1 rounded-lg"
+                  className="flex items-center gap-2 text-sm text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-lg"
                 >
                   <Code className="w-4 h-4" />
                   {showJson ? 'Hide' : 'Show'} JSON Messages
                 </button>
               </div>
               
-              <div className="flex items-center justify-between bg-gradient-to-r from-cyan-50 to-teal-50 rounded-lg p-4">
+              <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
                 <div className="text-center">
                   <div className="text-2xl mb-1">{healthParticipants.consumer.logo}</div>
                   <div className="font-medium text-sm">CRO</div>
                 </div>
                 <div className="flex-1 px-4">
                   <div className="flex items-center justify-center gap-2 text-sm mb-2">
-                    <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded">CatalogRequestMessage</span>
-                    <ArrowRight className="w-4 h-4 text-cyan-600" />
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">CatalogRequestMessage</span>
+                    <ArrowRight className="w-4 h-4 text-blue-600" />
                   </div>
                   <div className="flex items-center justify-center gap-2 text-sm">
-                    <ArrowRight className="w-4 h-4 text-teal-600 rotate-180" />
-                    <span className="bg-teal-100 text-teal-800 px-2 py-1 rounded">dcat:Catalog (EHR Datasets)</span>
+                    <ArrowRight className="w-4 h-4 text-blue-600 rotate-180" />
+                    <span className="bg-blue-100 text-teal-800 px-2 py-1 rounded">dcat:Catalog (EHR Datasets)</span>
                   </div>
                 </div>
                 <div className="text-center">
@@ -368,8 +410,8 @@ function AppHealth() {
                     key={asset['@id']}
                     className={`border rounded-lg p-4 cursor-pointer transition-all ${
                       selectedAsset?.['@id'] === asset['@id']
-                        ? 'border-teal-500 ring-2 ring-teal-200'
-                        : 'hover:border-teal-300 hover:shadow-md'
+                        ? 'border-blue-500 ring-2 ring-blue-200'
+                        : 'hover:border-blue-300 hover:shadow-md'
                     }`}
                     onClick={() => setSelectedAsset(asset as MockEHRAsset)}
                   >
@@ -406,7 +448,7 @@ function AppHealth() {
               <div className="flex justify-end">
                 <button
                   onClick={() => setPhase('negotiation')}
-                  className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                 >
                   Request Consent Verification for "{selectedAsset['dct:title']}"
                   <ArrowRight className="w-5 h-5" />
@@ -434,7 +476,7 @@ function AppHealth() {
                       i < negotiationStep 
                         ? 'bg-green-100 text-green-800'
                         : i === negotiationStep
-                          ? 'bg-teal-600 text-white shadow-lg'
+                          ? 'bg-blue-600 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-400'
                     }`}>
                       {i < negotiationStep ? (
@@ -467,7 +509,7 @@ function AppHealth() {
                     key={i}
                     className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
                       i <= negotiationStep
-                        ? 'bg-teal-50 border border-teal-200'
+                        ? 'bg-blue-50 border border-blue-200'
                         : 'bg-gray-50 border border-gray-200 opacity-50'
                     }`}
                   >
@@ -475,7 +517,7 @@ function AppHealth() {
                       i < negotiationStep
                         ? 'bg-green-500 text-white'
                         : i === negotiationStep
-                          ? 'bg-teal-600 text-white'
+                          ? 'bg-blue-600 text-white'
                           : 'bg-gray-300 text-gray-600'
                     }`}>
                       {i < negotiationStep ? <CheckCircle className="w-4 h-4" /> : i + 1}
@@ -484,7 +526,7 @@ function AppHealth() {
                       <div className="font-medium text-gray-900">{step.name}</div>
                       <div className="text-sm text-gray-600">{step.description}</div>
                     </div>
-                    <div className="text-sm text-teal-600 font-mono">{step.direction}</div>
+                    <div className="text-sm text-blue-600 font-mono">{step.direction}</div>
                   </div>
                 ))}
               </div>
@@ -608,7 +650,7 @@ function AppHealth() {
                     Research institute pulls de-identified EHR from Hospital&apos;s data plane
                   </p>
                 </div>
-                <div className="bg-teal-50 rounded-lg p-4">
+                <div className="bg-blue-50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-teal-800 mb-2">Data Address</h4>
                   <div className="bg-white rounded p-3 font-mono text-xs break-all">
                     https://provider.rheinland-uklinikum.de/fhir/Bundle/{selectedAsset['@id'].split(':').pop()}
@@ -676,7 +718,7 @@ function AppHealth() {
             <div className="flex justify-center">
               <button
                 onClick={resetDemo}
-                className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
               >
                 <RotateCcw className="w-5 h-5" />
                 Try Another EHR
@@ -698,7 +740,7 @@ function AppHealth() {
                 href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-teal-600 hover:underline flex items-center gap-1"
+                className="text-sm text-blue-600 hover:underline flex items-center gap-1"
               >
                 DSP Specification <ExternalLink className="w-3 h-3" />
               </a>
@@ -712,10 +754,10 @@ function AppHealth() {
                 EDC MVD
               </a>
               <a 
-                href="https://github.com/ma3u/MVD-health"
+                href={GITHUB_REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 <Github className="w-4 h-4" />
                 Health Dataspace Demo
@@ -743,7 +785,7 @@ function PhaseHeader({ phase, icon }: PhaseHeaderProps) {
     <div className="bg-white rounded-xl p-6 shadow-sm border">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-teal-100 rounded-lg text-teal-600">
+          <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
             {icon}
           </div>
           <div>
@@ -755,7 +797,7 @@ function PhaseHeader({ phase, icon }: PhaseHeaderProps) {
           href={phase.specLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 text-sm text-teal-600 hover:bg-teal-50 rounded-lg transition-colors whitespace-nowrap"
+          className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors whitespace-nowrap"
         >
           <BookOpen className="w-4 h-4" />
           View Spec
