@@ -36,7 +36,9 @@ This demonstration showcases the extraction of consent-gated Electronic Health R
 - **Prometheus-X**: Provides architectural blueprints for consent and contract negotiation.
 
 ### 1.3 Demo Scenario
-The demo simulates a clinical research study where a Contract Research Organization (CRO) requests access to patient data held by a Healthcare Provider.
+The demo simulates a clinical research study where a  Research Organization requests access to patient data held by a Healthcare Provider.
+
+![Demo of clinical study data exchange](demo-overview.png)
 
 **Participants:**
 - **Rheinland Universitätsklinikum** (Provider): A hospital holding patient EHR data.
@@ -67,42 +69,38 @@ This section outlines the step-by-step process of the EHR2EDC use case.
 ### 2.1 Pre-Enrollment (Patient Onboarding)
 The patient receives study information and a DID wallet link. They verify the Issuer DID and obtain Membership credentials to the healthcare network.
 
-![Pre-Enrollment Screenshot](placeholder-pre-enrollment.svg)
-
 ### 2.2 Study Enrollment and Consent Capture
 The patient reviews the protocol-specific consent. Upon agreement, the Issuer issues a **ConsentCredential** to the Patient's DID, which can be presented to the provider.
-
-![Study Enrollment Screenshot](placeholder-study-enrollment.svg)
 
 ### 2.3 Consent Verification and Policy Provisioning
 The Consumer (CRO) queries the catalog. The Provider evaluates access policies using the IdentityHub. Access is granted only if the **ConsentCredential** matches the study purpose and validity period.
 
-![Consent Verification Screenshot](placeholder-consent-verification.svg)
+![demo-step 1 data catalog](demo-step1-catalog.png)
 
 ### 2.4 EHR Data Discovery and Eligibility Screening
 The Consumer submits criteria (e.g., ICD-10 codes, age range) to discover eligible data. The Provider responds with aggregate counts (preserving privacy) to aid in feasibility analysis without revealing raw data.
 
-![Data Discovery Screenshot](placeholder-data-discovery.svg)
-
 ### 2.5 Contract Negotiation and Data Transfer Setup
 The Consumer requests a contract, presenting their **MembershipCredential** and **DataProcessorCredential**. The Provider returns a ContractAgreement and an EndpointDataReference (EDR) for the scoped FHIR bundle.
 
-![Contract Negotiation Screenshot](placeholder-contract-negotiation.svg)
+![contract negotionion](demo-step2-contractnegotiation.png)
 
 ### 2.6 De-identification and Provenance
 Before transfer, the Provider's dataplane runs a de-identification pipeline (removing direct identifiers, pseudonymizing). A **Provenance VC** is attached to record the transformation steps.
 
-![De-identification Screenshot](placeholder-de-identification.svg)
-
 ### 2.7 EDC Ingestion and Study Data Lock
 The Consumer fetches the de-identified FHIR Bundle, transforms it to CDISC SDTM/ODM standards, and loads it into their EDC system. The data is locked and an audit trail is maintained.
 
-![EDC Ingestion Screenshot](placeholder-edc-ingestion.svg)
+![alt text](demo-step3-datatransfer.png)
 
-### 2.8 Re-consent and Revocation
+### 2.8 Show Electronic Health Record
+
+If the file transfer is successful, the study data can be viewed in the Electronic Health Record system.
+
+![Electronic Health Record](demo-step4-EHR.png)
+
+### 2.9 Re-consent and Revocation
 If the protocol changes, the patient is notified to re-consent. If the patient revokes consent, the ConsentCredential status is updated, and the Provider enforces recall obligations.
-
-![Re-consent Screenshot](placeholder-re-consent.svg)
 
 ## 3. Architecture Overview
 
