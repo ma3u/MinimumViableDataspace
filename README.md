@@ -1,6 +1,6 @@
 # Health Data Exchange with High Privacy and Consent Management Demo
 
-A comprehensive demonstration of secure, interoperable, and consent-managed access to health data for research (secondary use), aligned with the European Health Data Space (EHDS) and German Health Data Use Act (GDNG).
+A comprehensive demonstration of secure, interoperable, and consent-managed access to health data for research (secondary use), aligned with the European Health Data Space (EHDS) and German Health Data Use Act (GDNG). We utilize the Dataspace Protocol,  Eclipse Dataspace Components (EDC) for sovereign data exchange, IdentityHub for verifiable credential management, and implement strong privacy-preserving techniques.
 
 ---
 
@@ -120,7 +120,12 @@ The solution leverages the **Eclipse Dataspace Components (EDC)** for sovereign 
 ### 4.2 Setup Steps
 
 1.  **Infrastructure Setup**:
-    Start the MVD infrastructure (EDC connectors, IdentityHubs) using your preferred method (Gradle or Kubernetes).
+      Start the MVD infrastructure (EDC connectors, IdentityHubs) using your preferred method (Gradle or Kubernetes). For details abot the Eclipse Dataspace Components setup in the Minimum Viable Dataspace, refer to the [MVD Deployment Guide](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector/blob/main/docs/deployment-guide.md).
+
+    ![Docker](demo-docker.png)
+
+    The screenshot shows Docker Desktop with running containers for the Frontend and Backend, Provider and Consumer EDC connectors, IdentityHubs, and supporting services.
+
 
 2.  **Seed Identities**:
     Initialize the basic identities and credentials.
