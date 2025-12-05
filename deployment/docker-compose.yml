@@ -335,6 +335,44 @@ services:
       - postgres
       - vault
 
+  # -----------------------------------------------------------------------------------------------
+  # HEALTH DATASPACE - EHR2EDC APPLICATION LAYER
+  # -----------------------------------------------------------------------------------------------
+  ehr-backend:
+    build:
+      context: ../backend-mock
+      dockerfile: Dockerfile
+    image: health-ehr-backend:latest
+    container_name: ehr-backend
+    ports:
+      - "3003:3001"  # Host 3003 -> Container 3001
+    networks:
+      - mvd-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  health-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    image: health-ehr2edc-frontend:latest
+    container_name: health-frontend
+    ports:
+      - "3010:80"  # Host 3010 -> Container 80 (nginx)
+    networks:
+      - mvd-network
+    depends_on:
+      ehr-backend:
+        condition: service_healthy
+      consumer-controlplane:
+        condition: service_started
+      provider-qna-controlplane:
+        condition: service_started
+
 networks:
   mvd-network:
     driver: bridge
