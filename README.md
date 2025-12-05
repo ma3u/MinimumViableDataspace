@@ -1,4 +1,4 @@
-# EHR2EDC with High Privacy and Consent Management Demo
+# Health Data Exchange with High Privacy and Consent Management Demo
 
 A comprehensive demonstration of secure, interoperable, and consent-managed access to health data for research (secondary use), aligned with the European Health Data Space (EHDS) and German Health Data Use Act (GDNG).
 
