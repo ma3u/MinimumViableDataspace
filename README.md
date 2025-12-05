@@ -1,6 +1,6 @@
-# DECADE-X Aerospace Digital Product Passport Demo
+# Aerospace Supply Chain Digital Product Passport Demo
 
-A comprehensive demonstration of sovereign data exchange for aerospace Digital Product Passports (DPP) using Eclipse Dataspace Components within the DECADE-X initiative.
+A comprehensive demonstration of sovereign data exchange for aerospace Digital Product Passports (DPP) using Eclipse Dataspace Components within the Aerospace Supply Chain initiative.
 
 ---
 
@@ -8,7 +8,7 @@ A comprehensive demonstration of sovereign data exchange for aerospace Digital P
 
 1. [Introduction](#1-introduction)
    - 1.1 [Purpose](#11-purpose)
-   - 1.2 [DECADE-X Context](#12-decade-x-context)
+   - 1.2 [Aerospace Supply Chain Context](#12-aerospace-supply-chain-context)
    - 1.3 [Demo Scenario](#13-demo-scenario)
 2. [Architecture Overview](#2-architecture-overview)
    - 2.1 [System Components](#21-system-components)
@@ -29,8 +29,8 @@ A comprehensive demonstration of sovereign data exchange for aerospace Digital P
    - 4.7 [Verification Checklist](#47-verification-checklist)
 5. [User Manual](#5-user-manual)
    - 5.1 [Accessing the Demo](#51-accessing-the-demo)
-   - 5.2 [Consumer Workflow (Airbus)](#52-consumer-workflow-airbus)
-   - 5.3 [Provider Workflow (Rolls-Royce)](#53-provider-workflow-rolls-royce)
+   - 5.2 [Consumer Workflow (Horizon Aviation Group)](#52-consumer-workflow-horizon-aviation-group)
+   - 5.3 [Provider Workflow (ApexPropulsion Systems)](#53-provider-workflow-apexpropulsion-systems)
    - 5.4 [Understanding the DPP Data](#54-understanding-the-dpp-data)
 6. [Data Model Specification](#6-data-model-specification)
    - 6.1 [Digital Product Passport Structure](#61-digital-product-passport-structure)
@@ -53,9 +53,9 @@ A comprehensive demonstration of sovereign data exchange for aerospace Digital P
 
 This demonstration showcases the secure, sovereign exchange of aerospace Digital Product Passports between industry participants using Eclipse Dataspace Components. It illustrates how OEMs and suppliers can share critical component data—including airworthiness certificates, sustainability metrics, and operational history—while maintaining full control over their data assets.
 
-### 1.2 DECADE-X Context
+### 1.2 Aerospace Supply Chain Context
 
-DECADE-X (Decentralized European Collaborative Aerospace Data Exchange) represents a vision for a federated aerospace data ecosystem built on dataspace principles. This demo implements a key DECADE-X use case:
+The Aerospace Supply Chain initiative represents a vision for a federated aerospace data ecosystem built on dataspace principles. This demo implements a key use case:
 
 **Sovereign Data Exchange for Aerospace Supply Chain**
 - **Data Sovereignty**: Each participant maintains control over their data and access policies
@@ -65,18 +65,18 @@ DECADE-X (Decentralized European Collaborative Aerospace Data Exchange) represen
 
 ### 1.3 Demo Scenario
 
-The demo simulates a real-world aerospace supply chain data exchange. This diagram shows how Rolls-Royce manufactures engine components and creates Digital Product Passports, which are then shared with Airbus via the Dataspace Protocol (DSP). Airbus integrates this data into their Skywise fleet management platform.
+The demo simulates a real-world aerospace supply chain data exchange. This diagram shows how ApexPropulsion Systems manufactures engine components and creates Digital Product Passports, which are then shared with Horizon Aviation Group via the Dataspace Protocol (DSP). Horizon Aviation Group integrates this data into their fleet management platform.
 
 ```mermaid
 flowchart LR
-    subgraph Provider["Rolls-Royce - Provider"]
+    subgraph Provider["ApexPropulsion Systems - Provider"]
         RR["Engine OEM"]
         DPP["Digital Product Passports"]
     end
     
-    subgraph Consumer["Airbus - Consumer"]
+    subgraph Consumer["Horizon Aviation Group - Consumer"]
         AB["Airframe OEM"]
-        SKY["Skywise Platform"]
+        SKY["Fleet Management Platform"]
     end
     
     RR --> |"Manufactures"| DPP
@@ -85,8 +85,8 @@ flowchart LR
 ```
 
 **Participants:**
-- **Rolls-Royce** (Provider): Manufactures Trent XWB engine components and provides Digital Product Passports
-- **Airbus** (Consumer): Procures engine components and requires DPP data for fleet management
+- **ApexPropulsion Systems** (Provider): Manufactures Trent XWB engine components and provides Digital Product Passports
+- **Horizon Aviation Group** (Consumer): Procures engine components and requires DPP data for fleet management
 
 **Data Exchanged:**
 - Airworthiness certificates (EASA Form 1)
@@ -94,13 +94,30 @@ flowchart LR
 - Operational metrics (flight hours, cycles)
 - Technical specifications
 
+### 1.4 Demo User Journey
+
+![alt text](dpp-frontend1.png)
+Frontend interface showing catalog of DPP assets and detailed passport view.
+
+![choose a asset from the data catalog](demo-step1.png)
+In the first step the suer choose a asset from the data catalog to view its Digital Product Passport.
+
+![user negotiates a contract to access the DPP](demo-step2.png)
+In step 2 the user negotiates a contract to access the DPP data by presenting their Verifiable Credentials under one data access policy.
+
+![Start the transfer](demo-step3.png)
+In step 3 the user starts the data transfer to fetch the DPP data over HTTP-PULL.
+
+![Finally the DPP from the supplier will be displayed](demo-step4.png)
+Finally the DPP from the supplier will be displayed in a structured viewer format.
+
 ---
 
 ## 2. Architecture Overview
 
 ### 2.1 System Components
 
-The demo architecture consists of three layers. The Presentation Layer contains the React frontend, the Dataspace Layer hosts the EDC connectors and IdentityHubs for both Consumer (Airbus) and Provider (Rolls-Royce), plus a Trust Anchor with the Issuer Service. The Data Layer contains the DPP Backend that serves the actual product passport data.
+The demo architecture consists of three layers. The Presentation Layer contains the React frontend, the Dataspace Layer hosts the EDC connectors and IdentityHubs for both Consumer (Horizon Aviation Group) and Provider (ApexPropulsion Systems), plus a Trust Anchor with the Issuer Service. The Data Layer contains the DPP Backend that serves the actual product passport data.
 
 ```mermaid
 flowchart TB
@@ -109,13 +126,13 @@ flowchart TB
     end
     
     subgraph Dataspace["Dataspace Layer - MVD"]
-        subgraph Consumer["Consumer - Airbus"]
+        subgraph Consumer["Consumer - Horizon Aviation Group"]
             CC["Consumer Controlplane :8081"]
             CD["Consumer Dataplane :11001"]
             CIH["Consumer IdentityHub :7082"]
         end
         
-        subgraph Provider["Provider - Rolls-Royce"]
+        subgraph Provider["Provider - ApexPropulsion Systems"]
             PC["Provider Controlplane :8191"]
             PD["Provider Dataplane :11002"]
             PIH["Provider IdentityHub :7092"]
@@ -148,7 +165,7 @@ The following diagram shows the complete data exchange flow. It illustrates the 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as Airbus User
+    participant User as Horizon Aviation Group User
     participant FE as Frontend
     participant CC as Consumer<br/>Controlplane
     participant CIH as Consumer<br/>IdentityHub
@@ -315,7 +332,7 @@ The IdentityHub manages participant identities and credentials:
 **DPP Backend** (Node.js/Express)
 - URL: `http://localhost:3001`
 - Serves mock DPP data in JSON-LD format
-- Simulates Rolls-Royce internal systems
+- Simulates ApexPropulsion Systems internal systems
 
 ---
 
@@ -531,9 +548,9 @@ curl -X POST http://localhost:8081/api/catalog/v1alpha/catalog/query \
 
 Open your browser and navigate to: **http://localhost:3000**
 
-The interface allows switching between Consumer (Airbus) and Provider (Rolls-Royce) perspectives.
+The interface allows switching between Consumer (Horizon Aviation Group) and Provider (ApexPropulsion Systems) perspectives.
 
-### 5.2 Consumer Workflow (Airbus)
+### 5.2 Consumer Workflow (Horizon Aviation Group)
 
 This diagram shows the six-step workflow for consuming DPP data. Users select their role, browse the provider's catalog, select an asset, negotiate a contract based on their credentials, initiate the data transfer, and finally view the complete Digital Product Passport.
 
@@ -547,12 +564,12 @@ flowchart LR
 ```
 
 **Step 1: Select Consumer Role**
-- Click "Consumer (Airbus)" in the role switcher
+- Click "Consumer (Horizon Aviation Group)" in the role switcher
 - The interface shows the consumer perspective
 
 **Step 2: Browse Catalog**
 - Click "Refresh Catalog" to fetch available DPPs
-- The catalog shows assets from Rolls-Royce
+- The catalog shows assets from ApexPropulsion Systems
 - Each asset displays: Name, Part Type, Serial Number
 
 **Step 3: Select Asset**
@@ -571,10 +588,10 @@ Click "Start Transfer". The system initiates an HTTP-PULL transfer, receives an 
 
 The Digital Product Passport is displayed. Navigate through sections: **Identity** (Part number, serial number, manufacturer), **Airworthiness** (EASA Form 1 status, certifications), **Sustainability** (PCF value, material composition), **Operational** (Flight hours, cycles), and **Technical** (Specifications, dimensions).
 
-### 5.3 Provider Workflow (Rolls-Royce)
+### 5.3 Provider Workflow (ApexPropulsion Systems)
 
 **Step 1: Select Provider Role**
-- Click "Provider (Rolls-Royce)" in the role switcher
+- Click "Provider (ApexPropulsion Systems)" in the role switcher
 
 **Step 2: View Registered Assets**
 - See all DPP assets registered in the provider's EDC
@@ -624,16 +641,16 @@ The DPP follows a JSON-LD Verifiable Credential format:
     "https://www.w3.org/2018/credentials/v1",
     "https://w3id.org/aerospace/dpp/v1"
   ],
-  "id": "did:web:rolls-royce.com:parts:serial:98765-XYZ-123",
+  "id": "did:web:apexpropulsion.com:parts:serial:98765-XYZ-123",
   "type": ["VerifiableCredential", "AerospacePartPassport"],
-  "issuer": "did:web:rolls-royce.com",
+  "issuer": "did:web:apexpropulsion.com",
   "issuanceDate": "2025-10-27T10:00:00Z",
   "credentialSubject": {
-    "id": "did:web:rolls-royce.com:parts:serial:98765-XYZ-123",
+    "id": "did:web:apexpropulsion.com:parts:serial:98765-XYZ-123",
     "partType": "HighPressureTurbineBlade",
-    "sku": "RR-TrentXWB-HPT-Blade-001",
+    "sku": "APEX-TrentXWB-HPT-Blade-001",
     "identityNode": {
-      "manufacturerName": "Rolls-Royce plc",
+      "manufacturerName": "ApexPropulsion Systems",
       "cageCode": "K1039",
       "partNumber": "FW12345",
       "serialNumber": "HPT998877",
@@ -643,7 +660,7 @@ The DPP follows a JSON-LD Verifiable Credential format:
     },
     "airworthinessNode": {
       "formType": "EASA_FORM_1",
-      "formTrackingNumber": "RR-DERBY-2025-00451",
+      "formTrackingNumber": "APEX-DERBY-2025-00451",
       "status": "NEW",
       "certificationAuthority": "EASA",
       "qualityStandards": ["AS9100D", "ISO9001:2015"]
@@ -689,7 +706,7 @@ Assets are registered with the following structure:
     "contenttype": "application/ld+json",
     "dct:type": "ids:DigitalProductPassport",
     "aerospace:partType": "HighPressureTurbineBlade",
-    "aerospace:manufacturer": "Rolls-Royce plc",
+    "aerospace:manufacturer": "ApexPropulsion Systems",
     "aerospace:serialNumber": "HPT998877"
   },
   "dataAddress": {
@@ -875,4 +892,4 @@ Apache License 2.0 - see LICENSE file
 
 ---
 
-*This demo is part of the DECADE-X initiative for sovereign aerospace data exchange.*
+*This demo is part of the Aerospace Supply Chain initiative for sovereign aerospace data exchange.*

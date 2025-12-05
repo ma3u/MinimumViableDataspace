@@ -17,21 +17,21 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// 20 Rolls-Royce Trent XWB Engine Spare Parts
+// 20 ApexPropulsion Systems Trent XWB Engine Spare Parts
 const spareParts: Record<string, any> = {
   // 1. HP Turbine Blade
   "RR001": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR001",
+    "id": "did:web:apexpropulsion.com:parts:RR001",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-01T10:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR001",
+      "id": "did:web:apexpropulsion.com:parts:RR001",
       "partType": "HighPressureTurbineBlade",
-      "sku": "RR-TXWB-HPT-001",
+      "sku": "APEX-TXWB-HPT-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "HPT-BLD-001",
         "serialNumber": "SN-HPT-78001",
@@ -41,7 +41,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-HPT-001",
+        "formTrackingNumber": "APEX-2025-HPT-001",
         "status": "NEW",
         "certificationAuthority": "EASA",
         "qualityStandards": ["AS9100D", "ISO9001:2015"]
@@ -73,16 +73,16 @@ const spareParts: Record<string, any> = {
   // 2. HP Compressor Blade
   "RR002": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR002",
+    "id": "did:web:apexpropulsion.com:parts:RR002",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-02T11:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR002",
+      "id": "did:web:apexpropulsion.com:parts:RR002",
       "partType": "HighPressureCompressorBlade",
-      "sku": "RR-TXWB-HPC-001",
+      "sku": "APEX-TXWB-HPC-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "HPC-BLD-001",
         "serialNumber": "SN-HPC-78002",
@@ -91,7 +91,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-HPC-001",
+        "formTrackingNumber": "APEX-2025-HPC-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -120,16 +120,16 @@ const spareParts: Record<string, any> = {
   // 3. Combustor Liner
   "RR003": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR003",
+    "id": "did:web:apexpropulsion.com:parts:RR003",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-03T09:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR003",
+      "id": "did:web:apexpropulsion.com:parts:RR003",
       "partType": "CombustorLiner",
-      "sku": "RR-TXWB-CMB-001",
+      "sku": "APEX-TXWB-CMB-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "CMB-LNR-001",
         "serialNumber": "SN-CMB-78003",
@@ -138,7 +138,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-CMB-001",
+        "formTrackingNumber": "APEX-2025-CMB-001",
         "status": "OVERHAULED",
         "certificationAuthority": "EASA"
       },
@@ -170,16 +170,16 @@ const spareParts: Record<string, any> = {
   // 4. Fan Blade
   "RR004": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR004",
+    "id": "did:web:apexpropulsion.com:parts:RR004",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-04T08:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR004",
+      "id": "did:web:apexpropulsion.com:parts:RR004",
       "partType": "FanBlade",
-      "sku": "RR-TXWB-FAN-001",
+      "sku": "APEX-TXWB-FAN-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "FAN-BLD-001",
         "serialNumber": "SN-FAN-78004",
@@ -188,7 +188,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-FAN-001",
+        "formTrackingNumber": "APEX-2025-FAN-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -218,16 +218,16 @@ const spareParts: Record<string, any> = {
   // 5. LP Turbine Blade
   "RR005": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR005",
+    "id": "did:web:apexpropulsion.com:parts:RR005",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-05T10:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR005",
+      "id": "did:web:apexpropulsion.com:parts:RR005",
       "partType": "LowPressureTurbineBlade",
-      "sku": "RR-TXWB-LPT-001",
+      "sku": "APEX-TXWB-LPT-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "LPT-BLD-001",
         "serialNumber": "SN-LPT-78005",
@@ -236,7 +236,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-LPT-001",
+        "formTrackingNumber": "APEX-2025-LPT-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -261,16 +261,16 @@ const spareParts: Record<string, any> = {
   // 6. HP Turbine Disk
   "RR006": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR006",
+    "id": "did:web:apexpropulsion.com:parts:RR006",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-06T11:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR006",
+      "id": "did:web:apexpropulsion.com:parts:RR006",
       "partType": "HighPressureTurbineDisk",
-      "sku": "RR-TXWB-HPTD-001",
+      "sku": "APEX-TXWB-HPTD-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "HPT-DSK-001",
         "serialNumber": "SN-HPTD-78006",
@@ -279,7 +279,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-HPTD-001",
+        "formTrackingNumber": "APEX-2025-HPTD-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -307,16 +307,16 @@ const spareParts: Record<string, any> = {
   // 7. Fuel Nozzle
   "RR007": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR007",
+    "id": "did:web:apexpropulsion.com:parts:RR007",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-07T09:30:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR007",
+      "id": "did:web:apexpropulsion.com:parts:RR007",
       "partType": "FuelNozzle",
-      "sku": "RR-TXWB-FN-001",
+      "sku": "APEX-TXWB-FN-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "FN-001",
         "serialNumber": "SN-FN-78007",
@@ -325,7 +325,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-FN-001",
+        "formTrackingNumber": "APEX-2025-FN-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -350,16 +350,16 @@ const spareParts: Record<string, any> = {
   // 8. Bearing Assembly
   "RR008": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR008",
+    "id": "did:web:apexpropulsion.com:parts:RR008",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-08T14:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR008",
+      "id": "did:web:apexpropulsion.com:parts:RR008",
       "partType": "MainShaftBearing",
-      "sku": "RR-TXWB-BRG-001",
+      "sku": "APEX-TXWB-BRG-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "BRG-MSB-001",
         "serialNumber": "SN-BRG-78008",
@@ -368,7 +368,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-BRG-001",
+        "formTrackingNumber": "APEX-2025-BRG-001",
         "status": "SERVICEABLE",
         "certificationAuthority": "EASA"
       },
@@ -393,16 +393,16 @@ const spareParts: Record<string, any> = {
   // 9. Nozzle Guide Vane
   "RR009": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR009",
+    "id": "did:web:apexpropulsion.com:parts:RR009",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-09T10:30:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR009",
+      "id": "did:web:apexpropulsion.com:parts:RR009",
       "partType": "NozzleGuideVane",
-      "sku": "RR-TXWB-NGV-001",
+      "sku": "APEX-TXWB-NGV-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "NGV-001",
         "serialNumber": "SN-NGV-78009",
@@ -411,7 +411,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-NGV-001",
+        "formTrackingNumber": "APEX-2025-NGV-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -437,16 +437,16 @@ const spareParts: Record<string, any> = {
   // 10. Compressor Stator Vane
   "RR010": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR010",
+    "id": "did:web:apexpropulsion.com:parts:RR010",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-10T11:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR010",
+      "id": "did:web:apexpropulsion.com:parts:RR010",
       "partType": "CompressorStatorVane",
-      "sku": "RR-TXWB-CSV-001",
+      "sku": "APEX-TXWB-CSV-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "CSV-001",
         "serialNumber": "SN-CSV-78010",
@@ -455,7 +455,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-CSV-001",
+        "formTrackingNumber": "APEX-2025-CSV-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -480,16 +480,16 @@ const spareParts: Record<string, any> = {
   // 11. Oil Pump
   "RR011": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR011",
+    "id": "did:web:apexpropulsion.com:parts:RR011",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-11T09:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR011",
+      "id": "did:web:apexpropulsion.com:parts:RR011",
       "partType": "OilPump",
-      "sku": "RR-TXWB-OLP-001",
+      "sku": "APEX-TXWB-OLP-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "OLP-001",
         "serialNumber": "SN-OLP-78011",
@@ -498,7 +498,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-OLP-001",
+        "formTrackingNumber": "APEX-2025-OLP-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -523,16 +523,16 @@ const spareParts: Record<string, any> = {
   // 12. Starter Generator
   "RR012": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR012",
+    "id": "did:web:apexpropulsion.com:parts:RR012",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-12T13:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR012",
+      "id": "did:web:apexpropulsion.com:parts:RR012",
       "partType": "StarterGenerator",
-      "sku": "RR-TXWB-SG-001",
+      "sku": "APEX-TXWB-SG-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "SG-001",
         "serialNumber": "SN-SG-78012",
@@ -541,7 +541,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-SG-001",
+        "formTrackingNumber": "APEX-2025-SG-001",
         "status": "OVERHAULED",
         "certificationAuthority": "EASA"
       },
@@ -568,16 +568,16 @@ const spareParts: Record<string, any> = {
   // 13. Thrust Reverser Actuator
   "RR013": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR013",
+    "id": "did:web:apexpropulsion.com:parts:RR013",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-13T10:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR013",
+      "id": "did:web:apexpropulsion.com:parts:RR013",
       "partType": "ThrustReverserActuator",
-      "sku": "RR-TXWB-TRA-001",
+      "sku": "APEX-TXWB-TRA-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "TRA-001",
         "serialNumber": "SN-TRA-78013",
@@ -586,7 +586,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-TRA-001",
+        "formTrackingNumber": "APEX-2025-TRA-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -611,16 +611,16 @@ const spareParts: Record<string, any> = {
   // 14. FADEC Controller
   "RR014": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR014",
+    "id": "did:web:apexpropulsion.com:parts:RR014",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-14T11:30:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR014",
+      "id": "did:web:apexpropulsion.com:parts:RR014",
       "partType": "FADECController",
-      "sku": "RR-TXWB-FADEC-001",
+      "sku": "APEX-TXWB-FADEC-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "FADEC-001",
         "serialNumber": "SN-FADEC-78014",
@@ -629,7 +629,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-FADEC-001",
+        "formTrackingNumber": "APEX-2025-FADEC-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -654,16 +654,16 @@ const spareParts: Record<string, any> = {
   // 15. Exhaust Mixer
   "RR015": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR015",
+    "id": "did:web:apexpropulsion.com:parts:RR015",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-15T09:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR015",
+      "id": "did:web:apexpropulsion.com:parts:RR015",
       "partType": "ExhaustMixer",
-      "sku": "RR-TXWB-EXM-001",
+      "sku": "APEX-TXWB-EXM-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "EXM-001",
         "serialNumber": "SN-EXM-78015",
@@ -672,7 +672,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-EXM-001",
+        "formTrackingNumber": "APEX-2025-EXM-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -697,16 +697,16 @@ const spareParts: Record<string, any> = {
   // 16. Intermediate Pressure Compressor Disk
   "RR016": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR016",
+    "id": "did:web:apexpropulsion.com:parts:RR016",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-16T10:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR016",
+      "id": "did:web:apexpropulsion.com:parts:RR016",
       "partType": "IPCompressorDisk",
-      "sku": "RR-TXWB-IPCD-001",
+      "sku": "APEX-TXWB-IPCD-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "IPCD-001",
         "serialNumber": "SN-IPCD-78016",
@@ -715,7 +715,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-IPCD-001",
+        "formTrackingNumber": "APEX-2025-IPCD-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -740,16 +740,16 @@ const spareParts: Record<string, any> = {
   // 17. Gearbox Assembly
   "RR017": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR017",
+    "id": "did:web:apexpropulsion.com:parts:RR017",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-17T14:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR017",
+      "id": "did:web:apexpropulsion.com:parts:RR017",
       "partType": "AccessoryGearbox",
-      "sku": "RR-TXWB-AGB-001",
+      "sku": "APEX-TXWB-AGB-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "AGB-001",
         "serialNumber": "SN-AGB-78017",
@@ -758,7 +758,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-AGB-001",
+        "formTrackingNumber": "APEX-2025-AGB-001",
         "status": "SERVICEABLE",
         "certificationAuthority": "EASA"
       },
@@ -783,16 +783,16 @@ const spareParts: Record<string, any> = {
   // 18. Turbine Shroud Segment
   "RR018": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR018",
+    "id": "did:web:apexpropulsion.com:parts:RR018",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-18T11:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR018",
+      "id": "did:web:apexpropulsion.com:parts:RR018",
       "partType": "TurbineShroudSegment",
-      "sku": "RR-TXWB-TSS-001",
+      "sku": "APEX-TXWB-TSS-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "TSS-001",
         "serialNumber": "SN-TSS-78018",
@@ -801,7 +801,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-TSS-001",
+        "formTrackingNumber": "APEX-2025-TSS-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -827,16 +827,16 @@ const spareParts: Record<string, any> = {
   // 19. Bleed Valve
   "RR019": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR019",
+    "id": "did:web:apexpropulsion.com:parts:RR019",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-19T09:30:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR019",
+      "id": "did:web:apexpropulsion.com:parts:RR019",
       "partType": "CompressorBleedValve",
-      "sku": "RR-TXWB-CBV-001",
+      "sku": "APEX-TXWB-CBV-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "CBV-001",
         "serialNumber": "SN-CBV-78019",
@@ -845,7 +845,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-CBV-001",
+        "formTrackingNumber": "APEX-2025-CBV-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -870,16 +870,16 @@ const spareParts: Record<string, any> = {
   // 20. Fan Case
   "RR020": {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://w3id.org/aerospace/dpp/v1"],
-    "id": "did:web:rolls-royce.com:parts:RR020",
+    "id": "did:web:apexpropulsion.com:parts:RR020",
     "type": ["VerifiableCredential", "AerospacePartPassport"],
-    "issuer": "did:web:rolls-royce.com",
+    "issuer": "did:web:apexpropulsion.com",
     "issuanceDate": "2025-10-20T10:00:00Z",
     "credentialSubject": {
-      "id": "did:web:rolls-royce.com:parts:RR020",
+      "id": "did:web:apexpropulsion.com:parts:RR020",
       "partType": "FanContainmentCase",
-      "sku": "RR-TXWB-FCC-001",
+      "sku": "APEX-TXWB-FCC-001",
       "identityNode": {
-        "manufacturerName": "Rolls-Royce plc",
+        "manufacturerName": "ApexPropulsion Systems",
         "cageCode": "K1039",
         "partNumber": "FCC-001",
         "serialNumber": "SN-FCC-78020",
@@ -888,7 +888,7 @@ const spareParts: Record<string, any> = {
       },
       "airworthinessNode": {
         "formType": "EASA_FORM_1",
-        "formTrackingNumber": "RR-2025-FCC-001",
+        "formTrackingNumber": "APEX-2025-FCC-001",
         "status": "NEW",
         "certificationAuthority": "EASA"
       },
@@ -961,7 +961,7 @@ app.listen(PORT, () => {
 ╔════════════════════════════════════════════════════════════════════╗
 ║     Aerospace Digital Product Passport Backend Service             ║
 ║                                                                    ║
-║  Rolls-Royce Trent XWB Engine - DPP Mock Server                    ║
+║  ApexPropulsion Systems Trent XWB Engine - DPP Mock Server                    ║
 ║  Serving ${partsCatalog.length} spare parts with full DPP data                       ║
 ║                                                                    ║
 ║  Endpoints:                                                        ║

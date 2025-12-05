@@ -19,9 +19,9 @@ export const mockCatalogAssets = [
     '@id': 'asset:dpp:RR001',
     '@type': 'dcat:Dataset',
     'dct:title': 'HP Turbine Blade',
-    'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Turbine Blade',
+    'dct:description': 'Digital Product Passport for ApexPropulsion Systems Trent XWB High-Pressure Turbine Blade',
     'dcat:keyword': ['turbine', 'blade', 'aerospace', 'DPP'],
-    'dct:creator': 'did:web:rolls-royce.com',
+    'dct:creator': 'did:web:apexpropulsion.com',
     'aerospace:partType': 'HighPressureTurbineBlade',
     'aerospace:serialNumber': 'SN-HPT-78001',
     'aerospace:status': 'NEW',
@@ -50,9 +50,9 @@ export const mockCatalogAssets = [
     '@id': 'asset:dpp:RR002',
     '@type': 'dcat:Dataset',
     'dct:title': 'HP Compressor Blade',
-    'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Compressor Blade',
+    'dct:description': 'Digital Product Passport for ApexPropulsion Systems Trent XWB High-Pressure Compressor Blade',
     'dcat:keyword': ['compressor', 'blade', 'aerospace', 'DPP'],
-    'dct:creator': 'did:web:rolls-royce.com',
+    'dct:creator': 'did:web:apexpropulsion.com',
     'aerospace:partType': 'HighPressureCompressorBlade',
     'aerospace:serialNumber': 'SN-HPC-78002',
     'aerospace:status': 'NEW',
@@ -81,9 +81,9 @@ export const mockCatalogAssets = [
     '@id': 'asset:dpp:RR003',
     '@type': 'dcat:Dataset',
     'dct:title': 'Combustor Liner',
-    'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB Combustor Liner',
+    'dct:description': 'Digital Product Passport for ApexPropulsion Systems Trent XWB Combustor Liner',
     'dcat:keyword': ['combustor', 'liner', 'aerospace', 'DPP'],
-    'dct:creator': 'did:web:rolls-royce.com',
+    'dct:creator': 'did:web:apexpropulsion.com',
     'aerospace:partType': 'CombustorLiner',
     'aerospace:serialNumber': 'SN-CMB-78003',
     'aerospace:status': 'OVERHAULED',
@@ -112,9 +112,9 @@ export const mockCatalogAssets = [
     '@id': 'asset:dpp:RR004',
     '@type': 'dcat:Dataset',
     'dct:title': 'Fan Blade',
-    'dct:description': 'Digital Product Passport for Rolls-Royce Trent XWB Carbon Fiber Fan Blade',
+    'dct:description': 'Digital Product Passport for ApexPropulsion Systems Trent XWB Carbon Fiber Fan Blade',
     'dcat:keyword': ['fan', 'blade', 'carbon fiber', 'aerospace', 'DPP'],
-    'dct:creator': 'did:web:rolls-royce.com',
+    'dct:creator': 'did:web:apexpropulsion.com',
     'aerospace:partType': 'FanBlade',
     'aerospace:serialNumber': 'SN-FAN-78004',
     'aerospace:status': 'NEW',
@@ -252,16 +252,16 @@ export const mockTransferFlow: TransferState[] = [
 export const mockDPPData: Record<string, DigitalProductPassport> = {
   'asset:dpp:RR001': {
     '@context': ['https://www.w3.org/2018/credentials/v1', 'https://w3id.org/aerospace/dpp/v1'],
-    id: 'did:web:rolls-royce.com:parts:RR001',
+    id: 'did:web:apexpropulsion.com:parts:RR001',
     type: ['VerifiableCredential', 'AerospacePartPassport'],
-    issuer: 'did:web:rolls-royce.com',
+    issuer: 'did:web:apexpropulsion.com',
     issuanceDate: '2025-10-01T10:00:00Z',
     credentialSubject: {
-      id: 'did:web:rolls-royce.com:parts:RR001',
+      id: 'did:web:apexpropulsion.com:parts:RR001',
       partType: 'HighPressureTurbineBlade',
-      sku: 'RR-TXWB-HPT-001',
+      sku: 'APEX-TXWB-HPT-001',
       identityNode: {
-        manufacturerName: 'Rolls-Royce plc',
+        manufacturerName: 'ApexPropulsion Systems',
         cageCode: 'K1039',
         partNumber: 'HPT-BLD-001',
         serialNumber: 'SN-HPT-78001',
@@ -271,7 +271,7 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
       },
       airworthinessNode: {
         formType: 'EASA_FORM_1',
-        formTrackingNumber: 'RR-2025-HPT-001',
+        formTrackingNumber: 'APEX-2025-HPT-001',
         status: 'NEW',
         certificationAuthority: 'EASA',
         qualityStandards: ['AS9100D', 'ISO9001:2015']
@@ -311,16 +311,16 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
   },
   'asset:dpp:RR002': {
     '@context': ['https://www.w3.org/2018/credentials/v1', 'https://w3id.org/aerospace/dpp/v1'],
-    id: 'did:web:rolls-royce.com:parts:RR002',
+    id: 'did:web:apexpropulsion.com:parts:RR002',
     type: ['VerifiableCredential', 'AerospacePartPassport'],
-    issuer: 'did:web:rolls-royce.com',
+    issuer: 'did:web:apexpropulsion.com',
     issuanceDate: '2025-10-02T11:00:00Z',
     credentialSubject: {
-      id: 'did:web:rolls-royce.com:parts:RR002',
+      id: 'did:web:apexpropulsion.com:parts:RR002',
       partType: 'HighPressureCompressorBlade',
-      sku: 'RR-TXWB-HPC-001',
+      sku: 'APEX-TXWB-HPC-001',
       identityNode: {
-        manufacturerName: 'Rolls-Royce plc',
+        manufacturerName: 'ApexPropulsion Systems',
         cageCode: 'K1039',
         partNumber: 'HPC-BLD-001',
         serialNumber: 'SN-HPC-78002',
@@ -329,7 +329,7 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
       },
       airworthinessNode: {
         formType: 'EASA_FORM_1',
-        formTrackingNumber: 'RR-2025-HPC-001',
+        formTrackingNumber: 'APEX-2025-HPC-001',
         status: 'NEW',
         certificationAuthority: 'EASA'
       },
@@ -366,16 +366,16 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
   },
   'asset:dpp:RR003': {
     '@context': ['https://www.w3.org/2018/credentials/v1', 'https://w3id.org/aerospace/dpp/v1'],
-    id: 'did:web:rolls-royce.com:parts:RR003',
+    id: 'did:web:apexpropulsion.com:parts:RR003',
     type: ['VerifiableCredential', 'AerospacePartPassport'],
-    issuer: 'did:web:rolls-royce.com',
+    issuer: 'did:web:apexpropulsion.com',
     issuanceDate: '2025-10-03T09:00:00Z',
     credentialSubject: {
-      id: 'did:web:rolls-royce.com:parts:RR003',
+      id: 'did:web:apexpropulsion.com:parts:RR003',
       partType: 'CombustorLiner',
-      sku: 'RR-TXWB-CMB-001',
+      sku: 'APEX-TXWB-CMB-001',
       identityNode: {
-        manufacturerName: 'Rolls-Royce plc',
+        manufacturerName: 'ApexPropulsion Systems',
         cageCode: 'K1039',
         partNumber: 'CMB-LNR-001',
         serialNumber: 'SN-CMB-78003',
@@ -384,7 +384,7 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
       },
       airworthinessNode: {
         formType: 'EASA_FORM_1',
-        formTrackingNumber: 'RR-2025-CMB-001',
+        formTrackingNumber: 'APEX-2025-CMB-001',
         status: 'OVERHAULED',
         certificationAuthority: 'EASA'
       },
@@ -424,16 +424,16 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
   },
   'asset:dpp:RR004': {
     '@context': ['https://www.w3.org/2018/credentials/v1', 'https://w3id.org/aerospace/dpp/v1'],
-    id: 'did:web:rolls-royce.com:parts:RR004',
+    id: 'did:web:apexpropulsion.com:parts:RR004',
     type: ['VerifiableCredential', 'AerospacePartPassport'],
-    issuer: 'did:web:rolls-royce.com',
+    issuer: 'did:web:apexpropulsion.com',
     issuanceDate: '2025-10-04T08:00:00Z',
     credentialSubject: {
-      id: 'did:web:rolls-royce.com:parts:RR004',
+      id: 'did:web:apexpropulsion.com:parts:RR004',
       partType: 'FanBlade',
-      sku: 'RR-TXWB-FAN-001',
+      sku: 'APEX-TXWB-FAN-001',
       identityNode: {
-        manufacturerName: 'Rolls-Royce plc',
+        manufacturerName: 'ApexPropulsion Systems',
         cageCode: 'K1039',
         partNumber: 'FAN-BLD-001',
         serialNumber: 'SN-FAN-78004',
@@ -442,7 +442,7 @@ export const mockDPPData: Record<string, DigitalProductPassport> = {
       },
       airworthinessNode: {
         formType: 'EASA_FORM_1',
-        formTrackingNumber: 'RR-2025-FAN-001',
+        formTrackingNumber: 'APEX-2025-FAN-001',
         status: 'NEW',
         certificationAuthority: 'EASA'
       },
@@ -573,20 +573,20 @@ export const dspMessages = {
 
 export const participants = {
   provider: {
-    name: 'Rolls-Royce plc',
+    name: 'ApexPropulsion Systems',
     role: 'Data Provider',
-    did: 'did:web:rolls-royce.com',
+    did: 'did:web:apexpropulsion.com',
     description: 'Engine OEM providing Digital Product Passports for aerospace components',
     logo: '🏭',
-    connectorEndpoint: 'https://provider.rolls-royce.com/dsp'
+    connectorEndpoint: 'https://provider.apexpropulsion.com/dsp'
   },
   consumer: {
-    name: 'Airbus SE',
+    name: 'Horizon Aviation Group',
     role: 'Data Consumer',
-    did: 'did:web:airbus.com',
-    description: 'Airframe OEM consuming DPP data for Skywise fleet management',
+    did: 'did:web:horizonaviation.com',
+    description: 'Airframe OEM consuming DPP data for fleet management',
     logo: '✈️',
-    connectorEndpoint: 'https://consumer.airbus.com/dsp'
+    connectorEndpoint: 'https://consumer.horizonaviation.com/dsp'
   }
 };
 

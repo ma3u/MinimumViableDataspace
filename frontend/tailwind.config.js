@@ -13,10 +13,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Rolls-Royce brand colors
+        // ApexPropulsion Systems brand colors
         'rr-blue': '#002f6c',
         'rr-gold': '#b8860b',
-        // Airbus brand colors
+        // Horizon Aviation Group brand colors
         'airbus-blue': '#00205b',
         'airbus-cyan': '#00b5e2',
       }

@@ -119,7 +119,7 @@ function App() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  DECADE-X - Digital Passport (DPP) Demo
+                  Aerospace Supply Chain - Digital Passport (DPP) Demo
                 </h1>
                 <p className="text-sm text-gray-500">Digital Product Passport Exchange</p>
               </div>
@@ -603,7 +603,7 @@ function App() {
                 <div className="bg-blue-50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-blue-800 mb-2">Data Address</h4>
                   <div className="bg-white rounded p-3 font-mono text-xs break-all">
-                    https://provider.rolls-royce.com/public/data/{selectedAsset['@id'].split(':').pop()}
+                    https://provider.apexpropulsion.com/public/data/{selectedAsset['@id'].split(':').pop()}
                   </div>
                 </div>
               </div>
@@ -702,7 +702,7 @@ function App() {
                 className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 <Github className="w-4 h-4" />
-                Decade-X Demo
+                Aerospace Supply Chain Demo
               </a>
             </div>
           </div>

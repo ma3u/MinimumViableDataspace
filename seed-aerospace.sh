@@ -12,13 +12,13 @@
 
 ## This script seeds the Aerospace Digital Product Passport demo data
 ## Run this AFTER running the standard seed.sh script
-## Seeds 20 Rolls-Royce Trent XWB engine spare parts
+## Seeds 20 ApexPropulsion Systems Trent XWB engine spare parts
 
 echo ""
 echo "╔════════════════════════════════════════════════════════════════════╗"
 echo "║     Aerospace Digital Product Passport - Data Seeding              ║"
 echo "║                                                                    ║"
-echo "║  Seeding 20 Rolls-Royce Trent XWB Spare Parts                      ║"
+echo "║  Seeding 20 ApexPropulsion Systems Trent XWB Spare Parts                      ║"
 echo "╚════════════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -56,7 +56,7 @@ create_asset() {
             "dct:type": "ids:DigitalProductPassport",
             "version": "1.0",
             "aerospace:partType": "'"$PART_TYPE"'",
-            "aerospace:manufacturer": "Rolls-Royce plc",
+            "aerospace:manufacturer": "ApexPropulsion Systems",
             "aerospace:serialNumber": "'"$SERIAL"'",
             "aerospace:status": "'"$STATUS"'"
         },
@@ -76,7 +76,7 @@ echo ""
 # 1. HP Turbine Blade
 create_asset "asset:dpp:RR001" \
     "HP Turbine Blade DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Turbine Blade" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB High-Pressure Turbine Blade" \
     "HighPressureTurbineBlade" \
     "SN-HPT-78001" \
     "NEW"
@@ -84,7 +84,7 @@ create_asset "asset:dpp:RR001" \
 # 2. HP Compressor Blade
 create_asset "asset:dpp:RR002" \
     "HP Compressor Blade DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Compressor Blade" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB High-Pressure Compressor Blade" \
     "HighPressureCompressorBlade" \
     "SN-HPC-78002" \
     "NEW"
@@ -92,7 +92,7 @@ create_asset "asset:dpp:RR002" \
 # 3. Combustor Liner
 create_asset "asset:dpp:RR003" \
     "Combustor Liner DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Combustor Liner" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Combustor Liner" \
     "CombustorLiner" \
     "SN-CMB-78003" \
     "OVERHAULED"
@@ -100,7 +100,7 @@ create_asset "asset:dpp:RR003" \
 # 4. Fan Blade
 create_asset "asset:dpp:RR004" \
     "Fan Blade DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Carbon Fiber Fan Blade" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Carbon Fiber Fan Blade" \
     "FanBlade" \
     "SN-FAN-78004" \
     "NEW"
@@ -108,7 +108,7 @@ create_asset "asset:dpp:RR004" \
 # 5. LP Turbine Blade
 create_asset "asset:dpp:RR005" \
     "LP Turbine Blade DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Low-Pressure Turbine Blade" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Low-Pressure Turbine Blade" \
     "LowPressureTurbineBlade" \
     "SN-LPT-78005" \
     "NEW"
@@ -116,7 +116,7 @@ create_asset "asset:dpp:RR005" \
 # 6. HP Turbine Disk
 create_asset "asset:dpp:RR006" \
     "HP Turbine Disk DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB High-Pressure Turbine Disk" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB High-Pressure Turbine Disk" \
     "HighPressureTurbineDisk" \
     "SN-HPTD-78006" \
     "NEW"
@@ -124,7 +124,7 @@ create_asset "asset:dpp:RR006" \
 # 7. Fuel Nozzle
 create_asset "asset:dpp:RR007" \
     "Fuel Nozzle DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Fuel Nozzle" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Fuel Nozzle" \
     "FuelNozzle" \
     "SN-FN-78007" \
     "NEW"
@@ -132,7 +132,7 @@ create_asset "asset:dpp:RR007" \
 # 8. Main Shaft Bearing
 create_asset "asset:dpp:RR008" \
     "Main Shaft Bearing DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Main Shaft Bearing Assembly" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Main Shaft Bearing Assembly" \
     "MainShaftBearing" \
     "SN-BRG-78008" \
     "SERVICEABLE"
@@ -140,7 +140,7 @@ create_asset "asset:dpp:RR008" \
 # 9. Nozzle Guide Vane
 create_asset "asset:dpp:RR009" \
     "Nozzle Guide Vane DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB HP Turbine Nozzle Guide Vane" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB HP Turbine Nozzle Guide Vane" \
     "NozzleGuideVane" \
     "SN-NGV-78009" \
     "NEW"
@@ -148,7 +148,7 @@ create_asset "asset:dpp:RR009" \
 # 10. Compressor Stator Vane
 create_asset "asset:dpp:RR010" \
     "Compressor Stator Vane DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB HP Compressor Stator Vane" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB HP Compressor Stator Vane" \
     "CompressorStatorVane" \
     "SN-CSV-78010" \
     "NEW"
@@ -156,7 +156,7 @@ create_asset "asset:dpp:RR010" \
 # 11. Oil Pump
 create_asset "asset:dpp:RR011" \
     "Oil Pump DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Oil Pump Assembly" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Oil Pump Assembly" \
     "OilPump" \
     "SN-OLP-78011" \
     "NEW"
@@ -164,7 +164,7 @@ create_asset "asset:dpp:RR011" \
 # 12. Starter Generator
 create_asset "asset:dpp:RR012" \
     "Starter Generator DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Starter Generator" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Starter Generator" \
     "StarterGenerator" \
     "SN-SG-78012" \
     "OVERHAULED"
@@ -172,7 +172,7 @@ create_asset "asset:dpp:RR012" \
 # 13. Thrust Reverser Actuator
 create_asset "asset:dpp:RR013" \
     "Thrust Reverser Actuator DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Thrust Reverser Actuator" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Thrust Reverser Actuator" \
     "ThrustReverserActuator" \
     "SN-TRA-78013" \
     "NEW"
@@ -180,7 +180,7 @@ create_asset "asset:dpp:RR013" \
 # 14. FADEC Controller
 create_asset "asset:dpp:RR014" \
     "FADEC Controller DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Full Authority Digital Engine Control" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Full Authority Digital Engine Control" \
     "FADECController" \
     "SN-FADEC-78014" \
     "NEW"
@@ -188,7 +188,7 @@ create_asset "asset:dpp:RR014" \
 # 15. Exhaust Mixer
 create_asset "asset:dpp:RR015" \
     "Exhaust Mixer DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Exhaust Mixer" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Exhaust Mixer" \
     "ExhaustMixer" \
     "SN-EXM-78015" \
     "NEW"
@@ -196,7 +196,7 @@ create_asset "asset:dpp:RR015" \
 # 16. IP Compressor Disk
 create_asset "asset:dpp:RR016" \
     "IP Compressor Disk DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Intermediate Pressure Compressor Disk" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Intermediate Pressure Compressor Disk" \
     "IPCompressorDisk" \
     "SN-IPCD-78016" \
     "NEW"
@@ -204,7 +204,7 @@ create_asset "asset:dpp:RR016" \
 # 17. Accessory Gearbox
 create_asset "asset:dpp:RR017" \
     "Accessory Gearbox DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Accessory Gearbox Assembly" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Accessory Gearbox Assembly" \
     "AccessoryGearbox" \
     "SN-AGB-78017" \
     "SERVICEABLE"
@@ -212,7 +212,7 @@ create_asset "asset:dpp:RR017" \
 # 18. Turbine Shroud Segment
 create_asset "asset:dpp:RR018" \
     "Turbine Shroud Segment DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB HP Turbine Shroud Segment" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB HP Turbine Shroud Segment" \
     "TurbineShroudSegment" \
     "SN-TSS-78018" \
     "NEW"
@@ -220,7 +220,7 @@ create_asset "asset:dpp:RR018" \
 # 19. Compressor Bleed Valve
 create_asset "asset:dpp:RR019" \
     "Compressor Bleed Valve DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB HP Compressor Bleed Valve" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB HP Compressor Bleed Valve" \
     "CompressorBleedValve" \
     "SN-CBV-78019" \
     "NEW"
@@ -228,7 +228,7 @@ create_asset "asset:dpp:RR019" \
 # 20. Fan Containment Case
 create_asset "asset:dpp:RR020" \
     "Fan Containment Case DPP" \
-    "Digital Product Passport for Rolls-Royce Trent XWB Fan Containment Case" \
+    "Digital Product Passport for ApexPropulsion Systems Trent XWB Fan Containment Case" \
     "FanContainmentCase" \
     "SN-FCC-78020" \
     "NEW"

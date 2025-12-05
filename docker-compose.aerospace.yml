@@ -25,7 +25,7 @@ services:
       - aerospace-network
     restart: unless-stopped
 
-  # DPP Backend Mock Service (Rolls-Royce data)
+  # DPP Backend Mock Service (ApexPropulsion Systems data)
   dpp-backend:
     build:
       context: ./backend-mock
