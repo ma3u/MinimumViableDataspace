@@ -416,9 +416,9 @@ function AppHealth() {
 
             {/* Filter Bar */}
             <div className="bg-white rounded-xl p-4 shadow-sm border">
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col md:flex-row gap-4 items-center">
                 {/* Search */}
-                <div className="flex-1 relative">
+                <div className="flex-[3] relative w-full">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
@@ -429,34 +429,25 @@ function AppHealth() {
                   />
                 </div>
                 {/* Category Filter */}
-                <div className="flex gap-2 flex-wrap">
-                  <button
-                    onClick={() => setCategoryFilter('all')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                      categoryFilter === 'all' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                <div className="flex items-center gap-2 flex-1 min-w-[250px]">
+                  <label htmlFor="category-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">Filter:</label>
+                  <select
+                    id="category-filter"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                   >
-                    All ({mockEHRCatalogAssets.length})
-                  </button>
-                  {Object.entries(medicalCategories).map(([key, cat]) => {
-                    const count = mockEHRCatalogAssets.filter(a => a['health:category'] === key).length;
-                    if (count === 0) return null;
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => setCategoryFilter(key)}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                          categoryFilter === key 
-                            ? cat.color.replace('100', '600').replace('800', 'white') + ' text-white'
-                            : cat.color + ' hover:opacity-80'
-                        }`}
-                      >
-                        {cat.icon} {cat.label} ({count})
-                      </button>
-                    );
-                  })}
+                    <option value="all">All Categories ({mockEHRCatalogAssets.length})</option>
+                    {Object.entries(medicalCategories).map(([key, cat]) => {
+                      const count = mockEHRCatalogAssets.filter(a => a['health:category'] === key).length;
+                      if (count === 0) return null;
+                      return (
+                        <option key={key} value={key}>
+                          {cat.icon} {cat.label} ({count})
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
               </div>
             </div>
