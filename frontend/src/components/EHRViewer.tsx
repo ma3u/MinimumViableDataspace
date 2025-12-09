@@ -394,7 +394,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
               <div className="flex items-center justify-between bg-white rounded-lg p-3 shadow-sm">
                 <div>
                   <span className="text-sm text-gray-600">Signal Status</span>
-                  <div className="font-medium text-gray-900 capitalize mt-1">{subject.signalVerificationNode.signalStatus.signalCategory.replace(/-/g, ' ')}</div>
+                  <div className="font-medium text-gray-900 capitalize mt-1">{subject.signalVerificationNode.signalStatus.signalCategory?.replace(/-/g, ' ') ?? 'Unknown'}</div>
                 </div>
                 <div className="text-right">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${

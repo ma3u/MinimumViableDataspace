@@ -63,6 +63,17 @@ interface MockEHRAsset {
   'health:biologicalSex': string;
   'health:consentStatus': string;
   'health:sensitiveCategory'?: string;
+  'health:clinicalTrialPhase'?: string;
+  'health:medDRA'?: {
+    socCode: string;
+    socName: string;
+    ptCode: string;
+    ptName: string;
+  };
+  'health:signalStatus'?: {
+    hasActiveSignal: boolean;
+    adrCount: number;
+  };
   'health:consent'?: {
     purposes: string[];
     restrictions: string[];
@@ -399,7 +410,8 @@ function AppHealth() {
               <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
                 <div className="text-center">
                   <div className="text-2xl mb-1">{healthParticipants.consumer.logo}</div>
-                  <div className="font-medium text-sm">CRO</div>
+                  <div className="font-medium text-sm">Research Institute</div>
+                  <div className="text-xs text-gray-500">(Data Consumer)</div>
                 </div>
                 <div className="flex-1 px-4">
                   <div className="flex items-center justify-center gap-2 text-sm mb-2">
@@ -414,6 +426,7 @@ function AppHealth() {
                 <div className="text-center">
                   <div className="text-2xl mb-1">{healthParticipants.provider.logo}</div>
                   <div className="font-medium text-sm">Hospital</div>
+                  <div className="text-xs text-gray-500">(Data Provider)</div>
                 </div>
               </div>
 
@@ -441,15 +454,19 @@ function AppHealth() {
                 {/* Search and Filter Row */}
                 <div className="flex flex-col lg:flex-row gap-3">
                   {/* Search */}
-                  <div className="relative flex-[2]">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search: diabetes, E11.9, Phase III, Cardiac disorders, 55-64..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                  <div className="flex-[2]">
+                    <label htmlFor="search-input" className="text-xs font-medium text-gray-600 mb-1 block">Search</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        id="search-input"
+                        type="text"
+                        placeholder="diabetes, E11.9, Phase III, Cardiac disorders, 55-64..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      />
+                    </div>
                   </div>
                   
                   {/* Filters */}
@@ -709,6 +726,7 @@ function AppHealth() {
                 </button>
               </div>
             )}
+          </div>
           </div>
         )}
 
@@ -1265,7 +1283,6 @@ function AppHealth() {
                 Try Another EHR
               </button>
             </div>
-          </div>
           </div>
         )}
       </main>
