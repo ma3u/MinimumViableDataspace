@@ -27,7 +27,8 @@ import {
   Lock,
   Stethoscope,
   Search,
-  FileJson
+  FileJson,
+  AlertCircle
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
 import { 
@@ -80,17 +81,26 @@ function AppHealth() {
   const [showJson, setShowJson] = useState(false);
   const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [ageBandFilter, setAgeBandFilter] = useState<string>('all');
+  const [phaseFilter, setPhaseFilter] = useState<string>('all');
+  const [medDRAFilter, setMedDRAFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFhirJson, setShowFhirJson] = useState(false);
 
-  // Filter assets based on category and search
+  // Filter assets based on category, age band, phase, MedDRA SOC, and search
   const filteredAssets = mockEHRCatalogAssets.filter(asset => {
     const matchesCategory = categoryFilter === 'all' || asset['health:category'] === categoryFilter;
+    const matchesAgeBand = ageBandFilter === 'all' || asset['health:ageBand'] === ageBandFilter;
+    const matchesPhase = phaseFilter === 'all' || asset['health:clinicalTrialPhase'] === phaseFilter;
+    const matchesMedDRA = medDRAFilter === 'all' || asset['health:medDRA']?.socCode === medDRAFilter;
     const matchesSearch = searchTerm === '' || 
       asset['dct:title'].toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset['health:icdCode'].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:diagnosis'].toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+      asset['health:diagnosis'].toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:medDRA']?.socName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:medDRA']?.ptName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:clinicalTrialPhase']?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesAgeBand && matchesPhase && matchesMedDRA && matchesSearch;
   });
 
   // Check backend availability on mount
@@ -427,39 +437,158 @@ function AppHealth() {
 
             {/* Filter Bar */}
             <div className="bg-white rounded-xl p-4 shadow-sm border">
-              <div className="flex flex-col md:flex-row gap-4 items-center">
-                {/* Search */}
-                <div className="flex-[3] relative w-full">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by diagnosis, ICD code, or title..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+              <div className="space-y-4">
+                {/* Search and Filter Row */}
+                <div className="flex flex-col lg:flex-row gap-3">
+                  {/* Search */}
+                  <div className="relative flex-[2]">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search: diabetes, E11.9, Phase III, Cardiac disorders, 55-64..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  
+                  {/* Filters */}
+                  <div className="flex flex-wrap lg:flex-nowrap gap-3 flex-[3]">
+                    {/* Category Filter */}
+                    <div>
+                    <label htmlFor="category-filter" className="text-xs font-medium text-gray-600 mb-1 block">Medical Category</label>
+                    <select
+                      id="category-filter"
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                    >
+                      <option value="all">All Categories ({mockEHRCatalogAssets.length})</option>
+                      {Object.entries(medicalCategories).map(([key, cat]) => {
+                        const count = mockEHRCatalogAssets.filter(a => a['health:category'] === key).length;
+                        if (count === 0) return null;
+                        return (
+                          <option key={key} value={key}>
+                            {cat.icon} {cat.label} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+
+                  {/* Age Band Filter */}
+                  <div>
+                    <label htmlFor="age-filter" className="text-xs font-medium text-gray-600 mb-1 block">Age Band</label>
+                    <select
+                      id="age-filter"
+                      value={ageBandFilter}
+                      onChange={(e) => setAgeBandFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                    >
+                      <option value="all">All Ages</option>
+                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:ageBand']))).sort().map(age => {
+                        const count = mockEHRCatalogAssets.filter(a => a['health:ageBand'] === age).length;
+                        return (
+                          <option key={age} value={age}>
+                            {age} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+
+                  {/* Study Phase Filter */}
+                  <div>
+                    <label htmlFor="phase-filter" className="text-xs font-medium text-gray-600 mb-1 block">Study Phase</label>
+                    <select
+                      id="phase-filter"
+                      value={phaseFilter}
+                      onChange={(e) => setPhaseFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                    >
+                      <option value="all">All Phases</option>
+                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:clinicalTrialPhase']).filter(Boolean))).sort().map(phase => {
+                        const count = mockEHRCatalogAssets.filter(a => a['health:clinicalTrialPhase'] === phase).length;
+                        const phaseName = phase === 'Phase I' ? 'Phase I - First-in-Human' :
+                                        phase === 'Phase II' ? 'Phase II - Efficacy' :
+                                        phase === 'Phase III' ? 'Phase III - Confirmation' :
+                                        phase === 'Phase IV' ? 'Phase IV - Post-Marketing' : phase;
+                        return (
+                          <option key={phase} value={phase}>
+                            {phaseName} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+
+                  {/* MedDRA SOC Filter */}
+                  <div>
+                    <label htmlFor="meddra-filter" className="text-xs font-medium text-gray-600 mb-1 block">MedDRA SOC</label>
+                    <select
+                      id="meddra-filter"
+                      value={medDRAFilter}
+                      onChange={(e) => setMedDRAFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                    >
+                      <option value="all">All SOCs</option>
+                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:medDRA']?.socCode).filter(Boolean))).sort().map(socCode => {
+                        const asset = mockEHRCatalogAssets.find(a => a['health:medDRA']?.socCode === socCode);
+                        const socName = asset?.['health:medDRA']?.socName;
+                        const count = mockEHRCatalogAssets.filter(a => a['health:medDRA']?.socCode === socCode).length;
+                        return (
+                          <option key={socCode} value={socCode}>
+                            {socName} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
                 </div>
-                {/* Category Filter */}
-                <div className="flex items-center gap-2 flex-1 min-w-[250px]">
-                  <label htmlFor="category-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">Filter:</label>
-                  <select
-                    id="category-filter"
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
-                  >
-                    <option value="all">All Categories ({mockEHRCatalogAssets.length})</option>
-                    {Object.entries(medicalCategories).map(([key, cat]) => {
-                      const count = mockEHRCatalogAssets.filter(a => a['health:category'] === key).length;
-                      if (count === 0) return null;
-                      return (
-                        <option key={key} value={key}>
-                          {cat.icon} {cat.label} ({count})
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
+
+                {/* Active Filters Summary */}
+                {(categoryFilter !== 'all' || ageBandFilter !== 'all' || phaseFilter !== 'all' || medDRAFilter !== 'all' || searchTerm) && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs text-gray-600">Active filters:</span>
+                    {categoryFilter !== 'all' && (
+                      <button onClick={() => setCategoryFilter('all')} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs flex items-center gap-1 hover:bg-blue-200">
+                        {medicalCategories[categoryFilter as keyof typeof medicalCategories]?.label} ×
+                      </button>
+                    )}
+                    {ageBandFilter !== 'all' && (
+                      <button onClick={() => setAgeBandFilter('all')} className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs flex items-center gap-1 hover:bg-purple-200">
+                        Age: {ageBandFilter} ×
+                      </button>
+                    )}
+                    {phaseFilter !== 'all' && (
+                      <button onClick={() => setPhaseFilter('all')} className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs flex items-center gap-1 hover:bg-indigo-200">
+                        {phaseFilter} ×
+                      </button>
+                    )}
+                    {medDRAFilter !== 'all' && (
+                      <button onClick={() => setMedDRAFilter('all')} className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs flex items-center gap-1 hover:bg-pink-200">
+                        {mockEHRCatalogAssets.find(a => a['health:medDRA']?.socCode === medDRAFilter)?.['health:medDRA']?.socName} ×
+                      </button>
+                    )}
+                    {searchTerm && (
+                      <button onClick={() => setSearchTerm('')} className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs flex items-center gap-1 hover:bg-gray-200">
+                        Search: "{searchTerm}" ×
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setCategoryFilter('all');
+                        setAgeBandFilter('all');
+                        setPhaseFilter('all');
+                        setMedDRAFilter('all');
+                        setSearchTerm('');
+                      }}
+                      className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs hover:bg-red-200"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -511,7 +640,7 @@ function AppHealth() {
                         </div>
                         <h4 className="font-semibold text-gray-900 mb-1">{asset['dct:title']}</h4>
                         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{asset['dct:description']}</p>
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-2 flex-wrap mb-2">
                           {category && (
                             <span className={`px-2 py-1 rounded text-xs font-medium ${category.color}`}>
                               {category.label}
@@ -524,6 +653,32 @@ function AppHealth() {
                             {asset['health:biologicalSex']}
                           </span>
                         </div>
+                        {asset['health:clinicalTrialPhase'] && (
+                          <div className="mb-2">
+                            <span className="px-2 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded text-xs font-medium">
+                              📋 {asset['health:clinicalTrialPhase']}
+                            </span>
+                          </div>
+                        )}
+                        {asset['health:medDRA'] && (
+                          <div className="bg-gray-50 rounded p-2 text-xs space-y-1">
+                            <div className="flex items-center gap-1 text-gray-700">
+                              <span className="font-semibold">MedDRA SOC:</span>
+                              <span>{asset['health:medDRA'].socName}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-gray-600">
+                              <span className="font-semibold">PT:</span>
+                              <span>{asset['health:medDRA'].ptName}</span>
+                              <span className="font-mono ml-1 text-gray-500">({asset['health:medDRA'].ptCode})</span>
+                            </div>
+                          </div>
+                        )}
+                        {asset['health:signalStatus'] && asset['health:signalStatus'].adrCount > 0 && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-orange-700">
+                            <AlertCircle className="w-3 h-3" />
+                            <span>{asset['health:signalStatus'].adrCount} ADR(s) reported</span>
+                          </div>
+                        )}
                         {asset['health:sensitiveCategory'] && (
                           <div className="mt-2 flex items-center gap-1 text-xs text-amber-700">
                             <Shield className="w-3 h-3" />
@@ -1110,6 +1265,7 @@ function AppHealth() {
                 Try Another EHR
               </button>
             </div>
+          </div>
           </div>
         )}
       </main>

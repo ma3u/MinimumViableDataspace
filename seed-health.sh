@@ -44,6 +44,8 @@ create_ehr_asset() {
     local AGE_BAND=$6
     local SEX=$7
     local CONSENT_PURPOSES=$8
+    local MEDDRA_VERSION=$9
+    local STUDY_PHASE=${10}
     
     echo "Creating EHR Asset: $NAME ($ID)..."
     curl -s --location "$PROVIDER_HOST/api/management/v3/assets" \
@@ -65,6 +67,8 @@ create_ehr_asset() {
             "health:ageBand": "'"$AGE_BAND"'",
             "health:biologicalSex": "'"$SEX"'",
             "health:consentPurposes": "'"$CONSENT_PURPOSES"'",
+            "health:meddraVersion": "'"$MEDDRA_VERSION"'",
+            "health:studyPhase": "'"$STUDY_PHASE"'",
             "health:deIdentificationMethod": "k-anonymity-k5",
             "health:jurisdiction": "DE-NW",
             "health:provider": "Rheinland Universitätsklinikum"
@@ -179,7 +183,9 @@ create_ehr_asset "asset:ehr:EHR001" \
     "Type 2 diabetes mellitus" \
     "55-64" \
     "male" \
-    "clinical-research,registry-participation"
+    "clinical-research,registry-participation" \
+    "27.0" \
+    "Phase III"
 
 # 2. Heart Failure
 create_ehr_asset "asset:ehr:EHR002" \
@@ -189,7 +195,9 @@ create_ehr_asset "asset:ehr:EHR002" \
     "Heart failure" \
     "65-74" \
     "female" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase III"
 
 # 3. Breast Cancer
 create_ehr_asset "asset:ehr:EHR003" \
@@ -199,7 +207,9 @@ create_ehr_asset "asset:ehr:EHR003" \
     "Malignant neoplasm of breast" \
     "45-54" \
     "female" \
-    "clinical-research,cancer-registry"
+    "clinical-research,cancer-registry" \
+    "27.0" \
+    "Phase II"
 
 # 4. COPD
 create_ehr_asset "asset:ehr:EHR004" \
@@ -209,7 +219,9 @@ create_ehr_asset "asset:ehr:EHR004" \
     "COPD with acute exacerbation" \
     "65-74" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase III"
 
 # 5. Rheumatoid Arthritis
 create_ehr_asset "asset:ehr:EHR005" \
@@ -219,7 +231,9 @@ create_ehr_asset "asset:ehr:EHR005" \
     "Rheumatoid arthritis" \
     "35-44" \
     "female" \
-    "clinical-research,registry-participation"
+    "clinical-research,registry-participation" \
+    "27.0" \
+    "Phase II"
 
 # 6. Multiple Sclerosis
 create_ehr_asset "asset:ehr:EHR006" \

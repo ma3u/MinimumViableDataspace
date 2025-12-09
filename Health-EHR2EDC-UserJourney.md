@@ -142,6 +142,156 @@ The **Prometheus-X** ecosystem provides critical building blocks for this use ca
 - Frontend: add study workflow pages; show consent status, compute-to-data job status.
 - For the demo dont use trademarks, please use generic names like "HealthDataSpace" instead of "Sphin-X". Find names that do not infringe on trademarks.
 
+### 10.1 Docker Deployment Architecture & Endpoints
+
+The MVD-health demo runs as a multi-container Docker Compose setup with the following components:
+
+| Component | Container | Port(s) | Purpose | Key Endpoints |
+|-----------|-----------|---------|---------|---------------|
+| **Frontend** | `aerospace-frontend` | 3000 | React UI for browsing EHR catalog, viewing FHIR records, managing consent | `http://localhost:3000/` - Main UI<br>`http://localhost:3000/health` - Health check |
+| **Backend Mock** | `dpp-backend` | 3001 | Mock EHR server with 20 anonymized FHIR R4 records | `http://localhost:3001/api/ehr/:id` - Get EHR record<br>`http://localhost:3001/health` - Health check<br>`http://localhost:3001/api/ehr` - List all records |
+| **Consumer Control Plane** | Consumer Connector | 8080-8085 | EDC connector for research data consumer (CRO) | `http://localhost:8081/api/management/v3/catalog/request` - Query catalog<br>`http://localhost:8081/api/management/v3/contractnegotiations` - Negotiate contracts<br>`http://localhost:8082/api/dsp` - Dataspace Protocol endpoint |
+| **Consumer Data Plane** | Consumer Connector | 11001 | Data transfer proxy for consumer | `http://localhost:11001/api/public` - Public data endpoint |
+| **Consumer Identity Hub** | Consumer IdentityHub | 7080-7086 | Identity & credential management for consumer | `http://localhost:7082/api/identity` - Identity resolution<br>`http://localhost:7081/api/credentials` - Verifiable credentials<br>`http://localhost:7086/api/sts` - Security Token Service |
+| **Provider Control Plane** | Provider Connector | 8190-8195 | EDC connector for healthcare provider (EHR holder) | `http://localhost:8191/api/management/v3/assets` - Manage EHR assets<br>`http://localhost:8191/api/management/v3/policydefinitions` - Manage policies<br>`http://localhost:8192/api/dsp` - Dataspace Protocol endpoint |
+| **Provider Data Plane** | Provider Connector | 11002 | Data transfer proxy serving de-identified EHR data | `http://localhost:11002/api/public` - Public data endpoint |
+| **Provider Identity Hub** | Provider IdentityHub | 7090-7096 | Identity & credential management for provider | `http://localhost:7092/api/identity` - Identity resolution<br>`http://localhost:7091/api/credentials` - Verifiable credentials<br>`http://localhost:7096/api/sts` - Security Token Service<br>`http://localhost:7093/` - DID document endpoint |
+| **Provider Catalog Server** | Catalog Server | 8090-8093 | Federated catalog aggregating EHR assets | `http://localhost:8091/api/management/v3/catalog` - Catalog management<br>`http://localhost:8092/api/dsp` - DSP catalog endpoint |
+| **Issuer Service** | Issuer Service | 10010-10015 | Trust anchor issuing membership & consent credentials | `http://localhost:10012/api/issuance` - Issue credentials<br>`http://localhost:10013/api/admin` - Admin API<br>`http://localhost:10015/api/identity` - Issuer identity |
+
+#### Component Explanations
+
+**Frontend (React SPA)**
+- Provides the user interface for browsing the EHR catalog with multi-dimensional filtering (Age Band, Study Phase, MedDRA SOC, Medical Category)
+- Displays detailed FHIR-compliant health records including:
+  - Patient demographics & vital signs
+  - Clinical Trial Information (phase, study type, intervention model)
+  - MedDRA classification (System Organ Class, Preferred Terms)
+  - Signal verification & Adverse Drug Reactions (ADRs)
+  - 5-step Anamnesis (chief complaint, history, past medical history, family history, social history)
+- Integrates with backend mock via REST API for data retrieval
+
+**Backend Mock (EHR Server)**
+- Simulates a FHIR R4-compliant Electronic Health Record system
+- Serves 20 anonymized patient records enriched with clinical trial metadata
+- Each record includes:
+  - Standard FHIR resources (Patient, Condition, Observation, Procedure, Medication)
+  - Clinical trial nodes (phase, protocol, endpoints)
+  - MedDRA coding (SOC 10-digit codes, PT codes, HLT hierarchies)
+  - Signal verification data (suspected ADRs with severity, causality, outcome)
+  - Structured anamnesis following German clinical workflow
+- Data model aligns with CDISC SDTM for downstream EDC integration
+
+**Consumer Connector (EDC Control & Data Plane)**
+- Represents the research organization (CRO) consuming EHR data for clinical studies
+- Control Plane (ports 8080-8085):
+  - Queries the federated catalog to discover available EHR datasets
+  - Negotiates Dataspace Protocol (DSP) contracts with providers
+  - Enforces access policies requiring MembershipCredential + ConsentCredential
+  - Manages transfer processes for fetching de-identified FHIR bundles
+- Data Plane (port 11001):
+  - Receives data streams via HTTP-PULL from provider data plane
+  - Applies consumer-side transformation pipelines (FHIR → CDISC ODM/SDTM)
+  - Validates data integrity using provenance VCs
+
+**Consumer Identity Hub**
+- Stores and manages Verifiable Credentials for the consumer participant
+- Issues presentations combining:
+  - DataProcessorCredential (scope: `health.research:processing`)
+  - ConsentPresentation (proves patient authorization for specific study)
+- Resolves `did:web:localhost:7083` identity for the consumer
+- STS endpoint (port 7086) issues OAuth2 tokens for inter-connector authentication
+
+**Provider Connector (EDC Control & Data Plane)**
+- Represents the healthcare institution holding EHR data
+- Control Plane (ports 8190-8195):
+  - Publishes EHR assets to the dataspace with DCAT-AP metadata
+  - Enforces consent-based access policies:
+    - Access Policy: requires valid ConsentCredential with matching `purpose` and `data categories`
+    - Usage Policy: mandates de-identification, prohibits re-identification
+  - Evaluates contract offers against policy constraints
+- Data Plane (port 11002):
+  - Runs de-identification pipeline before data egress:
+    - Removes direct identifiers (names, SSNs, addresses)
+    - Pseudonymizes patient IDs using deterministic hashing
+    - Generalizes dates, locations (k-anonymity ≥ 5)
+    - Optionally applies differential privacy (ε-DP) for aggregate queries
+  - Attaches provenance metadata (transformation steps, DP epsilon)
+
+**Provider Identity Hub**
+- Manages credentials for the healthcare provider participant
+- Stores ConsentCredentials issued by patients via the Issuer Service
+- Resolves `did:web:localhost:7093` identity
+- DID document endpoint (port 7093) publishes public keys for signature verification
+- STS endpoint (port 7096) issues tokens for provider-side authentication
+
+**Provider Catalog Server**
+- Aggregates EHR asset metadata from multiple provider connectors (federated catalog)
+- Exposes DCAT-AP compliant catalog via DSP protocol
+- Enables consumer discovery without revealing patient-level data
+- Caches catalog state (refresh interval: 10 seconds)
+- Management API (port 8091) for adding/updating catalog entries
+
+**Issuer Service (Trust Anchor)**
+- Acts as the root of trust for the MVD dataspace
+- Issues foundational credentials:
+  - **MembershipCredential**: Proves participant is authorized member of the health dataspace
+  - **DataProcessorCredential**: Attests that consumer has lawful basis for research processing (GDPR Art. 9(2)(j))
+  - **ConsentCredential**: Machine-readable patient consent encoding:
+    - Study protocol ID (`purpose`)
+    - Allowed data categories (FHIR resource types)
+    - Retention period, jurisdiction constraints
+    - Revocation endpoint
+- Maintains status lists for credential revocation
+- Admin API (port 10013) for credential lifecycle management
+
+#### Authentication & Authorization Flow
+
+1. **Consumer queries catalog** → Catalog Server returns EHR asset metadata
+2. **Consumer initiates contract negotiation** → Provider evaluates:
+   - Consumer presents `MembershipCredential` + `DataProcessorCredential` (from IdentityHub 7082)
+   - Consumer includes `ConsentPresentation` proving patient authorized data use for study X
+3. **Provider validates consent** → IdentityHub 7092 verifies:
+   - Consent credential not revoked (check Issuer status list)
+   - `purpose` in consent matches asset's `health:studyPurpose` property
+   - `dataCategories` in consent cover requested FHIR resources (e.g., Condition, Observation)
+4. **Contract agreed** → Provider issues `EndpointDataReference` (EDR) with bearer token
+5. **Consumer fetches data** → Data Plane 11002:
+   - Token validated against STS 7096
+   - De-ID pipeline executes (remove PII, pseudonymize, generalize)
+   - Provenance VC attached: `{"transformations": ["anonymize"], "epsilon": 1.0, "timestamp": "..."}`
+6. **Data transferred** → Consumer Data Plane 11001 receives FHIR bundle → transforms to CDISC SDTM
+
+#### Security Considerations
+
+- **No TLS in local demo**: `EDC_IAM_DID_WEB_USE_HTTPS=false` (must enable for production)
+- **Static auth keys**: Management APIs use `password` token (replace with OAuth2/OIDC)
+- **Superuser credentials**: IdentityHubs use base64 `c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo=` (rotate in production)
+- **Consent revocation**: Patient updates ConsentCredential status → Provider must reject future requests (webhook or polling)
+- **Data minimization**: Policies enforce least-privilege scopes; queries return only consent-authorized fields
+
+#### Starting the Demo
+
+```bash
+# 1. Start all services
+docker-compose -f docker-compose.health.yml up --build
+
+# 2. Wait for all containers to be healthy (check logs)
+docker-compose -f docker-compose.health.yml logs -f
+
+# 3. Seed the dataspace with participants, assets, and policies
+./seed-health.sh
+
+# 4. Access the frontend
+open http://localhost:3000
+```
+
+The seeding script performs:
+- Creates 5 EHR assets (EHR001-EHR005) with clinical trial metadata
+- Defines access policies referencing `ConsentCredential` and `MembershipCredential`
+- Publishes assets to catalog server
+- Issues baseline credentials to consumer/provider IdentityHubs
+
 ## 11. Open Questions and Next Steps
 - Consent granularity for genomic data and imaging?
 - Cross-jurisdiction consent portability (DE federal states)?

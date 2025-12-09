@@ -227,6 +227,8 @@ services:
       EDC_SQL_SCHEMA_AUTOCREATE: "true"
       EDC_VAULT_HASHICORP_URL: http://health-vault:8200
       EDC_VAULT_HASHICORP_TOKEN: root
+    volumes:
+      - ./assets/participants:/app/deployment/assets/participants:ro
     extra_hosts:
       - "localhost:host-gateway"
     ports:

@@ -92,6 +92,92 @@ const healthRecords: Record<string, any> = {
         "extractionDate": "2025-11",
         "deIdentificationMethod": "k-anonymity-k5",
         "qualityScore": 0.94
+      },
+      "clinicalTrialNode": {
+        "phase": "Phase III",
+        "phaseCode": "C15602",
+        "studyType": "interventional",
+        "interventionModel": "parallel",
+        "primaryEndpoint": "HbA1c reduction at 52 weeks",
+        "trialRegistryId": "EudraCT 2024-001234-56"
+      },
+      "medDRANode": {
+        "version": "27.0",
+        "primarySOC": {
+          "code": "10027433",
+          "name": "Metabolism and nutrition disorders",
+          "abbreviation": "Metab"
+        },
+        "preferredTerm": {
+          "code": "10012601",
+          "name": "Diabetes mellitus",
+          "hltCode": "10012608"
+        }
+      },
+      "signalVerificationNode": {
+        "adverseEvents": [
+          {
+            "id": "AE-001-001",
+            "medDRAPT": "Hypoglycaemia",
+            "medDRACode": "10020993",
+            "severity": "moderate",
+            "seriousness": ["hospitalization"],
+            "outcome": "recovered",
+            "onsetPeriod": "2024-Q3",
+            "suspectedDrug": "A10BA02",
+            "relatedness": "probable",
+            "expectedness": "expected",
+            "actionTaken": "dose-reduced"
+          }
+        ],
+        "signalStatus": {
+          "hasActiveSignal": false,
+          "signalCategory": "closed",
+          "lastReviewDate": "2025-10"
+        },
+        "reportingStatus": "not-required"
+      },
+      "anamnesisNode": {
+        "chiefComplaint": {
+          "stepNumber": 1,
+          "stepName": "Chief Complaint",
+          "stepNameDE": "Hauptbeschwerde",
+          "summary": "Progressive fatigue and increased thirst over 6 months",
+          "relevantFindings": ["Polyuria", "Polydipsia", "Unintentional weight loss"],
+          "clinicalSignificance": "high"
+        },
+        "historyOfPresentIllness": {
+          "stepNumber": 2,
+          "stepName": "History of Present Illness",
+          "stepNameDE": "Jetzige Anamnese",
+          "summary": "Gradual onset of symptoms, initially attributed to stress; elevated fasting glucose detected during routine screening",
+          "relevantFindings": ["Symptom duration >6 months", "No ketoacidosis episodes", "Lifestyle modifications attempted"],
+          "clinicalSignificance": "high"
+        },
+        "pastMedicalHistory": {
+          "stepNumber": 3,
+          "stepName": "Past Medical History",
+          "stepNameDE": "Eigenanamnese",
+          "summary": "History of hypertension (diagnosed 2015), hypercholesterolemia (2017); no prior diabetes diagnosis",
+          "relevantFindings": ["Hypertension controlled with ACE inhibitor", "Statin therapy initiated", "No surgical history"],
+          "clinicalSignificance": "moderate"
+        },
+        "familyHistory": {
+          "stepNumber": 4,
+          "stepName": "Family History",
+          "stepNameDE": "Familienanamnese",
+          "summary": "Strong family history of metabolic disorders; mother with T2DM, father with coronary artery disease",
+          "relevantFindings": ["First-degree relative with T2DM", "Cardiovascular disease in family", "No known genetic conditions"],
+          "clinicalSignificance": "high"
+        },
+        "socialHistory": {
+          "stepNumber": 5,
+          "stepName": "Social History",
+          "stepNameDE": "Sozialanamnese",
+          "summary": "Sedentary occupation, former smoker (quit 5 years ago), moderate alcohol consumption",
+          "relevantFindings": ["Office work >8h/day", "Limited physical activity", "BMI in overweight category"],
+          "clinicalSignificance": "moderate"
+        }
       }
     }
   },
@@ -157,6 +243,92 @@ const healthRecords: Record<string, any> = {
         "extractionDate": "2025-11",
         "deIdentificationMethod": "k-anonymity-k5",
         "qualityScore": 0.91
+      },
+      "clinicalTrialNode": {
+        "phase": "Phase III",
+        "phaseCode": "C15602",
+        "studyType": "interventional",
+        "interventionModel": "parallel",
+        "primaryEndpoint": "Reduction in HF hospitalization",
+        "trialRegistryId": "EudraCT 2024-005678-90"
+      },
+      "medDRANode": {
+        "version": "27.0",
+        "primarySOC": {
+          "code": "10007541",
+          "name": "Cardiac disorders",
+          "abbreviation": "Card"
+        },
+        "preferredTerm": {
+          "code": "10019277",
+          "name": "Heart failure",
+          "hltCode": "10019279"
+        }
+      },
+      "signalVerificationNode": {
+        "adverseEvents": [
+          {
+            "id": "AE-002-001",
+            "medDRAPT": "Hypotension",
+            "medDRACode": "10021097",
+            "severity": "mild",
+            "seriousness": ["non-serious"],
+            "outcome": "recovered",
+            "onsetPeriod": "2024-Q4",
+            "suspectedDrug": "C09AA02",
+            "relatedness": "possible",
+            "expectedness": "expected",
+            "actionTaken": "dose-maintained"
+          }
+        ],
+        "signalStatus": {
+          "hasActiveSignal": false,
+          "signalCategory": "monitored",
+          "lastReviewDate": "2025-10"
+        },
+        "reportingStatus": "not-required"
+      },
+      "anamnesisNode": {
+        "chiefComplaint": {
+          "stepNumber": 1,
+          "stepName": "Chief Complaint",
+          "stepNameDE": "Hauptbeschwerde",
+          "summary": "Shortness of breath on exertion and swelling in ankles",
+          "relevantFindings": ["Dyspnea (NYHA II)", "Peripheral edema"],
+          "clinicalSignificance": "high"
+        },
+        "historyOfPresentIllness": {
+          "stepNumber": 2,
+          "stepName": "History of Present Illness",
+          "stepNameDE": "Jetzige Anamnese",
+          "summary": "Worsening exercise tolerance over past 3 months; orthopnea present",
+          "relevantFindings": ["Reduced exercise capacity", "2-pillow orthopnea"],
+          "clinicalSignificance": "high"
+        },
+        "pastMedicalHistory": {
+          "stepNumber": 3,
+          "stepName": "Past Medical History",
+          "stepNameDE": "Eigenanamnese",
+          "summary": "Chronic kidney disease (stage 3), atrial fibrillation",
+          "relevantFindings": ["CKD stable", "AFib rate controlled"],
+          "clinicalSignificance": "moderate"
+        },
+        "familyHistory": {
+          "stepNumber": 4,
+          "stepName": "Family History",
+          "stepNameDE": "Familienanamnese",
+          "summary": "Father died of MI at 65",
+          "relevantFindings": ["Paternal MI <65y"],
+          "clinicalSignificance": "moderate"
+        },
+        "socialHistory": {
+          "stepNumber": 5,
+          "stepName": "Social History",
+          "stepNameDE": "Sozialanamnese",
+          "summary": "Retired teacher, lives with spouse, non-smoker",
+          "relevantFindings": ["Good social support", "No tobacco use"],
+          "clinicalSignificance": "low"
+        }
       }
     }
   },
@@ -224,6 +396,92 @@ const healthRecords: Record<string, any> = {
         "extractionDate": "2025-11",
         "deIdentificationMethod": "k-anonymity-k5",
         "qualityScore": 0.96
+      },
+      "clinicalTrialNode": {
+        "phase": "Phase II",
+        "phaseCode": "C15601",
+        "studyType": "interventional",
+        "interventionModel": "single-group",
+        "primaryEndpoint": "Disease-free survival",
+        "trialRegistryId": "EudraCT 2024-009988-77"
+      },
+      "medDRANode": {
+        "version": "27.0",
+        "primarySOC": {
+          "code": "10029104",
+          "name": "Neoplasms benign, malignant and unspecified",
+          "abbreviation": "Neopl"
+        },
+        "preferredTerm": {
+          "code": "10006187",
+          "name": "Breast cancer",
+          "hltCode": "10006190"
+        }
+      },
+      "signalVerificationNode": {
+        "adverseEvents": [
+          {
+            "id": "AE-003-001",
+            "medDRAPT": "Hot flush",
+            "medDRACode": "10020406",
+            "severity": "moderate",
+            "seriousness": ["non-serious"],
+            "outcome": "not-recovered",
+            "onsetPeriod": "2024-Q2",
+            "suspectedDrug": "L02BA01",
+            "relatedness": "probable",
+            "expectedness": "expected",
+            "actionTaken": "dose-maintained"
+          }
+        ],
+        "signalStatus": {
+          "hasActiveSignal": false,
+          "signalCategory": "monitored",
+          "lastReviewDate": "2025-09"
+        },
+        "reportingStatus": "not-required"
+      },
+      "anamnesisNode": {
+        "chiefComplaint": {
+          "stepNumber": 1,
+          "stepName": "Chief Complaint",
+          "stepNameDE": "Hauptbeschwerde",
+          "summary": "Routine follow-up, reports frequent hot flashes",
+          "relevantFindings": ["Hot flashes", "No palpable masses"],
+          "clinicalSignificance": "low"
+        },
+        "historyOfPresentIllness": {
+          "stepNumber": 2,
+          "stepName": "History of Present Illness",
+          "stepNameDE": "Jetzige Anamnese",
+          "summary": "Diagnosed 2020, treated with mastectomy and chemo; currently on Tamoxifen",
+          "relevantFindings": ["Post-mastectomy", "Adherent to Tamoxifen"],
+          "clinicalSignificance": "high"
+        },
+        "pastMedicalHistory": {
+          "stepNumber": 3,
+          "stepName": "Past Medical History",
+          "stepNameDE": "Eigenanamnese",
+          "summary": "Mild depression diagnosed post-diagnosis",
+          "relevantFindings": ["Depression managed with therapy"],
+          "clinicalSignificance": "moderate"
+        },
+        "familyHistory": {
+          "stepNumber": 4,
+          "stepName": "Family History",
+          "stepNameDE": "Familienanamnese",
+          "summary": "Maternal aunt with breast cancer at 50",
+          "relevantFindings": ["Family history of breast cancer"],
+          "clinicalSignificance": "high"
+        },
+        "socialHistory": {
+          "stepNumber": 5,
+          "stepName": "Social History",
+          "stepNameDE": "Sozialanamnese",
+          "summary": "Works part-time, married, 2 children",
+          "relevantFindings": ["Active lifestyle", "Non-smoker"],
+          "clinicalSignificance": "low"
+        }
       }
     }
   },
@@ -286,6 +544,92 @@ const healthRecords: Record<string, any> = {
         "extractionDate": "2025-11",
         "deIdentificationMethod": "k-anonymity-k5",
         "qualityScore": 0.89
+      },
+      "clinicalTrialNode": {
+        "phase": "Phase III",
+        "phaseCode": "C15602",
+        "studyType": "interventional",
+        "interventionModel": "parallel",
+        "primaryEndpoint": "Reduction in exacerbations",
+        "trialRegistryId": "EudraCT 2024-003344-22"
+      },
+      "medDRANode": {
+        "version": "27.0",
+        "primarySOC": {
+          "code": "10038738",
+          "name": "Respiratory, thoracic and mediastinal disorders",
+          "abbreviation": "Resp"
+        },
+        "preferredTerm": {
+          "code": "10009033",
+          "name": "Chronic obstructive pulmonary disease",
+          "hltCode": "10009036"
+        }
+      },
+      "signalVerificationNode": {
+        "adverseEvents": [
+          {
+            "id": "AE-004-001",
+            "medDRAPT": "Dry mouth",
+            "medDRACode": "10013781",
+            "severity": "mild",
+            "seriousness": ["non-serious"],
+            "outcome": "recovered",
+            "onsetPeriod": "2024-Q3",
+            "suspectedDrug": "R03BB04",
+            "relatedness": "probable",
+            "expectedness": "expected",
+            "actionTaken": "dose-maintained"
+          }
+        ],
+        "signalStatus": {
+          "hasActiveSignal": false,
+          "signalCategory": "monitored",
+          "lastReviewDate": "2025-10"
+        },
+        "reportingStatus": "not-required"
+      },
+      "anamnesisNode": {
+        "chiefComplaint": {
+          "stepNumber": 1,
+          "stepName": "Chief Complaint",
+          "stepNameDE": "Hauptbeschwerde",
+          "summary": "Chronic cough and shortness of breath",
+          "relevantFindings": ["Productive cough", "Dyspnea on exertion"],
+          "clinicalSignificance": "high"
+        },
+        "historyOfPresentIllness": {
+          "stepNumber": 2,
+          "stepName": "History of Present Illness",
+          "stepNameDE": "Jetzige Anamnese",
+          "summary": "Worsening cough over winter months; frequent exacerbations",
+          "relevantFindings": ["Winter exacerbations", "Sputum production"],
+          "clinicalSignificance": "high"
+        },
+        "pastMedicalHistory": {
+          "stepNumber": 3,
+          "stepName": "Past Medical History",
+          "stepNameDE": "Eigenanamnese",
+          "summary": "Diagnosed with COPD 5 years ago; history of pneumonia",
+          "relevantFindings": ["COPD GOLD 3", "Prior pneumonia"],
+          "clinicalSignificance": "moderate"
+        },
+        "familyHistory": {
+          "stepNumber": 4,
+          "stepName": "Family History",
+          "stepNameDE": "Familienanamnese",
+          "summary": "Father was a heavy smoker with emphysema",
+          "relevantFindings": ["Paternal emphysema"],
+          "clinicalSignificance": "moderate"
+        },
+        "socialHistory": {
+          "stepNumber": 5,
+          "stepName": "Social History",
+          "stepNameDE": "Sozialanamnese",
+          "summary": "Retired construction worker, former smoker (40 pack-years)",
+          "relevantFindings": ["Heavy smoking history", "Occupational dust exposure"],
+          "clinicalSignificance": "high"
+        }
       }
     }
   },
@@ -350,6 +694,92 @@ const healthRecords: Record<string, any> = {
         "extractionDate": "2025-11",
         "deIdentificationMethod": "k-anonymity-k5",
         "qualityScore": 0.93
+      },
+      "clinicalTrialNode": {
+        "phase": "Phase II",
+        "phaseCode": "C15601",
+        "studyType": "interventional",
+        "interventionModel": "parallel",
+        "primaryEndpoint": "ACR20 response",
+        "trialRegistryId": "EudraCT 2024-001122-33"
+      },
+      "medDRANode": {
+        "version": "27.0",
+        "primarySOC": {
+          "code": "10028395",
+          "name": "Musculoskeletal and connective tissue disorders",
+          "abbreviation": "Musc"
+        },
+        "preferredTerm": {
+          "code": "10039073",
+          "name": "Rheumatoid arthritis",
+          "hltCode": "10039075"
+        }
+      },
+      "signalVerificationNode": {
+        "adverseEvents": [
+          {
+            "id": "AE-005-001",
+            "medDRAPT": "Injection site reaction",
+            "medDRACode": "10022095",
+            "severity": "mild",
+            "seriousness": ["non-serious"],
+            "outcome": "recovered",
+            "onsetPeriod": "2024-Q4",
+            "suspectedDrug": "L04AB02",
+            "relatedness": "certain",
+            "expectedness": "expected",
+            "actionTaken": "none"
+          }
+        ],
+        "signalStatus": {
+          "hasActiveSignal": false,
+          "signalCategory": "monitored",
+          "lastReviewDate": "2025-10"
+        },
+        "reportingStatus": "not-required"
+      },
+      "anamnesisNode": {
+        "chiefComplaint": {
+          "stepNumber": 1,
+          "stepName": "Chief Complaint",
+          "stepNameDE": "Hauptbeschwerde",
+          "summary": "Morning stiffness lasting >1 hour and joint pain",
+          "relevantFindings": ["Morning stiffness", "Polyarthralgia"],
+          "clinicalSignificance": "high"
+        },
+        "historyOfPresentIllness": {
+          "stepNumber": 2,
+          "stepName": "History of Present Illness",
+          "stepNameDE": "Jetzige Anamnese",
+          "summary": "Diagnosed 3 years ago; symptoms controlled on current biologic but recent flare",
+          "relevantFindings": ["Recent flare", "Biologic therapy"],
+          "clinicalSignificance": "high"
+        },
+        "pastMedicalHistory": {
+          "stepNumber": 3,
+          "stepName": "Past Medical History",
+          "stepNameDE": "Eigenanamnese",
+          "summary": "No other major chronic conditions",
+          "relevantFindings": ["Generally healthy otherwise"],
+          "clinicalSignificance": "low"
+        },
+        "familyHistory": {
+          "stepNumber": 4,
+          "stepName": "Family History",
+          "stepNameDE": "Familienanamnese",
+          "summary": "Mother with hypothyroidism",
+          "relevantFindings": ["Autoimmune history in family"],
+          "clinicalSignificance": "moderate"
+        },
+        "socialHistory": {
+          "stepNumber": 5,
+          "stepName": "Social History",
+          "stepNameDE": "Sozialanamnese",
+          "summary": "Office worker, non-smoker",
+          "relevantFindings": ["Low impact job"],
+          "clinicalSignificance": "low"
+        }
       }
     }
   },

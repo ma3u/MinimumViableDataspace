@@ -110,47 +110,388 @@ The solution leverages the **Eclipse Dataspace Components (EDC)** for sovereign 
 *   **Consumer Side**: EDC Consumer → EDC-to-EDC (EDC) → Study EDC System.
 *   **Trust**: Issuer Service issues MembershipCredential and DataProcessorCredential.
 
-## 4. Deployment Manual
+## 4. Developer Manual
 
 ### 4.1 Prerequisites
+*   **Java**: Temurin 17+ (for EDC components)
+*   **Node.js**: 18+ or 20+ (for frontend and backend mock)
+*   **Docker & Docker Compose**: For running EDC infrastructure
+*   **Build Tools**: Gradle (included via `gradlew`), npm
+
+### 4.2 Local Development Setup
+
+#### 4.2.1 Starting the Backend Mock (EHR Server)
+
+The backend mock simulates a FHIR R4-compliant EHR system with 20 anonymized patient records enriched with clinical trial metadata.
+
+```bash
+# Navigate to backend-mock directory
+cd backend-mock
+
+# Install dependencies (first time only)
+npm install
+
+# Start the development server (uses ts-node for hot reload)
+npm run dev:health
+```
+
+The backend will start on **http://localhost:3001**
+
+**Verify backend is running:**
+```bash
+curl http://localhost:3001/health
+# Expected output: {"status":"healthy","service":"ehr2edc-backend","recordsCount":20}
+```
+
+**Available endpoints:**
+- `GET /health` - Health check
+- `GET /api/ehr` - List all EHR records
+- `GET /api/ehr/:id` - Get specific EHR record (e.g., EHR001)
+
+**Note:** Use `npm run dev:health` (ts-node) instead of `npm run start:health` (compiled) during development to ensure code changes are reflected immediately without manual rebuilds.
+
+#### 4.2.2 Starting the Frontend (React App)
+
+The frontend provides the catalog browser and EHR viewer with advanced filtering capabilities.
+
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies (first time only)
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The frontend will start on **http://localhost:3000**
+
+**Development commands:**
+```bash
+npm run lint          # Run ESLint
+npm run build         # Production build
+npm run preview       # Preview production build
+```
+
+**Hot Module Replacement (HMR):** Vite automatically reloads changes. If you encounter issues, restart the dev server:
+```bash
+# Kill the process
+pkill -f vite
+
+# Restart
+npm run dev
+```
+
+#### 4.2.3 Starting Both Services
+
+**Option 1: Manual (recommended for development)**
+```bash
+# Terminal 1: Backend
+cd backend-mock && npm run dev:health
+
+# Terminal 2: Frontend
+cd frontend && npm run dev
+```
+
+**Option 2: Background processes**
+```bash
+# Start backend in background
+cd backend-mock && npm run dev:health > /tmp/backend.log 2>&1 &
+
+# Start frontend in background
+cd frontend && npm run dev > /tmp/frontend.log 2>&1 &
+
+# Monitor logs
+tail -f /tmp/backend.log
+tail -f /tmp/frontend.log
+```
+
+**Option 3: Docker Compose (for full stack)**
+```bash
+# Start frontend + backend + EDC infrastructure
+docker-compose -f docker-compose.health.yml up --build
+```
+
+### 4.3 Building the EDC Components
+
+The MVD-health project includes custom EDC extensions and launchers.
+
+```bash
+# Build all Java components
+./gradlew build
+
+# Build with Docker images
+./gradlew build dockerize
+
+# Build with persistence enabled
+./gradlew -Ppersistence=true build
+
+# Run end-to-end tests
+./gradlew :tests:end2end:test
+```
+
+### 4.4 Common Development Tasks
+
+#### Seeding Data
+After starting the EDC infrastructure, seed the dataspace with participants and EHR assets:
+
+```bash
+# Initialize basic identities and credentials
+./seed.sh
+
+# Seed health-specific EHR catalog (requires backend running on port 3001)
+./seed-health.sh
+```
+
+#### Cleaning Ports
+If you encounter "port already in use" errors:
+
+```bash
+# Check what's using ports 3000 and 3001
+lsof -i:3000,3001
+
+# Kill processes on these ports
+kill $(lsof -ti:3000,3001)
+```
+
+#### Troubleshooting
+
+**Backend not serving updated data:**
+- Ensure you're using `npm run dev:health` (ts-node) not `npm run start:health` (compiled)
+- Check that port 3001 is not occupied by another process
+
+**Frontend shows blank page:**
+- Check browser console for errors (F12)
+- Verify Vite dev server started on port 3000 (not 3001)
+- Restart the Vite server if HMR fails
+
+**TypeScript compilation errors:**
+- Run `npm install` to ensure dependencies are up to date
+- Clear `dist/` folder: `rm -rf backend-mock/dist`
+
+## 5. Deployment Manual
+
+### 5.1 Prerequisites
 *   Java 17+
 *   Docker & Docker Compose
-*   Kind (Kubernetes in Docker) - Optional for K8s deployment
+*   Kubernetes (optional, for production deployment)
 
-### 4.2 Setup Steps
+### 5.2 Docker Compose Deployment
 
-1.  **Infrastructure Setup**:
-      Start the MVD infrastructure (EDC connectors, IdentityHubs) using your preferred method (Gradle or Kubernetes). For details abot the Eclipse Dataspace Components setup in the Minimum Viable Dataspace, refer to the [MVD Deployment Guide](https://github.com/eclipse-dataspaceconnector/DataSpaceConnector/blob/main/docs/deployment-guide.md).
+The simplest way to run the complete demo stack:
 
-    ![Docker](demo-docker.png)
+```bash
+# Start all services (frontend, backend, EDC connectors, identity hubs)
+docker-compose -f docker-compose.health.yml up --build
 
-    The screenshot shows Docker Desktop with running containers for the Frontend and Backend, Provider and Consumer EDC connectors, IdentityHubs, and supporting services.
+# Run in detached mode
+docker-compose -f docker-compose.health.yml up -d --build
 
+# View logs
+docker-compose -f docker-compose.health.yml logs -f
 
-2.  **Seed Identities**:
-    Initialize the basic identities and credentials.
-    ```bash
-    ./seed.sh
-    ```
+# Stop all services
+docker-compose -f docker-compose.health.yml down
 
-3.  **Seed Health Data**:
-    This script seeds the Rheinland Universitätsklinikum with anonymized EHR records.
-    ```bash
-    ./seed-health.sh
-    ```
+# Clean volumes (removes all data)
+docker-compose -f docker-compose.health.yml down -v
+```
 
-4.  **Deploy Demo Application**:
-    Start the frontend and backend mock services.
-    ```bash
-    docker-compose -f docker-compose.health.yml up -d
-    ```
+**After services are running, seed the dataspace:**
+```bash
+# Wait for all containers to be healthy (check logs)
+docker-compose -f docker-compose.health.yml logs -f
 
-## 5. User Manual
+# Seed participants, assets, and policies
+./seed-health.sh
+```
 
-### 5.1 Accessing the Demo
-*   **Frontend**: http://localhost:3000
-*   **Provider Control Plane**: http://localhost:9191
-*   **Consumer Control Plane**: http://localhost:9192
+### 5.3 Infrastructure Components
 
-### 5.2 Workflows
-Follow the steps outlined in the [User Journey](#2-user-journey) section to simulate the interaction between the Patient, Provider, and Consumer.
+![Docker](demo-docker.png)
+
+The Docker Compose setup includes:
+- **Frontend** (port 3000): React catalog browser
+- **Backend Mock** (port 3001): FHIR R4 EHR server
+- **Provider Connector**: Control Plane (8191) + Data Plane (11002)
+- **Consumer Connector**: Control Plane (8081) + Data Plane (11001)
+- **Provider Identity Hub** (7090-7096): Credential management
+- **Consumer Identity Hub** (7080-7086): Credential management
+- **Catalog Server** (8091): Federated asset catalog
+- **Issuer Service** (10010-10015): Trust anchor for credentials
+
+For detailed endpoint documentation, see the [Docker Endpoints Table](Health-EHR2EDC-UserJourney.md#101-docker-deployment-architecture--endpoints) in the User Journey document.
+
+## 6. User Manual
+
+### 6.1 Accessing the Demo
+
+Once all services are running, access the demo through:
+
+**Main Application:**
+- **Frontend UI**: http://localhost:3000/
+  - Browse EHR catalog with multi-dimensional filters
+  - View detailed FHIR-compliant health records
+  - See clinical trial metadata, MedDRA classifications, ADRs, and anamnesis
+
+**Backend API:**
+- **Backend Health Check**: http://localhost:3001/health
+- **EHR Records**: http://localhost:3001/api/ehr
+- **Specific Record**: http://localhost:3001/api/ehr/EHR001
+
+**EDC Management APIs** (require auth header: `X-Api-Key: password`):
+- **Provider Management**: http://localhost:8191/api/management/v3/
+  - Assets: `/assets`
+  - Policies: `/policydefinitions`
+  - Catalog: `/catalog`
+- **Consumer Management**: http://localhost:8081/api/management/v3/
+  - Catalog Request: `/catalog/request`
+  - Contract Negotiations: `/contractnegotiations`
+  - Transfer Processes: `/transferprocesses`
+
+**Identity & Credentials:**
+- **Provider IdentityHub**: http://localhost:7092/api/identity
+- **Consumer IdentityHub**: http://localhost:7082/api/identity
+- **Issuer Service**: http://localhost:10012/api/issuance
+
+**Example API calls:**
+```bash
+# Query provider catalog from consumer
+curl -X POST http://localhost:8081/api/management/v3/catalog/request \
+  -H "X-Api-Key: password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "counterPartyAddress": "http://localhost:8192/api/dsp",
+    "protocol": "dataspace-protocol-http"
+  }'
+
+# Get EHR record with clinical trial data
+curl http://localhost:3001/api/ehr/EHR001 | jq '.credentialSubject | {
+  diagnosis: .diagnosis,
+  clinicalPhase: .clinicalTrialNode.phase,
+  medDRA: .medDRANode.primarySOC.name,
+  adrCount: .signalVerificationNode.adverseEvents | length
+}'
+```
+
+### 6.2 Demo Workflow
+
+Follow the interactive demo at http://localhost:3000/:
+
+1. **Start Demo**: Click "Start Demo" button on the landing page
+2. **Browse Catalog**: Use filters to find EHR datasets:
+   - Medical Category (Cardiology, Oncology, etc.)
+   - Age Band (18-24, 25-34, etc.)
+   - Study Phase (Phase I-IV)
+   - MedDRA SOC (System Organ Class)
+   - Text search (diagnosis, ICD codes, phase, MedDRA terms)
+3. **Select Record**: Click on an EHR card to select it
+4. **Request Consent Verification**: Proceed to contract negotiation
+5. **Review Contract**: See the DSP contract negotiation flow
+6. **Transfer Data**: Initiate secure data transfer with de-identification
+7. **View EHR**: Explore the complete FHIR record with:
+   - Patient demographics and vital signs
+   - Clinical trial information (phase, protocol, endpoints)
+   - MedDRA classification (SOC and Preferred Terms)
+   - Signal verification and Adverse Drug Reactions
+   - 5-step Anamnesis (medical history)
+   - Raw FHIR JSON (expandable)
+
+### 6.3 Testing Components
+
+#### Frontend Testing
+```bash
+cd frontend
+
+# Run linter
+npm run lint
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+#### Backend Testing
+```bash
+cd backend-mock
+
+# Health check
+curl http://localhost:3001/health
+
+# List all records
+curl http://localhost:3001/api/ehr | jq '.[]| .id'
+
+# Verify clinical trial metadata
+curl http://localhost:3001/api/ehr/EHR001 | jq '.credentialSubject | {
+  hasClinicalTrial: (.clinicalTrialNode != null),
+  hasMedDRA: (.medDRANode != null),
+  hasSignalVerification: (.signalVerificationNode != null),
+  hasAnamnesis: (.anamnesisNode != null)
+}'
+```
+
+#### EDC Component Testing
+```bash
+# Check provider assets
+curl -X POST http://localhost:8191/api/management/v3/assets/request \
+  -H "X-Api-Key: password" \
+  -H "Content-Type: application/json" \
+  -d '{"offset": 0, "limit": 10}'
+
+# Query catalog from consumer
+curl -X POST http://localhost:8081/api/management/v3/catalog/request \
+  -H "X-Api-Key: password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "counterPartyAddress": "http://localhost:8192/api/dsp",
+    "protocol": "dataspace-protocol-http"
+  }' | jq '.dcat:dataset | length'
+```
+
+### 6.4 Advanced Features
+
+**Multi-dimensional Filtering:**
+The catalog page supports filtering by multiple dimensions simultaneously:
+- Combine filters with AND logic (all conditions must match)
+- Active filters are displayed as removable chips
+- "Clear all" button resets all filters
+- Search includes: diagnosis, ICD codes, phase names, MedDRA terms, age bands
+
+**Clinical Trial Metadata:**
+Each EHR record includes:
+- **Phase**: Phase I (First-in-Human), Phase II (Efficacy), Phase III (Confirmation), Phase IV (Post-Marketing)
+- **MedDRA v27.0**: System Organ Class (SOC) with 10-digit codes, Preferred Terms (PT)
+- **ADRs**: Adverse Drug Reactions with severity, relatedness, causality, outcome
+- **Anamnesis**: 5-step medical history (Chief Complaint, HPI, PMH, Family History, Social History)
+
+**FHIR Compliance:**
+All data follows FHIR R4 standards and includes:
+- Patient resources with demographics
+- Condition resources with ICD-10-GM codes
+- Observation resources (vital signs, lab results)
+- Procedure and Medication resources
+- Extensions for clinical trial and safety data
+
+### 6.5 Troubleshooting
+
+**Page shows blank or errors:**
+- Check browser console (F12) for JavaScript errors
+- Verify backend is running: `curl http://localhost:3001/health`
+- Restart frontend: `pkill -f vite && cd frontend && npm run dev`
+
+**No data in catalog:**
+- Run seed script: `./seed-health.sh`
+- Check provider assets: `curl -X POST http://localhost:8191/api/management/v3/assets/request -H "X-Api-Key: password" -H "Content-Type: application/json" -d '{"offset": 0, "limit": 10}'`
+
+**Port conflicts:**
+- Frontend needs port 3000 free
+- Backend needs port 3001 free
+- Kill conflicting processes: `kill $(lsof -ti:3000,3001)`
+
+**Docker services not starting:**
+- Check logs: `docker-compose -f docker-compose.health.yml logs -f`
+- Clean volumes: `docker-compose -f docker-compose.health.yml down -v`
+- Rebuild: `docker-compose -f docker-compose.health.yml up --build`

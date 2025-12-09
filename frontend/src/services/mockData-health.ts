@@ -60,6 +60,117 @@ export const consentRestrictions = {
   'no-indefinite-storage': { label: 'Time-Limited Storage', icon: '⏰', description: 'Data must be deleted after study completion' },
 };
 
+// ============================================================================
+// CLINICAL TRIAL PHASES - ICH E8(R1) / FDA / EMA Classification
+// ============================================================================
+
+export const clinicalTrialPhases = {
+  'Phase I': { 
+    code: 'C15600', 
+    label: 'Phase I', 
+    description: 'First-in-human, safety & tolerability', 
+    subjects: '20-100',
+    color: 'bg-blue-100 text-blue-800'
+  },
+  'Phase I/II': { 
+    code: 'C15693', 
+    label: 'Phase I/II', 
+    description: 'Combined safety & preliminary efficacy', 
+    subjects: '50-200',
+    color: 'bg-indigo-100 text-indigo-800'
+  },
+  'Phase II': { 
+    code: 'C15601', 
+    label: 'Phase II', 
+    description: 'Proof-of-concept, dose-finding', 
+    subjects: '100-500',
+    color: 'bg-violet-100 text-violet-800'
+  },
+  'Phase II/III': { 
+    code: 'C15694', 
+    label: 'Phase II/III', 
+    description: 'Adaptive design, seamless transition', 
+    subjects: '300-1000',
+    color: 'bg-purple-100 text-purple-800'
+  },
+  'Phase III': { 
+    code: 'C15602', 
+    label: 'Phase III', 
+    description: 'Confirmatory, pivotal registration trial', 
+    subjects: '1000-5000',
+    color: 'bg-fuchsia-100 text-fuchsia-800'
+  },
+  'Phase IV': { 
+    code: 'C15603', 
+    label: 'Phase IV', 
+    description: 'Post-marketing surveillance, RWE', 
+    subjects: '>5000',
+    color: 'bg-pink-100 text-pink-800'
+  },
+  'Not Applicable': { 
+    code: 'C48660', 
+    label: 'N/A', 
+    description: 'Observational or registry study', 
+    subjects: 'Variable',
+    color: 'bg-gray-100 text-gray-800'
+  },
+};
+
+// ============================================================================
+// MedDRA v27.0 - System Organ Classes (SOC) Reference Data
+// ============================================================================
+
+export const medDRASystemOrganClasses = {
+  '10005329': { code: '10005329', name: 'Blood and lymphatic system disorders', abbreviation: 'Blood' },
+  '10007541': { code: '10007541', name: 'Cardiac disorders', abbreviation: 'Cardiac' },
+  '10010331': { code: '10010331', name: 'Congenital, familial and genetic disorders', abbreviation: 'Congen' },
+  '10013993': { code: '10013993', name: 'Ear and labyrinth disorders', abbreviation: 'Ear' },
+  '10014698': { code: '10014698', name: 'Endocrine disorders', abbreviation: 'Endoc' },
+  '10015919': { code: '10015919', name: 'Eye disorders', abbreviation: 'Eye' },
+  '10017947': { code: '10017947', name: 'Gastrointestinal disorders', abbreviation: 'Gastroint' },
+  '10018065': { code: '10018065', name: 'General disorders and administration site conditions', abbreviation: 'Genrl' },
+  '10019805': { code: '10019805', name: 'Hepatobiliary disorders', abbreviation: 'Hepatobil' },
+  '10021428': { code: '10021428', name: 'Immune system disorders', abbreviation: 'Immune' },
+  '10021881': { code: '10021881', name: 'Infections and infestations', abbreviation: 'Infec' },
+  '10022117': { code: '10022117', name: 'Injury, poisoning and procedural complications', abbreviation: 'Injury' },
+  '10022891': { code: '10022891', name: 'Investigations', abbreviation: 'Inv' },
+  '10027433': { code: '10027433', name: 'Metabolism and nutrition disorders', abbreviation: 'Metab' },
+  '10028395': { code: '10028395', name: 'Musculoskeletal and connective tissue disorders', abbreviation: 'Musc' },
+  '10029104': { code: '10029104', name: 'Neoplasms benign, malignant and unspecified', abbreviation: 'Neopl' },
+  '10029205': { code: '10029205', name: 'Nervous system disorders', abbreviation: 'Nerv' },
+  '10036585': { code: '10036585', name: 'Pregnancy, puerperium and perinatal conditions', abbreviation: 'Preg' },
+  '10037175': { code: '10037175', name: 'Psychiatric disorders', abbreviation: 'Psych' },
+  '10038359': { code: '10038359', name: 'Renal and urinary disorders', abbreviation: 'Renal' },
+  '10038604': { code: '10038604', name: 'Reproductive system and breast disorders', abbreviation: 'Reprod' },
+  '10038738': { code: '10038738', name: 'Respiratory, thoracic and mediastinal disorders', abbreviation: 'Resp' },
+  '10040785': { code: '10040785', name: 'Skin and subcutaneous tissue disorders', abbreviation: 'Skin' },
+  '10041244': { code: '10041244', name: 'Social circumstances', abbreviation: 'Soc' },
+  '10042613': { code: '10042613', name: 'Surgical and medical procedures', abbreviation: 'Surg' },
+  '10047065': { code: '10047065', name: 'Vascular disorders', abbreviation: 'Vasc' },
+  '10077536': { code: '10077536', name: 'Product issues', abbreviation: 'Product' },
+};
+
+// ============================================================================
+// ADR Severity and Signal Status Reference
+// ============================================================================
+
+export const adrSeverityLevels = {
+  'mild': { grade: 1, label: 'Mild', description: 'No treatment required', color: 'bg-green-100 text-green-800' },
+  'moderate': { grade: 2, label: 'Moderate', description: 'Local/noninvasive intervention', color: 'bg-yellow-100 text-yellow-800' },
+  'severe': { grade: 3, label: 'Severe', description: 'Hospitalization indicated', color: 'bg-orange-100 text-orange-800' },
+  'life-threatening': { grade: 4, label: 'Life-threatening', description: 'Urgent intervention required', color: 'bg-red-100 text-red-800' },
+  'fatal': { grade: 5, label: 'Fatal', description: 'Death related to AE', color: 'bg-gray-800 text-white' },
+};
+
+export const relatednessCategories = {
+  'certain': { label: 'Certain', score: 6, color: 'bg-red-100 text-red-800' },
+  'probable': { label: 'Probable/Likely', score: 5, color: 'bg-orange-100 text-orange-800' },
+  'possible': { label: 'Possible', score: 4, color: 'bg-yellow-100 text-yellow-800' },
+  'unlikely': { label: 'Unlikely', score: 3, color: 'bg-green-100 text-green-800' },
+  'conditional': { label: 'Conditional', score: 2, color: 'bg-blue-100 text-blue-800' },
+  'unassessable': { label: 'Unassessable', score: 1, color: 'bg-gray-100 text-gray-800' },
+};
+
 export const mockEHRCatalogAssets = [
   {
     '@id': 'asset:ehr:EHR001',
@@ -74,6 +185,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '55-64',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase III',
+    'health:medDRA': {
+      socCode: '10027433',
+      socName: 'Metabolism and nutrition disorders',
+      ptCode: '10012601',
+      ptName: 'Diabetes mellitus'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 1 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'real-world-evidence'],
       restrictions: ['no-reidentification'],
@@ -94,6 +213,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase IV',
+    'health:medDRA': {
+      socCode: '10007541',
+      socName: 'Cardiac disorders',
+      ptCode: '10019279',
+      ptName: 'Heart failure'
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 2 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'public-health'],
       restrictions: ['no-reidentification', 'no-commercial'],
@@ -114,6 +241,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '45-54',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase II',
+    'health:medDRA': {
+      socCode: '10029104',
+      socName: 'Neoplasms benign, malignant and unspecified',
+      ptCode: '10006187',
+      ptName: 'Breast cancer'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 3 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'academic-research'],
       restrictions: ['no-reidentification', 'no-genetic'],
@@ -134,6 +269,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Not Applicable',
+    'health:medDRA': {
+      socCode: '10029104',
+      socName: 'Neoplasms benign, malignant and unspecified',
+      ptCode: '10036910',
+      ptName: 'Prostate cancer'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 0 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation'],
       restrictions: ['no-reidentification', 'no-third-party'],
@@ -154,6 +297,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '55-64',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase III',
+    'health:medDRA': {
+      socCode: '10038738',
+      socName: 'Respiratory, thoracic and mediastinal disorders',
+      ptCode: '10009033',
+      ptName: 'Chronic obstructive pulmonary disease'
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 2 },
     'health:consent': {
       purposes: ['clinical-research', 'real-world-evidence', 'public-health'],
       restrictions: ['no-reidentification'],
@@ -174,6 +325,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '25-34',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase II',
+    'health:medDRA': {
+      socCode: '10029205',
+      socName: 'Nervous system disorders',
+      ptCode: '10028245',
+      ptName: 'Multiple sclerosis'
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 2 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'ai-training'],
       restrictions: ['no-reidentification', 'no-commercial'],
@@ -194,6 +353,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '45-54',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase III',
+    'health:medDRA': {
+      socCode: '10028395',
+      socName: 'Musculoskeletal and connective tissue disorders',
+      ptCode: '10039073',
+      ptName: 'Rheumatoid arthritis'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 1 },
     'health:consent': {
       purposes: ['clinical-research', 'academic-research'],
       restrictions: ['no-reidentification', 'no-indefinite-storage'],
@@ -214,6 +381,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase IV',
+    'health:medDRA': {
+      socCode: '10038359',
+      socName: 'Renal and urinary disorders',
+      ptCode: '10064848',
+      ptName: 'Chronic kidney disease'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 2 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'real-world-evidence'],
       restrictions: ['no-reidentification'],
@@ -235,6 +410,14 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'mental-health',
+    'health:clinicalTrialPhase': 'Phase II/III',
+    'health:medDRA': {
+      socCode: '10037175',
+      socName: 'Psychiatric disorders',
+      ptCode: '10012378',
+      ptName: 'Depression'
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 3 },
     'health:consent': {
       purposes: ['academic-research'],
       restrictions: ['no-reidentification', 'no-commercial', 'no-third-party', 'no-indefinite-storage'],
@@ -255,6 +438,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '55-64',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase I/II',
+    'health:medDRA': {
+      socCode: '10029205',
+      socName: 'Nervous system disorders',
+      ptCode: '10034010',
+      ptName: "Parkinson's disease"
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 1 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'ai-training'],
       restrictions: ['no-reidentification'],
@@ -275,6 +466,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '25-34',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase III',
+    'health:medDRA': {
+      socCode: '10017947',
+      socName: 'Gastrointestinal disorders',
+      ptCode: '10011401',
+      ptName: "Crohn's disease"
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 2 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'real-world-evidence'],
       restrictions: ['no-reidentification', 'no-genetic'],
@@ -295,6 +494,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '18-24',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase II',
+    'health:medDRA': {
+      socCode: '10029205',
+      socName: 'Nervous system disorders',
+      ptCode: '10015037',
+      ptName: 'Epilepsy'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 1 },
     'health:consent': {
       purposes: ['clinical-research', 'academic-research'],
       restrictions: ['no-reidentification', 'no-commercial'],
@@ -315,6 +522,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '35-44',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase II',
+    'health:medDRA': {
+      socCode: '10028395',
+      socName: 'Musculoskeletal and connective tissue disorders',
+      ptCode: '10042945',
+      ptName: 'Systemic lupus erythematosus'
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 4 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'academic-research'],
       restrictions: ['no-reidentification', 'no-genetic'],
@@ -335,6 +550,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '75-84',
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase IV',
+    'health:medDRA': {
+      socCode: '10007541',
+      socName: 'Cardiac disorders',
+      ptCode: '10003658',
+      ptName: 'Atrial fibrillation'
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 3 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'public-health', 'real-world-evidence'],
       restrictions: ['no-reidentification'],
@@ -355,6 +578,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '35-44',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase III',
+    'health:medDRA': {
+      socCode: '10038738',
+      socName: 'Respiratory, thoracic and mediastinal disorders',
+      ptCode: '10003553',
+      ptName: 'Asthma'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 2 },
     'health:consent': {
       purposes: ['clinical-research', 'real-world-evidence'],
       restrictions: ['no-reidentification', 'no-commercial'],
@@ -375,6 +606,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '25-34',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase II',
+    'health:medDRA': {
+      socCode: '10027433',
+      socName: 'Metabolism and nutrition disorders',
+      ptCode: '10067584',
+      ptName: 'Type 1 diabetes mellitus'
+    },
+    'health:signalStatus': { hasActiveSignal: true, adrCount: 2 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'ai-training', 'real-world-evidence'],
       restrictions: ['no-reidentification'],
@@ -395,6 +634,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '65-74',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase IV',
+    'health:medDRA': {
+      socCode: '10028395',
+      socName: 'Musculoskeletal and connective tissue disorders',
+      ptCode: '10031282',
+      ptName: 'Osteoporosis'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 1 },
     'health:consent': {
       purposes: ['clinical-research', 'public-health'],
       restrictions: ['no-reidentification', 'no-indefinite-storage'],
@@ -416,6 +663,14 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'infectious-disease',
+    'health:clinicalTrialPhase': 'Phase IV',
+    'health:medDRA': {
+      socCode: '10021881',
+      socName: 'Infections and infestations',
+      ptCode: '10019731',
+      ptName: 'Hepatitis C'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 0 },
     'health:consent': {
       purposes: ['clinical-research', 'public-health'],
       restrictions: ['no-reidentification', 'no-third-party', 'no-indefinite-storage'],
@@ -436,6 +691,14 @@ export const mockEHRCatalogAssets = [
     'health:ageBand': '35-44',
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
+    'health:clinicalTrialPhase': 'Phase III',
+    'health:medDRA': {
+      socCode: '10029205',
+      socName: 'Nervous system disorders',
+      ptCode: '10027599',
+      ptName: 'Migraine'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 1 },
     'health:consent': {
       purposes: ['clinical-research', 'registry-participation', 'academic-research'],
       restrictions: ['no-reidentification'],
@@ -457,6 +720,14 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'infectious-disease',
+    'health:clinicalTrialPhase': 'Phase IV',
+    'health:medDRA': {
+      socCode: '10021881',
+      socName: 'Infections and infestations',
+      ptCode: '10020098',
+      ptName: 'HIV infection'
+    },
+    'health:signalStatus': { hasActiveSignal: false, adrCount: 1 },
     'health:consent': {
       purposes: ['academic-research'],
       restrictions: ['no-reidentification', 'no-commercial', 'no-third-party', 'no-indefinite-storage'],
