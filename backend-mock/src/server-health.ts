@@ -99,7 +99,11 @@ const healthRecords: Record<string, any> = {
         "studyType": "interventional",
         "interventionModel": "parallel",
         "primaryEndpoint": "HbA1c reduction at 52 weeks",
-        "trialRegistryId": "EudraCT 2024-001234-56"
+        "euCtNumber": "2024-501234-12-DE",
+        "sponsor": { "name": "NordPharma AG", "type": "commercial", "country": "DE" },
+        "therapeuticArea": { "code": "ENDOCRINE", "name": "Endocrinology/Diabetology" },
+        "investigationalProduct": { "name": "NP-DM-2024", "atcCode": "A10BX" },
+        "memberStatesConcerned": ["DE", "FR", "NL", "ES"]
       },
       "medDRANode": {
         "version": "27.0",
@@ -245,12 +249,16 @@ const healthRecords: Record<string, any> = {
         "qualityScore": 0.91
       },
       "clinicalTrialNode": {
-        "phase": "Phase III",
-        "phaseCode": "C15602",
+        "phase": "Phase IV",
+        "phaseCode": "C15603",
         "studyType": "interventional",
         "interventionModel": "parallel",
         "primaryEndpoint": "Reduction in HF hospitalization",
-        "trialRegistryId": "EudraCT 2024-005678-90"
+        "euCtNumber": "2023-487652-41-DE",
+        "sponsor": { "name": "Rhenus Therapeutics GmbH", "type": "commercial", "country": "DE" },
+        "therapeuticArea": { "code": "CARDIO", "name": "Cardiovascular" },
+        "investigationalProduct": { "name": "RT-HF-2023", "atcCode": "C01DA" },
+        "memberStatesConcerned": ["DE", "AT", "NL"]
       },
       "medDRANode": {
         "version": "27.0",
@@ -403,7 +411,11 @@ const healthRecords: Record<string, any> = {
         "studyType": "interventional",
         "interventionModel": "single-group",
         "primaryEndpoint": "Disease-free survival",
-        "trialRegistryId": "EudraCT 2024-009988-77"
+        "euCtNumber": "2024-512876-23-DE",
+        "sponsor": { "name": "DKFZ Heidelberg", "type": "academic", "country": "DE" },
+        "therapeuticArea": { "code": "ANTINEOPL", "name": "Antineoplastic and Immunomodulating Agents" },
+        "investigationalProduct": { "name": "DKFZ-BC-2024", "atcCode": "L01XX" },
+        "memberStatesConcerned": ["DE"]
       },
       "medDRANode": {
         "version": "27.0",
@@ -551,7 +563,11 @@ const healthRecords: Record<string, any> = {
         "studyType": "interventional",
         "interventionModel": "parallel",
         "primaryEndpoint": "Reduction in exacerbations",
-        "trialRegistryId": "EudraCT 2024-003344-22"
+        "euCtNumber": "2024-503987-18-DE",
+        "sponsor": { "name": "BioMedTech Europa SE", "type": "commercial", "country": "NL" },
+        "therapeuticArea": { "code": "PULMONOLOGY", "name": "Pulmonology" },
+        "investigationalProduct": { "name": "BMT-COPD-2024", "atcCode": "R03BB" },
+        "memberStatesConcerned": ["DE", "FR", "NL", "ES"]
       },
       "medDRANode": {
         "version": "27.0",
@@ -701,7 +717,12 @@ const healthRecords: Record<string, any> = {
         "studyType": "interventional",
         "interventionModel": "parallel",
         "primaryEndpoint": "ACR20 response",
-        "trialRegistryId": "EudraCT 2024-001122-33"
+        "euCtNumber": "2024-505612-34-DE",
+        "sponsor": { "name": "NordPharma AG", "type": "commercial", "country": "DE" },
+        "therapeuticArea": { "code": "RHEUMATOLOGY", "name": "Rheumatology" },
+        "investigationalProduct": { "name": "NP-RA-2024", "atcCode": "M01AX" },
+        "memberStatesConcerned": ["DE", "FR", "NL", "ES"]
+      },
       },
       "medDRANode": {
         "version": "27.0",

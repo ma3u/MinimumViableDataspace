@@ -46,6 +46,11 @@ create_ehr_asset() {
     local CONSENT_PURPOSES=$8
     local MEDDRA_VERSION=$9
     local STUDY_PHASE=${10}
+    local EU_CT_NUMBER=${11}
+    local SPONSOR_NAME=${12}
+    local SPONSOR_TYPE=${13}
+    local THERAPEUTIC_AREA=${14}
+    local MEMBER_STATES=${15}
     
     echo "Creating EHR Asset: $NAME ($ID)..."
     curl -s --location "$PROVIDER_HOST/api/management/v3/assets" \
@@ -69,6 +74,11 @@ create_ehr_asset() {
             "health:consentPurposes": "'"$CONSENT_PURPOSES"'",
             "health:meddraVersion": "'"$MEDDRA_VERSION"'",
             "health:studyPhase": "'"$STUDY_PHASE"'",
+            "health:euCtNumber": "'"$EU_CT_NUMBER"'",
+            "health:sponsorName": "'"$SPONSOR_NAME"'",
+            "health:sponsorType": "'"$SPONSOR_TYPE"'",
+            "health:therapeuticArea": "'"$THERAPEUTIC_AREA"'",
+            "health:memberStatesConcerned": "'"$MEMBER_STATES"'",
             "health:deIdentificationMethod": "k-anonymity-k5",
             "health:jurisdiction": "DE-NW",
             "health:provider": "Rheinland Universitätsklinikum"
@@ -185,7 +195,12 @@ create_ehr_asset "asset:ehr:EHR001" \
     "male" \
     "clinical-research,registry-participation" \
     "27.0" \
-    "Phase III"
+    "Phase III" \
+    "2024-501234-12-DE" \
+    "NordPharma AG" \
+    "commercial" \
+    "Endocrinology/Diabetology" \
+    "DE,FR,NL,ES"
 
 # 2. Heart Failure
 create_ehr_asset "asset:ehr:EHR002" \
@@ -197,7 +212,12 @@ create_ehr_asset "asset:ehr:EHR002" \
     "female" \
     "clinical-research" \
     "27.0" \
-    "Phase III"
+    "Phase IV" \
+    "2023-487652-41-DE" \
+    "Rhenus Therapeutics GmbH" \
+    "commercial" \
+    "Cardiovascular" \
+    "DE,AT,NL"
 
 # 3. Breast Cancer
 create_ehr_asset "asset:ehr:EHR003" \
@@ -209,7 +229,12 @@ create_ehr_asset "asset:ehr:EHR003" \
     "female" \
     "clinical-research,cancer-registry" \
     "27.0" \
-    "Phase II"
+    "Phase II" \
+    "2024-512876-23-DE" \
+    "DKFZ Heidelberg" \
+    "academic" \
+    "Antineoplastic and Immunomodulating Agents" \
+    "DE"
 
 # 4. COPD
 create_ehr_asset "asset:ehr:EHR004" \
@@ -221,7 +246,12 @@ create_ehr_asset "asset:ehr:EHR004" \
     "male" \
     "clinical-research" \
     "27.0" \
-    "Phase III"
+    "Phase III" \
+    "2024-503987-18-DE" \
+    "BioMedTech Europa SE" \
+    "commercial" \
+    "Pulmonology" \
+    "DE,FR,NL,ES"
 
 # 5. Rheumatoid Arthritis
 create_ehr_asset "asset:ehr:EHR005" \
@@ -233,7 +263,12 @@ create_ehr_asset "asset:ehr:EHR005" \
     "female" \
     "clinical-research,registry-participation" \
     "27.0" \
-    "Phase II"
+    "Phase III" \
+    "2024-505612-34-DE" \
+    "NordPharma AG" \
+    "commercial" \
+    "Rheumatology" \
+    "DE,FR,NL,ES"
 
 # 6. Multiple Sclerosis
 create_ehr_asset "asset:ehr:EHR006" \
@@ -243,7 +278,14 @@ create_ehr_asset "asset:ehr:EHR006" \
     "Multiple sclerosis" \
     "25-34" \
     "female" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase II" \
+    "2024-518234-67-DE" \
+    "Charité Forschung GmbH" \
+    "academic" \
+    "Nervous System" \
+    "DE"
 
 # 7. Chronic Kidney Disease
 create_ehr_asset "asset:ehr:EHR007" \
@@ -253,7 +295,14 @@ create_ehr_asset "asset:ehr:EHR007" \
     "Chronic kidney disease stage 4" \
     "55-64" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase IV" \
+    "2023-492145-78-DE" \
+    "Universitätsklinikum Köln" \
+    "academic" \
+    "Nephrology" \
+    "DE,AT"
 
 # 8. Major Depression (Sensitive)
 create_ehr_asset "asset:ehr:EHR008" \
@@ -263,7 +312,14 @@ create_ehr_asset "asset:ehr:EHR008" \
     "Major depressive disorder recurrent" \
     "25-34" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase II/III" \
+    "2024-509876-45-DE" \
+    "Charité Forschung GmbH" \
+    "academic" \
+    "Psychiatry" \
+    "DE,FR,NL"
 
 # 9. Parkinson's Disease
 create_ehr_asset "asset:ehr:EHR009" \
@@ -273,7 +329,14 @@ create_ehr_asset "asset:ehr:EHR009" \
     "Parkinson's disease" \
     "65-74" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase I/II" \
+    "2024-521345-89-DE" \
+    "Helmholtz-Institut für Arzneimittelforschung" \
+    "academic" \
+    "Nervous System" \
+    "DE"
 
 # 10. Crohn's Disease
 create_ehr_asset "asset:ehr:EHR010" \
@@ -283,7 +346,14 @@ create_ehr_asset "asset:ehr:EHR010" \
     "Crohn's disease" \
     "25-34" \
     "female" \
-    "clinical-research,registry-participation"
+    "clinical-research,registry-participation" \
+    "27.0" \
+    "Phase III" \
+    "2024-506789-12-DE" \
+    "BioMedTech Europa SE" \
+    "commercial" \
+    "Gastroenterology" \
+    "DE,FR,NL,ES"
 
 # 11. Epilepsy
 create_ehr_asset "asset:ehr:EHR011" \
@@ -293,7 +363,14 @@ create_ehr_asset "asset:ehr:EHR011" \
     "Generalized idiopathic epilepsy" \
     "18-24" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase II" \
+    "2024-514567-23-DE" \
+    "Charité Forschung GmbH" \
+    "academic" \
+    "Nervous System" \
+    "DE"
 
 # 12. Systemic Lupus
 create_ehr_asset "asset:ehr:EHR012" \
@@ -303,7 +380,14 @@ create_ehr_asset "asset:ehr:EHR012" \
     "Systemic lupus erythematosus" \
     "35-44" \
     "female" \
-    "clinical-research,registry-participation"
+    "clinical-research,registry-participation" \
+    "27.0" \
+    "Phase II" \
+    "2024-517890-56-DE" \
+    "Rhenus Therapeutics GmbH" \
+    "commercial" \
+    "Rheumatology" \
+    "DE"
 
 # 13. Atrial Fibrillation
 create_ehr_asset "asset:ehr:EHR013" \
@@ -313,7 +397,14 @@ create_ehr_asset "asset:ehr:EHR013" \
     "Atrial fibrillation" \
     "75-84" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase IV" \
+    "2023-489234-67-DE" \
+    "NordPharma AG" \
+    "commercial" \
+    "Cardiovascular" \
+    "DE,FR,IT,ES"
 
 # 14. Severe Asthma
 create_ehr_asset "asset:ehr:EHR014" \
@@ -323,7 +414,14 @@ create_ehr_asset "asset:ehr:EHR014" \
     "Severe persistent asthma" \
     "35-44" \
     "female" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase III" \
+    "2024-508234-78-DE" \
+    "NordPharma AG" \
+    "commercial" \
+    "Pulmonology" \
+    "DE,FR,NL,ES"
 
 # 15. Prostate Cancer
 create_ehr_asset "asset:ehr:EHR015" \
@@ -333,7 +431,14 @@ create_ehr_asset "asset:ehr:EHR015" \
     "Malignant neoplasm of prostate" \
     "65-74" \
     "male" \
-    "clinical-research,cancer-registry"
+    "clinical-research,cancer-registry" \
+    "27.0" \
+    "Not Applicable" \
+    "2023-498123-55-DE" \
+    "EU Oncology Consortium" \
+    "non-profit" \
+    "Antineoplastic and Immunomodulating Agents" \
+    "DE,BE,NL"
 
 # 16. Osteoporosis
 create_ehr_asset "asset:ehr:EHR016" \
@@ -343,7 +448,14 @@ create_ehr_asset "asset:ehr:EHR016" \
     "Postmenopausal osteoporosis" \
     "75-84" \
     "female" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase IV" \
+    "2023-496543-21-DE" \
+    "Universitätsklinikum Köln" \
+    "academic" \
+    "Musculo-Skeletal System" \
+    "DE,AT,BE"
 
 # 17. Type 1 Diabetes
 create_ehr_asset "asset:ehr:EHR017" \
@@ -353,7 +465,14 @@ create_ehr_asset "asset:ehr:EHR017" \
     "Type 1 diabetes mellitus" \
     "25-34" \
     "female" \
-    "clinical-research,device-registry"
+    "clinical-research,device-registry" \
+    "27.0" \
+    "Phase II" \
+    "2024-519876-34-DE" \
+    "Helmholtz-Institut für Arzneimittelforschung" \
+    "academic" \
+    "Endocrinology/Diabetology" \
+    "DE"
 
 # 18. Hepatitis C (Cured)
 create_ehr_asset "asset:ehr:EHR018" \
@@ -363,7 +482,14 @@ create_ehr_asset "asset:ehr:EHR018" \
     "Chronic viral hepatitis C" \
     "55-64" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase IV" \
+    "2023-491234-56-DE" \
+    "BioMedTech Europa SE" \
+    "commercial" \
+    "Antiinfectives for Systemic Use" \
+    "DE,NL,BE"
 
 # 19. Chronic Migraine
 create_ehr_asset "asset:ehr:EHR019" \
@@ -373,7 +499,14 @@ create_ehr_asset "asset:ehr:EHR019" \
     "Migraine chronic" \
     "35-44" \
     "female" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase III" \
+    "2024-507654-89-DE" \
+    "Rhenus Therapeutics GmbH" \
+    "commercial" \
+    "Nervous System" \
+    "DE,FR,NL,ES"
 
 # 20. HIV (Sensitive)
 create_ehr_asset "asset:ehr:EHR020" \
@@ -383,7 +516,14 @@ create_ehr_asset "asset:ehr:EHR020" \
     "HIV disease" \
     "45-54" \
     "male" \
-    "clinical-research"
+    "clinical-research" \
+    "27.0" \
+    "Phase IV" \
+    "2023-494567-12-DE" \
+    "EU Oncology Consortium" \
+    "non-profit" \
+    "Antiinfectives for Systemic Use" \
+    "DE,FR,BE,NL"
 
 echo ""
 echo "Creating Contract Definitions..."
@@ -412,7 +552,7 @@ echo "╔═══════════════════════�
 echo "║     EHR2EDC Health Dataspace - Seeding Complete!                   ║"
 echo "║                                                                    ║"
 echo "║  Created:                                                          ║"
-echo "║    - 20 Anonymized EHR Assets                                      ║"
+echo "║    - 20 Anonymized EHR Assets (EU CTR 536/2014 compliant)          ║"
 echo "║    - 3 Policy Definitions (access, consent, sensitive)             ║"
 echo "║    - 1 Contract Definition                                         ║"
 echo "║                                                                    ║"
@@ -420,6 +560,6 @@ echo "║  Participants:                                                     ║
 echo "║    Provider: did:web:rheinland-uklinikum.de                        ║"
 echo "║    Consumer: did:web:nordstein-research.de                         ║"
 echo "║                                                                    ║"
-echo "║  Compliance: GDPR Art. 89, EHDS Secondary Use, BDSG                ║"
+echo "║  Compliance: EU CTR 536/2014, GDPR Art. 89, EHDS, GDNG             ║"
 echo "╚════════════════════════════════════════════════════════════════════╝"
 echo ""

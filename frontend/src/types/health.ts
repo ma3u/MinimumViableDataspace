@@ -230,17 +230,89 @@ export type DeIdentificationMethod =
   | 'generalization';
 
 // ============================================================================
-// Clinical Trial Node - FDA/EMA Phase Classification
+// Clinical Trial Node - EU CTR 536/2014 Compliant Structure
 // ============================================================================
 
+/**
+ * EU Clinical Trials Regulation 536/2014 compliant trial metadata.
+ * Uses CTIS (Clinical Trials Information System) format for EU CT numbers.
+ * Format: YYYY-NNNNNN-NN-CC (e.g., 2024-501234-12-DE)
+ */
 export interface ClinicalTrialNode {
   phase: ClinicalTrialPhase;
   phaseCode: string; // NCIt code
   studyType: StudyType;
   interventionModel: InterventionModel;
   primaryEndpoint?: string;
-  trialRegistryId?: string; // EudraCT or ClinicalTrials.gov
+  
+  // EU CTR 536/2014 Fields
+  euCtNumber: string; // CTIS format: YYYY-NNNNNN-NN-CC
+  sponsor: Sponsor;
+  therapeuticArea: EUTherapeuticArea;
+  investigationalProduct: IMPDetails;
+  memberStatesConcerned: EUMemberState[]; // Countries where trial is authorized
 }
+
+/**
+ * Sponsor information per EU CTR 536/2014 Article 2(14)
+ */
+export interface Sponsor {
+  name: string;
+  type: SponsorType;
+  country: EUMemberState;
+}
+
+export type SponsorType = 'commercial' | 'academic' | 'non-profit';
+
+/**
+ * Investigational Medicinal Product (IMP) details per EU CTR 536/2014
+ */
+export interface IMPDetails {
+  name: string;
+  atcCode?: string; // ATC classification (e.g., C01DA02)
+}
+
+/**
+ * EMA Therapeutic Areas - 27 categories aligned with ATC classification
+ * Used for filtering and categorization in CTIS
+ */
+export interface EUTherapeuticArea {
+  code: string; // e.g., "CARDIO"
+  name: string; // e.g., "Cardiovascular"
+}
+
+/**
+ * EU Member States for multi-national trial coordination
+ * Per EU CTR 536/2014 Article 5 (Member States Concerned)
+ */
+export type EUMemberState = 
+  | 'DE' // Germany 🇩🇪
+  | 'FR' // France 🇫🇷
+  | 'NL' // Netherlands 🇳🇱
+  | 'ES' // Spain 🇪🇸
+  | 'IT' // Italy 🇮🇹
+  | 'BE' // Belgium 🇧🇪
+  | 'AT' // Austria 🇦🇹
+  | 'PL' // Poland 🇵🇱
+  | 'SE' // Sweden 🇸🇪
+  | 'DK' // Denmark 🇩🇰
+  | 'FI' // Finland 🇫🇮
+  | 'PT' // Portugal 🇵🇹
+  | 'IE' // Ireland 🇮🇪
+  | 'CZ' // Czech Republic 🇨🇿
+  | 'HU' // Hungary 🇭🇺
+  | 'RO' // Romania 🇷🇴
+  | 'BG' // Bulgaria 🇧🇬
+  | 'GR' // Greece 🇬🇷
+  | 'SK' // Slovakia 🇸🇰
+  | 'HR' // Croatia 🇭🇷
+  | 'SI' // Slovenia 🇸🇮
+  | 'LT' // Lithuania 🇱🇹
+  | 'LV' // Latvia 🇱🇻
+  | 'EE' // Estonia 🇪🇪
+  | 'LU' // Luxembourg 🇱🇺
+  | 'MT' // Malta 🇲🇹
+  | 'CY'; // Cyprus 🇨🇾
 
 /**
  * Clinical Trial Phases per ICH E8(R1) and FDA/EMA guidelines:

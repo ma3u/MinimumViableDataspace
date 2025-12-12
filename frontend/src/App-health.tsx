@@ -42,7 +42,10 @@ import {
   medicalCategories,
   categoryBackgrounds,
   consentPurposes,
-  consentRestrictions
+  consentRestrictions,
+  sponsorTypes,
+  emaTherapeuticAreas,
+  memberStateFlags
 } from './services/mockData-health';
 import { fetchEHRById, checkBackendHealth } from './services/ehrApi';
 import type { ElectronicHealthRecord } from './types/health';
@@ -64,6 +67,18 @@ interface MockEHRAsset {
   'health:consentStatus': string;
   'health:sensitiveCategory'?: string;
   'health:clinicalTrialPhase'?: string;
+  // EU CTR 536/2014 Fields
+  'health:euCtNumber'?: string;
+  'health:sponsor'?: {
+    name: string;
+    type: 'commercial' | 'academic' | 'non-profit';
+    country: string;
+  };
+  'health:therapeuticArea'?: {
+    code: string;
+    name: string;
+  };
+  'health:memberStatesConcerned'?: string[];
   'health:medDRA'?: {
     socCode: string;
     socName: string;
@@ -97,21 +112,31 @@ function AppHealth() {
   const [medDRAFilter, setMedDRAFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFhirJson, setShowFhirJson] = useState(false);
+  
+  // Advanced EU CTR 536/2014 Filters (persist across demo phases)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [sponsorTypeFilter, setSponsorTypeFilter] = useState<string>('all');
+  const [therapeuticAreaFilter, setTherapeuticAreaFilter] = useState<string>('all');
 
-  // Filter assets based on category, age band, phase, MedDRA SOC, and search
+  // Filter assets based on category, age band, phase, MedDRA SOC, EU CTR fields, and search
   const filteredAssets = mockEHRCatalogAssets.filter(asset => {
     const matchesCategory = categoryFilter === 'all' || asset['health:category'] === categoryFilter;
     const matchesAgeBand = ageBandFilter === 'all' || asset['health:ageBand'] === ageBandFilter;
     const matchesPhase = phaseFilter === 'all' || asset['health:clinicalTrialPhase'] === phaseFilter;
     const matchesMedDRA = medDRAFilter === 'all' || asset['health:medDRA']?.socCode === medDRAFilter;
+    const matchesSponsorType = sponsorTypeFilter === 'all' || asset['health:sponsor']?.type === sponsorTypeFilter;
+    const matchesTherapeuticArea = therapeuticAreaFilter === 'all' || asset['health:therapeuticArea']?.code === therapeuticAreaFilter;
     const matchesSearch = searchTerm === '' || 
       asset['dct:title'].toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset['health:icdCode'].toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset['health:diagnosis'].toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset['health:medDRA']?.socName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset['health:medDRA']?.ptName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:clinicalTrialPhase']?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesAgeBand && matchesPhase && matchesMedDRA && matchesSearch;
+      asset['health:clinicalTrialPhase']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:euCtNumber']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:sponsor']?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['health:therapeuticArea']?.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesAgeBand && matchesPhase && matchesMedDRA && matchesSponsorType && matchesTherapeuticArea && matchesSearch;
   });
 
   // Check backend availability on mount
@@ -342,6 +367,7 @@ function AppHealth() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Regulatory Compliance</h3>
               <div className="flex gap-4 flex-wrap">
                 {[
+                  { name: 'EU CTR 536/2014', desc: 'Clinical Trials Regulation' },
                   { name: 'GDPR', desc: 'General Data Protection Regulation' },
                   { name: 'EHDS', desc: 'European Health Data Space' },
                   { name: 'GDNG', desc: 'Gesundheitsdatennutzungsgesetz' },
@@ -563,8 +589,69 @@ function AppHealth() {
                   </div>
                 </div>
 
+                {/* Advanced Filters Toggle - EU CTR 536/2014 */}
+                <div>
+                  <button
+                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    {showAdvancedFilters ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    EU CTR 536/2014 Filters
+                  </button>
+                  
+                  {showAdvancedFilters && (
+                    <div className="mt-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="flex flex-wrap gap-3">
+                        {/* Sponsor Type Filter */}
+                        <div className="min-w-[180px]">
+                          <label htmlFor="sponsor-type-filter" className="text-xs font-medium text-blue-800 mb-1 block">Sponsor Type</label>
+                          <select
+                            id="sponsor-type-filter"
+                            value={sponsorTypeFilter}
+                            onChange={(e) => setSponsorTypeFilter(e.target.value)}
+                            className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                          >
+                            <option value="all">All Types</option>
+                            {Object.entries(sponsorTypes).map(([key, sponsor]) => {
+                              const count = mockEHRCatalogAssets.filter(a => a['health:sponsor']?.type === key).length;
+                              if (count === 0) return null;
+                              return (
+                                <option key={key} value={key}>
+                                  {sponsor.icon} {sponsor.label} ({count})
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+
+                        {/* Therapeutic Area Filter */}
+                        <div className="min-w-[220px]">
+                          <label htmlFor="therapeutic-area-filter" className="text-xs font-medium text-blue-800 mb-1 block">EMA Therapeutic Area</label>
+                          <select
+                            id="therapeutic-area-filter"
+                            value={therapeuticAreaFilter}
+                            onChange={(e) => setTherapeuticAreaFilter(e.target.value)}
+                            className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                          >
+                            <option value="all">All Areas</option>
+                            {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:therapeuticArea']?.code).filter(Boolean))).sort().map(code => {
+                              const area = emaTherapeuticAreas[code as keyof typeof emaTherapeuticAreas];
+                              const count = mockEHRCatalogAssets.filter(a => a['health:therapeuticArea']?.code === code).length;
+                              return (
+                                <option key={code} value={code}>
+                                  {area?.name || code} ({count})
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Active Filters Summary */}
-                {(categoryFilter !== 'all' || ageBandFilter !== 'all' || phaseFilter !== 'all' || medDRAFilter !== 'all' || searchTerm) && (
+                {(categoryFilter !== 'all' || ageBandFilter !== 'all' || phaseFilter !== 'all' || medDRAFilter !== 'all' || sponsorTypeFilter !== 'all' || therapeuticAreaFilter !== 'all' || searchTerm) && (
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-gray-600">Active filters:</span>
                     {categoryFilter !== 'all' && (
@@ -587,6 +674,16 @@ function AppHealth() {
                         {mockEHRCatalogAssets.find(a => a['health:medDRA']?.socCode === medDRAFilter)?.['health:medDRA']?.socName} ×
                       </button>
                     )}
+                    {sponsorTypeFilter !== 'all' && (
+                      <button onClick={() => setSponsorTypeFilter('all')} className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs flex items-center gap-1 hover:bg-green-200">
+                        {sponsorTypes[sponsorTypeFilter as keyof typeof sponsorTypes]?.icon} {sponsorTypes[sponsorTypeFilter as keyof typeof sponsorTypes]?.label} ×
+                      </button>
+                    )}
+                    {therapeuticAreaFilter !== 'all' && (
+                      <button onClick={() => setTherapeuticAreaFilter('all')} className="px-2 py-1 bg-teal-100 text-teal-800 rounded text-xs flex items-center gap-1 hover:bg-teal-200">
+                        {emaTherapeuticAreas[therapeuticAreaFilter as keyof typeof emaTherapeuticAreas]?.name} ×
+                      </button>
+                    )}
                     {searchTerm && (
                       <button onClick={() => setSearchTerm('')} className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs flex items-center gap-1 hover:bg-gray-200">
                         Search: "{searchTerm}" ×
@@ -598,6 +695,8 @@ function AppHealth() {
                         setAgeBandFilter('all');
                         setPhaseFilter('all');
                         setMedDRAFilter('all');
+                        setSponsorTypeFilter('all');
+                        setTherapeuticAreaFilter('all');
                         setSearchTerm('');
                       }}
                       className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs hover:bg-red-200"
@@ -675,6 +774,32 @@ function AppHealth() {
                             <span className="px-2 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded text-xs font-medium">
                               📋 {asset['health:clinicalTrialPhase']}
                             </span>
+                          </div>
+                        )}
+                        {/* EU CTR 536/2014 Fields */}
+                        {asset['health:euCtNumber'] && (
+                          <div className="mb-2 flex flex-wrap gap-2">
+                            <span className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded text-xs font-mono">
+                              🇪🇺 {asset['health:euCtNumber']}
+                            </span>
+                            {asset['health:sponsor'] && (
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                sponsorTypes[asset['health:sponsor'].type as keyof typeof sponsorTypes]?.color || 'bg-gray-100 text-gray-700'
+                              }`}>
+                                {sponsorTypes[asset['health:sponsor'].type as keyof typeof sponsorTypes]?.icon} {asset['health:sponsor'].name}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {/* Member States - only show for multinational trials */}
+                        {asset['health:memberStatesConcerned'] && asset['health:memberStatesConcerned'].length > 1 && (
+                          <div className="mb-2 flex items-center gap-1 text-xs">
+                            <span className="text-gray-500">Countries:</span>
+                            {asset['health:memberStatesConcerned'].map(code => (
+                              <span key={code} title={memberStateFlags[code]?.name}>
+                                {memberStateFlags[code]?.flag}
+                              </span>
+                            ))}
                           </div>
                         )}
                         {asset['health:medDRA'] && (

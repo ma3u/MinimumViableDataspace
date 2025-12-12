@@ -171,6 +171,87 @@ export const relatednessCategories = {
   'unassessable': { label: 'Unassessable', score: 1, color: 'bg-gray-100 text-gray-800' },
 };
 
+// ============================================================================
+// EU CTR 536/2014 - CTIS Reference Data
+// ============================================================================
+
+/**
+ * EMA Therapeutic Areas - 27 categories aligned with ATC classification
+ * Used for trial categorization in CTIS (Clinical Trials Information System)
+ */
+export const emaTherapeuticAreas = {
+  'ALIMENTARY': { code: 'ALIMENTARY', name: 'Alimentary Tract and Metabolism', atcPrefix: 'A' },
+  'BLOOD': { code: 'BLOOD', name: 'Blood and Blood Forming Organs', atcPrefix: 'B' },
+  'CARDIO': { code: 'CARDIO', name: 'Cardiovascular', atcPrefix: 'C' },
+  'DERMA': { code: 'DERMA', name: 'Dermatologicals', atcPrefix: 'D' },
+  'GENITO': { code: 'GENITO', name: 'Genito Urinary System and Sex Hormones', atcPrefix: 'G' },
+  'HORMONAL': { code: 'HORMONAL', name: 'Systemic Hormonal Preparations', atcPrefix: 'H' },
+  'ANTIINFECT': { code: 'ANTIINFECT', name: 'Antiinfectives for Systemic Use', atcPrefix: 'J' },
+  'ANTINEOPL': { code: 'ANTINEOPL', name: 'Antineoplastic and Immunomodulating Agents', atcPrefix: 'L' },
+  'MUSCULO': { code: 'MUSCULO', name: 'Musculo-Skeletal System', atcPrefix: 'M' },
+  'NERVOUS': { code: 'NERVOUS', name: 'Nervous System', atcPrefix: 'N' },
+  'ANTIPARAS': { code: 'ANTIPARAS', name: 'Antiparasitic Products', atcPrefix: 'P' },
+  'RESPIRATORY': { code: 'RESPIRATORY', name: 'Respiratory System', atcPrefix: 'R' },
+  'SENSORY': { code: 'SENSORY', name: 'Sensory Organs', atcPrefix: 'S' },
+  'VARIOUS': { code: 'VARIOUS', name: 'Various', atcPrefix: 'V' },
+  'IMMUNOLOGY': { code: 'IMMUNOLOGY', name: 'Immunology', atcPrefix: 'L03' },
+  'VACCINES': { code: 'VACCINES', name: 'Vaccines', atcPrefix: 'J07' },
+  'RARE': { code: 'RARE', name: 'Rare Diseases (Orphan)', atcPrefix: null },
+  'PEDIATRIC': { code: 'PEDIATRIC', name: 'Pediatric Use', atcPrefix: null },
+  'GERIATRIC': { code: 'GERIATRIC', name: 'Geriatric Use', atcPrefix: null },
+  'PSYCHIATRY': { code: 'PSYCHIATRY', name: 'Psychiatry', atcPrefix: 'N05' },
+  'NEPHROLOGY': { code: 'NEPHROLOGY', name: 'Nephrology', atcPrefix: 'C03' },
+  'HEPATOLOGY': { code: 'HEPATOLOGY', name: 'Hepatology', atcPrefix: 'A05' },
+  'HEMATOLOGY': { code: 'HEMATOLOGY', name: 'Hematology', atcPrefix: 'B' },
+  'RHEUMATOLOGY': { code: 'RHEUMATOLOGY', name: 'Rheumatology', atcPrefix: 'M01' },
+  'GASTRO': { code: 'GASTRO', name: 'Gastroenterology', atcPrefix: 'A02' },
+  'PULMONOLOGY': { code: 'PULMONOLOGY', name: 'Pulmonology', atcPrefix: 'R03' },
+  'ENDOCRINE': { code: 'ENDOCRINE', name: 'Endocrinology/Diabetology', atcPrefix: 'A10' },
+};
+
+/**
+ * Sponsor types per EU CTR 536/2014 Article 2(14)
+ */
+export const sponsorTypes = {
+  'commercial': { type: 'commercial', label: 'Commercial', icon: '🏢', color: 'bg-blue-100 text-blue-800' },
+  'academic': { type: 'academic', label: 'Academic', icon: '🎓', color: 'bg-purple-100 text-purple-800' },
+  'non-profit': { type: 'non-profit', label: 'Non-Profit', icon: '🏛️', color: 'bg-green-100 text-green-800' },
+};
+
+/**
+ * Fictional but realistic sponsor organizations for the demo
+ */
+export const demoSponsors = {
+  'nordpharma': { name: 'NordPharma AG', type: 'commercial' as const, country: 'DE' as const, icon: '🏢' },
+  'rhenus': { name: 'Rhenus Therapeutics GmbH', type: 'commercial' as const, country: 'DE' as const, icon: '🏢' },
+  'charite': { name: 'Charité Forschung GmbH', type: 'academic' as const, country: 'DE' as const, icon: '🎓' },
+  'helmholtz': { name: 'Helmholtz-Institut für Arzneimittelforschung', type: 'academic' as const, country: 'DE' as const, icon: '🎓' },
+  'biomedtech': { name: 'BioMedTech Europa SE', type: 'commercial' as const, country: 'NL' as const, icon: '🏢' },
+  'ukkoeln': { name: 'Universitätsklinikum Köln', type: 'academic' as const, country: 'DE' as const, icon: '🎓' },
+  'dkfz': { name: 'DKFZ Heidelberg', type: 'academic' as const, country: 'DE' as const, icon: '🎓' },
+  'euoncology': { name: 'EU Oncology Consortium', type: 'non-profit' as const, country: 'BE' as const, icon: '🏛️' },
+};
+
+/**
+ * EU Member State flags for display
+ */
+export const memberStateFlags: Record<string, { code: string; flag: string; name: string }> = {
+  'DE': { code: 'DE', flag: '🇩🇪', name: 'Germany' },
+  'FR': { code: 'FR', flag: '🇫🇷', name: 'France' },
+  'NL': { code: 'NL', flag: '🇳🇱', name: 'Netherlands' },
+  'ES': { code: 'ES', flag: '🇪🇸', name: 'Spain' },
+  'IT': { code: 'IT', flag: '🇮🇹', name: 'Italy' },
+  'BE': { code: 'BE', flag: '🇧🇪', name: 'Belgium' },
+  'AT': { code: 'AT', flag: '🇦🇹', name: 'Austria' },
+  'PL': { code: 'PL', flag: '🇵🇱', name: 'Poland' },
+  'SE': { code: 'SE', flag: '🇸🇪', name: 'Sweden' },
+  'DK': { code: 'DK', flag: '🇩🇰', name: 'Denmark' },
+  'FI': { code: 'FI', flag: '🇫🇮', name: 'Finland' },
+  'PT': { code: 'PT', flag: '🇵🇹', name: 'Portugal' },
+  'IE': { code: 'IE', flag: '🇮🇪', name: 'Ireland' },
+  'CZ': { code: 'CZ', flag: '🇨🇿', name: 'Czech Republic' },
+};
+
 export const mockEHRCatalogAssets = [
   {
     '@id': 'asset:ehr:EHR001',
@@ -186,6 +267,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase III',
+    'health:euCtNumber': '2024-501234-12-DE',
+    'health:sponsor': { name: 'NordPharma AG', type: 'commercial', country: 'DE' },
+    'health:therapeuticArea': { code: 'ENDOCRINE', name: 'Endocrinology/Diabetology' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'NL', 'ES'],
     'health:medDRA': {
       socCode: '10027433',
       socName: 'Metabolism and nutrition disorders',
@@ -214,6 +299,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase IV',
+    'health:euCtNumber': '2023-487652-41-DE',
+    'health:sponsor': { name: 'Rhenus Therapeutics GmbH', type: 'commercial', country: 'DE' },
+    'health:therapeuticArea': { code: 'CARDIO', name: 'Cardiovascular' },
+    'health:memberStatesConcerned': ['DE', 'AT', 'NL'],
     'health:medDRA': {
       socCode: '10007541',
       socName: 'Cardiac disorders',
@@ -242,6 +331,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase II',
+    'health:euCtNumber': '2024-512876-23-DE',
+    'health:sponsor': { name: 'DKFZ Heidelberg', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'ANTINEOPL', name: 'Antineoplastic and Immunomodulating Agents' },
+    'health:memberStatesConcerned': ['DE'],
     'health:medDRA': {
       socCode: '10029104',
       socName: 'Neoplasms benign, malignant and unspecified',
@@ -270,6 +363,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Not Applicable',
+    'health:euCtNumber': '2023-498123-55-DE',
+    'health:sponsor': { name: 'EU Oncology Consortium', type: 'non-profit', country: 'BE' },
+    'health:therapeuticArea': { code: 'ANTINEOPL', name: 'Antineoplastic and Immunomodulating Agents' },
+    'health:memberStatesConcerned': ['DE', 'BE', 'NL'],
     'health:medDRA': {
       socCode: '10029104',
       socName: 'Neoplasms benign, malignant and unspecified',
@@ -298,6 +395,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase III',
+    'health:euCtNumber': '2024-503987-18-DE',
+    'health:sponsor': { name: 'BioMedTech Europa SE', type: 'commercial', country: 'NL' },
+    'health:therapeuticArea': { code: 'PULMONOLOGY', name: 'Pulmonology' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'NL', 'ES'],
     'health:medDRA': {
       socCode: '10038738',
       socName: 'Respiratory, thoracic and mediastinal disorders',
@@ -326,6 +427,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase II',
+    'health:euCtNumber': '2024-518234-67-DE',
+    'health:sponsor': { name: 'Charité Forschung GmbH', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'NERVOUS', name: 'Nervous System' },
+    'health:memberStatesConcerned': ['DE'],
     'health:medDRA': {
       socCode: '10029205',
       socName: 'Nervous system disorders',
@@ -354,6 +459,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase III',
+    'health:euCtNumber': '2024-505612-34-DE',
+    'health:sponsor': { name: 'NordPharma AG', type: 'commercial', country: 'DE' },
+    'health:therapeuticArea': { code: 'RHEUMATOLOGY', name: 'Rheumatology' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'NL', 'ES'],
     'health:medDRA': {
       socCode: '10028395',
       socName: 'Musculoskeletal and connective tissue disorders',
@@ -382,6 +491,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase IV',
+    'health:euCtNumber': '2023-492145-78-DE',
+    'health:sponsor': { name: 'Universitätsklinikum Köln', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'NEPHROLOGY', name: 'Nephrology' },
+    'health:memberStatesConcerned': ['DE', 'AT'],
     'health:medDRA': {
       socCode: '10038359',
       socName: 'Renal and urinary disorders',
@@ -411,6 +524,10 @@ export const mockEHRCatalogAssets = [
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'mental-health',
     'health:clinicalTrialPhase': 'Phase II/III',
+    'health:euCtNumber': '2024-509876-45-DE',
+    'health:sponsor': { name: 'Charité Forschung GmbH', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'PSYCHIATRY', name: 'Psychiatry' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'NL'],
     'health:medDRA': {
       socCode: '10037175',
       socName: 'Psychiatric disorders',
@@ -439,6 +556,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase I/II',
+    'health:euCtNumber': '2024-521345-89-DE',
+    'health:sponsor': { name: 'Helmholtz-Institut für Arzneimittelforschung', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'NERVOUS', name: 'Nervous System' },
+    'health:memberStatesConcerned': ['DE'],
     'health:medDRA': {
       socCode: '10029205',
       socName: 'Nervous system disorders',
@@ -467,6 +588,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase III',
+    'health:euCtNumber': '2024-506789-12-DE',
+    'health:sponsor': { name: 'BioMedTech Europa SE', type: 'commercial', country: 'NL' },
+    'health:therapeuticArea': { code: 'GASTRO', name: 'Gastroenterology' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'NL', 'ES'],
     'health:medDRA': {
       socCode: '10017947',
       socName: 'Gastrointestinal disorders',
@@ -495,6 +620,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase II',
+    'health:euCtNumber': '2024-514567-23-DE',
+    'health:sponsor': { name: 'Charité Forschung GmbH', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'NERVOUS', name: 'Nervous System' },
+    'health:memberStatesConcerned': ['DE'],
     'health:medDRA': {
       socCode: '10029205',
       socName: 'Nervous system disorders',
@@ -523,6 +652,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase II',
+    'health:euCtNumber': '2024-517890-56-DE',
+    'health:sponsor': { name: 'Rhenus Therapeutics GmbH', type: 'commercial', country: 'DE' },
+    'health:therapeuticArea': { code: 'RHEUMATOLOGY', name: 'Rheumatology' },
+    'health:memberStatesConcerned': ['DE'],
     'health:medDRA': {
       socCode: '10028395',
       socName: 'Musculoskeletal and connective tissue disorders',
@@ -551,6 +684,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'male',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase IV',
+    'health:euCtNumber': '2023-489234-67-DE',
+    'health:sponsor': { name: 'NordPharma AG', type: 'commercial', country: 'DE' },
+    'health:therapeuticArea': { code: 'CARDIO', name: 'Cardiovascular' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'IT', 'ES'],
     'health:medDRA': {
       socCode: '10007541',
       socName: 'Cardiac disorders',
@@ -579,6 +716,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase III',
+    'health:euCtNumber': '2024-508234-78-DE',
+    'health:sponsor': { name: 'NordPharma AG', type: 'commercial', country: 'DE' },
+    'health:therapeuticArea': { code: 'PULMONOLOGY', name: 'Pulmonology' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'NL', 'ES'],
     'health:medDRA': {
       socCode: '10038738',
       socName: 'Respiratory, thoracic and mediastinal disorders',
@@ -607,6 +748,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase II',
+    'health:euCtNumber': '2024-519876-34-DE',
+    'health:sponsor': { name: 'Helmholtz-Institut für Arzneimittelforschung', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'ENDOCRINE', name: 'Endocrinology/Diabetology' },
+    'health:memberStatesConcerned': ['DE'],
     'health:medDRA': {
       socCode: '10027433',
       socName: 'Metabolism and nutrition disorders',
@@ -635,6 +780,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase IV',
+    'health:euCtNumber': '2023-496543-21-DE',
+    'health:sponsor': { name: 'Universitätsklinikum Köln', type: 'academic', country: 'DE' },
+    'health:therapeuticArea': { code: 'MUSCULO', name: 'Musculo-Skeletal System' },
+    'health:memberStatesConcerned': ['DE', 'AT', 'BE'],
     'health:medDRA': {
       socCode: '10028395',
       socName: 'Musculoskeletal and connective tissue disorders',
@@ -664,6 +813,10 @@ export const mockEHRCatalogAssets = [
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'infectious-disease',
     'health:clinicalTrialPhase': 'Phase IV',
+    'health:euCtNumber': '2023-491234-56-DE',
+    'health:sponsor': { name: 'BioMedTech Europa SE', type: 'commercial', country: 'NL' },
+    'health:therapeuticArea': { code: 'ANTIINFECT', name: 'Antiinfectives for Systemic Use' },
+    'health:memberStatesConcerned': ['DE', 'NL', 'BE'],
     'health:medDRA': {
       socCode: '10021881',
       socName: 'Infections and infestations',
@@ -692,6 +845,10 @@ export const mockEHRCatalogAssets = [
     'health:biologicalSex': 'female',
     'health:consentStatus': 'active',
     'health:clinicalTrialPhase': 'Phase III',
+    'health:euCtNumber': '2024-507654-89-DE',
+    'health:sponsor': { name: 'Rhenus Therapeutics GmbH', type: 'commercial', country: 'DE' },
+    'health:therapeuticArea': { code: 'NERVOUS', name: 'Nervous System' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'NL', 'ES'],
     'health:medDRA': {
       socCode: '10029205',
       socName: 'Nervous system disorders',
@@ -721,6 +878,10 @@ export const mockEHRCatalogAssets = [
     'health:consentStatus': 'active',
     'health:sensitiveCategory': 'infectious-disease',
     'health:clinicalTrialPhase': 'Phase IV',
+    'health:euCtNumber': '2023-494567-12-DE',
+    'health:sponsor': { name: 'EU Oncology Consortium', type: 'non-profit', country: 'BE' },
+    'health:therapeuticArea': { code: 'ANTIINFECT', name: 'Antiinfectives for Systemic Use' },
+    'health:memberStatesConcerned': ['DE', 'FR', 'BE', 'NL'],
     'health:medDRA': {
       socCode: '10021881',
       socName: 'Infections and infestations',

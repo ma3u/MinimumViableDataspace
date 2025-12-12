@@ -19,7 +19,8 @@ import {
   Clock,
   MapPin,
   Lock,
-  Database
+  Database,
+  ExternalLink
 } from 'lucide-react';
 import type { ElectronicHealthRecord } from '../types/health';
 
@@ -328,6 +329,12 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
               <h3 className="text-lg font-semibold text-gray-900">Clinical Trial Information</h3>
             </div>
             <div className="bg-indigo-50 rounded-lg p-4 space-y-3">
+              {/* EU CTR 536/2014 Badge */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                  🇪🇺 EU CTR 536/2014 Compliant
+                </span>
+              </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-white rounded-lg p-3 shadow-sm">
                   <span className="text-sm text-gray-600">Study Phase</span>
@@ -343,10 +350,70 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
                   <div className="font-medium text-gray-900 capitalize">{subject.clinicalTrialNode.interventionModel}</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <span className="text-sm text-gray-600">Registry ID</span>
-                  <div className="font-mono text-sm text-gray-900">{subject.clinicalTrialNode.trialRegistryId}</div>
+                  <span className="text-sm text-gray-600">EU CT Number (CTIS)</span>
+                  <a 
+                    href={`https://euclinicaltrials.eu/ctis-public/search#searchCriteria={"containAll":"${subject.clinicalTrialNode.euCtNumber}","containAny":"","containNot":""}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-sm text-blue-600 hover:underline flex items-center gap-1"
+                    title="Demo trial - not in CTIS"
+                  >
+                    {subject.clinicalTrialNode.euCtNumber}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
               </div>
+              {/* Sponsor Information */}
+              {subject.clinicalTrialNode.sponsor && (
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <span className="text-sm text-gray-600">Sponsor</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      subject.clinicalTrialNode.sponsor.type === 'commercial' ? 'bg-blue-100 text-blue-800' :
+                      subject.clinicalTrialNode.sponsor.type === 'academic' ? 'bg-purple-100 text-purple-800' :
+                      'bg-green-100 text-green-800'
+                    }`}>
+                      {subject.clinicalTrialNode.sponsor.type === 'commercial' ? '🏢' :
+                       subject.clinicalTrialNode.sponsor.type === 'academic' ? '🎓' : '🏛️'}
+                      {' '}{subject.clinicalTrialNode.sponsor.type}
+                    </span>
+                    <span className="font-medium text-gray-900">{subject.clinicalTrialNode.sponsor.name}</span>
+                  </div>
+                </div>
+              )}
+              {/* Therapeutic Area */}
+              {subject.clinicalTrialNode.therapeuticArea && (
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <span className="text-sm text-gray-600">EMA Therapeutic Area</span>
+                  <div className="font-medium text-gray-900 mt-1">{subject.clinicalTrialNode.therapeuticArea.name}</div>
+                  <div className="text-xs text-gray-500">Code: {subject.clinicalTrialNode.therapeuticArea.code}</div>
+                </div>
+              )}
+              {/* Member States Concerned */}
+              {subject.clinicalTrialNode.memberStatesConcerned && subject.clinicalTrialNode.memberStatesConcerned.length > 0 && (
+                <div className="bg-white rounded-lg p-3 shadow-sm">
+                  <span className="text-sm text-gray-600">Member States Concerned</span>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    {subject.clinicalTrialNode.memberStatesConcerned.map(code => {
+                      const flagMap: Record<string, { flag: string; name: string }> = {
+                        'DE': { flag: '🇩🇪', name: 'Germany' },
+                        'FR': { flag: '🇫🇷', name: 'France' },
+                        'NL': { flag: '🇳🇱', name: 'Netherlands' },
+                        'ES': { flag: '🇪🇸', name: 'Spain' },
+                        'IT': { flag: '🇮🇹', name: 'Italy' },
+                        'BE': { flag: '🇧🇪', name: 'Belgium' },
+                        'AT': { flag: '🇦🇹', name: 'Austria' },
+                      };
+                      const country = flagMap[code];
+                      return (
+                        <span key={code} className="px-2 py-1 bg-gray-100 rounded text-sm" title={country?.name || code}>
+                          {country?.flag || ''} {code}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div className="bg-white rounded-lg p-3 shadow-sm">
                 <span className="text-sm text-gray-600">Primary Endpoint</span>
                 <div className="font-medium text-gray-900 mt-1">{subject.clinicalTrialNode.primaryEndpoint}</div>
