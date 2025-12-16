@@ -215,6 +215,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
         </section>
 
         {/* Observations Node */}
+        {subject.observationsNode && (
         <section>
           <div className="flex items-center gap-2 mb-4">
             <Activity className="w-5 h-5 text-green-600" />
@@ -223,27 +224,31 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
           <div className="bg-green-50 rounded-lg p-4">
             {/* Vitals */}
             <div className="grid md:grid-cols-3 gap-4 mb-4">
-              <VitalCard 
-                label="BMI Category" 
-                value={subject.observationsNode.latestVitals.bmiCategory.replace(/-/g, ' ')} 
-              />
-              <VitalCard 
-                label="Blood Pressure" 
-                value={subject.observationsNode.latestVitals.bloodPressureCategory.replace(/-/g, ' ')} 
-              />
-              {subject.observationsNode.latestVitals.hba1cRange && (
+              {subject.observationsNode.latestVitals?.bmiCategory && (
+                <VitalCard 
+                  label="BMI Category" 
+                  value={subject.observationsNode.latestVitals.bmiCategory.replace(/-/g, ' ')} 
+                />
+              )}
+              {subject.observationsNode.latestVitals?.bloodPressureCategory && (
+                <VitalCard 
+                  label="Blood Pressure" 
+                  value={subject.observationsNode.latestVitals.bloodPressureCategory.replace(/-/g, ' ')} 
+                />
+              )}
+              {subject.observationsNode.latestVitals?.hba1cRange && (
                 <VitalCard label="HbA1c" value={subject.observationsNode.latestVitals.hba1cRange} />
               )}
-              {subject.observationsNode.latestVitals.ejectionFractionRange && (
+              {subject.observationsNode.latestVitals?.ejectionFractionRange && (
                 <VitalCard label="Ejection Fraction" value={subject.observationsNode.latestVitals.ejectionFractionRange} />
               )}
-              {subject.observationsNode.latestVitals.edssScore && (
+              {subject.observationsNode.latestVitals?.edssScore && (
                 <VitalCard label="EDSS Score" value={subject.observationsNode.latestVitals.edssScore} />
               )}
             </div>
             
             {/* Lab Results */}
-            {subject.observationsNode.labResults.length > 0 && (
+            {subject.observationsNode.labResults && subject.observationsNode.labResults.length > 0 && (
               <div>
                 <span className="text-sm text-gray-600 mb-2 block">Lab Results (Ranges):</span>
                 <div className="bg-white rounded-lg overflow-hidden shadow-sm">
@@ -272,6 +277,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
             )}
           </div>
         </section>
+        )}
 
         {/* Procedures Node (if present) */}
         {subject.proceduresNode && subject.proceduresNode.historicalProcedures.length > 0 && (
@@ -297,6 +303,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
         )}
 
         {/* Medications Node */}
+        {subject.medicationsNode && (
         <section>
           <div className="flex items-center gap-2 mb-4">
             <Pill className="w-5 h-5 text-indigo-600" />
@@ -320,6 +327,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
             </div>
           </div>
         </section>
+        )}
 
         {/* Clinical Trial Information */}
         {subject.clinicalTrialNode && (
@@ -343,11 +351,11 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
                 </div>
                 <div className="bg-white rounded-lg p-3 shadow-sm">
                   <span className="text-sm text-gray-600">Study Type</span>
-                  <div className="text-lg font-medium text-gray-900 capitalize">{subject.clinicalTrialNode.studyType.replace(/-/g, ' ')}</div>
+                  <div className="text-lg font-medium text-gray-900 capitalize">{subject.clinicalTrialNode.studyType?.replace(/-/g, ' ') || 'N/A'}</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 shadow-sm">
                   <span className="text-sm text-gray-600">Intervention Model</span>
-                  <div className="font-medium text-gray-900 capitalize">{subject.clinicalTrialNode.interventionModel}</div>
+                  <div className="font-medium text-gray-900 capitalize">{subject.clinicalTrialNode.interventionModel || 'N/A'}</div>
                 </div>
                 <div className="bg-white rounded-lg p-3 shadow-sm">
                   <span className="text-sm text-gray-600">EU CT Number (CTIS)</span>
@@ -368,16 +376,22 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
                 <div className="bg-white rounded-lg p-3 shadow-sm">
                   <span className="text-sm text-gray-600">Sponsor</span>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      subject.clinicalTrialNode.sponsor.type === 'commercial' ? 'bg-blue-100 text-blue-800' :
-                      subject.clinicalTrialNode.sponsor.type === 'academic' ? 'bg-purple-100 text-purple-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
-                      {subject.clinicalTrialNode.sponsor.type === 'commercial' ? '🏢' :
-                       subject.clinicalTrialNode.sponsor.type === 'academic' ? '🎓' : '🏛️'}
-                      {' '}{subject.clinicalTrialNode.sponsor.type}
-                    </span>
-                    <span className="font-medium text-gray-900">{subject.clinicalTrialNode.sponsor.name}</span>
+                    {typeof subject.clinicalTrialNode.sponsor === 'object' ? (
+                      <>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          subject.clinicalTrialNode.sponsor.type === 'commercial' ? 'bg-blue-100 text-blue-800' :
+                          subject.clinicalTrialNode.sponsor.type === 'academic' ? 'bg-purple-100 text-purple-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {subject.clinicalTrialNode.sponsor.type === 'commercial' ? '🏢' :
+                           subject.clinicalTrialNode.sponsor.type === 'academic' ? '🎓' : '🏛️'}
+                          {' '}{subject.clinicalTrialNode.sponsor.type}
+                        </span>
+                        <span className="font-medium text-gray-900">{subject.clinicalTrialNode.sponsor.name}</span>
+                      </>
+                    ) : (
+                      <span className="font-medium text-gray-900">{subject.clinicalTrialNode.sponsor}</span>
+                    )}
                   </div>
                 </div>
               )}
@@ -477,7 +491,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
               {subject.signalVerificationNode.adverseEvents && subject.signalVerificationNode.adverseEvents.length > 0 && (
                 <div>
                   <div className="text-sm font-semibold text-gray-700 mb-2">Reported Adverse Events (ADRs):</div>
-                  {subject.signalVerificationNode.adverseEvents.map((ae: any, i: number) => (
+                  {subject.signalVerificationNode.adverseEvents.map((ae: Record<string, unknown>, i: number) => (
                     <div key={i} className="bg-white rounded-lg p-4 shadow-sm mb-2">
                       <div className="flex items-center justify-between mb-2">
                         <div className="font-semibold text-gray-900">{ae.medDRAPT}</div>
@@ -531,47 +545,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
           </section>
         )}
 
-        {/* Anamnesis (Medical History) */}
-        {subject.anamnesisNode && (
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <FileText className="w-5 h-5 text-teal-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Anamnesis (Medical History)</h3>
-            </div>
-            <div className="bg-teal-50 rounded-lg p-4 space-y-3">
-              {Object.entries(subject.anamnesisNode).map(([key, step]: [string, any]) => (
-                <div key={key} className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-teal-100 text-teal-700 text-sm font-bold">
-                      {step.stepNumber}
-                    </span>
-                    <div>
-                      <div className="font-semibold text-gray-900">{step.stepName}</div>
-                      <div className="text-xs text-gray-500">{step.stepNameDE}</div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-700 mb-2">{step.summary}</p>
-                  {step.relevantFindings && step.relevantFindings.length > 0 && (
-                    <div className="flex gap-2 flex-wrap mt-2">
-                      {step.relevantFindings.map((finding: string, i: number) => (
-                        <span key={i} className="px-2 py-1 bg-teal-50 text-teal-700 rounded text-xs">
-                          • {finding}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="mt-2 text-xs text-gray-500">
-                    Clinical Significance: <span className={`font-medium ${
-                      step.clinicalSignificance === 'high' ? 'text-red-600' :
-                      step.clinicalSignificance === 'moderate' ? 'text-yellow-600' :
-                      'text-green-600'
-                    }`}>{step.clinicalSignificance}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+
 
         {/* Study Eligibility */}
         <section>
@@ -588,6 +562,64 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
             ))}
           </div>
         </section>
+
+        {/* MedDRA Classification */}
+        {subject.medDRANode && (
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-semibold text-gray-900">MedDRA Classification</h3>
+            </div>
+            <div className="bg-purple-50 rounded-lg p-4 grid md:grid-cols-2 gap-4">
+              <div className="bg-white rounded-lg p-3 shadow-sm">
+                <span className="text-sm text-gray-600">System Organ Class (SOC)</span>
+                <div className="font-medium text-gray-900">{subject.medDRANode.primarySOC.name}</div>
+                <div className="text-xs text-gray-500 font-mono">{subject.medDRANode.primarySOC.code}</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 shadow-sm">
+                <span className="text-sm text-gray-600">Preferred Term (PT)</span>
+                <div className="font-medium text-gray-900">{subject.medDRANode.preferredTerm.name}</div>
+                <div className="text-xs text-gray-500 font-mono">{subject.medDRANode.preferredTerm.code}</div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Anamnesis (Medical History) */}
+        {subject.anamnesisNode && (
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold text-gray-900">Anamnesis (Medical History)</h3>
+            </div>
+            <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+              {Object.entries(subject.anamnesisNode).sort((a: [string, Record<string, unknown>], b: [string, Record<string, unknown>]) => (a[1].stepNumber as number) - (b[1].stepNumber as number)).map(([key, step]: [string, Record<string, unknown>]) => (
+                <div key={key} className="bg-white rounded-lg p-3 shadow-sm">
+                  <div className="flex justify-between items-start mb-1">
+                    <span className="font-medium text-gray-900">{step.stepName}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      step.clinicalSignificance === 'high' ? 'bg-red-100 text-red-800' :
+                      step.clinicalSignificance === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {step.clinicalSignificance}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-700">{step.summary}</div>
+                  {step.relevantFindings && step.relevantFindings.length > 0 && (
+                    <div className="mt-2 flex gap-2 flex-wrap">
+                      {step.relevantFindings.map((finding: string, i: number) => (
+                        <span key={i} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+                          {finding}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Provenance Node */}
         <section className="border-t pt-4">

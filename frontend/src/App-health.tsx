@@ -28,9 +28,11 @@ import {
   Stethoscope,
   Search,
   FileJson,
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
+import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
 import { 
   mockEHRCatalogAssets, 
   mockEHRData, 
@@ -39,6 +41,7 @@ import {
   healthParticipants,
   mockNegotiationFlow,
   mockTransferFlow,
+  mockComputeFlow,
   medicalCategories,
   categoryBackgrounds,
   consentPurposes,
@@ -53,43 +56,43 @@ import type { ElectronicHealthRecord } from './types/health';
 // GitHub repository URL
 const GITHUB_REPO_URL = 'https://github.com/ma3u/MinimumViableDataspace/tree/health-demo';
 
-type DemoPhase = 'intro' | 'catalog' | 'negotiation' | 'transfer' | 'complete';
+type DemoPhase = 'intro' | 'catalog' | 'negotiation' | 'transfer' | 'compute' | 'complete';
 
 interface MockEHRAsset {
   '@id': string;
   'dct:title': string;
   'dct:description': string;
-  'health:icdCode': string;
-  'health:diagnosis': string;
-  'health:category': string;
-  'health:ageBand': string;
-  'health:biologicalSex': string;
-  'health:consentStatus': string;
-  'health:sensitiveCategory'?: string;
-  'health:clinicalTrialPhase'?: string;
+  'healthdcatap:icdCode': string;
+  'healthdcatap:diagnosis': string;
+  'healthdcatap:category': string;
+  'healthdcatap:ageRange': string;
+  'healthdcatap:biologicalSex': string;
+  'healthdcatap:consentStatus': string;
+  'healthdcatap:sensitiveCategory'?: string;
+  'healthdcatap:clinicalTrialPhase'?: string;
   // EU CTR 536/2014 Fields
-  'health:euCtNumber'?: string;
-  'health:sponsor'?: {
+  'healthdcatap:euCtNumber'?: string;
+  'healthdcatap:sponsor'?: {
     name: string;
     type: 'commercial' | 'academic' | 'non-profit';
     country: string;
   };
-  'health:therapeuticArea'?: {
+  'healthdcatap:therapeuticArea'?: {
     code: string;
     name: string;
   };
-  'health:memberStatesConcerned'?: string[];
-  'health:medDRA'?: {
+  'healthdcatap:memberStates'?: string[];
+  'healthdcatap:medDRA'?: {
     socCode: string;
     socName: string;
     ptCode: string;
     ptName: string;
   };
-  'health:signalStatus'?: {
+  'healthdcatap:signalStatus'?: {
     hasActiveSignal: boolean;
     adrCount: number;
   };
-  'health:consent'?: {
+  'healthdcatap:consent'?: {
     purposes: string[];
     restrictions: string[];
     validUntil: string;
@@ -102,6 +105,7 @@ function AppHealth() {
   const [selectedAsset, setSelectedAsset] = useState<MockEHRAsset | null>(null);
   const [negotiationStep, setNegotiationStep] = useState(0);
   const [transferStep, setTransferStep] = useState(0);
+  const [computeStep, setComputeStep] = useState(0);
   const [ehrData, setEhrData] = useState<ElectronicHealthRecord | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showJson, setShowJson] = useState(false);
@@ -120,22 +124,22 @@ function AppHealth() {
 
   // Filter assets based on category, age band, phase, MedDRA SOC, EU CTR fields, and search
   const filteredAssets = mockEHRCatalogAssets.filter(asset => {
-    const matchesCategory = categoryFilter === 'all' || asset['health:category'] === categoryFilter;
-    const matchesAgeBand = ageBandFilter === 'all' || asset['health:ageBand'] === ageBandFilter;
-    const matchesPhase = phaseFilter === 'all' || asset['health:clinicalTrialPhase'] === phaseFilter;
-    const matchesMedDRA = medDRAFilter === 'all' || asset['health:medDRA']?.socCode === medDRAFilter;
-    const matchesSponsorType = sponsorTypeFilter === 'all' || asset['health:sponsor']?.type === sponsorTypeFilter;
-    const matchesTherapeuticArea = therapeuticAreaFilter === 'all' || asset['health:therapeuticArea']?.code === therapeuticAreaFilter;
+    const matchesCategory = categoryFilter === 'all' || asset['healthdcatap:category'] === categoryFilter;
+    const matchesAgeBand = ageBandFilter === 'all' || asset['healthdcatap:ageRange'] === ageBandFilter;
+    const matchesPhase = phaseFilter === 'all' || asset['healthdcatap:clinicalTrialPhase'] === phaseFilter;
+    const matchesMedDRA = medDRAFilter === 'all' || asset['healthdcatap:medDRA']?.socCode === medDRAFilter;
+    const matchesSponsorType = sponsorTypeFilter === 'all' || asset['healthdcatap:sponsor']?.type === sponsorTypeFilter;
+    const matchesTherapeuticArea = therapeuticAreaFilter === 'all' || asset['healthdcatap:therapeuticArea']?.code === therapeuticAreaFilter;
     const matchesSearch = searchTerm === '' || 
       asset['dct:title'].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:icdCode'].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:diagnosis'].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:medDRA']?.socName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:medDRA']?.ptName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:clinicalTrialPhase']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:euCtNumber']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:sponsor']?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['health:therapeuticArea']?.name.toLowerCase().includes(searchTerm.toLowerCase());
+      asset['healthdcatap:icdCode'].toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:diagnosis'].toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:medDRA']?.socName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:medDRA']?.ptName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:clinicalTrialPhase']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:euCtNumber']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:sponsor']?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:therapeuticArea']?.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesAgeBand && matchesPhase && matchesMedDRA && matchesSponsorType && matchesTherapeuticArea && matchesSearch;
   });
 
@@ -149,6 +153,7 @@ function AppHealth() {
     setSelectedAsset(null);
     setNegotiationStep(0);
     setTransferStep(0);
+    setComputeStep(0);
     setEhrData(null);
     setIsAnimating(false);
     setShowJson(false);
@@ -161,7 +166,25 @@ function AppHealth() {
       await new Promise(resolve => setTimeout(resolve, 800));
     }
     setIsAnimating(false);
-    setPhase('transfer');
+    
+    // Check if asset requires confidential compute
+    if (selectedAsset?.['healthdcatap:sensitiveCategory'] === 'genomics' || selectedAsset?.['healthdcatap:sensitiveCategory'] === 'mental-health') {
+      setPhase('compute');
+      simulateCompute();
+    } else {
+      setPhase('transfer');
+    }
+  };
+
+  const simulateCompute = async () => {
+    setIsAnimating(true);
+    for (let i = 0; i < mockComputeFlow.length; i++) {
+      setComputeStep(i);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    setIsAnimating(false);
+    setPhase('complete');
+    loadEhrData();
   };
 
   const simulateTransfer = async () => {
@@ -172,6 +195,12 @@ function AppHealth() {
       await new Promise(resolve => setTimeout(resolve, 800));
     }
     
+    setIsAnimating(false);
+    setPhase('complete');
+    loadEhrData();
+  };
+
+  const loadEhrData = async () => {
     // Load the EHR data - try backend first, fall back to mock
     if (selectedAsset) {
       try {
@@ -187,9 +216,6 @@ function AppHealth() {
         setEhrData(mockEHRData[selectedAsset['@id']]);
       }
     }
-    
-    setIsAnimating(false);
-    setPhase('complete');
   };
 
   return (
@@ -292,14 +318,20 @@ function AppHealth() {
           <div className="space-y-8">
             {/* Hero Section */}
             <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl p-8 text-white">
-              <div className="max-w-3xl">
-                <h2 className="text-3xl font-bold mb-4">
-                  Sovereign Health Data Exchange via Dataspace Protocol
-                </h2>
+              <div className="w-full">
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  <h2 className="text-3xl font-bold">
+                    Sovereign Health Data Exchange via Dataspace Protocol
+                  </h2>
+                  <span className="px-3 py-1 bg-white/20 text-white text-sm font-medium rounded-full border border-white/30">
+                    HealthDCAT-AP v1.0
+                  </span>
+                </div>
                 <p className="text-blue-100 text-lg mb-6">
                   This demo illustrates how anonymized Electronic Health Records (EHR) can be securely 
                   exchanged between hospitals and research institutes using the Dataspace Protocol (DSP). 
-                  It demonstrates consent-based data sharing compliant with GDPR, EHDS, and German health data regulations.
+                  All 21 datasets are fully compliant with <strong>HealthDCAT-AP</strong> for EHDS interoperability, 
+                  including mandatory metadata for sensitive health data discovery across EU health data portals.
                 </p>
                 <div className="flex gap-4 flex-wrap">
                   <button
@@ -362,22 +394,114 @@ function AppHealth() {
               </div>
             </div>
 
+            {/* HealthDCAT-AP Compliance Highlight */}
+            <div className="bg-gradient-to-r from-teal-50 via-cyan-50 to-blue-50 rounded-xl p-6 shadow-sm border border-teal-200">
+              <div className="flex items-start gap-4">
+                <div className="bg-teal-600 p-3 rounded-xl">
+                  <Database className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold text-gray-900">HealthDCAT-AP v1.0 Compliant</h3>
+                    <span className="px-2 py-0.5 bg-teal-100 text-teal-800 text-xs font-medium rounded-full">NEW</span>
+                  </div>
+                  <p className="text-gray-600 mb-4">
+                    All 21 EHR datasets are fully compliant with the HealthDCAT-AP specification for the European Health Data Space (EHDS). 
+                    Each dataset includes mandatory properties for sensitive health data, enabling seamless discovery and interoperability across EU health data portals.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-4 mb-4">
+                    <div className="bg-white/60 rounded-lg p-3 border border-teal-100">
+                      <div className="text-2xl font-bold text-teal-700">21</div>
+                      <div className="text-sm text-gray-600">EHR Datasets with full metadata</div>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-3 border border-teal-100">
+                      <div className="text-2xl font-bold text-teal-700">20+</div>
+                      <div className="text-sm text-gray-600">Mandatory properties per dataset</div>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-3 border border-teal-100">
+                      <div className="text-2xl font-bold text-teal-700">100%</div>
+                      <div className="text-sm text-gray-600">EHDS Regulation compliant</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {[
+                      'dcat:contactPoint',
+                      'dct:publisher',
+                      'healthdcatap:hdab',
+                      'healthdcatap:healthTheme',
+                      'dqv:hasQualityAnnotation',
+                      'healthdcatap:analytics',
+                      'dpv:hasPurpose',
+                      'dpv:hasLegalBasis'
+                    ].map((prop) => (
+                      <span key={prop} className="px-2 py-1 bg-white text-teal-700 text-xs font-mono rounded border border-teal-200">
+                        {prop}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-3">
+                    <a
+                      href="https://ehds.healthdataportal.eu/editor2/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors text-sm"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Open EHDS Data Model Editor
+                    </a>
+                    <a
+                      href="https://www.healthinformationportal.eu/healthdcat-ap"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-white text-teal-700 border border-teal-300 rounded-lg font-medium hover:bg-teal-50 transition-colors text-sm"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      HealthDCAT-AP Specification
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Compliance Badges */}
             <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Regulatory Compliance</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Regulatory & Standards Compliance</h3>
               <div className="flex gap-4 flex-wrap">
                 {[
-                  { name: 'EU CTR 536/2014', desc: 'Clinical Trials Regulation' },
-                  { name: 'GDPR', desc: 'General Data Protection Regulation' },
-                  { name: 'EHDS', desc: 'European Health Data Space' },
-                  { name: 'GDNG', desc: 'Gesundheitsdatennutzungsgesetz' },
-                  { name: 'k-Anonymity', desc: 'De-identification Standard (k=5)' },
+                  { name: 'HealthDCAT-AP', desc: 'Health Data Catalog Application Profile', color: 'teal' },
+                  { name: 'EHDS 2025/327', desc: 'European Health Data Space Regulation', color: 'blue' },
+                  { name: 'EU CTR 536/2014', desc: 'Clinical Trials Regulation', color: 'green' },
+                  { name: 'GDPR', desc: 'General Data Protection Regulation', color: 'green' },
+                  { name: 'GDNG', desc: 'Gesundheitsdatennutzungsgesetz', color: 'green' },
+                  { name: 'FHIR R4', desc: 'HL7 Fast Healthcare Interoperability', color: 'purple' },
+                  { name: 'MedDRA v27.0', desc: 'Medical Dictionary for Regulatory Activities', color: 'purple' },
+                  { name: 'k-Anonymity', desc: 'De-identification Standard (k=5)', color: 'green' },
                 ].map((badge) => (
-                  <div key={badge.name} className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-                    <Shield className="w-4 h-4 text-green-600" />
+                  <div key={badge.name} className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                    badge.color === 'teal' ? 'bg-teal-50 border border-teal-200' :
+                    badge.color === 'blue' ? 'bg-blue-50 border border-blue-200' :
+                    badge.color === 'purple' ? 'bg-purple-50 border border-purple-200' :
+                    'bg-green-50 border border-green-200'
+                  }`}>
+                    <Shield className={`w-4 h-4 ${
+                      badge.color === 'teal' ? 'text-teal-600' :
+                      badge.color === 'blue' ? 'text-blue-600' :
+                      badge.color === 'purple' ? 'text-purple-600' :
+                      'text-green-600'
+                    }`} />
                     <div>
-                      <div className="font-medium text-green-800">{badge.name}</div>
-                      <div className="text-xs text-green-600">{badge.desc}</div>
+                      <div className={`font-medium ${
+                        badge.color === 'teal' ? 'text-teal-800' :
+                        badge.color === 'blue' ? 'text-blue-800' :
+                        badge.color === 'purple' ? 'text-purple-800' :
+                        'text-green-800'
+                      }`}>{badge.name}</div>
+                      <div className={`text-xs ${
+                        badge.color === 'teal' ? 'text-teal-600' :
+                        badge.color === 'blue' ? 'text-blue-600' :
+                        badge.color === 'purple' ? 'text-purple-600' :
+                        'text-green-600'
+                      }`}>{badge.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -409,6 +533,99 @@ function AppHealth() {
                 ))}
               </div>
             </div>
+
+            {/* HealthDCAT-AP Dataset Properties */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">HealthDCAT-AP Dataset Properties</h3>
+                  <p className="text-sm text-gray-500 mt-1">Each EHR dataset includes these mandatory and recommended properties for EHDS compliance</p>
+                </div>
+                <a
+                  href="https://healthdcat-ap.github.io/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                >
+                  Full Specification <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { 
+                    prop: 'dcat:contactPoint', 
+                    desc: 'Research Data Steward contact information',
+                    type: 'MANDATORY',
+                    example: 'vcard:Kind with email, phone, organization'
+                  },
+                  { 
+                    prop: 'dct:publisher', 
+                    desc: 'Publishing organization with full address',
+                    type: 'MANDATORY',
+                    example: 'foaf:Agent with name, homepage, address'
+                  },
+                  { 
+                    prop: 'healthdcatap:hdab', 
+                    desc: 'Health Data Access Body (HDAB)',
+                    type: 'MANDATORY',
+                    example: 'Forschungsdatenzentrum Gesundheit (FDZ)'
+                  },
+                  { 
+                    prop: 'healthdcatap:healthTheme', 
+                    desc: 'Wikidata URIs for health topics',
+                    type: 'MANDATORY',
+                    example: 'Q12206 (Diabetes), Q12078 (Cancer)...'
+                  },
+                  { 
+                    prop: 'dqv:hasQualityAnnotation', 
+                    desc: 'Data quality certificate',
+                    type: 'RECOMMENDED',
+                    example: 'Quality assessment with oa:hasTarget'
+                  },
+                  { 
+                    prop: 'healthdcatap:analytics', 
+                    desc: 'Pre-computed analytics distribution',
+                    type: 'RECOMMENDED',
+                    example: 'CSV/PDF reports with accessURL'
+                  },
+                  { 
+                    prop: 'dpv:hasPurpose', 
+                    desc: 'Data processing purposes',
+                    type: 'MANDATORY',
+                    example: 'AcademicResearch, ClinicalResearch'
+                  },
+                  { 
+                    prop: 'dpv:hasLegalBasis', 
+                    desc: 'GDPR legal basis for processing',
+                    type: 'MANDATORY',
+                    example: 'GDPR Art. 6(1)(a), Art. 9(2)(j)'
+                  },
+                  { 
+                    prop: 'dcatap:applicableLegislation', 
+                    desc: 'Applicable EU regulations',
+                    type: 'MANDATORY',
+                    example: 'EHDS 2025/327, GDPR, DGA'
+                  },
+                ].map((item) => (
+                  <div key={item.prop} className={`rounded-lg p-4 border ${
+                    item.type === 'MANDATORY' ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <code className={`text-sm font-medium ${
+                        item.type === 'MANDATORY' ? 'text-blue-800' : 'text-gray-800'
+                      }`}>{item.prop}</code>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        item.type === 'MANDATORY' 
+                          ? 'bg-blue-200 text-blue-800' 
+                          : 'bg-gray-200 text-gray-700'
+                      }`}>{item.type}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-1">{item.desc}</p>
+                    <p className="text-xs text-gray-500 italic">e.g., {item.example}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -419,6 +636,21 @@ function AppHealth() {
               phase={healthDspPhases.catalog}
               icon={<Database className="w-6 h-6" />}
             />
+            <div className="flex justify-end -mt-4 mb-2 gap-4 items-center">
+               <button 
+                 onClick={downloadHealthDCATAP}
+                 className="text-sm text-blue-600 hover:underline flex items-center gap-1 font-medium"
+               >
+                 Export for EHDS Editor <Download className="w-3 h-3" />
+               </button>
+               <div className="h-4 w-px bg-gray-300"></div>
+               <a href="https://www.healthinformationportal.eu/healthdcat-ap" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                 View HealthDCAT-AP Specification <ExternalLink className="w-3 h-3" />
+               </a>
+               <a href="https://ehds.healthdataportal.eu/editor2/" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                 Open Data Model Editor <ExternalLink className="w-3 h-3" />
+               </a>
+            </div>
 
             {/* Protocol Flow */}
             <div className="bg-white rounded-xl p-6 shadow-sm border">
@@ -508,7 +740,7 @@ function AppHealth() {
                     >
                       <option value="all">All Categories ({mockEHRCatalogAssets.length})</option>
                       {Object.entries(medicalCategories).map(([key, cat]) => {
-                        const count = mockEHRCatalogAssets.filter(a => a['health:category'] === key).length;
+                        const count = mockEHRCatalogAssets.filter(a => a['healthdcatap:category'] === key).length;
                         if (count === 0) return null;
                         return (
                           <option key={key} value={key}>
@@ -529,8 +761,8 @@ function AppHealth() {
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                     >
                       <option value="all">All Ages</option>
-                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:ageBand']))).sort().map(age => {
-                        const count = mockEHRCatalogAssets.filter(a => a['health:ageBand'] === age).length;
+                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['healthdcatap:ageRange']))).sort().map(age => {
+                        const count = mockEHRCatalogAssets.filter(a => a['healthdcatap:ageRange'] === age).length;
                         return (
                           <option key={age} value={age}>
                             {age} ({count})
@@ -550,8 +782,8 @@ function AppHealth() {
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                     >
                       <option value="all">All Phases</option>
-                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:clinicalTrialPhase']).filter(Boolean))).sort().map(phase => {
-                        const count = mockEHRCatalogAssets.filter(a => a['health:clinicalTrialPhase'] === phase).length;
+                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['healthdcatap:clinicalTrialPhase']).filter(Boolean))).sort().map(phase => {
+                        const count = mockEHRCatalogAssets.filter(a => a['healthdcatap:clinicalTrialPhase'] === phase).length;
                         const phaseName = phase === 'Phase I' ? 'Phase I - First-in-Human' :
                                         phase === 'Phase II' ? 'Phase II - Efficacy' :
                                         phase === 'Phase III' ? 'Phase III - Confirmation' :
@@ -575,10 +807,10 @@ function AppHealth() {
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                     >
                       <option value="all">All SOCs</option>
-                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:medDRA']?.socCode).filter(Boolean))).sort().map(socCode => {
-                        const asset = mockEHRCatalogAssets.find(a => a['health:medDRA']?.socCode === socCode);
-                        const socName = asset?.['health:medDRA']?.socName;
-                        const count = mockEHRCatalogAssets.filter(a => a['health:medDRA']?.socCode === socCode).length;
+                      {Array.from(new Set(mockEHRCatalogAssets.map(a => a['healthdcatap:medDRA']?.socCode).filter(Boolean))).sort().map(socCode => {
+                        const asset = mockEHRCatalogAssets.find(a => a['healthdcatap:medDRA']?.socCode === socCode);
+                        const socName = asset?.['healthdcatap:medDRA']?.socName;
+                        const count = mockEHRCatalogAssets.filter(a => a['healthdcatap:medDRA']?.socCode === socCode).length;
                         return (
                           <option key={socCode} value={socCode}>
                             {socName} ({count})
@@ -613,7 +845,7 @@ function AppHealth() {
                           >
                             <option value="all">All Types</option>
                             {Object.entries(sponsorTypes).map(([key, sponsor]) => {
-                              const count = mockEHRCatalogAssets.filter(a => a['health:sponsor']?.type === key).length;
+                              const count = mockEHRCatalogAssets.filter(a => a['healthdcatap:sponsor']?.type === key).length;
                               if (count === 0) return null;
                               return (
                                 <option key={key} value={key}>
@@ -634,9 +866,9 @@ function AppHealth() {
                             className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                           >
                             <option value="all">All Areas</option>
-                            {Array.from(new Set(mockEHRCatalogAssets.map(a => a['health:therapeuticArea']?.code).filter(Boolean))).sort().map(code => {
+                            {Array.from(new Set(mockEHRCatalogAssets.map(a => a['healthdcatap:therapeuticArea']?.code).filter(Boolean))).sort().map(code => {
                               const area = emaTherapeuticAreas[code as keyof typeof emaTherapeuticAreas];
-                              const count = mockEHRCatalogAssets.filter(a => a['health:therapeuticArea']?.code === code).length;
+                              const count = mockEHRCatalogAssets.filter(a => a['healthdcatap:therapeuticArea']?.code === code).length;
                               return (
                                 <option key={code} value={code}>
                                   {area?.name || code} ({count})
@@ -671,7 +903,7 @@ function AppHealth() {
                     )}
                     {medDRAFilter !== 'all' && (
                       <button onClick={() => setMedDRAFilter('all')} className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs flex items-center gap-1 hover:bg-pink-200">
-                        {mockEHRCatalogAssets.find(a => a['health:medDRA']?.socCode === medDRAFilter)?.['health:medDRA']?.socName} ×
+                        {mockEHRCatalogAssets.find(a => a['healthdcatap:medDRA']?.socCode === medDRAFilter)?.['healthdcatap:medDRA']?.socName} ×
                       </button>
                     )}
                     {sponsorTypeFilter !== 'all' && (
@@ -716,8 +948,8 @@ function AppHealth() {
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredAssets.map(asset => {
-                  const category = medicalCategories[asset['health:category'] as keyof typeof medicalCategories];
-                  const bgImage = categoryBackgrounds[asset['health:category']];
+                  const category = medicalCategories[asset['healthdcatap:category'] as keyof typeof medicalCategories];
+                  const bgImage = categoryBackgrounds[asset['healthdcatap:category']];
                   return (
                     <div 
                       key={asset['@id']}
@@ -744,14 +976,14 @@ function AppHealth() {
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <span className="text-lg">{category?.icon || '📋'}</span>
-                            <span className="font-mono text-xs text-gray-600 bg-white/80 px-1.5 py-0.5 rounded">{asset['health:icdCode']}</span>
+                            <span className="font-mono text-xs text-gray-600 bg-white/80 px-1.5 py-0.5 rounded">{asset['healthdcatap:icdCode']}</span>
                           </div>
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            asset['health:consentStatus'] === 'active' 
+                            asset['healthdcatap:consentStatus'] === 'active' 
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
                           }`}>
-                            Consent: {asset['health:consentStatus']}
+                            Consent: {asset['healthdcatap:consentStatus']}
                           </span>
                         </div>
                         <h4 className="font-semibold text-gray-900 mb-1">{asset['dct:title']}</h4>
@@ -763,68 +995,68 @@ function AppHealth() {
                             </span>
                           )}
                           <span className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded text-xs">
-                            Age: {asset['health:ageBand']}
+                            Age: {asset['healthdcatap:ageRange']}
                           </span>
                           <span className="px-2 py-1 bg-purple-50 border border-purple-200 text-purple-700 rounded text-xs capitalize">
-                            {asset['health:biologicalSex']}
+                            {asset['healthdcatap:biologicalSex']}
                           </span>
                         </div>
-                        {asset['health:clinicalTrialPhase'] && (
+                        {asset['healthdcatap:clinicalTrialPhase'] && (
                           <div className="mb-2">
                             <span className="px-2 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded text-xs font-medium">
-                              📋 {asset['health:clinicalTrialPhase']}
+                              📋 {asset['healthdcatap:clinicalTrialPhase']}
                             </span>
                           </div>
                         )}
                         {/* EU CTR 536/2014 Fields */}
-                        {asset['health:euCtNumber'] && (
+                        {asset['healthdcatap:euCtNumber'] && (
                           <div className="mb-2 flex flex-wrap gap-2">
                             <span className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded text-xs font-mono">
-                              🇪🇺 {asset['health:euCtNumber']}
+                              🇪🇺 {asset['healthdcatap:euCtNumber']}
                             </span>
-                            {asset['health:sponsor'] && (
+                            {asset['healthdcatap:sponsor'] && (
                               <span className={`px-2 py-1 rounded text-xs ${
-                                sponsorTypes[asset['health:sponsor'].type as keyof typeof sponsorTypes]?.color || 'bg-gray-100 text-gray-700'
+                                sponsorTypes[asset['healthdcatap:sponsor'].type as keyof typeof sponsorTypes]?.color || 'bg-gray-100 text-gray-700'
                               }`}>
-                                {sponsorTypes[asset['health:sponsor'].type as keyof typeof sponsorTypes]?.icon} {asset['health:sponsor'].name}
+                                {sponsorTypes[asset['healthdcatap:sponsor'].type as keyof typeof sponsorTypes]?.icon} {asset['healthdcatap:sponsor'].name}
                               </span>
                             )}
                           </div>
                         )}
                         {/* Member States - only show for multinational trials */}
-                        {asset['health:memberStatesConcerned'] && asset['health:memberStatesConcerned'].length > 1 && (
+                        {asset['healthdcatap:memberStates'] && asset['healthdcatap:memberStates'].length > 1 && (
                           <div className="mb-2 flex items-center gap-1 text-xs">
                             <span className="text-gray-500">Countries:</span>
-                            {asset['health:memberStatesConcerned'].map(code => (
+                            {asset['healthdcatap:memberStates'].map(code => (
                               <span key={code} title={memberStateFlags[code]?.name}>
                                 {memberStateFlags[code]?.flag}
                               </span>
                             ))}
                           </div>
                         )}
-                        {asset['health:medDRA'] && (
+                        {asset['healthdcatap:medDRA'] && (
                           <div className="bg-gray-50 rounded p-2 text-xs space-y-1">
                             <div className="flex items-center gap-1 text-gray-700">
                               <span className="font-semibold">MedDRA SOC:</span>
-                              <span>{asset['health:medDRA'].socName}</span>
+                              <span>{asset['healthdcatap:medDRA'].socName}</span>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600">
                               <span className="font-semibold">PT:</span>
-                              <span>{asset['health:medDRA'].ptName}</span>
-                              <span className="font-mono ml-1 text-gray-500">({asset['health:medDRA'].ptCode})</span>
+                              <span>{asset['healthdcatap:medDRA'].ptName}</span>
+                              <span className="font-mono ml-1 text-gray-500">({asset['healthdcatap:medDRA'].ptCode})</span>
                             </div>
                           </div>
                         )}
-                        {asset['health:signalStatus'] && asset['health:signalStatus'].adrCount > 0 && (
+                        {asset['healthdcatap:signalStatus'] && asset['healthdcatap:signalStatus'].adrCount > 0 && (
                           <div className="mt-2 flex items-center gap-1 text-xs text-orange-700">
                             <AlertCircle className="w-3 h-3" />
-                            <span>{asset['health:signalStatus'].adrCount} ADR(s) reported</span>
+                            <span>{asset['healthdcatap:signalStatus'].adrCount} ADR(s) reported</span>
                           </div>
                         )}
-                        {asset['health:sensitiveCategory'] && (
+                        {asset['healthdcatap:sensitiveCategory'] && (
                           <div className="mt-2 flex items-center gap-1 text-xs text-amber-700">
                             <Shield className="w-3 h-3" />
-                            <span>Sensitive: {asset['health:sensitiveCategory'].replace('-', ' ')}</span>
+                            <span>Sensitive: {asset['healthdcatap:sensitiveCategory'].replace('-', ' ')}</span>
                           </div>
                         )}
                       </div>
@@ -930,7 +1162,7 @@ function AppHealth() {
             </div>
 
             {/* Patient Consent Display */}
-            {selectedAsset['health:consent'] && (
+            {selectedAsset['healthdcatap:consent'] && (
               <div className="bg-white rounded-xl p-6 shadow-sm border">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Shield className="w-5 h-5 text-green-600" />
@@ -942,12 +1174,12 @@ function AppHealth() {
                       <span className="text-2xl">✅</span>
                       <div>
                         <div className="font-medium text-green-800">Consent Active</div>
-                        <div className="text-sm text-green-600">Granted by: {selectedAsset['health:consent'].grantor}</div>
+                        <div className="text-sm text-green-600">Granted by: {selectedAsset['healthdcatap:consent'].grantor}</div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm text-gray-500">Valid Until</div>
-                      <div className="font-medium text-green-800">{selectedAsset['health:consent'].validUntil}</div>
+                      <div className="font-medium text-green-800">{selectedAsset['healthdcatap:consent'].validUntil}</div>
                     </div>
                   </div>
                 </div>
@@ -959,7 +1191,7 @@ function AppHealth() {
                       ✓ Permitted Data Use Purposes
                     </h4>
                     <div className="space-y-2">
-                      {selectedAsset['health:consent'].purposes.map((purpose) => {
+                      {selectedAsset['healthdcatap:consent'].purposes.map((purpose) => {
                         const purposeInfo = consentPurposes[purpose as keyof typeof consentPurposes];
                         return purposeInfo ? (
                           <div key={purpose} className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
@@ -980,7 +1212,7 @@ function AppHealth() {
                       ✗ Consent Restrictions
                     </h4>
                     <div className="space-y-2">
-                      {selectedAsset['health:consent'].restrictions.map((restriction) => {
+                      {selectedAsset['healthdcatap:consent'].restrictions.map((restriction) => {
                         const restrictionInfo = consentRestrictions[restriction as keyof typeof consentRestrictions];
                         return restrictionInfo ? (
                           <div key={restriction} className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-lg p-3">
@@ -1162,6 +1394,97 @@ function AppHealth() {
           </div>
         )}
 
+        {/* COMPUTE PHASE */}
+        {phase === 'compute' && selectedAsset && (
+          <div className="space-y-6">
+            <PhaseHeader 
+              phase={healthDspPhases.compute}
+              icon={<Lock className="w-6 h-6" />}
+            />
+
+            {/* Compute State Machine */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Confidential Compute Workflow</h3>
+              <div className="flex items-center justify-center gap-4 overflow-x-auto pb-4">
+                {mockComputeFlow.map((state, i) => (
+                  <div key={i} className="flex items-center">
+                    <div className={`flex flex-col items-center px-6 py-3 rounded-lg transition-all ${
+                      i < computeStep 
+                        ? 'bg-indigo-100 text-indigo-800'
+                        : i === computeStep
+                          ? 'bg-indigo-600 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      {i < computeStep ? (
+                        <CheckCircle className="w-8 h-8 mb-1" />
+                      ) : i === computeStep && isAnimating ? (
+                        <Loader2 className="w-8 h-8 mb-1 animate-spin" />
+                      ) : (
+                        <Lock className="w-8 h-8 mb-1" />
+                      )}
+                      <span className="text-sm font-medium whitespace-nowrap">
+                        {state.label}
+                      </span>
+                    </div>
+                    {i < mockComputeFlow.length - 1 && (
+                      <ArrowRight className={`w-6 h-6 mx-2 ${
+                        i < computeStep ? 'text-indigo-500' : 'text-gray-300'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Compute Details */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h3 className="font-semibold text-gray-900 mb-4">Secure Enclave Configuration</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-indigo-50 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-indigo-800 mb-2">Execution Environment</h4>
+                  <div className="bg-white rounded p-3">
+                    <code className="text-sm">Intel SGX / AMD SEV-SNP</code>
+                  </div>
+                  <p className="text-xs text-indigo-700 mt-2">
+                    Code and data are isolated from the host OS and hypervisor.
+                  </p>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-purple-800 mb-2">Encryption Policy</h4>
+                  <div className="bg-white rounded p-3 font-mono text-xs">
+                    Security.confidentialComputing = true
+                    <br/>
+                    Security.encryptionInTransit = true
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="flex justify-end">
+              {computeStep < mockComputeFlow.length - 1 ? (
+                <button
+                  onClick={simulateCompute}
+                  disabled={isAnimating}
+                  className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                >
+                  {isAnimating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Running Secure Analysis...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5" />
+                      Start Secure Analysis
+                    </>
+                  )}
+                </button>
+              ) : null}
+            </div>
+          </div>
+        )}
+
         {/* COMPLETE PHASE */}
         {phase === 'complete' && selectedAsset && (
           <div className="space-y-6">
@@ -1191,13 +1514,13 @@ function AppHealth() {
                       <p className="text-blue-200 mt-1">FHIR Bundle - De-identified for Research</p>
                     </div>
                     <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                      {selectedAsset['health:consentStatus']}
+                      {selectedAsset['healthdcatap:consentStatus']}
                     </span>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-blue-200">Pseudonym ID:</span>
-                      <span className="ml-2 font-mono">{selectedAsset['health:consent']?.grantor.match(/[A-Z0-9]+\)?$/)?.[0]?.replace(')', '') || 'ANON-' + selectedAsset['@id'].split(':').pop()}</span>
+                      <span className="ml-2 font-mono">{selectedAsset['healthdcatap:consent']?.grantor.match(/[A-Z0-9]+\)?$/)?.[0]?.replace(')', '') || 'ANON-' + selectedAsset['@id'].split(':').pop()}</span>
                     </div>
                     <div>
                       <span className="text-blue-200">Transfer Date:</span>
@@ -1208,7 +1531,7 @@ function AppHealth() {
 
                 <div className="p-6 space-y-6">
                   {/* Consent Scope */}
-                  {selectedAsset['health:consent'] && (
+                  {selectedAsset['healthdcatap:consent'] && (
                     <section>
                       <div className="flex items-center gap-2 mb-4">
                         <Lock className="w-5 h-5 text-purple-600" />
@@ -1219,7 +1542,7 @@ function AppHealth() {
                           <div>
                             <span className="text-sm text-gray-600">Permitted Purposes:</span>
                             <div className="flex gap-2 mt-2 flex-wrap">
-                              {selectedAsset['health:consent'].purposes.map((purpose) => {
+                              {selectedAsset['healthdcatap:consent'].purposes.map((purpose) => {
                                 const purposeInfo = consentPurposes[purpose as keyof typeof consentPurposes];
                                 return purposeInfo ? (
                                   <span key={purpose} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded text-sm">
@@ -1233,7 +1556,7 @@ function AppHealth() {
                           <div>
                             <span className="text-sm text-gray-600">Restrictions:</span>
                             <div className="flex gap-2 mt-2 flex-wrap">
-                              {selectedAsset['health:consent'].restrictions.map((restriction) => {
+                              {selectedAsset['healthdcatap:consent'].restrictions.map((restriction) => {
                                 const restrictionInfo = consentRestrictions[restriction as keyof typeof consentRestrictions];
                                 return restrictionInfo ? (
                                   <span key={restriction} className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded text-sm">
@@ -1245,7 +1568,7 @@ function AppHealth() {
                           </div>
                           <div>
                             <span className="text-sm text-gray-600">Valid Until:</span>
-                            <div className="font-medium text-gray-900">{selectedAsset['health:consent'].validUntil}</div>
+                            <div className="font-medium text-gray-900">{selectedAsset['healthdcatap:consent'].validUntil}</div>
                           </div>
                           <div>
                             <span className="text-sm text-gray-600">Jurisdiction:</span>
@@ -1265,11 +1588,11 @@ function AppHealth() {
                     <div className="bg-blue-50 rounded-lg p-4 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Age Band</div>
-                        <div className="text-xl font-bold text-gray-900">{selectedAsset['health:ageBand']}</div>
+                        <div className="text-xl font-bold text-gray-900">{selectedAsset['healthdcatap:ageRange']}</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Biological Sex</div>
-                        <div className="text-xl font-bold text-gray-900 capitalize">{selectedAsset['health:biologicalSex']}</div>
+                        <div className="text-xl font-bold text-gray-900 capitalize">{selectedAsset['healthdcatap:biologicalSex']}</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Region</div>
@@ -1278,8 +1601,8 @@ function AppHealth() {
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Category</div>
                         <div className="font-medium text-gray-900 capitalize">
-                          {medicalCategories[selectedAsset['health:category'] as keyof typeof medicalCategories]?.icon}{' '}
-                          {medicalCategories[selectedAsset['health:category'] as keyof typeof medicalCategories]?.label}
+                          {medicalCategories[selectedAsset['healthdcatap:category'] as keyof typeof medicalCategories]?.icon}{' '}
+                          {medicalCategories[selectedAsset['healthdcatap:category'] as keyof typeof medicalCategories]?.label}
                         </div>
                       </div>
                     </div>
@@ -1296,11 +1619,11 @@ function AppHealth() {
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-red-800">Primary Diagnosis</span>
                           <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded text-xs font-mono">
-                            {selectedAsset['health:icdCode']}
+                            {selectedAsset['healthdcatap:icdCode']}
                           </span>
                         </div>
                         <div className="text-lg font-medium text-gray-900">
-                          {selectedAsset['health:diagnosis']}
+                          {selectedAsset['healthdcatap:diagnosis']}
                         </div>
                         <div className="text-sm text-gray-600 mt-2">
                           {selectedAsset['dct:description']}
@@ -1318,11 +1641,11 @@ function AppHealth() {
                     <div className="flex gap-2 flex-wrap">
                       <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-medium">
                         <CheckCircle className="w-4 h-4" />
-                        EHR-TO-EDC-{selectedAsset['health:category'].toUpperCase()}-2025
+                        EHR-TO-EDC-{selectedAsset['healthdcatap:category'].toUpperCase()}-2025
                       </span>
                       <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-medium">
                         <CheckCircle className="w-4 h-4" />
-                        REGISTRY-{selectedAsset['health:icdCode'].split('.')[0]}-2025
+                        REGISTRY-{selectedAsset['healthdcatap:icdCode'].split('.')[0]}-2025
                       </span>
                     </div>
                   </section>
@@ -1494,7 +1817,7 @@ function PhaseHeader({ phase, icon }: PhaseHeaderProps) {
 
 // Generate FHIR Bundle from catalog asset when detailed data not available
 function generateFhirBundle(asset: MockEHRAsset) {
-  const pseudonymId = asset['health:consent']?.grantor.match(/[A-Z0-9]+\)?$/)?.[0]?.replace(')', '') || 'ANON-' + asset['@id'].split(':').pop();
+  const pseudonymId = asset['healthdcatap:consent']?.grantor.match(/[A-Z0-9]+\)?$/)?.[0]?.replace(')', '') || 'ANON-' + asset['@id'].split(':').pop();
   
   return {
     '@context': [
@@ -1510,29 +1833,29 @@ function generateFhirBundle(asset: MockEHRAsset) {
       id: `did:web:rheinland-uklinikum.de:patient:pseudonym:${pseudonymId}`,
       resourceType: 'Bundle',
       studyEligibility: [
-        `EHR-TO-EDC-${asset['health:category'].toUpperCase()}-2025`,
-        `REGISTRY-${asset['health:icdCode'].split('.')[0]}-2025`
+        `EHR-TO-EDC-${asset['healthdcatap:category'].toUpperCase()}-2025`,
+        `REGISTRY-${asset['healthdcatap:icdCode'].split('.')[0]}-2025`
       ],
       consentScope: {
-        purposes: asset['health:consent']?.purposes || ['clinical-research'],
+        purposes: asset['healthdcatap:consent']?.purposes || ['clinical-research'],
         dataCategories: ['demographics', 'conditions', 'observations', 'medications'],
         retentionPeriod: '10-years',
         jurisdiction: 'DE-NW',
-        restrictions: asset['health:consent']?.restrictions || ['no-reidentification'],
-        validUntil: asset['health:consent']?.validUntil || '2027-12-31'
+        restrictions: asset['healthdcatap:consent']?.restrictions || ['no-reidentification'],
+        validUntil: asset['healthdcatap:consent']?.validUntil || '2027-12-31'
       },
       demographicsNode: {
         pseudonymId: pseudonymId,
-        ageBand: asset['health:ageBand'],
-        biologicalSex: asset['health:biologicalSex'],
+        ageBand: asset['healthdcatap:ageRange'],
+        biologicalSex: asset['healthdcatap:biologicalSex'],
         region: 'Nordrhein-Westfalen',
         enrollmentPeriod: '2024-Q4'
       },
       conditionsNode: {
         primaryDiagnosis: {
-          code: asset['health:icdCode'],
+          code: asset['healthdcatap:icdCode'],
           system: 'ICD-10-GM',
-          display: asset['health:diagnosis'],
+          display: asset['healthdcatap:diagnosis'],
           clinicalStatus: 'active'
         },
         comorbidities: []
@@ -1571,7 +1894,7 @@ function FhirJsonHighlighter({ data }: { data: unknown }) {
       coloredLine = coloredLine.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       
       // Brackets and braces - make them bright
-      coloredLine = coloredLine.replace(/([\[\]{}])/g, 
+      coloredLine = coloredLine.replace(/([[\]{}])/g, 
         '<span class="text-yellow-300">$1</span>');
       
       // Commas - subtle but visible

@@ -58,7 +58,8 @@ export type ConsentPurpose =
   | 'drug-safety-surveillance'
   | 'quality-improvement'
   | 'public-health'
-  | 'rare-disease-research';
+  | 'rare-disease-research'
+  | 'genetic-research';
 
 export type DataCategory =
   | 'demographics'
@@ -68,7 +69,8 @@ export type DataCategory =
   | 'procedures'
   | 'lab-results'
   | 'imaging'
-  | 'genetic';
+  | 'genetic'
+  | 'genomics';
 
 export type RetentionPeriod =
   | '5-years'
@@ -96,7 +98,7 @@ export interface DemographicsNode {
 }
 
 export type AgeBand = 
-  | '18-24' | '25-34' | '35-44' | '45-54' 
+  | '0-17' | '18-24' | '25-34' | '35-44' | '45-54' 
   | '55-64' | '65-74' | '75-84' | '85+';
 
 export type BiologicalSex = 'male' | 'female' | 'other' | 'unknown';
@@ -174,7 +176,10 @@ export type LabInterpretation =
   | 'critical'
   | 'stable'
   | 'improved'
-  | 'worsened';
+  | 'worsened'
+  | 'pathogenic'
+  | 'benign'
+  | 'uncertain';
 
 // ============================================================================
 // Procedures Node - ICD-10-PCS / OPS coded procedures

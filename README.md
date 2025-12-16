@@ -32,6 +32,7 @@ This demonstration showcases the extraction of consent-gated Electronic Health R
 
 ### 1.2 Context & Initiatives
 - **European Health Data Space (EHDS)**: Mandates secure secondary use of health data ("HealthData@EU").
+- **HealthDCAT-AP**: The demo implements the HealthDCAT-AP metadata standard for dataset description, ensuring semantic interoperability across the dataspace.
 - **Sphin-X & GDNG**: Focus on decentralized access and "Data Visiting" (Compute-to-Data) to minimize privacy risks.
 - **Prometheus-X**: Provides architectural blueprints for consent and contract negotiation.
 
@@ -104,11 +105,73 @@ If the protocol changes, the patient is notified to re-consent. If the patient r
 
 ## 3. Architecture Overview
 
-The solution leverages the **Eclipse Dataspace Components (EDC)** for sovereign data exchange and **IdentityHub** for managing Verifiable Credentials.
+The solution leverages the **Eclipse Dataspace Components (EDC)** for sovereign data exchange and **IdentityHub** for managing Verifiable Credentials. It now incorporates the **HealthDCAT-AP** standard for metadata interoperability.
 
 *   **Provider Side**: EHR Adapter → De-ID Service → Provider Controlplane/Dataplane → IdentityHub.
 *   **Consumer Side**: EDC Consumer → EDC-to-EDC (EDC) → Study EDC System.
 *   **Trust**: Issuer Service issues MembershipCredential and DataProcessorCredential.
+*   **Metadata**: HealthDCAT-AP Editor (SHACL Validator) for validating dataset descriptions.
+
+### Metadata Standard: HealthDCAT-AP
+
+The demo implements the **HealthDCAT-AP** specification ([https://metadata.healthdataportal.eu/healthDCAT-AP/](https://metadata.healthdataportal.eu/healthDCAT-AP/)) for health dataset metadata, ensuring compliance with the **European Health Data Space (EHDS) Regulation** (EU 2025/327).
+
+#### MANDATORY Properties (NON_PUBLIC Sensitive Health Data)
+
+All 21 EHR catalog assets implement the mandatory HealthDCAT-AP properties for sensitive health data:
+
+| Property | Description | Example Value |
+|----------|-------------|---------------|
+| `dcatap:applicableLegislation` | Governing regulations | EHDS (EU 2025/327), GDPR (EU 2016/679), DGA |
+| `dct:type` | Dataset type | `PERSONAL_DATA` |
+| `dct:accessRights` | Access level | `NON_PUBLIC` |
+| `healthdcatap:healthCategory` | Art. 51 EHDS categories | `EHR`, `CLINICAL_TRIAL`, `RARE_DISEASE`, etc. |
+| `healthdcatap:hdab` | Health Data Access Body | German FDZ (Forschungsdatenzentrum) |
+| `dct:spatial` | Geographic coverage | EU country URIs |
+| `dct:provenance` | Data provenance | Source and transformation details |
+| `dpv:hasPurpose` | Processing purposes | `AcademicResearch`, `ScientificResearch` |
+| `dpv:hasPersonalData` | Personal data categories | `HealthData`, `MedicalHealth`, `Genetic` |
+| `dpv:hasLegalBasis` | GDPR legal basis | Art. 6.1.a, 9.2.a, 9.2.j |
+| `healthdcatap:publishernote` | Ethics reference | Ethics committee approval numbers |
+| `healthdcatap:publishertype` | Publisher type | Healthcare Provider, Research Organization |
+
+#### RECOMMENDED Properties
+
+| Property | Description | Example Value |
+|----------|-------------|---------------|
+| `healthdcatap:minTypicalAge` / `maxTypicalAge` | Age range | 18-85 |
+| `healthdcatap:numberOfRecords` | Record count | 450-4500 |
+| `healthdcatap:numberOfUniqueIndividuals` | Unique subjects | 45-450 |
+| `healthdcatap:populationcoverage` | Population description | German hospital patient population |
+| `healthdcatap:hasCodingSystem` | Coding standards (Wikidata) | ICD-10, LOINC, SNOMED CT, MedDRA |
+| `healthdcatap:hasCodeValues` | Actual codes | ICD-10 codes, LOINC codes |
+
+#### Art. 51 EHDS Health Categories
+
+The demo maps assets to official EHDS health categories:
+- `EHR` - Electronic Health Records
+- `CLINICAL_TRIAL` - Clinical Trial Data
+- `RARE_DISEASE` - Rare Disease Data
+- `GENOMIC` - Genomic Data
+- `HEALTH_REGISTRY` - Health Registries
+- `CLAIMS` - Claims and Reimbursement Data
+- `PUBLIC_HEALTH` - Public Health Surveillance
+- And 10+ additional categories per Art. 51
+
+#### Data Privacy Vocabulary (DPV) Integration
+
+The demo uses W3C Data Privacy Vocabulary for:
+- **Purposes**: `dpv:AcademicResearch`, `dpv:ScientificResearch`, `dpv:NonCommercialResearch`
+- **Personal Data**: `dpv-pd:HealthData`, `dpv-pd:MedicalHealth`, `dpv-pd:Genetic`, `dpv-pd:Age`
+- **Legal Basis**: GDPR articles via `dpv-gdpr` namespace
+
+#### Export Formats
+
+The catalog supports exporting metadata in:
+- **Turtle (TTL)** - HealthDCAT-AP compliant RDF
+- **JSON-LD** - Linked Data format with context
+
+Use the "Export Catalog (Turtle)" button in the EHR viewer to download the complete HealthDCAT-AP metadata.
 
 ## 4. Developer Manual
 
@@ -207,9 +270,20 @@ tail -f /tmp/backend.log
 tail -f /tmp/frontend.log
 ```
 
+#### 4.2.4 Starting the HealthDCAT-AP Editor
+
+The HealthDCAT-AP Editor (Interoperability Test Bed SHACL Validator) is available as a Docker service. It allows you to validate and edit metadata against the HealthDCAT-AP SHACL shapes.
+
+```bash
+# Start the editor service
+docker-compose -f docker-compose.health.yml up -d healthdcatap-editor
+```
+
+The editor will be available at **http://localhost:8082**.
+
 **Option 3: Docker Compose (for full stack)**
 ```bash
-# Start frontend + backend + EDC infrastructure
+# Start frontend + backend + EDC infrastructure + HealthDCAT-AP Editor
 docker-compose -f docker-compose.health.yml up --build
 ```
 

@@ -62,26 +62,25 @@ create_ehr_asset() {
         "@id": "'"$ID"'",
         "@type": "Asset",
         "properties": {
-            "name": "'"$NAME"'",
-            "description": "'"$DESC"'",
-            "contenttype": "application/ld+json",
-            "dct:type": "ehds:ElectronicHealthRecord",
+            "dct:title": "'"$NAME"'",
+            "dct:description": "'"$DESC"'",
+            "contenttype": "application/fhir+json",
+            "healthdcatap:healthCategory": "ehds:ElectronicHealthRecord",
             "version": "1.0",
-            "health:icdCode": "'"$ICD_CODE"'",
-            "health:diagnosis": "'"$DIAGNOSIS"'",
-            "health:ageBand": "'"$AGE_BAND"'",
-            "health:biologicalSex": "'"$SEX"'",
-            "health:consentPurposes": "'"$CONSENT_PURPOSES"'",
-            "health:meddraVersion": "'"$MEDDRA_VERSION"'",
-            "health:studyPhase": "'"$STUDY_PHASE"'",
-            "health:euCtNumber": "'"$EU_CT_NUMBER"'",
-            "health:sponsorName": "'"$SPONSOR_NAME"'",
-            "health:sponsorType": "'"$SPONSOR_TYPE"'",
-            "health:therapeuticArea": "'"$THERAPEUTIC_AREA"'",
-            "health:memberStatesConcerned": "'"$MEMBER_STATES"'",
-            "health:deIdentificationMethod": "k-anonymity-k5",
-            "health:jurisdiction": "DE-NW",
-            "health:provider": "Rheinland Universitätsklinikum"
+            "dcat:keyword": ["ICD:'"$ICD_CODE"'", "'"$DIAGNOSIS"'"],
+            "healthdcatap:ageRange": "'"$AGE_BAND"'",
+            "healthdcatap:biologicalSex": "'"$SEX"'",
+            "dct:conformsTo": "'"$CONSENT_PURPOSES"'",
+            "healthdcatap:meddraVersion": "'"$MEDDRA_VERSION"'",
+            "healthdcatap:clinicalTrialPhase": "'"$STUDY_PHASE"'",
+            "healthdcatap:euCtNumber": "'"$EU_CT_NUMBER"'",
+            "healthdcatap:sponsorName": "'"$SPONSOR_NAME"'",
+            "healthdcatap:sponsorType": "'"$SPONSOR_TYPE"'",
+            "healthdcatap:therapeuticArea": "'"$THERAPEUTIC_AREA"'",
+            "healthdcatap:memberStates": "'"$MEMBER_STATES"'",
+            "healthdcatap:anonymizationMethod": "k-anonymity-k5",
+            "dct:spatial": "DE-NW",
+            "healthdcatap:healthDataHolder": "Rheinland Universitätsklinikum"
         },
         "dataAddress": {
             "@type": "DataAddress",
@@ -181,9 +180,57 @@ curl -s --location "$PROVIDER_HOST/api/management/v3/policydefinitions" \
     }
 }' > /dev/null && echo "  ✓ Sensitive Data Contract Policy created"
 
+# Create confidential compute policy (Encryption in Compute)
+echo "Creating Confidential Compute Policy..."
+curl -s --location "$PROVIDER_HOST/api/management/v3/policydefinitions" \
+--header 'Content-Type: application/json' \
+--data '{
+    "@context": [
+        "https://w3id.org/edc/connector/management/v0.0.1",
+        "http://www.w3.org/ns/odrl.jsonld"
+    ],
+    "@id": "health-confidential-compute-policy",
+    "@type": "PolicyDefinition",
+    "policy": {
+        "@type": "Set",
+        "obligation": [{
+            "action": "use",
+            "constraint": {
+                "leftOperand": "Security.confidentialComputing",
+                "operator": "eq",
+                "rightOperand": "true"
+            }
+        }, {
+            "action": "use",
+            "constraint": {
+                "leftOperand": "Security.encryptionInTransit",
+                "operator": "eq",
+                "rightOperand": "true"
+            }
+        }]
+    }
+}' > /dev/null && echo "  ✓ Confidential Compute Policy created"
+
 echo ""
-echo "Creating 20 Anonymized EHR Assets..."
+echo "Creating 21 Anonymized EHR Assets..."
 echo ""
+
+# 0. Rare Genetic Disorder (Confidential Compute)
+create_ehr_asset "asset:ehr:EHR021" \
+    "EHR - Rare Genetic Disorder (Pediatric)" \
+    "Genomic sequencing data for pediatric rare disease cohort" \
+    "Q87.1" \
+    "Congenital malformation syndromes" \
+    "0-17" \
+    "male" \
+    "clinical-research,genetic-research" \
+    "27.0" \
+    "Phase I" \
+    "2025-530123-99-DE" \
+    "Charité Forschung GmbH" \
+    "academic" \
+    "CONGENITAL" \
+    "DE,FR"
 
 # 1. Diabetes Type 2
 create_ehr_asset "asset:ehr:EHR001" \
@@ -547,14 +594,74 @@ curl -s --location "$PROVIDER_HOST/api/management/v3/contractdefinitions" \
     }
 }' > /dev/null && echo "  ✓ Standard Clinical Research Contract created"
 
+# 21. Rare Genetic Disorder (Genomics - Requires Confidential Compute)
+echo "Creating EHR Asset: Rare Genetic Disorder (asset:ehr:EHR021)..."
+curl -s --location "$PROVIDER_HOST/api/management/v3/assets" \
+--header 'Content-Type: application/json' \
+--data '{
+    "@context": [
+        "https://w3id.org/edc/connector/management/v0.0.1"
+    ],
+    "@id": "asset:ehr:EHR021",
+    "@type": "Asset",
+    "properties": {
+        "dct:title": "EHR - Rare Genetic Disorder",
+        "dct:description": "Anonymized EHR: Rare genetic variant (SENSITIVE - GENOMICS)",
+        "contenttype": "application/fhir+json",
+        "healthdcatap:healthCategory": "ehds:ElectronicHealthRecord",
+        "healthdcatap:sensitiveCategory": "genomics",
+        "version": "1.0",
+        "dcat:keyword": ["ICD:Q99.9", "Genetic Disorder"],
+        "healthdcatap:ageRange": "18-24",
+        "healthdcatap:biologicalSex": "female",
+        "dct:conformsTo": "clinical-research",
+        "healthdcatap:meddraVersion": "27.0",
+        "healthdcatap:clinicalTrialPhase": "Phase I",
+        "healthdcatap:euCtNumber": "2024-GEN-001-DE",
+        "healthdcatap:sponsorName": "Genomic Research Inst",
+        "healthdcatap:sponsorType": "academic",
+        "healthdcatap:therapeuticArea": "Genetics",
+        "healthdcatap:memberStates": "DE",
+        "healthdcatap:anonymizationMethod": "k-anonymity-k5",
+        "dct:spatial": "DE-NW",
+        "healthdcatap:healthDataHolder": "Rheinland Universitätsklinikum"
+    },
+    "dataAddress": {
+        "@type": "DataAddress",
+        "type": "HttpData",
+        "baseUrl": "'"$BACKEND_URL"'/api/ehr/EHR021",
+        "proxyPath": "false",
+        "proxyQueryParams": "false"
+    }
+}' > /dev/null && echo "  ✓ Created"
+
+# Confidential Compute contract (for genomics)
+echo "Creating Confidential Compute Contract..."
+curl -s --location "$PROVIDER_HOST/api/management/v3/contractdefinitions" \
+--header 'Content-Type: application/json' \
+--data '{
+    "@context": [
+        "https://w3id.org/edc/connector/management/v0.0.1"
+    ],
+    "@id": "health-genomics-contract",
+    "@type": "ContractDefinition",
+    "accessPolicyId": "health-research-access-policy",
+    "contractPolicyId": "health-confidential-compute-policy",
+    "assetsSelector": {
+        "operandLeft": "healthdcatap:sensitiveCategory",
+        "operator": "=",
+        "operandRight": "genomics"
+    }
+}' > /dev/null && echo "  ✓ Confidential Compute Contract created"
+
 echo ""
 echo "╔════════════════════════════════════════════════════════════════════╗"
 echo "║     EHR2EDC Health Dataspace - Seeding Complete!                   ║"
 echo "║                                                                    ║"
 echo "║  Created:                                                          ║"
-echo "║    - 20 Anonymized EHR Assets (EU CTR 536/2014 compliant)          ║"
-echo "║    - 3 Policy Definitions (access, consent, sensitive)             ║"
-echo "║    - 1 Contract Definition                                         ║"
+echo "║    - 21 Anonymized EHR Assets (EU CTR 536/2014 compliant)          ║"
+echo "║    - 4 Policy Definitions (access, consent, sensitive, compute)    ║"
+echo "║    - 2 Contract Definitions                                        ║"
 echo "║                                                                    ║"
 echo "║  Participants:                                                     ║"
 echo "║    Provider: did:web:rheinland-uklinikum.de                        ║"
