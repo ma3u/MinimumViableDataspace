@@ -32,7 +32,7 @@ This demonstration showcases the extraction of consent-gated Electronic Health R
 
 ### 1.2 Context & Initiatives
 - **European Health Data Space (EHDS)**: Mandates secure secondary use of health data ("HealthData@EU").
-- **HealthDCAT-AP**: The demo implements the HealthDCAT-AP metadata standard for dataset description, ensuring semantic interoperability across the dataspace.
+- **DCAT-AP for Health**: The demo implements the DCAT-AP for Health metadata standard for dataset description, ensuring semantic interoperability across the dataspace.
 - **Sphin-X & GDNG**: Focus on decentralized access and "Data Visiting" (Compute-to-Data) to minimize privacy risks.
 - **Prometheus-X**: Provides architectural blueprints for consent and contract negotiation.
 
@@ -105,20 +105,20 @@ If the protocol changes, the patient is notified to re-consent. If the patient r
 
 ## 3. Architecture Overview
 
-The solution leverages the **Eclipse Dataspace Components (EDC)** for sovereign data exchange and **IdentityHub** for managing Verifiable Credentials. It now incorporates the **HealthDCAT-AP** standard for metadata interoperability.
+The solution leverages the **Eclipse Dataspace Components (EDC)** for sovereign data exchange and **IdentityHub** for managing Verifiable Credentials. It now incorporates the **DCAT-AP for Health** standard for metadata interoperability.
 
 *   **Provider Side**: EHR Adapter → De-ID Service → Provider Controlplane/Dataplane → IdentityHub.
 *   **Consumer Side**: EDC Consumer → EDC-to-EDC (EDC) → Study EDC System.
 *   **Trust**: Issuer Service issues MembershipCredential and DataProcessorCredential.
-*   **Metadata**: HealthDCAT-AP Editor (SHACL Validator) for validating dataset descriptions.
+*   **Metadata**: DCAT-AP for Health Editor (SHACL Validator) for validating dataset descriptions.
 
-### Metadata Standard: HealthDCAT-AP
+### Metadata Standard: DCAT-AP for Health
 
-The demo implements the **HealthDCAT-AP** specification ([https://metadata.healthdataportal.eu/healthDCAT-AP/](https://metadata.healthdataportal.eu/healthDCAT-AP/)) for health dataset metadata, ensuring compliance with the **European Health Data Space (EHDS) Regulation** (EU 2025/327).
+The demo implements the **DCAT-AP for Health** specification ([https://healthdcat-ap.github.io/](https://healthdcat-ap.github.io/)) for health dataset metadata, ensuring compliance with the **European Health Data Space (EHDS) Regulation** (EU 2025/327).
 
 #### MANDATORY Properties (NON_PUBLIC Sensitive Health Data)
 
-All 21 EHR catalog assets implement the mandatory HealthDCAT-AP properties for sensitive health data:
+All 21 EHR catalog assets implement the mandatory DCAT-AP for Health properties for sensitive health data:
 
 | Property | Description | Example Value |
 |----------|-------------|---------------|
@@ -168,10 +168,78 @@ The demo uses W3C Data Privacy Vocabulary for:
 #### Export Formats
 
 The catalog supports exporting metadata in:
-- **Turtle (TTL)** - HealthDCAT-AP compliant RDF
+- **Turtle (TTL)** - DCAT-AP for Health compliant RDF
 - **JSON-LD** - Linked Data format with context
 
-Use the "Export Catalog (Turtle)" button in the EHR viewer to download the complete HealthDCAT-AP metadata.
+Use the "Export Catalog (Turtle)" button in the EHR viewer to download the complete DCAT-AP for Health metadata.
+
+### Data Clean Rooms & Confidential Computing
+
+The architecture supports privacy-preserving computation patterns aligned with EHDS "Data Visiting" principles:
+
+#### Data Clean Room Concept
+
+A **Data Clean Room (DCR)** provides a secure, neutral environment where multiple parties can collaborate on sensitive health data without exposing raw records:
+
+```mermaid
+flowchart TB
+    subgraph DCR["Data Clean Room (Secure Enclave)"]
+        Query["Research Query"]
+        Compute["Federated Analytics"]
+        Results["Aggregated Results"]
+    end
+    
+    subgraph Provider1["Hospital A"]
+        EHR1["EHR Data"]
+    end
+    
+    subgraph Provider2["Hospital B"]
+        EHR2["EHR Data"]
+    end
+    
+    EHR1 -.->|"Encrypted"| Compute
+    EHR2 -.->|"Encrypted"| Compute
+    Query --> Compute
+    Compute --> Results
+    Results -->|"Only aggregates"| Consumer["Research Institute"]
+```
+
+**Key Principles:**
+- **Data Never Leaves**: Raw patient data remains at the source; only queries travel to the data
+- **Code-to-Data**: Researchers submit analysis code, not data extraction requests
+- **Aggregate Only**: Only de-identified, aggregated results are returned
+- **Audit Trail**: All queries and access are logged for compliance
+
+#### Confidential Computing Integration
+
+The demo is designed to integrate with **Confidential Computing** technologies for hardware-enforced data protection:
+
+| Technology | Description | Use Case |
+|------------|-------------|----------|
+| **Intel SGX** | Secure enclaves for isolated execution | Query processing on encrypted EHR data |
+| **AMD SEV** | Memory encryption for VMs | Secure multi-party analytics |
+| **Azure Confidential Computing** | Cloud-based TEEs | Scalable federated learning |
+| **AWS Nitro Enclaves** | Isolated compute environments | Cross-border EHDS data collaboration |
+
+**Trusted Execution Environment (TEE) Workflow:**
+1. Provider encrypts EHR data with enclave-specific keys
+2. Consumer submits signed, attested analysis code
+3. TEE decrypts data only inside the secure enclave
+4. Computation runs in isolation (no external access)
+5. Only approved outputs (aggregates, trained models) are released
+
+#### EHDS Alignment
+
+This approach directly implements EHDS Art. 50 requirements for Secure Processing Environments (SPE):
+- **Art. 50(1)**: Data holders provide access via secure processing environments
+- **Art. 50(3)**: SPEs must prevent unauthorized data extraction
+- **Art. 50(4)**: Only non-identifying statistical results may be exported
+
+**Future Roadmap:**
+- Integration with Gaia-X Trusted Execution framework
+- Support for differential privacy guarantees
+- Federated learning across multiple Health Data Access Bodies (HDABs)
+- Homomorphic encryption for queries on encrypted data
 
 ## 4. Developer Manual
 
@@ -270,9 +338,9 @@ tail -f /tmp/backend.log
 tail -f /tmp/frontend.log
 ```
 
-#### 4.2.4 Starting the HealthDCAT-AP Editor
+#### 4.2.4 Starting the DCAT-AP for Health Editor
 
-The HealthDCAT-AP Editor (Interoperability Test Bed SHACL Validator) is available as a Docker service. It allows you to validate and edit metadata against the HealthDCAT-AP SHACL shapes.
+The DCAT-AP for Health Editor (Interoperability Test Bed SHACL Validator) is available as a Docker service. It allows you to validate and edit metadata against the DCAT-AP for Health SHACL shapes.
 
 ```bash
 # Start the editor service
@@ -283,7 +351,7 @@ The editor will be available at **http://localhost:8082**.
 
 **Option 3: Docker Compose (for full stack)**
 ```bash
-# Start frontend + backend + EDC infrastructure + HealthDCAT-AP Editor
+# Start frontend + backend + EDC infrastructure + DCAT-AP for Health Editor
 docker-compose -f docker-compose.health.yml up --build
 ```
 

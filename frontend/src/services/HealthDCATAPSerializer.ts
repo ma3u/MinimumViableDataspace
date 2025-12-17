@@ -362,14 +362,14 @@ export const serializeToTurtle = (): string => {
     const datasetType = asset['dct:type'] as string | undefined;
     lines.push(`  dct:type <${datasetType || 'http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA'}> ;`);
 
-    // Health Categories (MANDATORY - Art. 51 EHDS)
+    // Health Categories (MANDATORY - Art. 51 EHDS) - lowercase per spec
     const healthCategories = asset['healthdcatap:healthCategory'] as string[] | undefined;
     if (healthCategories && Array.isArray(healthCategories)) {
       healthCategories.forEach((cat: string) => {
-        lines.push(`  healthdcatap:healthCategory <${cat}> ;`);
+        lines.push(`  healthdcatap:healthcategory <${cat}> ;`);
       });
     } else {
-      lines.push(`  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;`);
+      lines.push(`  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;`);
     }
 
     // Spatial Coverage (MANDATORY)
@@ -429,14 +429,14 @@ export const serializeToTurtle = (): string => {
     // ==================== RECOMMENDED HealthDCAT-AP Properties ====================
     lines.push(`  # RECOMMENDED HealthDCAT-AP Properties`);
     
-    // Age Range (Release 5: minimumTypicalAge, maximumTypicalAge)
+    // Age Range - Official property names per HealthDCAT-AP tabular overview
     const minAge = asset['healthdcatap:minTypicalAge'] as number | undefined;
     const maxAge = asset['healthdcatap:maxTypicalAge'] as number | undefined;
     if (minAge !== undefined) {
-      lines.push(`  healthdcatap:minimumTypicalAge "${minAge}"^^xsd:nonNegativeInteger ;`);
+      lines.push(`  healthdcatap:mintypicalage "${minAge}"^^xsd:nonNegativeInteger ;`);  // lowercase per spec
     }
     if (maxAge !== undefined) {
-      lines.push(`  healthdcatap:maximumTypicalAge "${maxAge}"^^xsd:nonNegativeInteger ;`);
+      lines.push(`  healthdcatap:maxtypicalage "${maxAge}"^^xsd:nonNegativeInteger ;`);  // lowercase per spec
     }
 
     // Number of Records (Release 5: xsd:nonNegativeInteger)
@@ -473,11 +473,11 @@ export const serializeToTurtle = (): string => {
       });
     }
 
-    // Health Theme (MANDATORY for NON_PUBLIC) - Wikidata concept URIs
+    // Health Theme (MANDATORY for NON_PUBLIC) - Wikidata concept URIs, lowercase per spec
     const healthThemes = asset['healthdcatap:healthTheme'] as string[] | undefined;
     if (healthThemes && Array.isArray(healthThemes)) {
       healthThemes.forEach((theme: string) => {
-        lines.push(`  healthdcatap:healthTheme <${theme}> ;`);
+        lines.push(`  healthdcatap:healththeme <${theme}> ;`);
       });
     }
 
@@ -539,10 +539,10 @@ export const serializeToTurtle = (): string => {
     lines.push(`  dct:accessRights <http://publications.europa.eu/resource/authority/access-right/NON_PUBLIC> ;`);
     lines.push(`  odrl:hasPolicy <${policyUri}> ;`);
     
-    // Health Data Access Body (MANDATORY - Art. 37/77 EHDS) - Release 5 property name
+    // Health Data Access Body (MANDATORY - Art. 37/77 EHDS) - Official HealthDCAT-AP property
     const hdab = asset['healthdcatap:hdab'] as { '@id': string; 'foaf:name': string; 'foaf:homepage': string; 'foaf:mbox': string } | undefined;
     if (hdab) {
-      lines.push(`  healthdcatap:healthDataAccessBody [`);
+      lines.push(`  healthdcatap:hdab [`);  // Official property name per HealthDCAT-AP spec
       lines.push(`    a foaf:Agent ;`);
       lines.push(`    dct:identifier "${hdab['@id']}" ;`);
       lines.push(`    foaf:name "${hdab['foaf:name']}"@de ;`);

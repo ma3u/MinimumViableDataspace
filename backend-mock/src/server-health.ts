@@ -17,14 +17,71 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Interface for EHR records (Verifiable Credential structure)
+// Interfaces for EHR records (Verifiable Credential structure)
+interface DemographicsNode {
+  pseudonymId: string;
+  ageBand: string;
+  biologicalSex: string;
+  region: string;
+  enrollmentPeriod: string;
+  [key: string]: unknown;
+}
+
+interface Diagnosis {
+  code: string;
+  system: string;
+  display: string;
+  onsetPeriod?: string;
+  [key: string]: unknown;
+}
+
+interface ConditionsNode {
+  primaryDiagnosis: Diagnosis;
+  comorbidities: Diagnosis[];
+  [key: string]: unknown;
+}
+
+interface ConsentScope {
+  purposes: string[];
+  dataCategories: string[];
+  retentionPeriod: string;
+  jurisdiction: string;
+  [key: string]: unknown;
+}
+
+interface ProvenanceNode {
+  sourceSystem: string;
+  extractionDate: string;
+  deIdentificationMethod: string;
+  qualityScore: number;
+  [key: string]: unknown;
+}
+
+interface CredentialSubject {
+  id: string;
+  resourceType: string;
+  type: string;
+  studyEligibility: string[];
+  consentScope: ConsentScope;
+  demographicsNode: DemographicsNode;
+  conditionsNode: ConditionsNode;
+  provenanceNode: ProvenanceNode;
+  observationsNode?: Record<string, unknown>;
+  medicationsNode?: Record<string, unknown>;
+  clinicalTrialNode?: Record<string, unknown>;
+  medDRANode?: Record<string, unknown>;
+  signalVerificationNode?: Record<string, unknown>;
+  anamnesisNode?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
 interface HealthRecord {
   '@context': string[];
   id: string;
   type: string[];
   issuer: string;
   issuanceDate: string;
-  credentialSubject: Record<string, unknown>;
+  credentialSubject: CredentialSubject;
   proof?: Record<string, unknown>;
 }
 
