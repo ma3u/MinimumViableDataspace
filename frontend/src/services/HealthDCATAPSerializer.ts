@@ -676,6 +676,16 @@ export const serializeToTurtle = (): string => {
       lines.push(`      vcard:postal-code "${publisher['vcard:hasAddress']['vcard:postal-code']}" ;`);
       lines.push(`      vcard:country-name "${publisher['vcard:hasAddress']['vcard:country-name']}"`);
       lines.push(`    ] ;`);
+      // MANDATORY: dcat:contactPoint for HealthPublisherAgent_Shape (HealthDCAT-AP Release 5)
+      lines.push(`    dcat:contactPoint [`);
+      lines.push(`      a vcard:Kind, vcard:Organization ;`);
+      lines.push(`      vcard:fn "Forschungsdatenmanagement"@de ;`);
+      lines.push(`      vcard:fn "Research Data Management"@en ;`);
+      lines.push(`      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;`);
+      lines.push(`      vcard:hasTelephone <tel:+49-221-478-0>`);
+      lines.push(`    ] ;`);
+      lines.push(`    foaf:homepage <${publisher['foaf:homepage']}>`);
+      lines.push(`  ] ;`);
     } else {
       lines.push(`    vcard:hasAddress [`);
       lines.push(`      a vcard:Address ;`);
@@ -685,6 +695,14 @@ export const serializeToTurtle = (): string => {
       lines.push(`      vcard:country-name "Germany"`);
       lines.push(`    ] ;`);
     }
+    // MANDATORY: dcat:contactPoint for HealthPublisherAgent_Shape (HealthDCAT-AP Release 5)
+    lines.push(`    dcat:contactPoint [`);
+    lines.push(`      a vcard:Kind, vcard:Organization ;`);
+    lines.push(`      vcard:fn "Forschungsdatenmanagement"@de ;`);
+    lines.push(`      vcard:fn "Research Data Management"@en ;`);
+    lines.push(`      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;`);
+    lines.push(`      vcard:hasTelephone <tel:+49-221-478-0>`);
+    lines.push(`    ] ;`);
     lines.push(`    foaf:homepage <${publisher?.['foaf:homepage'] || 'https://www.rheinland-uklinikum.de'}>`);
     lines.push(`  ] ;`);
 
@@ -863,7 +881,9 @@ export const serializeToTurtle = (): string => {
     lines.push(`  adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;`);
     lines.push(`  dct:issued "2024-12-01"^^xsd:date ;`);
     lines.push(`  dct:conformsTo <http://hl7.org/fhir/R4> ;`);
-    lines.push(`  dct:conformsTo <http://www.w3.org/ns/csvw> .`);  // CSVW conformance
+    lines.push(`  dct:conformsTo <http://www.w3.org/ns/csvw> ;`);  // CSVW conformance
+    // MANDATORY: Applicable legislation for distribution (HealthDCAT-AP Release 5)
+    lines.push(`  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .`);
     lines.push('');
     
     // ==================== CSVW VARIABLE DICTIONARY (Release 5) ====================
@@ -877,41 +897,41 @@ export const serializeToTurtle = (): string => {
     lines.push(`    csvw:column [`);
     lines.push(`      a csvw:Column ;`);
     lines.push(`      csvw:name "patient_id" ;`);
-    lines.push(`      csvw:title "Patient Identifier"@en ;`);
-    lines.push(`      csvw:description "Pseudonymized patient identifier"@en ;`);
+    lines.push(`      csvw:titles "Patient Identifier"@en ;`);
+    lines.push(`      dct:description "Pseudonymized patient identifier"@en ;`);
     lines.push(`      csvw:datatype "string"`);
     lines.push(`    ], [`);
     lines.push(`      a csvw:Column ;`);
     lines.push(`      csvw:name "diagnosis_code" ;`);
-    lines.push(`      csvw:title "ICD-10 Diagnosis Code"@en ;`);
-    lines.push(`      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;`);
+    lines.push(`      csvw:titles "ICD-10 Diagnosis Code"@en ;`);
+    lines.push(`      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;`);
     lines.push(`      csvw:datatype "string" ;`);
     lines.push(`      csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>`);
     lines.push(`    ], [`);
     lines.push(`      a csvw:Column ;`);
     lines.push(`      csvw:name "age_at_diagnosis" ;`);
-    lines.push(`      csvw:title "Age at Diagnosis"@en ;`);
-    lines.push(`      csvw:description "Patient age in years at time of diagnosis"@en ;`);
+    lines.push(`      csvw:titles "Age at Diagnosis"@en ;`);
+    lines.push(`      dct:description "Patient age in years at time of diagnosis"@en ;`);
     lines.push(`      csvw:datatype "integer"`);
     lines.push(`    ], [`);
     lines.push(`      a csvw:Column ;`);
     lines.push(`      csvw:name "biological_sex" ;`);
-    lines.push(`      csvw:title "Biological Sex"@en ;`);
-    lines.push(`      csvw:description "Biological sex (male, female, other, unknown)"@en ;`);
+    lines.push(`      csvw:titles "Biological Sex"@en ;`);
+    lines.push(`      dct:description "Biological sex (male, female, other, unknown)"@en ;`);
     lines.push(`      csvw:datatype "string" ;`);
     lines.push(`      csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>`);
     lines.push(`    ], [`);
     lines.push(`      a csvw:Column ;`);
     lines.push(`      csvw:name "meddra_pt_code" ;`);
-    lines.push(`      csvw:title "MedDRA Preferred Term Code"@en ;`);
-    lines.push(`      csvw:description "MedDRA v27.0 Preferred Term code"@en ;`);
+    lines.push(`      csvw:titles "MedDRA Preferred Term Code"@en ;`);
+    lines.push(`      dct:description "MedDRA v27.0 Preferred Term code"@en ;`);
     lines.push(`      csvw:datatype "string" ;`);
     lines.push(`      csvw:propertyUrl <https://meddra.org/>`);
     lines.push(`    ], [`);
     lines.push(`      a csvw:Column ;`);
     lines.push(`      csvw:name "observation_date" ;`);
-    lines.push(`      csvw:title "Observation Date"@en ;`);
-    lines.push(`      csvw:description "Date of clinical observation"@en ;`);
+    lines.push(`      csvw:titles "Observation Date"@en ;`);
+    lines.push(`      dct:description "Date of clinical observation"@en ;`);
     lines.push(`      csvw:datatype "date"`);
     lines.push(`    ]`);
     lines.push(`  ] .`);
@@ -938,7 +958,9 @@ export const serializeToTurtle = (): string => {
     lines.push(`  adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;`);
     lines.push(`  dct:issued "2024-12-01"^^xsd:date ;`);
     lines.push(`  dct:modified "2024-12-15"^^xsd:date ;`);
-    lines.push(`  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .`);
+    lines.push(`  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;`);
+    // MANDATORY: Applicable legislation for distribution (HealthDCAT-AP Release 5)
+    lines.push(`  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .`);
     lines.push('');
 
     // ==================== CONFIDENTIAL COMPUTING DATA SERVICE ====================

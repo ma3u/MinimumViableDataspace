@@ -293,7 +293,7 @@
     ] ;
     skos:notation "363235000" ;
     skos:prefLabel "SNOMED-CT:363235000"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q15304597> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7020> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q104548805> ;
@@ -336,7 +336,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR021> ;
       dcat:servesDataset <http://example.org/dataset/EHR021>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -356,7 +357,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Congenital, Familial and Genetic Disorders"@de ;
     foaf:name "Rheinland University Hospital - Department of Congenital, Familial and Genetic Disorders"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -370,7 +378,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "Q87.1" ;
@@ -497,7 +512,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR021> a csvw:TableGroup ;
   csvw:table [
@@ -508,41 +524,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -560,7 +576,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR021> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Rare Genetic Disorder (Pediatric)"@en ;
@@ -782,7 +799,7 @@
     ] ;
     skos:notation "A10B" ;
     skos:prefLabel "ATC:A10B"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q3025883> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q389735> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q133212> ;
@@ -825,7 +842,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR001> ;
       dcat:servesDataset <http://example.org/dataset/EHR001>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -845,7 +863,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Endocrinology/Diabetology"@de ;
     foaf:name "Rheinland University Hospital - Department of Endocrinology/Diabetology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -859,7 +884,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "E11.9" ;
@@ -988,7 +1020,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR001> a csvw:TableGroup ;
   csvw:table [
@@ -999,41 +1032,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -1051,7 +1084,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR001> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Type 2 Diabetes with CV Risk"@en ;
@@ -1279,7 +1313,7 @@
     ] ;
     skos:notation "10019279" ;
     skos:prefLabel "MedDRA:10019279"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q181754> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q389735> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q190805> ;
@@ -1322,7 +1356,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR002> ;
       dcat:servesDataset <http://example.org/dataset/EHR002>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -1342,7 +1377,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Cardiovascular"@de ;
     foaf:name "Rheinland University Hospital - Department of Cardiovascular"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -1356,7 +1398,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "I50.9" ;
@@ -1485,7 +1534,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR002> a csvw:TableGroup ;
   csvw:table [
@@ -1496,41 +1546,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -1548,7 +1598,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR002> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Chronic Heart Failure (HFrEF)"@en ;
@@ -1767,7 +1818,7 @@
     ] ;
     skos:notation "10029104" ;
     skos:prefLabel "MedDRA:10029104"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q128581> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12078> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7164> ;
@@ -1810,7 +1861,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR003> ;
       dcat:servesDataset <http://example.org/dataset/EHR003>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -1830,7 +1882,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Antineoplastic and Immunomodulating Agents"@de ;
     foaf:name "Rheinland University Hospital - Department of Antineoplastic and Immunomodulating Agents"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -1844,7 +1903,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "C50.9" ;
@@ -1971,7 +2037,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR003> a csvw:TableGroup ;
   csvw:table [
@@ -1982,41 +2049,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -2034,7 +2101,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR003> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Breast Cancer (Remission)"@en ;
@@ -2232,7 +2300,7 @@
     ] ;
     skos:notation "10036910" ;
     skos:prefLabel "MedDRA:10036910"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q181257> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12078> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7164> ;
@@ -2275,7 +2343,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR004> ;
       dcat:servesDataset <http://example.org/dataset/EHR004>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -2295,7 +2364,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Antineoplastic and Immunomodulating Agents"@de ;
     foaf:name "Rheinland University Hospital - Department of Antineoplastic and Immunomodulating Agents"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -2309,7 +2385,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "C61" ;
@@ -2437,7 +2520,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR004> a csvw:TableGroup ;
   csvw:table [
@@ -2448,41 +2532,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -2500,7 +2584,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR004> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Prostate Cancer (Active Surveillance)"@en ;
@@ -2711,7 +2796,7 @@
     ] ;
     skos:notation "19926-5" ;
     skos:prefLabel "LOINC:19926-5"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q35869> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q3286546> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q161635> ;
@@ -2754,7 +2839,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR005> ;
       dcat:servesDataset <http://example.org/dataset/EHR005>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -2774,7 +2860,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Pulmonology"@de ;
     foaf:name "Rheinland University Hospital - Department of Pulmonology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -2788,7 +2881,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "J44.9" ;
@@ -2917,7 +3017,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR005> a csvw:TableGroup ;
   csvw:table [
@@ -2928,41 +3029,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -2980,7 +3081,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR005> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for COPD with Emphysema"@en ;
@@ -3174,7 +3276,7 @@
     ] ;
     skos:notation "10028155" ;
     skos:prefLabel "MedDRA:10028155"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q134561> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q1054718> ;
@@ -3217,7 +3319,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR006> ;
       dcat:servesDataset <http://example.org/dataset/EHR006>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -3237,7 +3340,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Nervous System"@de ;
     foaf:name "Rheinland University Hospital - Department of Nervous System"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -3251,7 +3361,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "G35" ;
@@ -3378,7 +3495,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR006> a csvw:TableGroup ;
   csvw:table [
@@ -3389,41 +3507,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -3441,7 +3559,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR006> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Multiple Sclerosis (RRMS)"@en ;
@@ -3641,7 +3760,7 @@
     ] ;
     skos:notation "10039073" ;
     skos:prefLabel "MedDRA:10039073"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q8277> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q188874> ;
@@ -3684,7 +3803,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR007> ;
       dcat:servesDataset <http://example.org/dataset/EHR007>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -3704,7 +3824,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Rheumatology"@de ;
     foaf:name "Rheinland University Hospital - Department of Rheumatology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -3718,7 +3845,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "M05.9" ;
@@ -3847,7 +3981,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR007> a csvw:TableGroup ;
   csvw:table [
@@ -3858,41 +3993,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -3910,7 +4045,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR007> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Rheumatoid Arthritis"@en ;
@@ -4120,7 +4256,7 @@
     ] ;
     skos:notation "33914-3" ;
     skos:prefLabel "LOINC:33914-3"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q476921> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q208414> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q3025883> ;
@@ -4163,7 +4299,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR008> ;
       dcat:servesDataset <http://example.org/dataset/EHR008>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -4183,7 +4320,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Nephrology"@de ;
     foaf:name "Rheinland University Hospital - Department of Nephrology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -4197,7 +4341,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "N18.4" ;
@@ -4324,7 +4475,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR008> a csvw:TableGroup ;
   csvw:table [
@@ -4335,41 +4487,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -4387,7 +4539,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR008> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Chronic Kidney Disease Stage 4"@en ;
@@ -4581,7 +4734,7 @@
     ] ;
     skos:notation "10012378" ;
     skos:prefLabel "MedDRA:10012378"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q42844> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q13386846> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q178190> ;
@@ -4624,7 +4777,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR009> ;
       dcat:servesDataset <http://example.org/dataset/EHR009>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -4644,7 +4798,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Psychiatry"@de ;
     foaf:name "Rheinland University Hospital - Department of Psychiatry"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -4658,7 +4819,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "F33.1" ;
@@ -4787,7 +4955,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR009> a csvw:TableGroup ;
   csvw:table [
@@ -4798,41 +4967,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -4850,7 +5019,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR009> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Major Depressive Disorder"@en ;
@@ -5058,7 +5228,7 @@
     ] ;
     skos:notation "10034010" ;
     skos:prefLabel "MedDRA:10034010"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q11085> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q386591> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q913672> ;
@@ -5101,7 +5271,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR010> ;
       dcat:servesDataset <http://example.org/dataset/EHR010>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -5121,7 +5292,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Nervous System"@de ;
     foaf:name "Rheinland University Hospital - Department of Nervous System"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -5135,7 +5313,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "G20" ;
@@ -5261,7 +5446,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR010> a csvw:TableGroup ;
   csvw:table [
@@ -5272,41 +5458,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -5324,7 +5510,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR010> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Parkinson's Disease"@en ;
@@ -5519,7 +5706,7 @@
     ] ;
     skos:notation "10011401" ;
     skos:prefLabel "MedDRA:10011401"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q155100> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q127076> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
@@ -5562,7 +5749,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR011> ;
       dcat:servesDataset <http://example.org/dataset/EHR011>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -5582,7 +5770,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Gastroenterology"@de ;
     foaf:name "Rheinland University Hospital - Department of Gastroenterology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -5596,7 +5791,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "K50.0" ;
@@ -5726,7 +5928,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR011> a csvw:TableGroup ;
   csvw:table [
@@ -5737,41 +5940,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -5789,7 +5992,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR011> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Crohn's Disease"@en ;
@@ -5986,7 +6190,7 @@
     ] ;
     skos:notation "10015037" ;
     skos:prefLabel "MedDRA:10015037"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q112> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q1156499> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q853090> ;
@@ -6029,7 +6233,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR012> ;
       dcat:servesDataset <http://example.org/dataset/EHR012>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -6049,7 +6254,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Nervous System"@de ;
     foaf:name "Rheinland University Hospital - Department of Nervous System"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -6063,7 +6275,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "G40.2" ;
@@ -6189,7 +6408,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR012> a csvw:TableGroup ;
   csvw:table [
@@ -6200,41 +6420,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -6252,7 +6472,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR012> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Epilepsy (Focal)"@en ;
@@ -6449,7 +6670,7 @@
     ] ;
     skos:notation "10042945" ;
     skos:prefLabel "MedDRA:10042945"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7881> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q500459> ;
@@ -6492,7 +6713,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR013> ;
       dcat:servesDataset <http://example.org/dataset/EHR013>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -6512,7 +6734,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Rheumatology"@de ;
     foaf:name "Rheinland University Hospital - Department of Rheumatology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -6526,7 +6755,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "M32.1" ;
@@ -6653,7 +6889,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR013> a csvw:TableGroup ;
   csvw:table [
@@ -6664,41 +6901,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -6716,7 +6953,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR013> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Systemic Lupus Erythematosus"@en ;
@@ -6929,7 +7167,7 @@
     ] ;
     skos:notation "10003658" ;
     skos:prefLabel "MedDRA:10003658"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q207067> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q389735> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q160680> ;
@@ -6972,7 +7210,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR014> ;
       dcat:servesDataset <http://example.org/dataset/EHR014>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -6992,7 +7231,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Cardiovascular"@de ;
     foaf:name "Rheinland University Hospital - Department of Cardiovascular"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -7006,7 +7252,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "I48.1" ;
@@ -7136,7 +7389,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR014> a csvw:TableGroup ;
   csvw:table [
@@ -7147,41 +7401,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -7199,7 +7453,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR014> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Atrial Fibrillation"@en ;
@@ -7405,7 +7660,7 @@
     ] ;
     skos:notation "10003553" ;
     skos:prefLabel "MedDRA:10003553"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12206> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q188504> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q147778> ;
@@ -7448,7 +7703,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR015> ;
       dcat:servesDataset <http://example.org/dataset/EHR015>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -7468,7 +7724,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Pulmonology"@de ;
     foaf:name "Rheinland University Hospital - Department of Pulmonology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -7482,7 +7745,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "J45.5" ;
@@ -7611,7 +7881,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR015> a csvw:TableGroup ;
   csvw:table [
@@ -7622,41 +7893,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -7674,7 +7945,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR015> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Severe Asthma"@en ;
@@ -7884,7 +8156,7 @@
     ] ;
     skos:notation "10067584" ;
     skos:prefLabel "MedDRA:10067584"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q124407> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q8063> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
@@ -7927,7 +8199,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR016> ;
       dcat:servesDataset <http://example.org/dataset/EHR016>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -7947,7 +8220,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Endocrinology/Diabetology"@de ;
     foaf:name "Rheinland University Hospital - Department of Endocrinology/Diabetology"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -7961,7 +8241,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "E10.9" ;
@@ -8088,7 +8375,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR016> a csvw:TableGroup ;
   csvw:table [
@@ -8099,41 +8387,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -8151,7 +8439,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR016> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Type 1 Diabetes"@en ;
@@ -8344,7 +8633,7 @@
     ] ;
     skos:notation "10031282" ;
     skos:prefLabel "MedDRA:10031282"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q165328> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q155688> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q188913> ;
@@ -8387,7 +8676,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR017> ;
       dcat:servesDataset <http://example.org/dataset/EHR017>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -8407,7 +8697,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Musculo-Skeletal System"@de ;
     foaf:name "Rheinland University Hospital - Department of Musculo-Skeletal System"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -8421,7 +8718,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "M80.0" ;
@@ -8549,7 +8853,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR017> a csvw:TableGroup ;
   csvw:table [
@@ -8560,41 +8865,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -8612,7 +8917,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR017> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Osteoporosis with Fracture"@en ;
@@ -8823,7 +9129,7 @@
     ] ;
     skos:notation "10019731" ;
     skos:prefLabel "MedDRA:10019731"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q174701> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7556> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q18975> ;
@@ -8866,7 +9172,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR018> ;
       dcat:servesDataset <http://example.org/dataset/EHR018>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -8886,7 +9193,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Antiinfectives for Systemic Use"@de ;
     foaf:name "Rheinland University Hospital - Department of Antiinfectives for Systemic Use"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -8900,7 +9214,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "B18.2" ;
@@ -9029,7 +9350,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR018> a csvw:TableGroup ;
   csvw:table [
@@ -9040,41 +9362,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -9092,7 +9414,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR018> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Hepatitis C (Chronic)"@en ;
@@ -9297,7 +9620,7 @@
     ] ;
     skos:notation "10027599" ;
     skos:prefLabel "MedDRA:10027599"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q133823> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q86> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q774352> ;
@@ -9340,7 +9663,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR019> ;
       dcat:servesDataset <http://example.org/dataset/EHR019>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -9360,7 +9684,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Nervous System"@de ;
     foaf:name "Rheinland University Hospital - Department of Nervous System"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -9374,7 +9705,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "G43.1" ;
@@ -9503,7 +9841,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR019> a csvw:TableGroup ;
   csvw:table [
@@ -9514,41 +9853,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -9566,7 +9905,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR019> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for Chronic Migraine"@en ;
@@ -9772,7 +10112,7 @@
     ] ;
     skos:notation "10020098" ;
     skos:prefLabel "MedDRA:10020098"@en
-  ]
+  ] ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q2840> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12199> ;
   healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
@@ -9815,7 +10155,8 @@
       dct:title "EHR Analytics Service"@en ;
       dcat:endpointURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR020> ;
       dcat:servesDataset <http://example.org/dataset/EHR020>
-    ]
+    ] ;
+    dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj>
   ] ;
   # Provenance / Metadata Quality
   dct:provenance [
@@ -9835,7 +10176,14 @@
     foaf:name "Rheinland Universitätsklinikum - Klinik für Antiinfectives for Systemic Use"@de ;
     foaf:name "Rheinland University Hospital - Department of Antiinfectives for Systemic Use"@en ;
     dct:identifier "did:web:rheinland-uklinikum.de" ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   dct:publisher [
     a foaf:Agent, foaf:Organization ;
@@ -9849,7 +10197,14 @@
       vcard:postal-code "50937" ;
       vcard:country-name "Germany"
     ] ;
-    foaf:homepage <https://www.rheinland-uklinikum.de>
+    foaf:homepage <https://www.rheinland-uklinikum.de> ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:fn "Forschungsdatenmanagement"@de ;
+      vcard:fn "Research Data Management"@en ;
+      vcard:hasEmail <mailto:forschungsdaten@rheinland-uklinikum.de> ;
+      vcard:hasTelephone <tel:+49-221-478-0>
+    ]
   ] ;
   # HealthDCAT-AP Specific Fields
   healthdcatap:icdCode "B20" ;
@@ -9979,7 +10334,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:conformsTo <http://hl7.org/fhir/R4> ;
-  dct:conformsTo <http://www.w3.org/ns/csvw> .
+  dct:conformsTo <http://www.w3.org/ns/csvw> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/csvw/EHR020> a csvw:TableGroup ;
   csvw:table [
@@ -9990,41 +10346,41 @@
     csvw:column [
       a csvw:Column ;
       csvw:name "patient_id" ;
-      csvw:title "Patient Identifier"@en ;
-      csvw:description "Pseudonymized patient identifier"@en ;
+      csvw:titles "Patient Identifier"@en ;
+      dct:description "Pseudonymized patient identifier"@en ;
       csvw:datatype "string"
     ], [
       a csvw:Column ;
       csvw:name "diagnosis_code" ;
-      csvw:title "ICD-10 Diagnosis Code"@en ;
-      csvw:description "Primary diagnosis using ICD-10-GM coding"@en ;
+      csvw:titles "ICD-10 Diagnosis Code"@en ;
+      dct:description "Primary diagnosis using ICD-10-GM coding"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Condition>
     ], [
       a csvw:Column ;
       csvw:name "age_at_diagnosis" ;
-      csvw:title "Age at Diagnosis"@en ;
-      csvw:description "Patient age in years at time of diagnosis"@en ;
+      csvw:titles "Age at Diagnosis"@en ;
+      dct:description "Patient age in years at time of diagnosis"@en ;
       csvw:datatype "integer"
     ], [
       a csvw:Column ;
       csvw:name "biological_sex" ;
-      csvw:title "Biological Sex"@en ;
-      csvw:description "Biological sex (male, female, other, unknown)"@en ;
+      csvw:titles "Biological Sex"@en ;
+      dct:description "Biological sex (male, female, other, unknown)"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <http://hl7.org/fhir/StructureDefinition/Patient>
     ], [
       a csvw:Column ;
       csvw:name "meddra_pt_code" ;
-      csvw:title "MedDRA Preferred Term Code"@en ;
-      csvw:description "MedDRA v27.0 Preferred Term code"@en ;
+      csvw:titles "MedDRA Preferred Term Code"@en ;
+      dct:description "MedDRA v27.0 Preferred Term code"@en ;
       csvw:datatype "string" ;
       csvw:propertyUrl <https://meddra.org/>
     ], [
       a csvw:Column ;
       csvw:name "observation_date" ;
-      csvw:title "Observation Date"@en ;
-      csvw:description "Date of clinical observation"@en ;
+      csvw:titles "Observation Date"@en ;
+      dct:description "Date of clinical observation"@en ;
       csvw:datatype "date"
     ]
   ] .
@@ -10042,7 +10398,8 @@
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
   dct:modified "2024-12-15"^^xsd:date ;
-  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> .
+  dct:conformsTo <https://www.w3.org/TR/vocab-dqv/> ;
+  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .
 
 <http://example.org/analytics-service/EHR020> a dcat:DataService ;
   dct:title "Confidential Computing Analytics Service for HIV (Well-Controlled)"@en ;
