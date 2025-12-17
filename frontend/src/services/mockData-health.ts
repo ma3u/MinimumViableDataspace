@@ -305,7 +305,7 @@ export const healthDataAccessBodies = {
       'locn:postName': 'Bonn',
       'locn:thoroughfare': 'Kurt-Georg-Kiesinger-Allee 3'
     },
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/NationalPublicHealthInstitut'
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/NationalPublicHealthInstitut'
   },
   'NL': {
     '@id': 'https://www.healthri.nl',
@@ -480,8 +480,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',      // Consent
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',      // Scientific research
     ],
-    'healthdcatap:publishernote': 'Data collected under ethical approval (Ethics Committee Rheinland-Pfalz, Ref: 2023-RLP-0847). All records pseudonymized per EHDS Art. 55.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Data collected under ethical approval (Ethics Committee Rheinland-Pfalz, Ref: 2023-RLP-0847). All records pseudonymized per EHDS Art. 55.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     // dct:identifier - MANDATORY persistent URI
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR021',
     // dcat:contactPoint - MANDATORY
@@ -541,7 +541,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 17,
     'healthdcatap:numberOfRecords': 127,
     'healthdcatap:numberOfUniqueIndividuals': 42,
-    'healthdcatap:populationcoverage': 'Pediatric patients with rare genetic disorders in Rhineland-Palatinate catchment area',
+    'healthdcatap:populationCoverage': 'Pediatric patients with rare genetic disorders in Rhineland-Palatinate catchment area',
     'healthdcatap:hasCodingSystem': [
       'https://www.wikidata.org/entity/Q45127',     // ICD-10
       'https://www.wikidata.org/entity/Q900684',   // SNOMED-CT
@@ -694,8 +694,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',      // Consent
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',      // Scientific research
     ],
-    'healthdcatap:publishernote': 'Data from Phase III clinical trial with HbA1c monitoring. Ethics approval: Ethikkommission Nordrhein Ref: 2024-NR-0123.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Data from Phase III clinical trial with HbA1c monitoring. Ethics approval: Ethikkommission Nordrhein Ref: 2024-NR-0123.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     // dct:identifier - MANDATORY persistent URI
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR001',
     // dcat:contactPoint - MANDATORY
@@ -747,7 +747,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 64,
     'healthdcatap:numberOfRecords': 2847,
     'healthdcatap:numberOfUniqueIndividuals': 156,
-    'healthdcatap:populationcoverage': 'Adult patients with Type 2 diabetes and cardiovascular comorbidities across EU partner sites',
+    'healthdcatap:populationCoverage': 'Adult patients with Type 2 diabetes and cardiovascular comorbidities across EU partner sites',
     'healthdcatap:hasCodingSystem': [
       'https://www.wikidata.org/entity/Q15629608',  // ICD-10-GM
       'https://www.wikidata.org/entity/Q744434',   // LOINC
@@ -902,8 +902,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',      // Consent
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',      // Scientific research
     ],
-    'healthdcatap:publishernote': 'Phase IV real-world evidence study. Includes echocardiography and biomarker data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0456.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase IV real-world evidence study. Includes echocardiography and biomarker data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0456.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     // dct:identifier - MANDATORY persistent URI
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR002',
     // dcat:contactPoint - MANDATORY
@@ -955,7 +955,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 74,
     'healthdcatap:numberOfRecords': 1523,
     'healthdcatap:numberOfUniqueIndividuals': 89,
-    'healthdcatap:populationcoverage': 'Patients with HFrEF (EF<40%) in Rhine region cardiology network',
+    'healthdcatap:populationCoverage': 'Patients with HFrEF (EF<40%) in Rhine region cardiology network',
     'healthdcatap:hasCodingSystem': [
       'https://www.wikidata.org/entity/Q15629608',  // ICD-10-GM
       'https://www.wikidata.org/entity/Q744434',   // LOINC
@@ -1107,8 +1107,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',      // Consent
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',      // Scientific research
     ],
-    'healthdcatap:publishernote': 'Academic oncology trial. No genetic analysis permitted. Ethics: Ethikkommission Baden-Württemberg Ref: 2024-BW-0234.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Academic oncology trial. No genetic analysis permitted. Ethics: Ethikkommission Baden-Württemberg Ref: 2024-BW-0234.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     // dct:identifier - MANDATORY persistent URI
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR003',
     // dcat:contactPoint - MANDATORY
@@ -1160,7 +1160,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 54,
     'healthdcatap:numberOfRecords': 892,
     'healthdcatap:numberOfUniqueIndividuals': 67,
-    'healthdcatap:populationcoverage': 'Female breast cancer patients in remission from Baden-Württemberg tumor registry',
+    'healthdcatap:populationCoverage': 'Female breast cancer patients in remission from Baden-Württemberg tumor registry',
     'healthdcatap:hasCodingSystem': [
       'https://www.wikidata.org/entity/Q15629608',  // ICD-10-GM
       'https://www.wikidata.org/entity/Q2743',     // MedDRA
@@ -1308,8 +1308,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Active surveillance registry. Ethics: Multi-site approval EU-OC-2023-0055.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Registry',
+    'healthdcatap:publisherNote': 'Active surveillance registry. Ethics: Multi-site approval EU-OC-2023-0055.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Registry',
     // dct:identifier - MANDATORY persistent URI
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR004',
     // dcat:contactPoint - MANDATORY
@@ -1360,7 +1360,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 74,
     'healthdcatap:numberOfRecords': 523,
     'healthdcatap:numberOfUniqueIndividuals': 78,
-    'healthdcatap:populationcoverage': 'Male patients with low-grade prostate cancer under active surveillance in EU network',
+    'healthdcatap:populationCoverage': 'Male patients with low-grade prostate cancer under active surveillance in EU network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:C61', 'MedDRA:10036910'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -1498,8 +1498,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase III COPD trial with spirometry data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0234.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase III COPD trial with spirometry data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0234.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR005',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Klaus Schmidt', 'vcard:hasEmail': 'mailto:k.schmidt@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-5600', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Pneumologie', 'vcard:hasRole': 'Clinical Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -1511,7 +1511,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 64,
     'healthdcatap:numberOfRecords': 1847,
     'healthdcatap:numberOfUniqueIndividuals': 134,
-    'healthdcatap:populationcoverage': 'Adult COPD patients with emphysema across EU partner respiratory centers',
+    'healthdcatap:populationCoverage': 'Adult COPD patients with emphysema across EU partner respiratory centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q744434', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:J44.9', 'ICD-10-GM:J43.9', 'LOINC:19926-5'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -1647,8 +1647,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase II MS trial with MRI data. Ethics: Ethikkommission Charité Ref: 2024-CH-0189.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Phase II MS trial with MRI data. Ethics: Ethikkommission Charité Ref: 2024-CH-0189.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR006',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Sabine Richter', 'vcard:hasEmail': 'mailto:s.richter@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-5700', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Neurologie', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -1660,7 +1660,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 34,
     'healthdcatap:numberOfRecords': 678,
     'healthdcatap:numberOfUniqueIndividuals': 45,
-    'healthdcatap:populationcoverage': 'RRMS patients aged 25-34 in German MS registry network',
+    'healthdcatap:populationCoverage': 'RRMS patients aged 25-34 in German MS registry network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:G35', 'MedDRA:10028155'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -1797,8 +1797,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase III RA trial with DAS28 monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0345.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase III RA trial with DAS28 monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0345.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR007',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Hans Weber', 'vcard:hasEmail': 'mailto:h.weber@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-5800', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Rheumatologie', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -1810,7 +1810,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 54,
     'healthdcatap:numberOfRecords': 1234,
     'healthdcatap:numberOfUniqueIndividuals': 98,
-    'healthdcatap:populationcoverage': 'Adult RA patients with seropositive disease across EU partner rheumatology centers',
+    'healthdcatap:populationCoverage': 'Adult RA patients with seropositive disease across EU partner rheumatology centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:M05.9', 'MedDRA:10039073'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -1947,8 +1947,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase IV CKD registry with eGFR monitoring. Ethics: Ethikkommission Köln Ref: 2023-UK-0567.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Phase IV CKD registry with eGFR monitoring. Ethics: Ethikkommission Köln Ref: 2023-UK-0567.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR008',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Petra Hoffmann', 'vcard:hasEmail': 'mailto:p.hoffmann@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-5900', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Nephrologie', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -1960,7 +1960,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 74,
     'healthdcatap:numberOfRecords': 2156,
     'healthdcatap:numberOfUniqueIndividuals': 123,
-    'healthdcatap:populationcoverage': 'CKD stage 4 patients with diabetic nephropathy in German-Austrian registry network',
+    'healthdcatap:populationCoverage': 'CKD stage 4 patients with diabetic nephropathy in German-Austrian registry network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q744434', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:N18.4', 'ICD-10-GM:E11.2', 'LOINC:33914-3'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -2096,8 +2096,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-a',
     ],
-    'healthdcatap:publishernote': 'Sensitive mental health data - strictly academic research only. Ethics: Ethikkommission Charité Ref: 2024-CH-0234.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Sensitive mental health data - strictly academic research only. Ethics: Ethikkommission Charité Ref: 2024-CH-0234.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR009',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Julia Neumann', 'vcard:hasEmail': 'mailto:j.neumann@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6000', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Psychiatrie', 'vcard:hasRole': 'Clinical Research Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -2109,7 +2109,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 44,
     'healthdcatap:numberOfRecords': 456,
     'healthdcatap:numberOfUniqueIndividuals': 34,
-    'healthdcatap:populationcoverage': 'Adult patients with recurrent MDD in German-French-Dutch psychiatric research network',
+    'healthdcatap:populationCoverage': 'Adult patients with recurrent MDD in German-French-Dutch psychiatric research network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:F33.1', 'MedDRA:10012378'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -2245,8 +2245,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase I/II Parkinson disease trial with UPDRS and motor assessment data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0123.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Phase I/II Parkinson disease trial with UPDRS and motor assessment data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0123.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR010',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Stefan Krause', 'vcard:hasEmail': 'mailto:s.krause@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6100', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Gastroenterologie', 'vcard:hasRole': 'Clinical Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -2258,7 +2258,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 64,
     'healthdcatap:numberOfRecords': 567,
     'healthdcatap:numberOfUniqueIndividuals': 42,
-    'healthdcatap:populationcoverage': 'Early-stage Parkinson disease patients in German neurology network',
+    'healthdcatap:populationCoverage': 'Early-stage Parkinson disease patients in German neurology network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:G20', 'MedDRA:10034010'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -2395,8 +2395,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase III IBD trial with CDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0456.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase III IBD trial with CDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0456.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR011',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Stefan Krause', 'vcard:hasEmail': 'mailto:s.krause@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6200', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Gastroenterologie', 'vcard:hasRole': 'Clinical Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -2408,7 +2408,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 34,
     'healthdcatap:numberOfRecords': 1678,
     'healthdcatap:numberOfUniqueIndividuals': 112,
-    'healthdcatap:populationcoverage': 'Adult Crohn disease patients in EU IBD registry network',
+    'healthdcatap:populationCoverage': 'Adult Crohn disease patients in EU IBD registry network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:K50.0', 'MedDRA:10011401'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -2542,8 +2542,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase II epilepsy trial with seizure diary and EEG data. Ethics: Ethikkommission Charité Ref: 2024-CH-0345.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Phase II epilepsy trial with seizure diary and EEG data. Ethics: Ethikkommission Charité Ref: 2024-CH-0345.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR012',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Monika Lang', 'vcard:hasEmail': 'mailto:m.lang@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6300', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Epilepsiezentrum', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -2555,7 +2555,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 24,
     'healthdcatap:numberOfRecords': 623,
     'healthdcatap:numberOfUniqueIndividuals': 48,
-    'healthdcatap:populationcoverage': 'Young adult patients with focal epilepsy in German epilepsy centers',
+    'healthdcatap:populationCoverage': 'Young adult patients with focal epilepsy in German epilepsy centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:G40.2', 'MedDRA:10015037'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -2689,8 +2689,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase II SLE trial with SLEDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0567.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase II SLE trial with SLEDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0567.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR013',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Anna Schulz', 'vcard:hasEmail': 'mailto:a.schulz@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6400', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Rheumatologie', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -2702,7 +2702,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 44,
     'healthdcatap:numberOfRecords': 789,
     'healthdcatap:numberOfUniqueIndividuals': 56,
-    'healthdcatap:populationcoverage': 'SLE patients with renal involvement in German lupus centers',
+    'healthdcatap:populationCoverage': 'SLE patients with renal involvement in German lupus centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:M32.1', 'MedDRA:10042945'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -2841,8 +2841,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase IV AFib RWE study with anticoagulation data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0678.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase IV AFib RWE study with anticoagulation data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0678.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR014',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Thomas Fischer', 'vcard:hasEmail': 'mailto:t.fischer@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6500', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Kardiologie', 'vcard:hasRole': 'Clinical Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -2854,7 +2854,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 84,
     'healthdcatap:numberOfRecords': 3456,
     'healthdcatap:numberOfUniqueIndividuals': 234,
-    'healthdcatap:populationcoverage': 'Elderly patients with persistent AFib across EU cardiology centers',
+    'healthdcatap:populationCoverage': 'Elderly patients with persistent AFib across EU cardiology centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q744434', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:I48.1', 'LOINC:8867-4', 'MedDRA:10003658'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -2992,8 +2992,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase III severe asthma trial with ACT and IgE data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0789.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase III severe asthma trial with ACT and IgE data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0789.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR015',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Birgit Schmidt', 'vcard:hasEmail': 'mailto:b.schmidt@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6600', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Pneumologie', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -3005,7 +3005,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 44,
     'healthdcatap:numberOfRecords': 1234,
     'healthdcatap:numberOfUniqueIndividuals': 89,
-    'healthdcatap:populationcoverage': 'Adult patients with severe persistent asthma across EU respiratory centers',
+    'healthdcatap:populationCoverage': 'Adult patients with severe persistent asthma across EU respiratory centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q744434', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:J45.5', 'LOINC:19926-5', 'MedDRA:10003553'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -3142,8 +3142,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase II T1D trial with CGM and insulin pump data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0234.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Phase II T1D trial with CGM and insulin pump data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0234.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR016',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Martin Gruber', 'vcard:hasEmail': 'mailto:m.gruber@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6700', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Diabetologie', 'vcard:hasRole': 'Clinical Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -3155,7 +3155,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 34,
     'healthdcatap:numberOfRecords': 45678,
     'healthdcatap:numberOfUniqueIndividuals': 56,
-    'healthdcatap:populationcoverage': 'Young adult T1D patients with insulin pump therapy in German diabetes centers',
+    'healthdcatap:populationCoverage': 'Young adult T1D patients with insulin pump therapy in German diabetes centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q744434', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:E10.9', 'LOINC:4548-4', 'MedDRA:10067584'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -3290,8 +3290,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase IV osteoporosis registry with DXA and FRAX data. Ethics: Ethikkommission Köln Ref: 2023-UK-0789.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
+    'healthdcatap:publisherNote': 'Phase IV osteoporosis registry with DXA and FRAX data. Ethics: Ethikkommission Köln Ref: 2023-UK-0789.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Academic',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR017',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Eva Becker', 'vcard:hasEmail': 'mailto:e.becker@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6800', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Rheumatologie', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -3303,7 +3303,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 74,
     'healthdcatap:numberOfRecords': 987,
     'healthdcatap:numberOfUniqueIndividuals': 78,
-    'healthdcatap:populationcoverage': 'Postmenopausal women with osteoporosis and fracture history in EU bone health network',
+    'healthdcatap:populationCoverage': 'Postmenopausal women with osteoporosis and fracture history in EU bone health network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:M80.0', 'MedDRA:10031282'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -3440,8 +3440,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-i',
     ],
-    'healthdcatap:publishernote': 'Sensitive infectious disease data - Phase IV HCV study with SVR monitoring. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0890.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Sensitive infectious disease data - Phase IV HCV study with SVR monitoring. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0890.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR018',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Klaus Zimmermann', 'vcard:hasEmail': 'mailto:k.zimmermann@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-6900', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Infektiologie', 'vcard:hasRole': 'Clinical Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -3453,7 +3453,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 54,
     'healthdcatap:numberOfRecords': 678,
     'healthdcatap:numberOfUniqueIndividuals': 52,
-    'healthdcatap:populationcoverage': 'Adult patients with chronic HCV in EU hepatitis treatment network',
+    'healthdcatap:populationCoverage': 'Adult patients with chronic HCV in EU hepatitis treatment network',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q744434', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:B18.2', 'LOINC:20416-4', 'MedDRA:10019731'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -3591,8 +3591,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-j',
     ],
-    'healthdcatap:publishernote': 'Phase III migraine trial with MIDAS scores and CGRP data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0912.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
+    'healthdcatap:publisherNote': 'Phase III migraine trial with MIDAS scores and CGRP data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0912.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Hospital',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR019',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Claudia Frank', 'vcard:hasEmail': 'mailto:c.frank@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-7000', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Kopfschmerzzentrum', 'vcard:hasRole': 'Research Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -3604,7 +3604,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 44,
     'healthdcatap:numberOfRecords': 1456,
     'healthdcatap:numberOfUniqueIndividuals': 102,
-    'healthdcatap:populationcoverage': 'Adult patients with chronic migraine across EU headache centers',
+    'healthdcatap:populationCoverage': 'Adult patients with chronic migraine across EU headache centers',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:G43.1', 'MedDRA:10027599'],
     // healthTheme - MANDATORY Wikidata URIs for health topics
@@ -3741,8 +3741,8 @@ export const mockEHRCatalogAssets = [
       'https://w3id.org/dpv/dpv-gdpr#A6-1-a',
       'https://w3id.org/dpv/dpv-gdpr#A9-2-a',
     ],
-    'healthdcatap:publishernote': 'Highly sensitive HIV data - strictly academic research only. Ethics: Multi-center approval EU-HIV-2023-0034.',
-    'healthdcatap:publishertype': 'http://healthdata.ec.europa.eu/authority/publisher-type/Registry',
+    'healthdcatap:publisherNote': 'Highly sensitive HIV data - strictly academic research only. Ethics: Multi-center approval EU-HIV-2023-0034.',
+    'healthdcatap:publisherType': 'http://healthdata.ec.europa.eu/authority/publisher-type/Registry',
     'dct:identifier': 'https://dataspace.rheinland-uklinikum.de/dataset/EHR020',
     'dcat:contactPoint': [{ '@type': 'vcard:Kind', 'vcard:fn': 'Dr. Markus Hartmann', 'vcard:hasEmail': 'mailto:m.hartmann@rheinland-uklinikum.de', 'vcard:hasTelephone': 'tel:+49-221-478-7100', 'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Infektiologie', 'vcard:hasRole': 'Clinical Data Manager' }],
     'dct:publisher': { '@type': 'foaf:Agent', 'foaf:name': 'Rheinland Universitätsklinikum', 'foaf:homepage': 'https://www.rheinland-uklinikum.de', 'dct:type': 'http://purl.org/adms/publishertype/Academia', 'vcard:hasAddress': { 'vcard:street-address': 'Kerpener Straße 62', 'vcard:locality': 'Köln', 'vcard:postal-code': '50937', 'vcard:country-name': 'Germany' } },
@@ -3754,7 +3754,7 @@ export const mockEHRCatalogAssets = [
     'healthdcatap:maxTypicalAge': 44,
     'healthdcatap:numberOfRecords': 345,
     'healthdcatap:numberOfUniqueIndividuals': 28,
-    'healthdcatap:populationcoverage': 'Well-controlled HIV patients on ART in EU clinical cohort',
+    'healthdcatap:populationCoverage': 'Well-controlled HIV patients on ART in EU clinical cohort',
     'healthdcatap:hasCodingSystem': ['https://www.wikidata.org/entity/Q15629608', 'https://www.wikidata.org/entity/Q744434', 'https://www.wikidata.org/entity/Q2743', 'https://www.wikidata.org/entity/Q19597236'],
     'healthdcatap:hasCodeValues': ['ICD-10-GM:B20', 'LOINC:24467-3', 'MedDRA:10020098'],
     // healthTheme - MANDATORY Wikidata URIs for health topics

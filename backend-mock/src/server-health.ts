@@ -10,6 +10,8 @@
 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -3318,24 +3320,277 @@ app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'healthy', service: 'ehr2edc-backend', recordsCount: ehrCatalog.length });
 });
 
+// ============================================================
+// HealthDCAT-AP Catalog Endpoint - Single Source of Truth
+// ============================================================
+
+/**
+ * Serve the HealthDCAT-AP catalog as Turtle (TTL) format.
+ * This eliminates drift between the static file and the serializer
+ * by serving the canonical resources/health-catalog.ttl file.
+ */
+app.get('/api/catalog.ttl', (req: Request, res: Response) => {
+  // Try multiple paths to find the TTL file (local dev vs Docker)
+  const possiblePaths = [
+    path.join(__dirname, '../../resources/health-catalog.ttl'),  // From backend-mock/src/
+    path.join(__dirname, '../../../resources/health-catalog.ttl'), // Alternative relative path
+    '/app/resources/health-catalog.ttl',  // Docker path
+    path.resolve(process.cwd(), '../resources/health-catalog.ttl'),  // From backend-mock/
+    path.resolve(process.cwd(), 'resources/health-catalog.ttl'),  // From root
+  ];
+  
+  let catalogPath: string | null = null;
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      catalogPath = p;
+      break;
+    }
+  }
+  
+  if (!catalogPath) {
+    console.error(`[${new Date().toISOString()}] GET /api/catalog.ttl - TTL file not found. Searched: ${possiblePaths.join(', ')}`);
+    res.status(404).json({ 
+      error: 'HealthDCAT-AP catalog not found', 
+      searchedPaths: possiblePaths,
+      hint: 'Ensure resources/health-catalog.ttl exists'
+    });
+    return;
+  }
+  
+  try {
+    const ttlContent = fs.readFileSync(catalogPath, 'utf-8');
+    console.log(`[${new Date().toISOString()}] GET /api/catalog.ttl - Serving ${(ttlContent.length / 1024).toFixed(1)}KB HealthDCAT-AP catalog`);
+    res.setHeader('Content-Type', 'text/turtle; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="health-catalog.ttl"');
+    res.send(ttlContent);
+  } catch (err) {
+    const error = err as Error;
+    console.error(`[${new Date().toISOString()}] GET /api/catalog.ttl - Error reading TTL: ${error.message}`);
+    res.status(500).json({ error: 'Failed to read catalog file', details: error.message });
+  }
+});
+
+// Catalog metadata endpoint (JSON summary with full HealthDCAT-AP properties)
+app.get('/api/catalog', (req: Request, res: Response) => {
+  console.log(`[${new Date().toISOString()}] GET /api/catalog - Full HealthDCAT-AP catalog metadata`);
+  
+  // Build rich dataset metadata from healthRecords
+  const datasets = Object.entries(healthRecords).map(([id, record]) => {
+    const cs = record.credentialSubject;
+    const clinicalTrial = cs.clinicalTrialNode as { phase?: string; phaseCode?: string; studyType?: string; euCtNumber?: string; sponsor?: unknown; therapeuticArea?: unknown; memberStatesConcerned?: string[] } | undefined;
+    const medDRA = cs.medDRANode as { version?: string; primarySOC?: unknown; preferredTerm?: { code?: string; name?: string } } | undefined;
+    
+    return {
+      '@id': `http://example.org/dataset/${id}`,
+      '@type': 'Dataset',
+      'dct:identifier': id,
+      'dct:title': `${cs.conditionsNode.primaryDiagnosis.display} - Clinical Study Data`,
+      'dct:description': `De-identified EHR data for ${cs.conditionsNode.primaryDiagnosis.display} (${cs.conditionsNode.primaryDiagnosis.code}) from ${clinicalTrial?.phase || 'clinical'} trial`,
+      'dct:accessRights': 'NON_PUBLIC',
+      // HealthDCAT-AP MANDATORY properties
+      'healthdcatap:healthCategory': ['EHR', 'CLINICAL_TRIAL'],
+      'healthdcatap:hdab': {
+        name: 'Forschungsdatenzentrum Gesundheit (FDZ)',
+        homepage: 'https://www.forschungsdatenzentrum-gesundheit.de'
+      },
+      'dcatap:applicableLegislation': [
+        'http://data.europa.eu/eli/reg/2025/327/oj',
+        'http://data.europa.eu/eli/reg/2016/679/oj'
+      ],
+      // Clinical metadata
+      diagnosis: {
+        display: cs.conditionsNode.primaryDiagnosis.display,
+        code: cs.conditionsNode.primaryDiagnosis.code,
+        system: 'ICD-10-GM'
+      },
+      clinicalTrial: clinicalTrial ? {
+        phase: clinicalTrial.phase,
+        phaseCode: clinicalTrial.phaseCode,
+        studyType: clinicalTrial.studyType,
+        euCtNumber: clinicalTrial.euCtNumber,
+        sponsor: clinicalTrial.sponsor,
+        therapeuticArea: clinicalTrial.therapeuticArea,
+        memberStates: clinicalTrial.memberStatesConcerned
+      } : null,
+      medDRA: medDRA ? {
+        version: medDRA.version,
+        primarySOC: medDRA.primarySOC,
+        preferredTerm: medDRA.preferredTerm
+      } : null,
+      // HealthDCAT-AP RECOMMENDED properties
+      'healthdcatap:hasCodeValues': [
+        `ICD-10-GM:${cs.conditionsNode.primaryDiagnosis.code}`,
+        ...(medDRA?.preferredTerm?.code ? [`MedDRA:${medDRA.preferredTerm.code}`] : [])
+      ],
+      'healthdcatap:hasCodingSystem': [
+        'https://www.wikidata.org/entity/Q15629608',  // ICD-10-GM
+        'https://www.wikidata.org/entity/Q1428979'   // MedDRA
+      ],
+      'healthdcatap:minTypicalAge': parseInt(cs.demographicsNode.ageBand.split('-')[0]) || 18,
+      'healthdcatap:maxTypicalAge': parseInt(cs.demographicsNode.ageBand.split('-')[1]) || 99,
+      'healthdcatap:populationCoverage': `${cs.demographicsNode.ageBand} age group, ${cs.demographicsNode.biologicalSex} patients with ${cs.conditionsNode.primaryDiagnosis.display}`,
+      demographics: {
+        ageBand: cs.demographicsNode.ageBand,
+        biologicalSex: cs.demographicsNode.biologicalSex
+      },
+      studyEligibility: cs.studyEligibility,
+      consentScope: cs.consentScope.purposes,
+      qualityScore: cs.provenanceNode.qualityScore,
+      
+      // ========================================
+      // SENSITIVE DATA (NON_PUBLIC) PROPERTIES
+      // HealthDCAT-AP Release 5 Requirements
+      // ========================================
+      
+      // MANDATORY for NON_PUBLIC: Theme (must include HEAL)
+      'dcat:theme': [
+        'http://publications.europa.eu/resource/authority/data-theme/HEAL',
+        'http://eurovoc.europa.eu/2784',  // Clinical medicine
+        'http://eurovoc.europa.eu/3885'   // Medical research
+      ],
+      
+      // MANDATORY for NON_PUBLIC: Keywords for discovery
+      'dcat:keyword': [
+        cs.conditionsNode.primaryDiagnosis.display,
+        clinicalTrial?.phase || 'clinical trial',
+        cs.demographicsNode.biologicalSex,
+        medDRA?.primarySOC ? (medDRA.primarySOC as { name?: string }).name : 'health data',
+        'EHR',
+        'secondary use',
+        'EHDS'
+      ].filter(Boolean),
+      
+      // MANDATORY for NON_PUBLIC: Dataset type
+      'dct:type': 'http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA',
+      
+      // MANDATORY for NON_PUBLIC: Provenance
+      'dct:provenance': {
+        '@type': 'dct:ProvenanceStatement',
+        'rdfs:label': `Electronic Health Records extracted from Rheinland Universitätsklinikum clinical systems under EHDS secondary use framework. Data collected under ethical approval for ${clinicalTrial?.phase || 'clinical'} trial.`,
+        'dct:source': 'Hospital Information System (HIS) - Krankenhausinformationssystem'
+      },
+      
+      // MANDATORY for NON_PUBLIC: Contact point
+      'dcat:contactPoint': {
+        '@type': 'vcard:Kind',
+        'vcard:fn': 'Research Data Steward',
+        'vcard:hasEmail': 'mailto:forschungsdaten@rheinland-uklinikum.de',
+        'vcard:hasOrganizationName': 'Rheinland Universitätsklinikum - Forschungsdatenmanagement'
+      },
+      
+      // RECOMMENDED for NON_PUBLIC: Personal data categories (DPV taxonomy)
+      'dpv:hasPersonalData': [
+        'https://w3id.org/dpv/dpv-pd#HealthRecord',
+        'https://w3id.org/dpv/dpv-pd#MedicalHealth',
+        'https://w3id.org/dpv/dpv-pd#Age',
+        'https://w3id.org/dpv/dpv-pd#Gender',
+        'https://w3id.org/dpv/dpv-pd#VitalSigns'
+      ],
+      
+      // RECOMMENDED for NON_PUBLIC: Legal basis (GDPR Art. 6 & 9)
+      'dpv:hasLegalBasis': [
+        'https://w3id.org/dpv/dpv-gdpr#A6-1-a',   // Consent
+        'https://w3id.org/dpv/dpv-gdpr#A9-2-j'    // Scientific research
+      ],
+      
+      // RECOMMENDED for NON_PUBLIC: Purpose of processing
+      'dpv:hasPurpose': [
+        'https://w3id.org/dpv#AcademicResearch',
+        'https://w3id.org/dpv#ScientificResearch',
+        'https://w3id.org/dpv#ClinicalResearch'
+      ],
+      
+      // RECOMMENDED for NON_PUBLIC: Number of records/individuals
+      'healthdcatap:numberOfRecords': Math.floor(Math.random() * 1000) + 100,
+      'healthdcatap:numberOfUniqueIndividuals': Math.floor(Math.random() * 500) + 50,
+      
+      // RECOMMENDED for NON_PUBLIC: Retention period
+      'healthdcatap:retentionPeriod': {
+        '@type': 'dct:PeriodOfTime',
+        'dcat:startDate': '2024-01-01',
+        'dcat:endDate': '2034-12-31'
+      },
+      
+      // RECOMMENDED for NON_PUBLIC: Health theme (specific health topics)
+      'healthdcatap:healthTheme': [
+        medDRA?.primarySOC ? `https://www.wikidata.org/entity/Q${(medDRA.primarySOC as { code?: string }).code?.slice(0,5) || '21169'}` : 'https://www.wikidata.org/entity/Q12136'  // Disease
+      ],
+      
+      // Distribution info
+      distribution: {
+        '@type': 'dcat:Distribution',
+        'dct:title': 'FHIR R4 Bundle Distribution',
+        accessURL: `http://localhost:3001/api/ehr/${id}`,
+        format: 'application/fhir+json',
+        conformsTo: ['http://hl7.org/fhir/R4'],
+        'dcatap:applicableLegislation': 'http://data.europa.eu/eli/reg/2025/327/oj'
+      }
+    };
+  });
+
+  res.json({
+    '@context': {
+      'dcat': 'http://www.w3.org/ns/dcat#',
+      'dct': 'http://purl.org/dc/terms/',
+      'healthdcatap': 'http://healthdataportal.eu/ns/health#',
+      'dcatap': 'http://data.europa.eu/r5r/',
+      'foaf': 'http://xmlns.com/foaf/0.1/'
+    },
+    '@type': 'dcat:Catalog',
+    'dct:title': 'MVD Health Demo Catalog - EHR2EDC',
+    'dct:description': 'HealthDCAT-AP Release 5 compliant catalog of anonymized Electronic Health Records for secondary use in clinical research. Demonstrates EHDS Regulation (EU) 2025/327 data governance.',
+    'dct:conformsTo': [
+      'https://healthdataeu.pages.code.europa.eu/healthdcat-ap/releases/release-5/',
+      'http://data.europa.eu/eli/reg/2025/327/oj',
+      'http://hl7.org/fhir/R4'
+    ],
+    'dct:publisher': {
+      '@type': 'foaf:Organization',
+      'foaf:name': 'Rheinland Universitätsklinikum',
+      'foaf:homepage': 'https://www.rheinland-uklinikum.de',
+      'healthdcatap:publisherType': 'Hospital'
+    },
+    'dcatap:applicableLegislation': [
+      'http://data.europa.eu/eli/reg/2025/327/oj',
+      'http://data.europa.eu/eli/reg/2016/679/oj',
+      'http://data.europa.eu/eli/reg/2022/868/oj'
+    ],
+    'dcat:themeTaxonomy': 'http://publications.europa.eu/resource/authority/data-theme',
+    'dct:spatial': 'http://publications.europa.eu/resource/authority/country/DEU',
+    datasetCount: datasets.length,
+    formats: {
+      ttl: '/api/catalog.ttl',
+      json: '/api/ehr',
+      jsonld: '/api/catalog'
+    },
+    'dcat:dataset': datasets
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`
-╔════════════════════════════════════════════════════════════════════╗
-║     EHR2EDC Health Data Exchange Backend Service                   ║
-║                                                                    ║
-║  Rheinland Universitätsklinikum - Anonymized EHR Server            ║
-║  Serving ${ehrCatalog.length} de-identified patient records                        ║
-║                                                                    ║
-║  Provider: Rheinland Universitätsklinikum (Hospital)               ║
-║  Consumer: Nordstein Research Institute (CRO)                      ║
-║                                                                    ║
-║  Endpoints:                                                        ║
-║    GET /api/ehr             - List all ${ehrCatalog.length} EHRs                        ║
-║    GET /api/ehr/:id         - Get specific EHR (EHR001-EHR020)     ║
-║    GET /health              - Health check                         ║
-║                                                                    ║
-║  GDPR/EHDS Compliant: k-anonymity (k=5), pseudonymized             ║
-║  Server running on port ${PORT}                                      ║
-╚════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════╗
+║     EHR2EDC Health Data Exchange Backend Service                      ║
+║                                                                       ║
+║  Rheinland Universitätsklinikum - Anonymized EHR Server               ║
+║  Serving ${ehrCatalog.length} de-identified patient records                           ║
+║                                                                       ║
+║  Provider: Rheinland Universitätsklinikum (Hospital)                  ║
+║  Consumer: Nordstein Research Institute (CRO)                         ║
+║                                                                       ║
+║  EHR Data Endpoints:                                                  ║
+║    GET /api/ehr             - List all ${ehrCatalog.length} EHRs                           ║
+║    GET /api/ehr/:id         - Get specific EHR (EHR001-EHR020)        ║
+║                                                                       ║
+║  HealthDCAT-AP Catalog (Single Source of Truth):                      ║
+║    GET /api/catalog         - Catalog metadata (JSON)                 ║
+║    GET /api/catalog.ttl     - Full catalog (Turtle/RDF)               ║
+║                                                                       ║
+║  Health & Monitoring:                                                 ║
+║    GET /health              - Health check                            ║
+║                                                                       ║
+║  Compliance: GDPR Art. 89, EHDS Reg. 2025/327, HealthDCAT-AP R5       ║
+║  Server running on port ${PORT}                                         ║
+╚═══════════════════════════════════════════════════════════════════════╝
   `);
 });

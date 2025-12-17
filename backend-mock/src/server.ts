@@ -18,13 +18,43 @@ app.use(cors());
 app.use(express.json());
 
 // Interface for Aerospace Part Passport (Verifiable Credential structure)
+interface IdentityNode {
+  manufacturerName: string;
+  cageCode: string;
+  partNumber: string;
+  serialNumber: string;
+  batchNumber?: string;
+  manufacturingDate: string;
+  [key: string]: unknown;
+}
+
+interface AirworthinessNode {
+  status: string;
+  [key: string]: unknown;
+}
+
+interface SustainabilityNode {
+  pcfValue: number;
+  [key: string]: unknown;
+}
+
+interface AerospaceCredentialSubject {
+  id: string;
+  partType: string;
+  sku: string;
+  identityNode: IdentityNode;
+  airworthinessNode: AirworthinessNode;
+  sustainabilityNode: SustainabilityNode;
+  [key: string]: unknown;
+}
+
 interface SparePart {
   '@context': string[];
   id: string;
   type: string[];
   issuer: string;
   issuanceDate: string;
-  credentialSubject: Record<string, unknown>;
+  credentialSubject: AerospaceCredentialSubject;
   proof?: Record<string, unknown>;
 }
 

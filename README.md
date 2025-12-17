@@ -142,9 +142,19 @@ All 21 EHR catalog assets implement the mandatory DCAT-AP for Health properties 
 | `healthdcatap:minTypicalAge` / `maxTypicalAge` | Age range | 18-85 |
 | `healthdcatap:numberOfRecords` | Record count | 450-4500 |
 | `healthdcatap:numberOfUniqueIndividuals` | Unique subjects | 45-450 |
-| `healthdcatap:populationcoverage` | Population description | German hospital patient population |
+| `healthdcatap:populationCoverage` | Population description | German hospital patient population |
 | `healthdcatap:hasCodingSystem` | Coding standards (Wikidata) | ICD-10, LOINC, SNOMED CT, MedDRA |
 | `healthdcatap:hasCodeValues` | Actual codes | ICD-10 codes, LOINC codes |
+| `healthdcatap:healthTheme` | Health themes (Wikidata) | Disease-specific themes |
+
+#### Distribution Properties (MANDATORY)
+
+All distributions include the required legislation reference per HealthDCAT-AP Release 5:
+
+| Property | Description | Example Value |
+|----------|-------------|---------------|
+| `dcat:accessURL` | Access endpoint | Distribution access URL |
+| `dcatap:applicableLegislation` | Governing regulations | EHDS (EU 2025/327) |
 
 #### Art. 51 EHDS Health Categories
 
@@ -171,7 +181,15 @@ The catalog supports exporting metadata in:
 - **Turtle (TTL)** - DCAT-AP for Health compliant RDF
 - **JSON-LD** - Linked Data format with context
 
-Use the "Export Catalog (Turtle)" button in the EHR viewer to download the complete DCAT-AP for Health metadata.
+**Export Methods:**
+- **Frontend Button**: Use the "Export Catalog (Turtle)" button in the EHR viewer to download the complete DCAT-AP for Health metadata
+- **REST API**: `GET http://localhost:3001/api/catalog` - Returns complete HealthDCAT-AP Release 5 catalog with all 31 properties per dataset
+
+**Catalog API Properties (per HealthDCAT-AP Release 5):**
+The `/api/catalog` endpoint generates a complete catalog including:
+- **MANDATORY**: `dct:title`, `dct:description`, `dct:publisher`, `dct:identifier`, `dcatap:applicableLegislation`, `dct:type`, `dct:accessRights`, `healthdcatap:healthCategory`, `dct:provenance`, `dcat:theme`, `dcat:keyword`, `dcat:contactPoint`
+- **SENSITIVE DATA (NON_PUBLIC)**: `dpv:hasPersonalData`, `dpv:hasLegalBasis`, `dpv:hasPurpose`
+- **RECOMMENDED**: `healthdcatap:numberOfRecords`, `healthdcatap:numberOfUniqueIndividuals`, `healthdcatap:retentionPeriod`, `healthdcatap:healthTheme`, `healthdcatap:hasCodingSystem`, `healthdcatap:hasCodeValues`
 
 ### Data Clean Rooms & Confidential Computing
 
@@ -355,6 +373,47 @@ The editor will be available at **http://localhost:8082**.
 docker-compose -f docker-compose.health.yml up --build
 ```
 
+#### 4.2.5 SHACL Validation with Apache Jena
+
+The project includes a command-line validation script for validating the health catalog against DCAT-AP 3.0.0 SHACL shapes using Apache Jena.
+
+**Prerequisites:**
+```bash
+# Install Apache Jena (macOS)
+brew install jena
+
+# Or download from: https://jena.apache.org/download/
+```
+
+**Running Validation:**
+```bash
+cd resources
+
+# Basic validation with summary
+./validate-healthdcat.sh health-catalog.ttl --summary
+
+# Full validation report
+./validate-healthdcat.sh health-catalog.ttl
+
+# Save report to file
+./validate-healthdcat.sh health-catalog.ttl --output report.ttl
+```
+
+**SHACL Shapes:**
+- Located in `resources/shacl/dcat-ap-shacl.ttl`
+- Source: [SEMICeu DCAT-AP 3.0.0](https://github.com/SEMICeu/DCAT-AP/tree/master/releases/3.0.0/shacl)
+- The script automatically downloads shapes if not present
+
+**Validation Coverage:**
+| Aspect | Status |
+|--------|--------|
+| Catalog structure | ✅ Validated |
+| Dataset metadata | ✅ Validated |
+| Distribution links | ✅ Validated |
+| Data Quality (DQV) | ✅ Validated |
+| ODRL Policies | ✅ Validated |
+| External vocabularies | ⚠️ Partial (external terms lack full metadata) |
+
 ### 4.3 Building the EDC Components
 
 The MVD-health project includes custom EDC extensions and launchers.
@@ -481,6 +540,7 @@ Once all services are running, access the demo through:
 - **Backend Health Check**: http://localhost:3001/health
 - **EHR Records**: http://localhost:3001/api/ehr
 - **Specific Record**: http://localhost:3001/api/ehr/EHR001
+- **DCAT-AP for Health Catalog**: http://localhost:3001/api/catalog - Complete HealthDCAT-AP Release 5 compliant RDF catalog
 
 **EDC Management APIs** (require auth header: `X-Api-Key: password`):
 - **Provider Management**: http://localhost:8191/api/management/v3/
@@ -515,6 +575,12 @@ curl http://localhost:3001/api/ehr/EHR001 | jq '.credentialSubject | {
   medDRA: .medDRANode.primarySOC.name,
   adrCount: .signalVerificationNode.adverseEvents | length
 }'
+
+# Export DCAT-AP for Health catalog (Turtle RDF format)
+curl http://localhost:3001/api/catalog
+
+# Verify sensitive data properties
+curl http://localhost:3001/api/catalog | grep -E "dpv:has(Purpose|PersonalData|LegalBasis)" | head -10
 ```
 
 ### 6.2 Demo Workflow

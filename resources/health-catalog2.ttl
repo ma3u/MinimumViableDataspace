@@ -232,10 +232,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/GENOMIC> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/GENOMIC> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:provenance [
@@ -253,50 +253,23 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Data collected under ethical approval (Ethics Committee Rheinland-Pfalz, Ref: 2023-RLP-0847). All records pseudonymized per EHDS Art. 55."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Data collected under ethical approval (Ethics Committee Rheinland-Pfalz, Ref: 2023-RLP-0847). All records pseudonymized per EHDS Art. 55."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "0"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "17"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "0"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "17"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "127"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "42"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Pediatric patients with rare genetic disorders in Rhineland-Palatinate catchment area"@en ;
+  healthdcatap:populationcoverage "Pediatric patients with rare genetic disorders in Rhineland-Palatinate catchment area"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q45127> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q900684> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q45127"^^xsd:anyURI ;
-      skos:prefLabel "International Classification of Diseases, 10th Revision (ICD-10)"@en ;
-      skos:notation "ICD-10" ;
-      owl:versionInfo "Version:2019"
-    ] ;
-    skos:notation "Q87.1" ;
-    skos:prefLabel "ICD-10:Q87.1"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q45127"^^xsd:anyURI ;
-      skos:prefLabel "International Classification of Diseases, 10th Revision (ICD-10)"@en ;
-      skos:notation "ICD-10" ;
-      owl:versionInfo "Version:2019"
-    ] ;
-    skos:notation "Q99.9" ;
-    skos:prefLabel "ICD-10:Q99.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1753681"^^xsd:anyURI ;
-      skos:prefLabel "SNOMED Clinical Terms"@en ;
-      skos:notation "SNOMED-CT" ;
-      owl:versionInfo "Version:2024-03"
-    ] ;
-    skos:notation "363235000" ;
-    skos:prefLabel "SNOMED-CT:363235000"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q15304597> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7020> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q104548805> ;
+  healthdcatap:hasCodeValues "ICD-10:Q87.1" ;
+  healthdcatap:hasCodeValues "ICD-10:Q99.9" ;
+  healthdcatap:hasCodeValues "SNOMED-CT:363235000" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q15304597> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q7020> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q104548805> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2024-01-01"^^xsd:date ;
@@ -709,9 +682,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -731,61 +704,25 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#VitalSigns> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Data from Phase III clinical trial with HbA1c monitoring. Ethics approval: Ethikkommission Nordrhein Ref: 2024-NR-0123."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Data from Phase III clinical trial with HbA1c monitoring. Ethics approval: Ethikkommission Nordrhein Ref: 2024-NR-0123."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "55"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "64"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "55"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "64"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "2847"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "156"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult patients with Type 2 diabetes and cardiovascular comorbidities across EU partner sites"@en ;
+  healthdcatap:populationcoverage "Adult patients with Type 2 diabetes and cardiovascular comorbidities across EU partner sites"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q192093> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "E11.9" ;
-    skos:prefLabel "ICD-10-GM:E11.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "I25.9" ;
-    skos:prefLabel "ICD-10-GM:I25.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "4548-4" ;
-    skos:prefLabel "LOINC:4548-4"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q192093"^^xsd:anyURI ;
-      skos:prefLabel "Anatomical Therapeutic Chemical Classification System"@en ;
-      skos:notation "ATC" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "A10B" ;
-    skos:prefLabel "ATC:A10B"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q3025883> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q389735> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q133212> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:E11.9" ;
+  healthdcatap:hasCodeValues "ICD-10-GM:I25.9" ;
+  healthdcatap:hasCodeValues "LOINC:4548-4" ;
+  healthdcatap:hasCodeValues "ATC:A10B" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q3025883> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q389735> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q133212> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-06-01"^^xsd:date ;
@@ -1195,10 +1132,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/AUT> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -1218,71 +1155,26 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Biometric> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase IV real-world evidence study. Includes echocardiography and biomarker data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0456."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase IV real-world evidence study. Includes echocardiography and biomarker data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0456."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "65"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "74"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "65"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "74"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "1523"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "89"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Patients with HFrEF (EF<40%) in Rhine region cardiology network"@en ;
+  healthdcatap:populationcoverage "Patients with HFrEF (EF<40%) in Rhine region cardiology network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "I50.9" ;
-    skos:prefLabel "ICD-10-GM:I50.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "I42.0" ;
-    skos:prefLabel "ICD-10-GM:I42.0"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "33762-6" ;
-    skos:prefLabel "LOINC:33762-6"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "10230-1" ;
-    skos:prefLabel "LOINC:10230-1"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10019279" ;
-    skos:prefLabel "MedDRA:10019279"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q181754> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q389735> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q190805> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:I50.9" ;
+  healthdcatap:hasCodeValues "ICD-10-GM:I42.0" ;
+  healthdcatap:hasCodeValues "LOINC:33762-6" ;
+  healthdcatap:hasCodeValues "LOINC:10230-1" ;
+  healthdcatap:hasCodeValues "MedDRA:10019279" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q181754> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q389735> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q190805> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-01-15"^^xsd:date ;
@@ -1697,10 +1589,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/PUBLIC_HEALTH_REG> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/PUBLIC_HEALTH_REG> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:provenance [
     a dct:ProvenanceStatement ;
@@ -1717,60 +1609,24 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#PhysicalHealth> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Academic oncology trial. No genetic analysis permitted. Ethics: Ethikkommission Baden-Württemberg Ref: 2024-BW-0234."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Academic oncology trial. No genetic analysis permitted. Ethics: Ethikkommission Baden-Württemberg Ref: 2024-BW-0234."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "45"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "54"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "45"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "54"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "892"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "67"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Female breast cancer patients in remission from Baden-Württemberg tumor registry"@en ;
+  healthdcatap:populationcoverage "Female breast cancer patients in remission from Baden-Württemberg tumor registry"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "C50.9" ;
-    skos:prefLabel "ICD-10-GM:C50.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "Z85.3" ;
-    skos:prefLabel "ICD-10-GM:Z85.3"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10006187" ;
-    skos:prefLabel "MedDRA:10006187"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10029104" ;
-    skos:prefLabel "MedDRA:10029104"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q128581> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12078> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7164> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:C50.9" ;
+  healthdcatap:hasCodeValues "ICD-10-GM:Z85.3" ;
+  healthdcatap:hasCodeValues "MedDRA:10006187" ;
+  healthdcatap:hasCodeValues "MedDRA:10029104" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q128581> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q12078> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q7164> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2023-06-01"^^xsd:date ;
@@ -2183,9 +2039,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/PUBLIC_HEALTH_REG> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/PUBLIC_HEALTH_REG> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/BEL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -2202,40 +2058,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Active surveillance registry. Ethics: Multi-site approval EU-OC-2023-0055."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Registry> ;
+  healthdcatap:publishernote "Active surveillance registry. Ethics: Multi-site approval EU-OC-2023-0055."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Registry> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "65"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "74"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "65"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "74"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "523"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "78"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Male patients with low-grade prostate cancer under active surveillance in EU network"@en ;
+  healthdcatap:populationcoverage "Male patients with low-grade prostate cancer under active surveillance in EU network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "C61" ;
-    skos:prefLabel "ICD-10-GM:C61"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10036910" ;
-    skos:prefLabel "MedDRA:10036910"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q181257> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12078> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7164> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:C61" ;
+  healthdcatap:hasCodeValues "MedDRA:10036910" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q181257> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q12078> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q7164> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2021-01-01"^^xsd:date ;
@@ -2649,9 +2487,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -2671,50 +2509,23 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#VitalSigns> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase III COPD trial with spirometry data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0234."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase III COPD trial with spirometry data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0234."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "55"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "64"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "55"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "64"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "1847"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "134"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult COPD patients with emphysema across EU partner respiratory centers"@en ;
+  healthdcatap:populationcoverage "Adult COPD patients with emphysema across EU partner respiratory centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "J44.9" ;
-    skos:prefLabel "ICD-10-GM:J44.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "J43.9" ;
-    skos:prefLabel "ICD-10-GM:J43.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "19926-5" ;
-    skos:prefLabel "LOINC:19926-5"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q35869> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q3286546> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q161635> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:J44.9" ;
+  healthdcatap:hasCodeValues "ICD-10-GM:J43.9" ;
+  healthdcatap:hasCodeValues "LOINC:19926-5" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q35869> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q3286546> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q161635> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-03-15"^^xsd:date ;
@@ -3124,10 +2935,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:provenance [
     a dct:ProvenanceStatement ;
@@ -3144,40 +2955,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Biometric> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase II MS trial with MRI data. Ethics: Ethikkommission Charité Ref: 2024-CH-0189."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Phase II MS trial with MRI data. Ethics: Ethikkommission Charité Ref: 2024-CH-0189."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "25"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "34"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "25"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "34"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "678"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "45"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "RRMS patients aged 25-34 in German MS registry network"@en ;
+  healthdcatap:populationcoverage "RRMS patients aged 25-34 in German MS registry network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "G35" ;
-    skos:prefLabel "ICD-10-GM:G35"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10028155" ;
-    skos:prefLabel "MedDRA:10028155"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q134561> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q1054718> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:G35" ;
+  healthdcatap:hasCodeValues "MedDRA:10028155" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q134561> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q210392> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q1054718> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2021-09-01"^^xsd:date ;
@@ -3590,9 +3383,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -3611,40 +3404,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase III RA trial with DAS28 monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0345."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase III RA trial with DAS28 monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0345."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "45"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "54"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "45"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "54"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "1234"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "98"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult RA patients with seropositive disease across EU partner rheumatology centers"@en ;
+  healthdcatap:populationcoverage "Adult RA patients with seropositive disease across EU partner rheumatology centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "M05.9" ;
-    skos:prefLabel "ICD-10-GM:M05.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10039073" ;
-    skos:prefLabel "MedDRA:10039073"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q8277> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q188874> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:M05.9" ;
+  healthdcatap:hasCodeValues "MedDRA:10039073" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q8277> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q210392> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q188874> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-02-01"^^xsd:date ;
@@ -4059,10 +3834,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/AUT> ;
   dct:provenance [
@@ -4080,50 +3855,23 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#DrugTestResult> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase IV CKD registry with eGFR monitoring. Ethics: Ethikkommission Köln Ref: 2023-UK-0567."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Phase IV CKD registry with eGFR monitoring. Ethics: Ethikkommission Köln Ref: 2023-UK-0567."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "65"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "74"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "65"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "74"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "2156"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "123"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "CKD stage 4 patients with diabetic nephropathy in German-Austrian registry network"@en ;
+  healthdcatap:populationcoverage "CKD stage 4 patients with diabetic nephropathy in German-Austrian registry network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "N18.4" ;
-    skos:prefLabel "ICD-10-GM:N18.4"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "E11.2" ;
-    skos:prefLabel "ICD-10-GM:E11.2"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "33914-3" ;
-    skos:prefLabel "LOINC:33914-3"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q476921> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q208414> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q3025883> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:N18.4" ;
+  healthdcatap:hasCodeValues "ICD-10-GM:E11.2" ;
+  healthdcatap:hasCodeValues "LOINC:33914-3" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q476921> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q208414> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q3025883> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2021-01-01"^^xsd:date ;
@@ -4531,9 +4279,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -4551,40 +4299,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#MentalHealth> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-a> ;
-  healthdcatap:publisherNote "Sensitive mental health data - strictly academic research only. Ethics: Ethikkommission Charité Ref: 2024-CH-0234."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Sensitive mental health data - strictly academic research only. Ethics: Ethikkommission Charité Ref: 2024-CH-0234."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "35"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "44"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "35"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "44"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "456"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "34"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult patients with recurrent MDD in German-French-Dutch psychiatric research network"@en ;
+  healthdcatap:populationcoverage "Adult patients with recurrent MDD in German-French-Dutch psychiatric research network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "F33.1" ;
-    skos:prefLabel "ICD-10-GM:F33.1"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10012378" ;
-    skos:prefLabel "MedDRA:10012378"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q42844> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q13386846> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q178190> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:F33.1" ;
+  healthdcatap:hasCodeValues "MedDRA:10012378" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q42844> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q13386846> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q178190> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2023-01-01"^^xsd:date ;
@@ -5009,9 +4739,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:provenance [
     a dct:ProvenanceStatement ;
@@ -5028,40 +4758,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Biometric> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase I/II Parkinson disease trial with UPDRS and motor assessment data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0123."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Phase I/II Parkinson disease trial with UPDRS and motor assessment data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0123."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "55"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "64"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "55"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "64"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "567"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "42"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Early-stage Parkinson disease patients in German neurology network"@en ;
+  healthdcatap:populationcoverage "Early-stage Parkinson disease patients in German neurology network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "G20" ;
-    skos:prefLabel "ICD-10-GM:G20"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10034010" ;
-    skos:prefLabel "MedDRA:10034010"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q11085> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q386591> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q913672> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:G20" ;
+  healthdcatap:hasCodeValues "MedDRA:10034010" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q11085> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q386591> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q913672> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2023-06-01"^^xsd:date ;
@@ -5468,9 +5180,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -5489,40 +5201,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase III IBD trial with CDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0456."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase III IBD trial with CDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0456."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "25"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "34"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "25"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "34"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "1678"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "112"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult Crohn disease patients in EU IBD registry network"@en ;
+  healthdcatap:populationcoverage "Adult Crohn disease patients in EU IBD registry network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "K50.0" ;
-    skos:prefLabel "ICD-10-GM:K50.0"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10011401" ;
-    skos:prefLabel "MedDRA:10011401"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q155100> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q127076> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:K50.0" ;
+  healthdcatap:hasCodeValues "MedDRA:10011401" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q155100> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q127076> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q210392> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-04-01"^^xsd:date ;
@@ -5938,9 +5632,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:provenance [
     a dct:ProvenanceStatement ;
@@ -5956,40 +5650,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Biometric> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase II epilepsy trial with seizure diary and EEG data. Ethics: Ethikkommission Charité Ref: 2024-CH-0345."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Phase II epilepsy trial with seizure diary and EEG data. Ethics: Ethikkommission Charité Ref: 2024-CH-0345."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "18"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "24"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "18"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "24"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "623"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "48"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Young adult patients with focal epilepsy in German epilepsy centers"@en ;
+  healthdcatap:populationcoverage "Young adult patients with focal epilepsy in German epilepsy centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "G40.2" ;
-    skos:prefLabel "ICD-10-GM:G40.2"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10015037" ;
-    skos:prefLabel "MedDRA:10015037"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q112> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q1156499> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q853090> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:G40.2" ;
+  healthdcatap:hasCodeValues "MedDRA:10015037" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q112> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q1156499> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q853090> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2023-02-15"^^xsd:date ;
@@ -6401,9 +6077,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:provenance [
     a dct:ProvenanceStatement ;
@@ -6419,40 +6095,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase II SLE trial with SLEDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0567."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase II SLE trial with SLEDAI monitoring. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0567."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "35"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "44"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "35"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "44"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "789"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "56"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "SLE patients with renal involvement in German lupus centers"@en ;
+  healthdcatap:populationcoverage "SLE patients with renal involvement in German lupus centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "M32.1" ;
-    skos:prefLabel "ICD-10-GM:M32.1"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10042945" ;
-    skos:prefLabel "MedDRA:10042945"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7881> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q500459> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:M32.1" ;
+  healthdcatap:hasCodeValues "MedDRA:10042945" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q7881> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q210392> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q500459> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-05-01"^^xsd:date ;
@@ -6865,10 +6523,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_REG> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/ITA> ;
@@ -6888,51 +6546,24 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#VitalSigns> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase IV AFib RWE study with anticoagulation data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0678."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase IV AFib RWE study with anticoagulation data. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0678."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "75"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "84"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "75"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "84"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "3456"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "234"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Elderly patients with persistent AFib across EU cardiology centers"@en ;
+  healthdcatap:populationcoverage "Elderly patients with persistent AFib across EU cardiology centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "I48.1" ;
-    skos:prefLabel "ICD-10-GM:I48.1"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "8867-4" ;
-    skos:prefLabel "LOINC:8867-4"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10003658" ;
-    skos:prefLabel "MedDRA:10003658"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q207067> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q389735> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q160680> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:I48.1" ;
+  healthdcatap:hasCodeValues "LOINC:8867-4" ;
+  healthdcatap:hasCodeValues "MedDRA:10003658" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q207067> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q389735> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q160680> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2021-06-01"^^xsd:date ;
@@ -7343,9 +6974,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -7365,50 +6996,23 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#VitalSigns> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase III severe asthma trial with ACT and IgE data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0789."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase III severe asthma trial with ACT and IgE data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0789."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "35"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "44"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "35"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "44"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "1234"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "89"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult patients with severe persistent asthma across EU respiratory centers"@en ;
+  healthdcatap:populationcoverage "Adult patients with severe persistent asthma across EU respiratory centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "J45.5" ;
-    skos:prefLabel "ICD-10-GM:J45.5"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "19926-5" ;
-    skos:prefLabel "LOINC:19926-5"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10003553" ;
-    skos:prefLabel "MedDRA:10003553"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12206> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q188504> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q147778> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:J45.5" ;
+  healthdcatap:hasCodeValues "LOINC:19926-5" ;
+  healthdcatap:hasCodeValues "MedDRA:10003553" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q12206> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q188504> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q147778> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-08-01"^^xsd:date ;
@@ -7823,10 +7427,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_DEVICE> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_DEVICE> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:provenance [
     a dct:ProvenanceStatement ;
@@ -7844,50 +7448,23 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#VitalSigns> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase II T1D trial with CGM and insulin pump data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0234."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Phase II T1D trial with CGM and insulin pump data. Ethics: Ethikkommission Saarland Ref: 2024-SL-0234."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "25"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "34"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "25"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "34"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "45678"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "56"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Young adult T1D patients with insulin pump therapy in German diabetes centers"@en ;
+  healthdcatap:populationcoverage "Young adult T1D patients with insulin pump therapy in German diabetes centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "E10.9" ;
-    skos:prefLabel "ICD-10-GM:E10.9"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "4548-4" ;
-    skos:prefLabel "LOINC:4548-4"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10067584" ;
-    skos:prefLabel "MedDRA:10067584"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q124407> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q8063> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:E10.9" ;
+  healthdcatap:hasCodeValues "LOINC:4548-4" ;
+  healthdcatap:hasCodeValues "MedDRA:10067584" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q124407> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q8063> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q210392> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2023-03-01"^^xsd:date ;
@@ -8295,9 +7872,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/AUT> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/BEL> ;
@@ -8314,40 +7891,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase IV osteoporosis registry with DXA and FRAX data. Ethics: Ethikkommission Köln Ref: 2023-UK-0789."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
+  healthdcatap:publishernote "Phase IV osteoporosis registry with DXA and FRAX data. Ethics: Ethikkommission Köln Ref: 2023-UK-0789."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Academic> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "65"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "74"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "65"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "74"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "987"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "78"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Postmenopausal women with osteoporosis and fracture history in EU bone health network"@en ;
+  healthdcatap:populationcoverage "Postmenopausal women with osteoporosis and fracture history in EU bone health network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "M80.0" ;
-    skos:prefLabel "ICD-10-GM:M80.0"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10031282" ;
-    skos:prefLabel "MedDRA:10031282"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q165328> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q155688> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q188913> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:M80.0" ;
+  healthdcatap:hasCodeValues "MedDRA:10031282" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q165328> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q155688> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q188913> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2020-01-01"^^xsd:date ;
@@ -8761,10 +8320,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/PATHOGEN> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/PATHOGEN> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/BEL> ;
@@ -8782,51 +8341,24 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-i> ;
-  healthdcatap:publisherNote "Sensitive infectious disease data - Phase IV HCV study with SVR monitoring. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0890."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Sensitive infectious disease data - Phase IV HCV study with SVR monitoring. Ethics: Ethikkommission Nordrhein Ref: 2023-NR-0890."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "45"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "54"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "45"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "54"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "678"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "52"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult patients with chronic HCV in EU hepatitis treatment network"@en ;
+  healthdcatap:populationcoverage "Adult patients with chronic HCV in EU hepatitis treatment network"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "B18.2" ;
-    skos:prefLabel "ICD-10-GM:B18.2"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "20416-4" ;
-    skos:prefLabel "LOINC:20416-4"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10019731" ;
-    skos:prefLabel "MedDRA:10019731"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q174701> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q7556> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q18975> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:B18.2" ;
+  healthdcatap:hasCodeValues "LOINC:20416-4" ;
+  healthdcatap:hasCodeValues "MedDRA:10019731" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q174701> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q7556> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q18975> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2022-06-01"^^xsd:date ;
@@ -9246,9 +8778,9 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/NLD> ;
@@ -9267,40 +8799,22 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-j> ;
-  healthdcatap:publisherNote "Phase III migraine trial with MIDAS scores and CGRP data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0912."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
+  healthdcatap:publishernote "Phase III migraine trial with MIDAS scores and CGRP data. Ethics: Ethikkommission Nordrhein Ref: 2024-NR-0912."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Hospital> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "35"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "44"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "35"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "44"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "1456"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "102"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Adult patients with chronic migraine across EU headache centers"@en ;
+  healthdcatap:populationcoverage "Adult patients with chronic migraine across EU headache centers"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "G43.1" ;
-    skos:prefLabel "ICD-10-GM:G43.1"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10027599" ;
-    skos:prefLabel "MedDRA:10027599"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q133823> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q86> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q774352> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:G43.1" ;
+  healthdcatap:hasCodeValues "MedDRA:10027599" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q133823> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q86> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q774352> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2023-01-01"^^xsd:date ;
@@ -9710,10 +9224,10 @@
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;
   dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;
-  dct:type <http://publications.europa.eu/resource/authority/dataset-type/PERSONAL_DATA> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
-  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/PATHOGEN> ;
+  dct:type <http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> ;
+  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/PATHOGEN> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/FRA> ;
   dct:spatial <http://publications.europa.eu/resource/authority/country/BEL> ;
@@ -9731,51 +9245,24 @@
   dpv:hasPersonalData <https://w3id.org/dpv/dpv-pd#Gender> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A6-1-a> ;
   dpv:hasLegalBasis <https://w3id.org/dpv/dpv-gdpr#A9-2-a> ;
-  healthdcatap:publisherNote "Highly sensitive HIV data - strictly academic research only. Ethics: Multi-center approval EU-HIV-2023-0034."@en ;
-  healthdcatap:publisherType <http://healthdata.ec.europa.eu/authority/publisher-type/Registry> ;
+  healthdcatap:publishernote "Highly sensitive HIV data - strictly academic research only. Ethics: Multi-center approval EU-HIV-2023-0034."@en ;
+  healthdcatap:publishertype <http://healthdata.ec.europa.eu/authority/publisher-type/Registry> ;
   # RECOMMENDED HealthDCAT-AP Properties
-  healthdcatap:minTypicalAge "35"^^xsd:nonNegativeInteger ;
-  healthdcatap:maxTypicalAge "44"^^xsd:nonNegativeInteger ;
+  healthdcatap:mintypicalage "35"^^xsd:nonNegativeInteger ;
+  healthdcatap:maxtypicalage "44"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfRecords "345"^^xsd:nonNegativeInteger ;
   healthdcatap:numberOfUniqueIndividuals "28"^^xsd:nonNegativeInteger ;
-  healthdcatap:populationCoverage "Well-controlled HIV patients on ART in EU clinical cohort"@en ;
+  healthdcatap:populationcoverage "Well-controlled HIV patients on ART in EU clinical cohort"@en ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q15629608> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
-    skos:notation "B20" ;
-    skos:prefLabel "ICD-10-GM:B20"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
-    skos:notation "24467-3" ;
-    skos:prefLabel "LOINC:24467-3"@en
-  ] ;
-  healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
-    skos:notation "10020098" ;
-    skos:prefLabel "MedDRA:10020098"@en
-  ]
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q2840> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q12199> ;
-  healthdcatap:healthTheme <https://www.wikidata.org/entity/Q210392> ;
+  healthdcatap:hasCodeValues "ICD-10-GM:B20" ;
+  healthdcatap:hasCodeValues "LOINC:24467-3" ;
+  healthdcatap:hasCodeValues "MedDRA:10020098" ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q2840> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q12199> ;
+  healthdcatap:healththeme <https://www.wikidata.org/entity/Q210392> ;
   healthdcatap:retentionPeriod [
     a dct:PeriodOfTime ;
     dcat:startDate "2021-01-01"^^xsd:date ;

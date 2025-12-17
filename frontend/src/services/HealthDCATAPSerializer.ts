@@ -166,9 +166,17 @@ export const serializeToTurtle = (): string => {
   lines.push('  ] ;');
   lines.push('  dct:language <http://publications.europa.eu/resource/authority/language/ENG> ;');
   lines.push('  dct:issued "2024-01-01"^^xsd:date ;');
-  lines.push('  dct:modified "2024-12-16"^^xsd:date ;');
+  lines.push('  dct:modified "2024-12-17"^^xsd:date ;');
   lines.push('  dct:spatial <http://publications.europa.eu/resource/authority/country/DEU> ;');
   lines.push('  dcat:themeTaxonomy <http://publications.europa.eu/resource/authority/data-theme> ;');
+  // MANDATORY: Applicable legislation (EHDS Regulation, GDPR, DGA)
+  lines.push('  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> ;');
+  lines.push('  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2016/679/oj> ;');
+  lines.push('  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2022/868/oj> ;');
+  // MANDATORY: Conformance to HealthDCAT-AP Release 5
+  lines.push('  dct:conformsTo <https://healthdataeu.pages.code.europa.eu/healthdcat-ap/releases/release-5/> ;');
+  lines.push('  dct:conformsTo <http://data.europa.eu/eli/reg/2025/327/oj> ;');
+  lines.push('  dct:conformsTo <http://hl7.org/fhir/R4> ;');
   lines.push('  foaf:homepage <https://www.rheinland-uklinikum.de/research> ;');
   lines.push('  dct:rights [');
   lines.push('    a dct:RightsStatement ;');
@@ -366,10 +374,10 @@ export const serializeToTurtle = (): string => {
     const healthCategories = asset['healthdcatap:healthCategory'] as string[] | undefined;
     if (healthCategories && Array.isArray(healthCategories)) {
       healthCategories.forEach((cat: string) => {
-        lines.push(`  healthdcatap:healthcategory <${cat}> ;`);
+        lines.push(`  healthdcatap:healthCategory <${cat}> ;`);
       });
     } else {
-      lines.push(`  healthdcatap:healthcategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;`);
+      lines.push(`  healthdcatap:healthCategory <http://healthdata.ec.europa.eu/authority/health-category/EHR> ;`);
     }
 
     // Spatial Coverage (MANDATORY)
@@ -415,15 +423,15 @@ export const serializeToTurtle = (): string => {
     }
 
     // Publisher Note (MANDATORY)
-    const publisherNote = asset['healthdcatap:publishernote'] as string | undefined;
+    const publisherNote = asset['healthdcatap:publisherNote'] as string | undefined;
     if (publisherNote) {
-      lines.push(`  healthdcatap:publishernote "${publisherNote}"@en ;`);
+      lines.push(`  healthdcatap:publisherNote "${publisherNote}"@en ;`);
     }
 
     // Publisher Type (MANDATORY)
-    const publisherType = asset['healthdcatap:publishertype'] as string | undefined;
+    const publisherType = asset['healthdcatap:publisherType'] as string | undefined;
     if (publisherType) {
-      lines.push(`  healthdcatap:publishertype <${publisherType}> ;`);
+      lines.push(`  healthdcatap:publisherType <${publisherType}> ;`);
     }
 
     // ==================== RECOMMENDED HealthDCAT-AP Properties ====================
@@ -433,10 +441,10 @@ export const serializeToTurtle = (): string => {
     const minAge = asset['healthdcatap:minTypicalAge'] as number | undefined;
     const maxAge = asset['healthdcatap:maxTypicalAge'] as number | undefined;
     if (minAge !== undefined) {
-      lines.push(`  healthdcatap:mintypicalage "${minAge}"^^xsd:nonNegativeInteger ;`);  // lowercase per spec
+      lines.push(`  healthdcatap:minTypicalAge "${minAge}"^^xsd:nonNegativeInteger ;`);
     }
     if (maxAge !== undefined) {
-      lines.push(`  healthdcatap:maxtypicalage "${maxAge}"^^xsd:nonNegativeInteger ;`);  // lowercase per spec
+      lines.push(`  healthdcatap:maxTypicalAge "${maxAge}"^^xsd:nonNegativeInteger ;`);
     }
 
     // Number of Records (Release 5: xsd:nonNegativeInteger)
@@ -452,12 +460,12 @@ export const serializeToTurtle = (): string => {
     }
 
     // Population Coverage
-    const populationCoverage = asset['healthdcatap:populationcoverage'] as string | undefined;
+    const populationCoverage = asset['healthdcatap:populationCoverage'] as string | undefined;
     if (populationCoverage) {
-      lines.push(`  healthdcatap:populationcoverage "${populationCoverage}"@en ;`);
+      lines.push(`  healthdcatap:populationCoverage "${populationCoverage}"@en ;`);
     }
 
-    // Coding Systems
+    // Coding Systems (RECOMMENDED) - Standards to Wikidata URIs per HealthDCAT-AP Release 5
     const codingSystems = asset['healthdcatap:hasCodingSystem'] as string[] | undefined;
     if (codingSystems && Array.isArray(codingSystems)) {
       codingSystems.forEach((cs: string) => {
@@ -465,19 +473,58 @@ export const serializeToTurtle = (): string => {
       });
     }
 
-    // Code Values
+    // Code Values (RECOMMENDED) - Must be skos:Concept per HealthDCAT-AP Release 5 §7.7
+    // Maps coding system prefixes to their Wikidata concept scheme URIs
+    const codingSystemSchemes: Record<string, { uri: string; label: string; notation: string }> = {
+      'ICD-10': { uri: 'https://www.wikidata.org/entity/Q45127', label: 'International Classification of Diseases, 10th Revision', notation: 'ICD-10' },
+      'ICD-10-GM': { uri: 'https://www.wikidata.org/entity/Q15629608', label: 'ICD-10-GM (German Modification)', notation: 'ICD-10-GM' },
+      'SNOMED-CT': { uri: 'https://www.wikidata.org/entity/Q744434', label: 'SNOMED Clinical Terms', notation: 'SNOMED-CT' },
+      'LOINC': { uri: 'https://www.wikidata.org/entity/Q192093', label: 'Logical Observation Identifiers Names and Codes', notation: 'LOINC' },
+      'MedDRA': { uri: 'https://www.wikidata.org/entity/Q19597236', label: 'Medical Dictionary for Regulatory Activities', notation: 'MedDRA' },
+      'ATC': { uri: 'https://www.wikidata.org/entity/Q192270', label: 'Anatomical Therapeutic Chemical Classification', notation: 'ATC' },
+      'FHIR': { uri: 'https://www.wikidata.org/entity/Q19597236', label: 'Fast Healthcare Interoperability Resources', notation: 'FHIR' },
+    };
+
     const codeValues = asset['healthdcatap:hasCodeValues'] as string[] | undefined;
     if (codeValues && Array.isArray(codeValues)) {
       codeValues.forEach((cv: string) => {
-        lines.push(`  healthdcatap:hasCodeValues "${cv}" ;`);
+        // Parse code value like "ICD-10-GM:E11.9" or "LOINC:4548-4"
+        const colonIdx = cv.lastIndexOf(':');
+        if (colonIdx > 0) {
+          const systemPrefix = cv.substring(0, colonIdx);
+          const codeNotation = cv.substring(colonIdx + 1);
+          const scheme = codingSystemSchemes[systemPrefix] || {
+            uri: `https://www.wikidata.org/entity/Q0`,  // Fallback
+            label: systemPrefix,
+            notation: systemPrefix
+          };
+          
+          // Per HealthDCAT-AP SHACL validation:
+          // - skos:inScheme must be an IRI (not a blank node)
+          // - dct:identifier must be xsd:anyURI
+          lines.push(`  healthdcatap:hasCodeValues [`);
+          lines.push(`    a skos:Concept ;`);
+          lines.push(`    skos:inScheme <${scheme.uri}> ;`);
+          lines.push(`    dct:identifier "${cv}"^^xsd:anyURI ;`);
+          lines.push(`    skos:notation "${codeNotation}" ;`);
+          lines.push(`    skos:prefLabel "${cv}"@en`);
+          lines.push(`  ] ;`);
+        } else {
+          // Fallback for codes without prefix
+          lines.push(`  healthdcatap:hasCodeValues [`);
+          lines.push(`    a skos:Concept ;`);
+          lines.push(`    dct:identifier "${cv}"^^xsd:anyURI ;`);
+          lines.push(`    skos:notation "${cv}"`);
+          lines.push(`  ] ;`);
+        }
       });
     }
 
-    // Health Theme (MANDATORY for NON_PUBLIC) - Wikidata concept URIs, lowercase per spec
+    // Health Theme (MANDATORY for NON_PUBLIC) - Wikidata concept URIs per HealthDCAT-AP Release 5
     const healthThemes = asset['healthdcatap:healthTheme'] as string[] | undefined;
     if (healthThemes && Array.isArray(healthThemes)) {
       healthThemes.forEach((theme: string) => {
-        lines.push(`  healthdcatap:healththeme <${theme}> ;`);
+        lines.push(`  healthdcatap:healthTheme <${theme}> ;`);
       });
     }
 
@@ -790,7 +837,9 @@ export const serializeToTurtle = (): string => {
     lines.push(`  ] ;`);
     lines.push(`  dct:conformsTo <http://hl7.org/fhir/R4> ;`);
     lines.push(`  dct:conformsTo <https://www.hl7.de/de/isik/> ;`);
-    lines.push(`  adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> .`);
+    lines.push(`  adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;`);
+    // MANDATORY: Applicable legislation for distribution (HealthDCAT-AP Release 5)
+    lines.push(`  dcatap:applicableLegislation <http://data.europa.eu/eli/reg/2025/327/oj> .`);
     lines.push('');
 
     // ==================== SAMPLE DISTRIBUTION ====================
@@ -1022,18 +1071,287 @@ export const serializeToTurtle = (): string => {
     lines.push('');
   });
 
+  // ============================================================
+  // EXTERNAL RESOURCE TYPE DECLARATIONS (SHACL Compliance)
+  // ============================================================
+  // These declarations provide rdf:type for external URIs referenced
+  // throughout the catalog, enabling DCAT-AP SHACL validation.
+  lines.push('# ============================================================');
+  lines.push('# External Resource Type Declarations (SHACL Compliance)');
+  lines.push('# ============================================================');
+  lines.push('# The following declarations provide rdf:type for external URIs');
+  lines.push('# used in the catalog. This enables DCAT-AP 3.0.0 SHACL validation.');
+  lines.push('');
+
+  // Languages (dct:LinguisticSystem)
+  lines.push('# Languages');
+  lines.push('<http://publications.europa.eu/resource/authority/language/ENG> a dct:LinguisticSystem .');
+  lines.push('<http://publications.europa.eu/resource/authority/language/DEU> a dct:LinguisticSystem .');
+  lines.push('');
+
+  // Locations (dct:Location)
+  lines.push('# Locations');
+  lines.push('<http://publications.europa.eu/resource/authority/country/DEU> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/FRA> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/NLD> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/ESP> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/AUT> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/BEL> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/ITA> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/POL> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/SWE> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/DNK> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/FIN> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/PRT> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/IRL> a dct:Location .');
+  lines.push('<http://publications.europa.eu/resource/authority/country/CZE> a dct:Location .');
+  lines.push('');
+
+  // Licenses (dct:LicenseDocument)
+  lines.push('# Licenses');
+  lines.push('<http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> a dct:LicenseDocument .');
+  lines.push('<http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> a dct:LicenseDocument .');
+  lines.push('<http://publications.europa.eu/resource/authority/licence/CC_BY_SA_4_0> a dct:LicenseDocument .');
+  lines.push('<http://publications.europa.eu/resource/authority/licence/CC0> a dct:LicenseDocument .');
+  lines.push('');
+
+  // Frequencies (dct:Frequency)
+  lines.push('# Frequencies');
+  lines.push('<http://publications.europa.eu/resource/authority/frequency/QUARTERLY> a dct:Frequency .');
+  lines.push('<http://publications.europa.eu/resource/authority/frequency/ANNUAL> a dct:Frequency .');
+  lines.push('<http://publications.europa.eu/resource/authority/frequency/MONTHLY> a dct:Frequency .');
+  lines.push('');
+
+  // Legal Resources (eli:LegalResource)
+  lines.push('# Legal Resources');
+  lines.push('<http://data.europa.eu/eli/reg/2025/327/oj> a eli:LegalResource .');
+  lines.push('<http://data.europa.eu/eli/reg/2016/679/oj> a eli:LegalResource .');
+  lines.push('<http://data.europa.eu/eli/reg/2014/536/oj> a eli:LegalResource .');
+  lines.push('<http://data.europa.eu/eli/reg/2017/745/oj> a eli:LegalResource .');
+  lines.push('<https://www.gesetze-im-internet.de/gdng/> a eli:LegalResource .');
+  lines.push('<https://www.gesetze-im-internet.de/bdsg_2018/> a eli:LegalResource .');
+  lines.push('');
+
+  // Standards (dct:Standard)
+  lines.push('# Standards');
+  lines.push('<https://w3id.org/ehds/ehr/v1> a dct:Standard .');
+  lines.push('<http://hl7.org/fhir/R4> a dct:Standard .');
+  lines.push('<https://www.hl7.de/de/isik/> a dct:Standard .');
+  lines.push('<https://simplifier.net/kbv> a dct:Standard .');
+  lines.push('<https://meddra.org/how-to-use/support-documentation/english> a dct:Standard .');
+  lines.push('<http://www.w3.org/ns/csvw#> a dct:Standard .');
+  lines.push('<http://www.w3.org/ns/csvw> a dct:Standard .');
+  lines.push('<https://www.iso.org/iso-27001-information-security.html> a dct:Standard .');
+  lines.push('<http://www.w3.org/ns/prov-o#> a dct:Standard .');
+  lines.push('');
+
+  // Themes (skos:Concept)
+  lines.push('# Themes');
+  lines.push('<http://publications.europa.eu/resource/authority/data-theme/HEAL> a skos:Concept .');
+  lines.push('<http://eurovoc.europa.eu/2784> a skos:Concept .');
+  lines.push('<http://eurovoc.europa.eu/3885> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D005820> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D004700> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D002318> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D009369> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D012140> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D012216> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D009422> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D007674> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D011570> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D005767> a skos:Concept .');
+  lines.push('<http://id.nlm.nih.gov/mesh/D007239> a skos:Concept .');
+  lines.push('');
+
+  // Dataset Types (skos:Concept)
+  lines.push('# Dataset Types');
+  lines.push('<http://publications.europa.eu/resource/dataset/dataset-type/PERSONAL_DATA> a skos:Concept .');
+  lines.push('<http://publications.europa.eu/resource/dataset/dataset-type/STATISTICAL> a skos:Concept .');
+  lines.push('<http://publications.europa.eu/resource/dataset/dataset-type/CODE_LIST> a skos:Concept .');
+  lines.push('');
+
+  // Dataset Status (skos:Concept)
+  lines.push('# Dataset Status');
+  lines.push('<http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> a skos:Concept .');
+  lines.push('<http://publications.europa.eu/resource/authority/dataset-status/ONGOING> a skos:Concept .');
+  lines.push('');
+
+  // Access Rights (dct:RightsStatement)
+  lines.push('# Access Rights');
+  lines.push('<http://publications.europa.eu/resource/authority/access-right/RESTRICTED> a dct:RightsStatement .');
+  lines.push('<http://publications.europa.eu/resource/authority/access-right/NON_PUBLIC> a dct:RightsStatement .');
+  lines.push('<http://publications.europa.eu/resource/authority/access-right/PUBLIC> a dct:RightsStatement .');
+  lines.push('');
+
+  // Media Types (dct:MediaType)
+  lines.push('# Media Types');
+  lines.push('<https://www.iana.org/assignments/media-types/application/fhir+json> a dct:MediaType .');
+  lines.push('<https://www.iana.org/assignments/media-types/text/csv> a dct:MediaType .');
+  lines.push('<https://www.iana.org/assignments/media-types/application/json> a dct:MediaType .');
+  lines.push('<https://www.iana.org/assignments/media-types/application/ld+json> a dct:MediaType .');
+  lines.push('');
+
+  // File Formats (dct:MediaTypeOrExtent)
+  lines.push('# File Formats');
+  lines.push('<http://publications.europa.eu/resource/authority/file-type/JSON> a dct:MediaTypeOrExtent .');
+  lines.push('<http://publications.europa.eu/resource/authority/file-type/CSV> a dct:MediaTypeOrExtent .');
+  lines.push('<http://publications.europa.eu/resource/authority/file-type/XML> a dct:MediaTypeOrExtent .');
+  lines.push('<http://publications.europa.eu/resource/authority/file-type/RDF_TURTLE> a dct:MediaTypeOrExtent .');
+  lines.push('');
+
+  // Checksum Algorithms (spdx:ChecksumAlgorithm)
+  lines.push('# Checksum Algorithms');
+  lines.push('<http://spdx.org/rdf/terms#checksumAlgorithm_sha256> a spdx:ChecksumAlgorithm .');
+  lines.push('<http://spdx.org/rdf/terms#checksumAlgorithm_sha512> a spdx:ChecksumAlgorithm .');
+  lines.push('');
+
+  // DCAT Roles
+  lines.push('# DCAT Roles');
+  lines.push('<http://www.iana.org/assignments/relation/related> a dcat:Role .');
+  lines.push('<http://www.iana.org/assignments/relation/describes> a dcat:Role .');
+  lines.push('');
+
+  // Health Categories (skos:Concept) - HealthDCAT-AP specific
+  lines.push('# Health Categories (EHDS Art. 51)');
+  lines.push('<http://healthdata.ec.europa.eu/authority/health-category/EHR> a skos:Concept .');
+  lines.push('<http://healthdata.ec.europa.eu/authority/health-category/CLINICAL_TRIAL> a skos:Concept .');
+  lines.push('<http://healthdata.ec.europa.eu/authority/health-category/MEDICAL_DEVICE> a skos:Concept .');
+  lines.push('<http://healthdata.ec.europa.eu/authority/health-category/BIOBANK> a skos:Concept .');
+  lines.push('');
+
+  // Theme Taxonomy (skos:ConceptScheme)
+  lines.push('# Theme Taxonomy');
+  lines.push('<http://publications.europa.eu/resource/authority/data-theme> a skos:ConceptScheme ;');
+  lines.push('  dct:title "EU Data Theme Taxonomy"@en .');
+  lines.push('');
+
+  // Publisher Types (skos:Concept)
+  lines.push('# Publisher Types');
+  lines.push('<http://purl.org/adms/publishertype/Academia> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/Company> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/LocalAuthority> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/NationalAuthority> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/RegionalAuthority> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/IndustryConsortium> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/NonGovernmentalOrganisation> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/StandardisationBody> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/SupraNationalAuthority> a skos:Concept .');
+  lines.push('<http://purl.org/adms/publishertype/NonProfitOrganisation> a skos:Concept .');
+  lines.push('');
+
+  // DPV Purposes (skos:Concept)
+  lines.push('# DPV Purposes');
+  lines.push('<https://w3id.org/dpv#ResearchAndDevelopment> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#AcademicResearch> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#ScientificResearch> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#NonCommercialResearch> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#StatisticalPurpose> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#PublicHealth> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#HealthMonitoring> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#DrugDevelopment> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#PersonalizedMedicine> a skos:Concept .');
+  lines.push('<https://w3id.org/dpv#ClinicalStudy> a skos:Concept .');
+  lines.push('');
+
+  // Additional Standards
+  lines.push('# Additional Standards');
+  lines.push('<https://www.cdisc.org/standards/foundational/sdtm> a dct:Standard .');
+  lines.push('<https://www.cdisc.org/standards/foundational/odm> a dct:Standard .');
+  lines.push('<https://www.iso.org/standard/79573.html> a dct:Standard .');
+  lines.push('<https://www.iso.org/standard/82528.html> a dct:Standard .');
+  lines.push('<https://www.iso.org/iso-27001> a dct:Standard .');
+  lines.push('<https://www.iso.org/standard/45170.html> a dct:Standard .');
+  lines.push('');
+
+  // Documentation (foaf:Document)
+  lines.push('# Documentation');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/docs/confidential-computing> a foaf:Document .');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/docs/ehr-catalog> a foaf:Document .');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/docs/fhir-api> a foaf:Document .');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/docs/consent> a foaf:Document .');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/docs/privacy> a foaf:Document .');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/docs/deidentification> a foaf:Document .');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/docs/data-quality> a foaf:Document .');
+  lines.push('');
+
+  // OpenAPI Documentation
+  lines.push('# OpenAPI Documentation');
+  lines.push('<https://dataspace.rheinland-uklinikum.de/api/tee/openapi.yaml> a rdfs:Resource .');
+  lines.push('');
+
+  // GZip Media Type
+  lines.push('# Compression Format');
+  lines.push('<https://www.iana.org/assignments/media-types/application/gzip> a dct:MediaType .');
+  lines.push('');
+
+  // Additional Legal Resources
+  lines.push('# Additional Legal Resources');
+  lines.push('<http://data.europa.eu/eli/reg/2022/868/oj> a eli:LegalResource .');
+  lines.push('');
+
+  // Generate per-record resource type declarations
+  lines.push('# Per-Record Resource Declarations');
+  const allRecordIds = mockEHRCatalogAssets.map((r) => r['@id'].split('/').pop() || r['@id']);
+  allRecordIds.forEach((id: string) => {
+    // Sample resources
+    lines.push(`<https://dataspace.rheinland-uklinikum.de/sample/${id}> a rdfs:Resource .`);
+    // Download sample URLs
+    lines.push(`<https://dataspace.rheinland-uklinikum.de/download/sample/${id}> a rdfs:Resource .`);
+    // Download analytics URLs
+    lines.push(`<https://dataspace.rheinland-uklinikum.de/download/analytics/${id}> a rdfs:Resource .`);
+    // TEE endpoint URLs
+    lines.push(`<https://dataspace.rheinland-uklinikum.de/tee/analytics/${id}> a rdfs:Resource .`);
+    // Analytics API endpoint URLs
+    lines.push(`<https://dataspace.rheinland-uklinikum.de/api/analytics/${id}> a rdfs:Resource .`);
+    // Download URLs for distributions
+    lines.push(`<https://dataspace.rheinland-uklinikum.de/download/${id}.json.gz> a rdfs:Resource .`);
+    // Catalog access URLs
+    lines.push(`<https://dataspace.rheinland-uklinikum.de/catalog/${id}> a rdfs:Resource .`);
+  });
+  lines.push('');
+
   return lines.join('\n');
 };
 
-export const downloadHealthDCATAP = () => {
-  const turtle = serializeToTurtle();
-  const blob = new Blob([turtle], { type: 'text/turtle' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'health-catalog.ttl';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+/**
+ * Download HealthDCAT-AP catalog from the backend API endpoint.
+ * This ensures single source of truth - the canonical TTL file served by backend-mock.
+ * Falls back to local serialization if API is unavailable.
+ */
+export const downloadHealthDCATAP = async () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+  
+  try {
+    // Try to fetch from the canonical API endpoint
+    const response = await fetch(`${backendUrl}/api/catalog.ttl`);
+    
+    if (response.ok) {
+      const turtle = await response.text();
+      const blob = new Blob([turtle], { type: 'text/turtle' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'health-catalog.ttl';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log('[HealthDCAT-AP] Downloaded from API endpoint');
+      return;
+    }
+    throw new Error(`API returned ${response.status}`);
+  } catch (error) {
+    // Fallback to local serialization if API unavailable
+    console.warn('[HealthDCAT-AP] API unavailable, using local serializer:', error);
+    const turtle = serializeToTurtle();
+    const blob = new Blob([turtle], { type: 'text/turtle' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'health-catalog.ttl';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 };

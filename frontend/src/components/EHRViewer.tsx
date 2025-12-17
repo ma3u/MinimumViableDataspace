@@ -491,7 +491,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
               {subject.signalVerificationNode.adverseEvents && subject.signalVerificationNode.adverseEvents.length > 0 && (
                 <div>
                   <div className="text-sm font-semibold text-gray-700 mb-2">Reported Adverse Events (ADRs):</div>
-                  {subject.signalVerificationNode.adverseEvents.map((ae: Record<string, unknown>, i: number) => (
+                  {subject.signalVerificationNode.adverseEvents.map((ae, i) => (
                     <div key={i} className="bg-white rounded-lg p-4 shadow-sm mb-2">
                       <div className="flex items-center justify-between mb-2">
                         <div className="font-semibold text-gray-900">{ae.medDRAPT}</div>
@@ -593,7 +593,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
               <h3 className="text-lg font-semibold text-gray-900">Anamnesis (Medical History)</h3>
             </div>
             <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-              {Object.entries(subject.anamnesisNode).sort((a: [string, Record<string, unknown>], b: [string, Record<string, unknown>]) => (a[1].stepNumber as number) - (b[1].stepNumber as number)).map(([key, step]: [string, Record<string, unknown>]) => (
+              {Object.entries(subject.anamnesisNode).sort((a, b) => a[1].stepNumber - b[1].stepNumber).map(([key, step]) => (
                 <div key={key} className="bg-white rounded-lg p-3 shadow-sm">
                   <div className="flex justify-between items-start mb-1">
                     <span className="font-medium text-gray-900">{step.stepName}</span>
