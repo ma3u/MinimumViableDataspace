@@ -46,20 +46,29 @@ The Editor may not correctly parse nested blank node structures such as:
 STEPS TO REPRODUCE
 ------------------
 1. Go to https://ehds.healthdataportal.eu/editor2/
-2. Upload the attached health-catalog.ttl
-3. Observe validation panel showing missing fields
-4. Compare with SHACL validation:
+2. Download health-catalog.ttl from GitHub (link below)
+3. Upload it to the Editor
+4. Observe validation panel showing missing fields
+5. Compare with SHACL validation:
    
    shacl validate --shapes healthdcatap-shacl.ttl --data health-catalog.ttl
    # Result: sh:conforms true
 
-ATTACHMENTS
------------
-Please find attached:
-1. health-catalog.ttl - Test catalog (21 datasets, ~10,500 lines)
-2. healthdcatap-shacl.ttl - HealthDCAT-AP Release 5 SHACL shapes
-3. EHDS-Editor-Issue.md - Detailed issue report with code samples
-4. HealthDCAT-AP-Field-Analysis.md - Complete field analysis
+FILES ON GITHUB
+---------------
+All files are available in our public repository:
+
+- Test Catalog (21 datasets):
+  https://github.com/ma3u/MinimumViableDataspace/blob/health-demo/resources/health-catalog.ttl
+
+- SHACL Shapes (HealthDCAT-AP Release 5):
+  https://github.com/ma3u/MinimumViableDataspace/blob/health-demo/resources/shacl/healthdcatap-shacl.ttl
+
+- Detailed Issue Report:
+  https://github.com/ma3u/MinimumViableDataspace/blob/health-demo/resources/EHDS-Editor-Issue.md
+
+- Complete Field Analysis:
+  https://github.com/ma3u/MinimumViableDataspace/blob/health-demo/resources/HealthDCAT-AP-Field-Analysis.md
 
 ENVIRONMENT
 -----------
@@ -79,6 +88,6 @@ Best regards,
 [Your Email]
 
 ---
-Project: MVD Health Demo
-Repository: https://github.com/siemens/MVD-health
+Project: MVD Health Demo (Minimum Viable Dataspace)
+Repository: https://github.com/ma3u/MinimumViableDataspace/tree/health-demo
 Compliance: EHDS Regulation 2025/327, HealthDCAT-AP Release 5

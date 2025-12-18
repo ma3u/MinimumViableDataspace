@@ -128,7 +128,7 @@ healthdcatap:hasCodeValues [
 
 ## Additional Context
 
-- **Project**: [MVD Health Demo](https://github.com/siemens/MVD-health) - Minimum Viable Dataspace for Health
+- **Project**: [MVD Health Demo](https://github.com/ma3u/MinimumViableDataspace/tree/health-demo) - Minimum Viable Dataspace for Health
 - **Compliance Target**: EHDS Regulation 2025/327, HealthDCAT-AP Release 5
 - **Catalog Size**: 21 datasets, 84 distributions, ~10,500 lines
 
