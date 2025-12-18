@@ -1,0 +1,84 @@
+To: EHDS2@sciensano.be
+Subject: HealthDCAT-AP Editor v4.0 - Validation Discrepancy Report (SHACL passes, Editor fails)
+
+Dear HealthDCAT-AP Editor Team,
+
+I am writing to report a validation discrepancy in the HealthDCAT-AP Editor v4.0 
+(https://ehds.healthdataportal.eu/editor2/).
+
+SUMMARY
+-------
+Our catalog passes Apache Jena SHACL validation with the official HealthDCAT-AP 
+Release 5 shapes (sh:conforms true), but the Editor reports 7 mandatory fields 
+as missing despite them being present in the TTL file.
+
+VALIDATION COMPARISON
+---------------------
+| Method                  | Result                    |
+|-------------------------|---------------------------|
+| SHACL (Apache Jena)     | ✓ sh:conforms true        |
+| HealthDCAT-AP Editor    | ✗ 11/18 mandatory fields  |
+| Actual fields in TTL    | ✓ 18/18 all present       |
+
+FIELDS REPORTED AS MISSING (but verified present)
+-------------------------------------------------
+- dpv:hasPurpose         → 59 occurrences in TTL
+- healthdcatap:hdab      → 21 occurrences  
+- dpv:hasLegalBasis      → 42 occurrences
+- healthdcatap:healthCategory → 51 occurrences
+- healthdcatap:hasCodeValues  → 57 occurrences
+- dcat:distribution      → 84 occurrences
+- dct:identifier         → 121 occurrences
+
+SUSPECTED CAUSE
+---------------
+The Editor may not correctly parse nested blank node structures such as:
+
+  healthdcatap:hdab [
+    a foaf:Agent ;
+    foaf:name "Rheinland Universitätsklinikum HDAB" ;
+    dcat:contactPoint [
+      a vcard:Kind, vcard:Organization ;
+      vcard:hasEmail <mailto:hdab@rheinland-uklinikum.de>
+    ]
+  ] ;
+
+STEPS TO REPRODUCE
+------------------
+1. Go to https://ehds.healthdataportal.eu/editor2/
+2. Upload the attached health-catalog.ttl
+3. Observe validation panel showing missing fields
+4. Compare with SHACL validation:
+   
+   shacl validate --shapes healthdcatap-shacl.ttl --data health-catalog.ttl
+   # Result: sh:conforms true
+
+ATTACHMENTS
+-----------
+Please find attached:
+1. health-catalog.ttl - Test catalog (21 datasets, ~10,500 lines)
+2. healthdcatap-shacl.ttl - HealthDCAT-AP Release 5 SHACL shapes
+3. EHDS-Editor-Issue.md - Detailed issue report with code samples
+4. HealthDCAT-AP-Field-Analysis.md - Complete field analysis
+
+ENVIRONMENT
+-----------
+- Editor: HealthDCAT-AP Editor v4.0
+- SHACL: HealthDCAT-AP Release 5 NON_PUBLIC (with DCAT-AP 3.0 imports)
+- Validation: Apache Jena SHACL
+- Project: MVD Health Demo (Minimum Viable Dataspace for Health)
+
+We are happy to provide additional information or test cases if needed.
+
+Thank you for your attention to this matter.
+
+Best regards,
+
+[Your Name]
+[Your Organization]
+[Your Email]
+
+---
+Project: MVD Health Demo
+Repository: https://github.com/siemens/MVD-health
+Compliance: EHDS Regulation 2025/327, HealthDCAT-AP Release 5

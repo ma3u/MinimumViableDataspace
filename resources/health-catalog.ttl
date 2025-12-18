@@ -123,6 +123,7 @@
   dct:publisher [
     a foaf:Agent ;
     foaf:name "Rheinland Universitätsklinikum" ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia>
   ] ;
   dct:language <http://publications.europa.eu/resource/authority/language/ENG> ;
@@ -265,32 +266,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q900684> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q45127"^^xsd:anyURI ;
-      skos:prefLabel "International Classification of Diseases, 10th Revision (ICD-10)"@en ;
-      skos:notation "ICD-10" ;
-      owl:versionInfo "Version:2019"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q45127> ;
+    dct:identifier "ICD-10:Q87.1"^^xsd:anyURI ;
     skos:notation "Q87.1" ;
     skos:prefLabel "ICD-10:Q87.1"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q45127"^^xsd:anyURI ;
-      skos:prefLabel "International Classification of Diseases, 10th Revision (ICD-10)"@en ;
-      skos:notation "ICD-10" ;
-      owl:versionInfo "Version:2019"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q45127> ;
+    dct:identifier "ICD-10:Q99.9"^^xsd:anyURI ;
     skos:notation "Q99.9" ;
     skos:prefLabel "ICD-10:Q99.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1753681"^^xsd:anyURI ;
-      skos:prefLabel "SNOMED Clinical Terms"@en ;
-      skos:notation "SNOMED-CT" ;
-      owl:versionInfo "Version:2024-03"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1753681> ;
+    dct:identifier "SNOMED-CT:363235000"^^xsd:anyURI ;
     skos:notation "363235000" ;
     skos:prefLabel "SNOMED-CT:363235000"@en
   ] ;
@@ -331,6 +320,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR021> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -370,6 +360,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -482,12 +473,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR021.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "524288"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "524288"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92400ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92400ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -507,7 +498,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR021.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "51200"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "51200"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -571,7 +562,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR021> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -761,42 +752,26 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q192093> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:E11.9"^^xsd:anyURI ;
     skos:notation "E11.9" ;
     skos:prefLabel "ICD-10-GM:E11.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:I25.9"^^xsd:anyURI ;
     skos:notation "I25.9" ;
     skos:prefLabel "ICD-10-GM:I25.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:4548-4"^^xsd:anyURI ;
     skos:notation "4548-4" ;
     skos:prefLabel "LOINC:4548-4"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q192093"^^xsd:anyURI ;
-      skos:prefLabel "Anatomical Therapeutic Chemical Classification System"@en ;
-      skos:notation "ATC" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q192093> ;
+    dct:identifier "ATC:A10B"^^xsd:anyURI ;
     skos:notation "A10B" ;
     skos:prefLabel "ATC:A10B"@en
   ] ;
@@ -837,6 +812,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR001> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -876,6 +852,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -990,12 +967,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR001.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "534528"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "534528"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92401ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92401ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -1015,7 +992,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR001.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "102400"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "102400"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -1079,7 +1056,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR001> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -1265,52 +1242,32 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:I50.9"^^xsd:anyURI ;
     skos:notation "I50.9" ;
     skos:prefLabel "ICD-10-GM:I50.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:I42.0"^^xsd:anyURI ;
     skos:notation "I42.0" ;
     skos:prefLabel "ICD-10-GM:I42.0"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:33762-6"^^xsd:anyURI ;
     skos:notation "33762-6" ;
     skos:prefLabel "LOINC:33762-6"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:10230-1"^^xsd:anyURI ;
     skos:notation "10230-1" ;
     skos:prefLabel "LOINC:10230-1"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10019279"^^xsd:anyURI ;
     skos:notation "10019279" ;
     skos:prefLabel "MedDRA:10019279"@en
   ] ;
@@ -1351,6 +1308,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR002> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -1390,6 +1348,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -1504,12 +1463,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR002.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "544768"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "544768"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92402ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92402ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -1529,7 +1488,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR002.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "76800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "76800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -1593,7 +1552,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR002> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -1780,42 +1739,26 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:C50.9"^^xsd:anyURI ;
     skos:notation "C50.9" ;
     skos:prefLabel "ICD-10-GM:C50.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:Z85.3"^^xsd:anyURI ;
     skos:notation "Z85.3" ;
     skos:prefLabel "ICD-10-GM:Z85.3"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10006187"^^xsd:anyURI ;
     skos:notation "10006187" ;
     skos:prefLabel "MedDRA:10006187"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10029104"^^xsd:anyURI ;
     skos:notation "10029104" ;
     skos:prefLabel "MedDRA:10029104"@en
   ] ;
@@ -1856,6 +1799,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR003> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -1895,6 +1839,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -2007,12 +1952,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR003.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "555008"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "555008"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92403ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92403ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -2032,7 +1977,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR003.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "61440"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "61440"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -2096,7 +2041,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR003> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -2282,22 +2227,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:C61"^^xsd:anyURI ;
     skos:notation "C61" ;
     skos:prefLabel "ICD-10-GM:C61"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10036910"^^xsd:anyURI ;
     skos:notation "10036910" ;
     skos:prefLabel "MedDRA:10036910"@en
   ] ;
@@ -2338,6 +2275,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR004> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -2377,6 +2315,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -2490,12 +2429,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR004.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "565248"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "565248"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92404ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92404ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -2515,7 +2454,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR004.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "40960"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "40960"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -2579,7 +2518,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR004> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -2768,32 +2707,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:J44.9"^^xsd:anyURI ;
     skos:notation "J44.9" ;
     skos:prefLabel "ICD-10-GM:J44.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:J43.9"^^xsd:anyURI ;
     skos:notation "J43.9" ;
     skos:prefLabel "ICD-10-GM:J43.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:19926-5"^^xsd:anyURI ;
     skos:notation "19926-5" ;
     skos:prefLabel "LOINC:19926-5"@en
   ] ;
@@ -2834,6 +2761,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR005> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -2873,6 +2801,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -2987,12 +2916,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR005.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "575488"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "575488"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92405ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92405ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -3012,7 +2941,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR005.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "51200"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "51200"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -3076,7 +3005,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR005> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -3258,22 +3187,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:G35"^^xsd:anyURI ;
     skos:notation "G35" ;
     skos:prefLabel "ICD-10-GM:G35"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10028155"^^xsd:anyURI ;
     skos:notation "10028155" ;
     skos:prefLabel "MedDRA:10028155"@en
   ] ;
@@ -3314,6 +3235,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR006> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -3353,6 +3275,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -3465,12 +3388,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR006.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "585728"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "585728"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92406ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92406ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -3490,7 +3413,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR006.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "92160"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "92160"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -3554,7 +3477,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR006> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -3742,22 +3665,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:M05.9"^^xsd:anyURI ;
     skos:notation "M05.9" ;
     skos:prefLabel "ICD-10-GM:M05.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10039073"^^xsd:anyURI ;
     skos:notation "10039073" ;
     skos:prefLabel "MedDRA:10039073"@en
   ] ;
@@ -3798,6 +3713,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR007> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -3837,6 +3753,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -3951,12 +3868,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR007.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "595968"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "595968"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92407ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92407ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -3976,7 +3893,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR007.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "61440"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "61440"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -4040,7 +3957,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR007> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -4228,32 +4145,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:N18.4"^^xsd:anyURI ;
     skos:notation "N18.4" ;
     skos:prefLabel "ICD-10-GM:N18.4"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:E11.2"^^xsd:anyURI ;
     skos:notation "E11.2" ;
     skos:prefLabel "ICD-10-GM:E11.2"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:33914-3"^^xsd:anyURI ;
     skos:notation "33914-3" ;
     skos:prefLabel "LOINC:33914-3"@en
   ] ;
@@ -4294,6 +4199,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR008> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -4333,6 +4239,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -4445,12 +4352,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR008.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "606208"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "606208"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92408ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92408ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -4470,7 +4377,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR008.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "122880"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "122880"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -4534,7 +4441,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR008> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -4716,22 +4623,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:F33.1"^^xsd:anyURI ;
     skos:notation "F33.1" ;
     skos:prefLabel "ICD-10-GM:F33.1"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10012378"^^xsd:anyURI ;
     skos:notation "10012378" ;
     skos:prefLabel "MedDRA:10012378"@en
   ] ;
@@ -4772,6 +4671,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR009> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -4811,6 +4711,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -4925,12 +4826,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR009.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "616448"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "616448"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92409ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92409ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -4950,7 +4851,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR009.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "30720"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "30720"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -5014,7 +4915,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR009> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -5210,22 +5111,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:G20"^^xsd:anyURI ;
     skos:notation "G20" ;
     skos:prefLabel "ICD-10-GM:G20"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10034010"^^xsd:anyURI ;
     skos:notation "10034010" ;
     skos:prefLabel "MedDRA:10034010"@en
   ] ;
@@ -5266,6 +5159,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR010> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -5305,6 +5199,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -5416,12 +5311,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR010.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "626688"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "626688"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92410ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92410ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -5441,7 +5336,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR010.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "76800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "76800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -5505,7 +5400,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR010> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -5688,22 +5583,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:K50.0"^^xsd:anyURI ;
     skos:notation "K50.0" ;
     skos:prefLabel "ICD-10-GM:K50.0"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10011401"^^xsd:anyURI ;
     skos:notation "10011401" ;
     skos:prefLabel "MedDRA:10011401"@en
   ] ;
@@ -5744,6 +5631,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR011> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -5783,6 +5671,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -5898,12 +5787,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR011.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "636928"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "636928"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92411ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92411ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -5923,7 +5812,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR011.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "86016"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "86016"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -5987,7 +5876,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR011> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -6172,22 +6061,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:G40.2"^^xsd:anyURI ;
     skos:notation "G40.2" ;
     skos:prefLabel "ICD-10-GM:G40.2"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10015037"^^xsd:anyURI ;
     skos:notation "10015037" ;
     skos:prefLabel "MedDRA:10015037"@en
   ] ;
@@ -6228,6 +6109,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR012> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -6267,6 +6149,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -6378,12 +6261,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR012.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "647168"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "647168"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92412ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92412ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -6403,7 +6286,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR012.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "46080"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "46080"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -6467,7 +6350,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR012> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -6652,22 +6535,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:M32.1"^^xsd:anyURI ;
     skos:notation "M32.1" ;
     skos:prefLabel "ICD-10-GM:M32.1"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10042945"^^xsd:anyURI ;
     skos:notation "10042945" ;
     skos:prefLabel "MedDRA:10042945"@en
   ] ;
@@ -6708,6 +6583,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR013> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -6747,6 +6623,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -6859,12 +6736,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR013.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "657408"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "657408"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92413ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92413ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -6884,7 +6761,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR013.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "71680"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "71680"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -6948,7 +6825,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR013> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -7139,32 +7016,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:I48.1"^^xsd:anyURI ;
     skos:notation "I48.1" ;
     skos:prefLabel "ICD-10-GM:I48.1"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:8867-4"^^xsd:anyURI ;
     skos:notation "8867-4" ;
     skos:prefLabel "LOINC:8867-4"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10003658"^^xsd:anyURI ;
     skos:notation "10003658" ;
     skos:prefLabel "MedDRA:10003658"@en
   ] ;
@@ -7205,6 +7070,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR014> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -7244,6 +7110,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -7359,12 +7226,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR014.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "667648"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "667648"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92414ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92414ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -7384,7 +7251,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR014.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "112640"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "112640"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -7448,7 +7315,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR014> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -7632,32 +7499,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:J45.5"^^xsd:anyURI ;
     skos:notation "J45.5" ;
     skos:prefLabel "ICD-10-GM:J45.5"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:19926-5"^^xsd:anyURI ;
     skos:notation "19926-5" ;
     skos:prefLabel "LOINC:19926-5"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10003553"^^xsd:anyURI ;
     skos:notation "10003553" ;
     skos:prefLabel "MedDRA:10003553"@en
   ] ;
@@ -7698,6 +7553,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR015> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -7737,6 +7593,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -7851,12 +7708,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR015.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "677888"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "677888"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92415ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92415ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -7876,7 +7733,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR015.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "56320"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "56320"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -7940,7 +7797,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR015> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -8128,32 +7985,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q744434> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:E10.9"^^xsd:anyURI ;
     skos:notation "E10.9" ;
     skos:prefLabel "ICD-10-GM:E10.9"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:4548-4"^^xsd:anyURI ;
     skos:notation "4548-4" ;
     skos:prefLabel "LOINC:4548-4"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10067584"^^xsd:anyURI ;
     skos:notation "10067584" ;
     skos:prefLabel "MedDRA:10067584"@en
   ] ;
@@ -8194,6 +8039,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR016> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -8233,6 +8079,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -8345,12 +8192,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR016.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "688128"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "688128"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92416ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92416ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -8370,7 +8217,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR016.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -8434,7 +8281,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR016> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -8615,22 +8462,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:M80.0"^^xsd:anyURI ;
     skos:notation "M80.0" ;
     skos:prefLabel "ICD-10-GM:M80.0"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10031282"^^xsd:anyURI ;
     skos:notation "10031282" ;
     skos:prefLabel "MedDRA:10031282"@en
   ] ;
@@ -8671,6 +8510,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR017> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -8710,6 +8550,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -8823,12 +8664,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR017.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "698368"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "698368"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92417ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92417ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -8848,7 +8689,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR017.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "40960"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "40960"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -8912,7 +8753,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR017> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -9101,32 +8942,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:B18.2"^^xsd:anyURI ;
     skos:notation "B18.2" ;
     skos:prefLabel "ICD-10-GM:B18.2"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:20416-4"^^xsd:anyURI ;
     skos:notation "20416-4" ;
     skos:prefLabel "LOINC:20416-4"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10019731"^^xsd:anyURI ;
     skos:notation "10019731" ;
     skos:prefLabel "MedDRA:10019731"@en
   ] ;
@@ -9167,6 +8996,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR018> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -9206,6 +9036,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -9320,12 +9151,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR018.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "708608"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "708608"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92418ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92418ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -9345,7 +9176,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR018.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "35840"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "35840"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -9409,7 +9240,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR018> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -9602,22 +9433,14 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:G43.1"^^xsd:anyURI ;
     skos:notation "G43.1" ;
     skos:prefLabel "ICD-10-GM:G43.1"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10027599"^^xsd:anyURI ;
     skos:notation "10027599" ;
     skos:prefLabel "MedDRA:10027599"@en
   ] ;
@@ -9658,6 +9481,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR019> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -9697,6 +9521,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -9811,12 +9636,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR019.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "718848"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "718848"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92419ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92419ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -9836,7 +9661,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR019.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "43008"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "43008"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -9900,7 +9725,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR019> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -10084,32 +9909,20 @@
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q2743> ;
   healthdcatap:hasCodingSystem <https://www.wikidata.org/entity/Q19597236> ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q15629608"^^xsd:anyURI ;
-      skos:prefLabel "ICD-10-GM (German Modification)"@en ;
-      skos:notation "ICD-10-GM" ;
-      owl:versionInfo "Version:2024"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q15629608> ;
+    dct:identifier "ICD-10-GM:B20"^^xsd:anyURI ;
     skos:notation "B20" ;
     skos:prefLabel "ICD-10-GM:B20"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q2614257"^^xsd:anyURI ;
-      skos:prefLabel "Logical Observation Identifiers Names and Codes"@en ;
-      skos:notation "LOINC" ;
-      owl:versionInfo "Version:2.77"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q2614257> ;
+    dct:identifier "LOINC:24467-3"^^xsd:anyURI ;
     skos:notation "24467-3" ;
     skos:prefLabel "LOINC:24467-3"@en
   ] ;
   healthdcatap:hasCodeValues [ a skos:Concept ;
-    skos:inScheme [ a skos:ConceptScheme ;
-      dct:identifier "http://www.wikidata.org/entity/Q1428979"^^xsd:anyURI ;
-      skos:prefLabel "Medical Dictionary for Regulatory Activities"@en ;
-      skos:notation "MedDRA" ;
-      owl:versionInfo "Version:27.0"
-    ] ;
+    skos:inScheme <http://www.wikidata.org/entity/Q1428979> ;
+    dct:identifier "MedDRA:10020098"^^xsd:anyURI ;
     skos:notation "10020098" ;
     skos:prefLabel "MedDRA:10020098"@en
   ] ;
@@ -10150,6 +9963,7 @@
   dcat:distribution [
     a dcat:Distribution ;
     dct:title "Analytics API Access"@en ;
+    dcat:accessURL <https://dataspace.rheinland-uklinikum.de/api/analytics/EHR020> ;
     dcat:accessService [
       a dcat:DataService ;
       dct:title "EHR Analytics Service"@en ;
@@ -10189,6 +10003,7 @@
     a foaf:Agent, foaf:Organization ;
     foaf:name "Rheinland Universitätsklinikum"@de ;
     foaf:name "Rheinland Universitätsklinikum"@en ;
+    healthdcatap:trustedDataHolder true ;
     dct:type <http://purl.org/adms/publishertype/Academia> ;
     vcard:hasAddress [
       a vcard:Address ;
@@ -10304,12 +10119,12 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/download/EHR020.json.gz> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "729088"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "729088"^^xsd:decimal ;
   dcat:compressFormat <https://www.iana.org/assignments/media-types/application/gzip> ;
   spdx:checksum [
     a spdx:Checksum ;
     spdx:algorithm spdx:checksumAlgorithm_sha256 ;
-    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92420ae41e4649b934ca495991b7852b855"
+    spdx:checksumValue "e3b0c44298fc1c149afbf4c8996fb92420ae41e4649b934ca495991b7852b855"^^xsd:hexBinary
   ] ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   dct:accessRights <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
@@ -10329,7 +10144,7 @@
   dcat:downloadURL <https://dataspace.rheinland-uklinikum.de/sample/EHR020.json> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/application/fhir+json> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/JSON> ;
-  dcat:byteSize "28672"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "28672"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
@@ -10393,7 +10208,7 @@
   dcat:accessService <http://example.org/analytics-service/EHR020> ;
   dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
   dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
-  dcat:byteSize "204800"^^xsd:nonNegativeInteger ;
+  dcat:byteSize "204800"^^xsd:decimal ;
   dct:license <http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0> ;
   adms:status <http://publications.europa.eu/resource/authority/dataset-status/COMPLETED> ;
   dct:issued "2024-12-01"^^xsd:date ;
