@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
 import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
+import { api, getApiMode } from './services/apiFactory';
 import { 
   mockEHRCatalogAssets, 
   mockEHRData, 
@@ -159,12 +160,51 @@ function AppHealth() {
     setShowJson(false);
   };
 
+  // Contract agreement ID for EDC flow (stored across negotiation and transfer)
+  const [contractAgreementId, setContractAgreementId] = useState<string | null>(null);
+
   const simulateNegotiation = async () => {
     setIsAnimating(true);
-    for (let i = 0; i < mockNegotiationFlow.length; i++) {
-      setNegotiationStep(i);
-      await new Promise(resolve => setTimeout(resolve, 800));
+    const mode = getApiMode();
+    
+    try {
+      if (mode === 'mock') {
+        // Mock mode: simulate with timeouts
+        for (let i = 0; i < mockNegotiationFlow.length; i++) {
+          setNegotiationStep(i);
+          await new Promise(resolve => setTimeout(resolve, 800));
+        }
+      } else {
+        // Hybrid/Full mode: use real EDC negotiation
+        const assetId = selectedAsset?.['@id'] || '';
+        const offerId = `offer:${assetId}`;
+        
+        // Step through mock UI while negotiation happens
+        setNegotiationStep(0); // Requesting
+        const negResponse = await api.initiateNegotiation(assetId, offerId);
+        
+        setNegotiationStep(1); // Processing
+        
+        if (negResponse.state !== 'FINALIZED') {
+          // Poll for completion
+          setNegotiationStep(2); // Verifying
+          const finalStatus = await api.pollNegotiation(negResponse.negotiationId, 30000);
+          setContractAgreementId(finalStatus.contractAgreementId || null);
+          setNegotiationStep(3); // Completed
+        } else {
+          setContractAgreementId(negResponse.contractAgreementId || null);
+          setNegotiationStep(mockNegotiationFlow.length - 1); // Jump to complete
+        }
+      }
+    } catch (error) {
+      console.error('Negotiation failed:', error);
+      // Fall back to completing the mock flow for demo purposes
+      for (let i = negotiationStep; i < mockNegotiationFlow.length; i++) {
+        setNegotiationStep(i);
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
     }
+    
     setIsAnimating(false);
     
     // Check if asset requires confidential compute
@@ -189,10 +229,40 @@ function AppHealth() {
 
   const simulateTransfer = async () => {
     setIsAnimating(true);
+    const mode = getApiMode();
     
-    for (let i = 0; i < mockTransferFlow.length; i++) {
-      setTransferStep(i);
-      await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      if (mode === 'mock') {
+        // Mock mode: simulate with timeouts
+        for (let i = 0; i < mockTransferFlow.length; i++) {
+          setTransferStep(i);
+          await new Promise(resolve => setTimeout(resolve, 800));
+        }
+      } else {
+        // Hybrid/Full mode: use real EDC transfer
+        const assetId = selectedAsset?.['@id'] || '';
+        const agreementId = contractAgreementId || `mock-agreement-${Date.now()}`;
+        
+        setTransferStep(0); // Initiating
+        const transferResponse = await api.initiateTransfer(agreementId, assetId);
+        
+        setTransferStep(1); // Provisioning
+        
+        if (transferResponse.state !== 'COMPLETED') {
+          setTransferStep(2); // Transferring
+          await api.pollTransfer(transferResponse.transferId, 30000);
+          setTransferStep(3); // Completing
+        }
+        
+        setTransferStep(mockTransferFlow.length - 1); // Complete
+      }
+    } catch (error) {
+      console.error('Transfer failed:', error);
+      // Fall back to completing the mock flow for demo purposes
+      for (let i = transferStep; i < mockTransferFlow.length; i++) {
+        setTransferStep(i);
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
     }
     
     setIsAnimating(false);
@@ -201,19 +271,29 @@ function AppHealth() {
   };
 
   const loadEhrData = async () => {
-    // Load the EHR data - try backend first, fall back to mock
+    // Load the EHR data - use apiFactory for consistent mode handling
     if (selectedAsset) {
+      const mode = getApiMode();
+      const ehrId = selectedAsset['@id'];
+      
       try {
-        if (backendAvailable) {
-          const data = await fetchEHRById(selectedAsset['@id']);
-          setEhrData(data);
+        if (mode === 'mock') {
+          // Mock mode: try backend first, fall back to mock data
+          if (backendAvailable) {
+            const data = await fetchEHRById(ehrId);
+            setEhrData(data);
+          } else {
+            setEhrData(mockEHRData[ehrId]);
+          }
         } else {
-          // Use mock data as fallback
-          setEhrData(mockEHRData[selectedAsset['@id']]);
+          // Hybrid/Full mode: use apiFactory
+          const data = await api.getEhr(ehrId);
+          setEhrData(data as unknown as ElectronicHealthRecord);
         }
       } catch (error) {
-        console.warn('Backend fetch failed, using mock data:', error);
-        setEhrData(mockEHRData[selectedAsset['@id']]);
+        console.warn('EHR fetch failed, using mock data:', error);
+        // Fallback to mock data
+        setEhrData(mockEHRData[ehrId]);
       }
     }
   };
@@ -237,6 +317,23 @@ function AppHealth() {
             </div>
             
             <div className="flex items-center gap-4">
+              {/* API Mode Indicator */}
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+                getApiMode() === 'full' 
+                  ? 'bg-purple-100 text-purple-700'
+                  : getApiMode() === 'hybrid'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-600'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  getApiMode() === 'full' 
+                    ? 'bg-purple-500'
+                    : getApiMode() === 'hybrid'
+                      ? 'bg-blue-500'
+                      : 'bg-gray-400'
+                }`} />
+                {getApiMode() === 'full' ? 'Full EDC' : getApiMode() === 'hybrid' ? 'Hybrid' : 'Mock'}
+              </div>
               {/* Backend Status Indicator */}
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
                 backendAvailable === null 

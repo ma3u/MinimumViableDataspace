@@ -17,6 +17,7 @@ Comprehensive technical documentation for the Health Dataspace Demo, including a
 9. [Testing Strategy](#9-testing-strategy)
 10. [Deployment](#10-deployment)
 11. [Troubleshooting](#11-troubleshooting)
+12. [Screenshots & Demo Flow](#12-screenshots--demo-flow)
 
 ---
 
@@ -1477,6 +1478,71 @@ psql -h localhost -p 5432 -U admin -d mvd
 1. Verify issuer service is running on port 10012
 2. Check credential expiration dates
 3. Ensure matching DID between issuer and credential
+
+---
+
+## 12. Screenshots & Demo Flow
+
+This section provides visual documentation of the demo workflow with screenshots from each phase.
+
+### Demo Overview
+
+The complete EHR2EDC demo flow consists of four main phases:
+
+![Demo Overview](demo-overview.png)
+
+### Step 1: Catalog Browser
+
+Browse the EHR catalog with multi-dimensional filtering (category, age band, clinical phase, MedDRA classification):
+
+![Catalog Browser](demo-step1-catalog.png)
+
+**Key Features:**
+- Search by diagnosis, ICD code, or MedDRA terms
+- Filter by medical category (Cardiology, Oncology, etc.)
+- Filter by clinical trial phase (Phase I-IV)
+- EU CTR 536/2014 compliance metadata
+
+### Step 2: Contract Negotiation
+
+Secure consent verification and contract negotiation following DSP state machine:
+
+![Contract Negotiation](demo-step2-contractnegotiation.png)
+
+**DSP States Visualized:**
+- REQUESTING → OFFERED → ACCEPTING → AGREED → FINALIZED
+
+### Step 3: Data Transfer
+
+Secure data transfer with de-identification and provenance tracking:
+
+![Data Transfer](demo-step3-datatransfer.png)
+
+**Transfer Features:**
+- EDR (Endpoint Data Reference) token management
+- Secure HTTPS data transfer
+- De-identification pipeline execution
+- Provenance credential generation
+
+### Step 4: EHR Viewer
+
+FHIR R4-compliant Electronic Health Record viewer with clinical trial metadata:
+
+![EHR Viewer](demo-step4-EHR.png)
+
+**Displayed Information:**
+- Patient demographics (anonymized)
+- Primary diagnosis with ICD-10 codes
+- Clinical trial information (phase, protocol, endpoints)
+- MedDRA v27.0 classification (SOC, Preferred Terms)
+- Adverse Drug Reactions with causality assessment
+- 5-step anamnesis (medical history)
+
+### Docker Environment
+
+Running the demo in Docker with full EDC infrastructure:
+
+![Docker Environment](demo-docker.png)
 
 ---
 
