@@ -1,0 +1,916 @@
+openapi: 3.1.0
+info:
+  title: Identity Hub API for Health Demo
+  description: |
+    Identity Hub API v1alpha for participant, credential, and DID management.
+    Based on Eclipse Dataspace Components IdentityHub 0.14.x.
+  version: 0.14.1
+  contact:
+    name: MVD Health Demo
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:7082/api/identity/v1alpha
+    description: Consumer Identity Hub
+  - url: http://localhost:7092/api/identity/v1alpha
+    description: Provider Identity Hub
+  - url: http://localhost:10012/api/admin/v1alpha
+    description: Issuer Service Admin API
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+
+  schemas:
+    # Participant Schemas
+    ParticipantContext:
+      type: object
+      required:
+        - participantId
+        - did
+      properties:
+        participantId:
+          type: string
+          description: Participant ID (typically DID)
+        did:
+          type: string
+          description: Decentralized Identifier
+        roles:
+          type: array
+          items:
+            type: string
+        serviceEndpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceEndpoint'
+        active:
+          type: boolean
+          default: true
+        key:
+          $ref: '#/components/schemas/KeyDescriptor'
+
+    ServiceEndpoint:
+      type: object
+      required:
+        - type
+        - serviceEndpoint
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [CredentialService, ProtocolEndpoint, IdentityHub]
+        serviceEndpoint:
+          type: string
+          format: uri
+
+    KeyDescriptor:
+      type: object
+      properties:
+        keyId:
+          type: string
+          description: Key ID (typically DID#key-1)
+        privateKeyAlias:
+          type: string
+          description: Alias in secret store
+        keyGeneratorParams:
+          $ref: '#/components/schemas/KeyGeneratorParams'
+
+    KeyGeneratorParams:
+      type: object
+      properties:
+        algorithm:
+          type: string
+          enum: [EdDSA, ES256, RS256]
+        curve:
+          type: string
+          enum: [Ed25519, P-256, secp256k1]
+
+    # KeyPair Schemas
+    KeyPairResource:
+      type: object
+      properties:
+        id:
+          type: string
+        keyId:
+          type: string
+        groupName:
+          type: string
+        participantId:
+          type: string
+        isDefaultPair:
+          type: boolean
+        useDuration:
+          type: integer
+        rotationDuration:
+          type: integer
+        serializedPublicKey:
+          type: string
+        privateKeyAlias:
+          type: string
+        state:
+          type: string
+          enum: [CREATED, ACTIVE, ROTATED, REVOKED]
+
+    RotateKeyPairRequest:
+      type: object
+      properties:
+        newKeyId:
+          type: string
+        duration:
+          type: integer
+
+    # Credential Schemas
+    VerifiableCredential:
+      type: object
+      properties:
+        '@context':
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        type:
+          type: array
+          items:
+            type: string
+        issuer:
+          oneOf:
+            - type: string
+            - type: object
+              properties:
+                id:
+                  type: string
+        issuanceDate:
+          type: string
+          format: date-time
+        expirationDate:
+          type: string
+          format: date-time
+        credentialSubject:
+          $ref: '#/components/schemas/CredentialSubject'
+        proof:
+          $ref: '#/components/schemas/Proof'
+
+    CredentialSubject:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Subject DID
+      additionalProperties: true
+
+    Proof:
+      type: object
+      properties:
+        type:
+          type: string
+        created:
+          type: string
+          format: date-time
+        verificationMethod:
+          type: string
+        proofPurpose:
+          type: string
+        proofValue:
+          type: string
+
+    CredentialResource:
+      type: object
+      properties:
+        id:
+          type: string
+        holderId:
+          type: string
+        issuerId:
+          type: string
+        vcState:
+          type: string
+          enum: [INITIAL, REQUESTED, ISSUED, REVOKED, EXPIRED, REISSUE_REQUESTED, REISSUING]
+        issuancePolicy:
+          type: object
+        reissuancePolicy:
+          type: object
+        timestamp:
+          type: integer
+          format: int64
+        verifiableCredential:
+          $ref: '#/components/schemas/VerifiableCredentialContainer'
+        participantId:
+          type: string
+
+    VerifiableCredentialContainer:
+      type: object
+      properties:
+        format:
+          type: string
+          enum: [JWT, JSON_LD, SD_JWT]
+        credential:
+          $ref: '#/components/schemas/VerifiableCredential'
+        rawVc:
+          type: string
+
+    # Health-specific Credential Types
+    MembershipCredential:
+      allOf:
+        - $ref: '#/components/schemas/VerifiableCredential'
+        - type: object
+          properties:
+            type:
+              type: array
+              items:
+                type: string
+              example: [VerifiableCredential, MembershipCredential]
+            credentialSubject:
+              type: object
+              properties:
+                id:
+                  type: string
+                membership:
+                  type: object
+                  properties:
+                    membershipType:
+                      type: string
+                      enum: [FullMember, AssociateMember, Observer]
+                    since:
+                      type: string
+                      format: date-time
+                    organization:
+                      type: string
+
+    ConsentCredential:
+      allOf:
+        - $ref: '#/components/schemas/VerifiableCredential'
+        - type: object
+          properties:
+            type:
+              type: array
+              items:
+                type: string
+              example: [VerifiableCredential, ConsentCredential]
+            credentialSubject:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Patient DID
+                consent:
+                  type: object
+                  properties:
+                    studyId:
+                      type: string
+                      description: Clinical trial identifier
+                    scope:
+                      type: array
+                      items:
+                        type: string
+                        enum: [demographics, diagnosis, medications, procedures, lab-results, genomics]
+                    purpose:
+                      type: string
+                      description: DPV purpose URI
+                    legalBasis:
+                      type: string
+                      description: GDPR legal basis URI
+                    grantedAt:
+                      type: string
+                      format: date-time
+                    expiresAt:
+                      type: string
+                      format: date-time
+
+    # Attestation Schemas (Issuer Service)
+    Attestation:
+      type: object
+      required:
+        - participantId
+        - attestationType
+      properties:
+        id:
+          type: string
+        participantId:
+          type: string
+          description: Holder's participant ID
+        attestationType:
+          type: string
+          description: Type of attestation
+        data:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+
+    MembershipAttestation:
+      allOf:
+        - $ref: '#/components/schemas/Attestation'
+        - type: object
+          properties:
+            attestationType:
+              type: string
+              default: MembershipCredential
+            data:
+              type: object
+              properties:
+                membershipType:
+                  type: integer
+                  description: "1=FullMember, 2=AssociateMember"
+                membershipStartDate:
+                  type: string
+                  format: date-time
+
+    ConsentAttestation:
+      allOf:
+        - $ref: '#/components/schemas/Attestation'
+        - type: object
+          properties:
+            attestationType:
+              type: string
+              default: ConsentCredential
+            data:
+              type: object
+              properties:
+                patientDid:
+                  type: string
+                studyId:
+                  type: string
+                consentScope:
+                  type: array
+                  items:
+                    type: string
+                purposeCode:
+                  type: string
+                legalBasis:
+                  type: string
+                grantedAt:
+                  type: string
+                  format: date-time
+                revokedAt:
+                  type: string
+                  format: date-time
+                revocationReason:
+                  type: string
+
+    # Credential Definition Schemas
+    CredentialDefinition:
+      type: object
+      required:
+        - credentialType
+      properties:
+        id:
+          type: string
+        credentialType:
+          type: string
+          description: VC type (e.g., MembershipCredential)
+        jsonSchema:
+          type: object
+          description: JSON Schema for credential validation
+        jsonLdContext:
+          type: array
+          items:
+            type: string
+        validityPeriod:
+          type: integer
+          description: Validity in seconds
+        mappingFunction:
+          type: string
+          description: Function to map attestation to VC
+
+    # DID Document Schemas
+    DidDocument:
+      type: object
+      properties:
+        '@context':
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+          description: DID
+        verificationMethod:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationMethod'
+        authentication:
+          type: array
+          items:
+            type: string
+        assertionMethod:
+          type: array
+          items:
+            type: string
+        service:
+          type: array
+          items:
+            $ref: '#/components/schemas/DidService'
+
+    VerificationMethod:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [JsonWebKey2020, Ed25519VerificationKey2020]
+        controller:
+          type: string
+        publicKeyJwk:
+          type: object
+
+    DidService:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        serviceEndpoint:
+          type: string
+
+    # Query Schemas
+    QuerySpec:
+      type: object
+      properties:
+        offset:
+          type: integer
+          default: 0
+        limit:
+          type: integer
+          default: 50
+        filterExpression:
+          type: array
+          items:
+            type: object
+            properties:
+              operandLeft:
+                type: string
+              operator:
+                type: string
+              operandRight:
+                type: string
+
+    # Response Schemas
+    IdResponse:
+      type: object
+      properties:
+        id:
+          type: string
+
+paths:
+  # Participant Endpoints
+  /participants:
+    get:
+      operationId: listParticipants
+      summary: List all participants
+      tags: [Participants]
+      responses:
+        '200':
+          description: Participant list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParticipantContext'
+
+    post:
+      operationId: createParticipant
+      summary: Create participant context
+      tags: [Participants]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantContext'
+      responses:
+        '201':
+          description: Participant created
+        '409':
+          description: Participant already exists
+
+  /participants/{participantId}:
+    get:
+      operationId: getParticipant
+      summary: Get participant by ID
+      tags: [Participants]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Participant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipantContext'
+        '404':
+          description: Participant not found
+
+    delete:
+      operationId: deleteParticipant
+      summary: Delete participant
+      tags: [Participants]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Participant deleted
+
+  /participants/{participantId}/state:
+    post:
+      operationId: updateParticipantState
+      summary: Activate or deactivate participant
+      tags: [Participants]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                active:
+                  type: boolean
+      responses:
+        '200':
+          description: State updated
+
+  # KeyPair Endpoints
+  /participants/{participantId}/keypairs:
+    get:
+      operationId: getParticipantKeyPairs
+      summary: Get key pairs for participant
+      tags: [KeyPairs]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Key pair list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KeyPairResource'
+
+    post:
+      operationId: addKeyPair
+      summary: Add key pair to participant
+      tags: [KeyPairs]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyDescriptor'
+      responses:
+        '201':
+          description: Key pair added
+
+  /participants/{participantId}/keypairs/{keyId}/rotate:
+    post:
+      operationId: rotateKeyPair
+      summary: Rotate key pair
+      tags: [KeyPairs]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RotateKeyPairRequest'
+      responses:
+        '200':
+          description: Key rotated
+
+  /participants/{participantId}/keypairs/{keyId}/revoke:
+    post:
+      operationId: revokeKeyPair
+      summary: Revoke key pair
+      tags: [KeyPairs]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Key revoked
+
+  # DID Endpoints
+  /participants/{participantId}/dids/publish:
+    post:
+      operationId: publishDid
+      summary: Publish DID document
+      tags: [DIDs]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: DID published
+
+  /participants/{participantId}/dids/unpublish:
+    post:
+      operationId: unpublishDid
+      summary: Unpublish DID document
+      tags: [DIDs]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: DID unpublished
+
+  /dids:
+    get:
+      operationId: listDids
+      summary: List all DIDs
+      tags: [DIDs]
+      responses:
+        '200':
+          description: DID list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DidDocument'
+
+  /dids/{did}:
+    get:
+      operationId: getDid
+      summary: Get DID document
+      tags: [DIDs]
+      parameters:
+        - name: did
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: DID document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DidDocument'
+
+  # Credential Endpoints
+  /participants/{participantId}/credentials:
+    get:
+      operationId: getParticipantCredentials
+      summary: Get credentials for participant
+      tags: [Credentials]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Credential list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CredentialResource'
+
+  /participants/{participantId}/credentials/request:
+    post:
+      operationId: requestCredential
+      summary: Request credential issuance
+      tags: [Credentials]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuerDid:
+                  type: string
+                credentialType:
+                  type: string
+      responses:
+        '202':
+          description: Credential request accepted
+
+  /credentials:
+    get:
+      operationId: listAllCredentials
+      summary: List all credentials
+      tags: [Credentials]
+      responses:
+        '200':
+          description: All credentials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CredentialResource'
+
+  # Attestation Endpoints (Issuer Service)
+  /participants/{participantId}/attestations:
+    post:
+      operationId: createAttestation
+      summary: Create attestation for participant
+      tags: [Attestations]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Attestation'
+      responses:
+        '201':
+          description: Attestation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+
+  /participants/{participantId}/attestations/query:
+    post:
+      operationId: queryAttestations
+      summary: Query attestations
+      tags: [Attestations]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: Attestation list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attestation'
+
+  # Credential Definition Endpoints
+  /participants/{participantId}/credentialdefinitions:
+    post:
+      operationId: createCredentialDefinition
+      summary: Create credential definition
+      tags: [CredentialDefinitions]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialDefinition'
+      responses:
+        '201':
+          description: Definition created
+
+  /participants/{participantId}/credentialdefinitions/query:
+    post:
+      operationId: queryCredentialDefinitions
+      summary: Query credential definitions
+      tags: [CredentialDefinitions]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: Definition list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CredentialDefinition'
+
+  # Issuance Endpoints
+  /participants/{participantId}/issuance:
+    post:
+      operationId: issueCredential
+      summary: Issue credential
+      tags: [Issuance]
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                holderDid:
+                  type: string
+                credentialType:
+                  type: string
+                claims:
+                  type: object
+      responses:
+        '200':
+          description: Credential issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredential'
+
+tags:
+  - name: Participants
+    description: Participant context management
+  - name: KeyPairs
+    description: Cryptographic key management
+  - name: DIDs
+    description: DID document operations
+  - name: Credentials
+    description: Verifiable credential management
+  - name: Attestations
+    description: Attestation management (Issuer)
+  - name: CredentialDefinitions
+    description: Credential type definitions (Issuer)
+  - name: Issuance
+    description: Credential issuance (Issuer)

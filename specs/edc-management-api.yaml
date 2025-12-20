@@ -1,0 +1,1186 @@
+openapi: 3.1.0
+info:
+  title: EDC Management API for Health Demo
+  description: |
+    EDC Management API v3 extended with HealthDCAT-AP properties.
+    Based on Eclipse Dataspace Components 0.14.x and MVD Postman collection.
+  version: 0.14.1
+  contact:
+    name: MVD Health Demo
+    url: https://github.com/example/mvd-health
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:8081/api/management/v3
+    description: Consumer Control Plane
+  - url: http://localhost:8191/api/management/v3
+    description: Provider Control Plane
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+
+  schemas:
+    # JSON-LD Context
+    JsonLdContext:
+      type: array
+      items:
+        type: string
+      default:
+        - https://w3id.org/edc/connector/management/v0.0.1
+
+    # Asset Schemas
+    Asset:
+      type: object
+      required:
+        - '@id'
+        - properties
+        - dataAddress
+      properties:
+        '@context':
+          $ref: '#/components/schemas/JsonLdContext'
+        '@id':
+          type: string
+          description: Asset ID (e.g., asset:ehr:EHR001)
+        '@type':
+          type: string
+          default: Asset
+        properties:
+          $ref: '#/components/schemas/AssetProperties'
+        privateProperties:
+          $ref: '#/components/schemas/AssetPrivateProperties'
+        dataAddress:
+          $ref: '#/components/schemas/DataAddress'
+
+    AssetProperties:
+      type: object
+      properties:
+        dct:title:
+          type: string
+          description: Human-readable title
+        dct:description:
+          type: string
+          description: Asset description
+        dct:type:
+          type: string
+          description: Asset type (e.g., ehds:ElectronicHealthRecord)
+        contenttype:
+          type: string
+          default: application/fhir+json
+        # HealthDCAT-AP properties
+        healthdcatap:healthCategory:
+          type: string
+          description: Health category URI
+        healthdcatap:ageRange:
+          type: string
+          description: Age band (e.g., 55-64)
+        healthdcatap:biologicalSex:
+          type: string
+          enum: [male, female, other, unknown]
+        healthdcatap:clinicalTrialPhase:
+          type: string
+          enum: [Phase I, Phase II, Phase III, Phase IV]
+        healthdcatap:meddraVersion:
+          type: string
+          description: MedDRA version (e.g., 27.0)
+        healthdcatap:sensitiveCategory:
+          type: string
+          enum: [standard, mental-health, hiv, genomics]
+          description: Sensitive data category for policy selection
+
+    AssetPrivateProperties:
+      type: object
+      description: Properties not exposed in catalog
+      properties:
+        dpv:hasLegalBasis:
+          type: string
+          description: Legal basis URI (GDPR Art. 6)
+        dpv:hasPurpose:
+          type: string
+          description: Purpose URI
+        dqv:hasQualityAnnotation:
+          type: string
+          description: Quality certification reference
+
+    DataAddress:
+      type: object
+      required:
+        - type
+      properties:
+        '@type':
+          type: string
+          default: DataAddress
+        type:
+          type: string
+          description: Data address type (HttpData, AmazonS3, etc.)
+        baseUrl:
+          type: string
+          format: uri
+          description: Base URL for HTTP data sources
+        proxyPath:
+          type: boolean
+          description: Whether to proxy path segments
+        proxyQueryParams:
+          type: boolean
+          description: Whether to proxy query parameters
+
+    AssetOutput:
+      allOf:
+        - $ref: '#/components/schemas/Asset'
+        - type: object
+          properties:
+            createdAt:
+              type: integer
+              format: int64
+              description: Creation timestamp (epoch ms)
+
+    # Policy Schemas
+    PolicyDefinition:
+      type: object
+      required:
+        - '@id'
+        - policy
+      properties:
+        '@context':
+          $ref: '#/components/schemas/JsonLdContext'
+        '@id':
+          type: string
+          description: Policy definition ID
+        '@type':
+          type: string
+          default: PolicyDefinition
+        policy:
+          $ref: '#/components/schemas/Policy'
+
+    Policy:
+      type: object
+      properties:
+        '@type':
+          type: string
+          enum: [Set, Offer, Agreement]
+          default: Set
+        permission:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+        prohibition:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prohibition'
+        obligation:
+          type: array
+          items:
+            $ref: '#/components/schemas/Duty'
+
+    Permission:
+      type: object
+      properties:
+        action:
+          type: string
+          default: use
+        constraint:
+          $ref: '#/components/schemas/Constraint'
+        duty:
+          type: array
+          items:
+            $ref: '#/components/schemas/Duty'
+
+    Prohibition:
+      type: object
+      properties:
+        action:
+          type: string
+          default: use
+        constraint:
+          $ref: '#/components/schemas/Constraint'
+
+    Duty:
+      type: object
+      properties:
+        action:
+          type: string
+          default: use
+        constraint:
+          $ref: '#/components/schemas/Constraint'
+
+    Constraint:
+      type: object
+      required:
+        - leftOperand
+        - operator
+        - rightOperand
+      properties:
+        leftOperand:
+          type: string
+          description: Constraint key (e.g., MembershipCredential, DataAccess.level)
+        operator:
+          type: string
+          enum: [eq, neq, lt, gt, lteq, gteq, in, isA, hasPart, isPartOf, isAllOf, isAnyOf, isNoneOf]
+        rightOperand:
+          oneOf:
+            - type: string
+            - type: boolean
+            - type: number
+
+    # Contract Definition Schemas
+    ContractDefinition:
+      type: object
+      required:
+        - '@id'
+        - accessPolicyId
+        - contractPolicyId
+      properties:
+        '@context':
+          $ref: '#/components/schemas/JsonLdContext'
+        '@id':
+          type: string
+          description: Contract definition ID
+        '@type':
+          type: string
+          default: ContractDefinition
+        accessPolicyId:
+          type: string
+          description: ID of the access policy
+        contractPolicyId:
+          type: string
+          description: ID of the contract policy
+        assetsSelector:
+          $ref: '#/components/schemas/Criterion'
+
+    Criterion:
+      type: object
+      properties:
+        operandLeft:
+          type: string
+        operator:
+          type: string
+          enum: ['=', 'like', 'in', 'contains']
+        operandRight:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+
+    # Catalog Schemas
+    CatalogRequest:
+      type: object
+      required:
+        - counterPartyAddress
+        - protocol
+      properties:
+        '@context':
+          $ref: '#/components/schemas/JsonLdContext'
+        '@type':
+          type: string
+          default: CatalogRequest
+        counterPartyAddress:
+          type: string
+          format: uri
+          description: Provider DSP endpoint URL
+        counterPartyId:
+          type: string
+          description: Provider participant ID (DID)
+        protocol:
+          type: string
+          default: dataspace-protocol-http
+        querySpec:
+          $ref: '#/components/schemas/QuerySpec'
+
+    Catalog:
+      type: object
+      properties:
+        '@id':
+          type: string
+        '@type':
+          type: string
+          default: dcat:Catalog
+        dcat:dataset:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dataset'
+        dcat:service:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataService'
+        participantId:
+          type: string
+
+    Dataset:
+      type: object
+      description: DCAT Dataset with offers
+      properties:
+        '@id':
+          type: string
+          description: Asset ID
+        '@type':
+          type: string
+          default: dcat:Dataset
+        odrl:hasPolicy:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offer'
+        dct:title:
+          type: string
+        dct:description:
+          type: string
+        # HealthDCAT-AP properties included
+
+    Offer:
+      type: object
+      properties:
+        '@id':
+          type: string
+          description: Offer ID (policy ID)
+        '@type':
+          type: string
+          default: odrl:Offer
+        permission:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+        prohibition:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prohibition'
+        obligation:
+          type: array
+          items:
+            $ref: '#/components/schemas/Duty'
+
+    DataService:
+      type: object
+      properties:
+        '@id':
+          type: string
+        '@type':
+          type: string
+          default: dcat:DataService
+        dct:terms:
+          type: string
+        dct:endpointUrl:
+          type: string
+          format: uri
+
+    # Contract Negotiation Schemas
+    ContractRequest:
+      type: object
+      required:
+        - counterPartyAddress
+        - protocol
+        - policy
+      properties:
+        '@context':
+          $ref: '#/components/schemas/JsonLdContext'
+        '@type':
+          type: string
+          default: ContractRequest
+        counterPartyAddress:
+          type: string
+          format: uri
+          description: Provider DSP endpoint
+        counterPartyId:
+          type: string
+          description: Provider participant ID
+        protocol:
+          type: string
+          default: dataspace-protocol-http
+        policy:
+          $ref: '#/components/schemas/ContractOffer'
+        callbackAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CallbackAddress'
+
+    ContractOffer:
+      type: object
+      required:
+        - '@id'
+        - target
+      properties:
+        '@type':
+          type: string
+          default: Offer
+        '@id':
+          type: string
+          description: Offer ID from catalog
+        assigner:
+          type: string
+          description: Provider participant ID
+        target:
+          type: string
+          description: Asset ID
+        permission:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+        prohibition:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prohibition'
+        obligation:
+          oneOf:
+            - $ref: '#/components/schemas/Duty'
+            - type: array
+              items:
+                $ref: '#/components/schemas/Duty'
+
+    CallbackAddress:
+      type: object
+      properties:
+        uri:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+        transactional:
+          type: boolean
+
+    ContractNegotiation:
+      type: object
+      properties:
+        '@id':
+          type: string
+          description: Negotiation ID
+        '@type':
+          type: string
+          default: ContractNegotiation
+        type:
+          type: string
+          enum: [CONSUMER, PROVIDER]
+        protocol:
+          type: string
+        state:
+          type: string
+          enum:
+            - INITIAL
+            - REQUESTING
+            - REQUESTED
+            - OFFERING
+            - OFFERED
+            - ACCEPTING
+            - ACCEPTED
+            - AGREEING
+            - AGREED
+            - VERIFYING
+            - VERIFIED
+            - FINALIZING
+            - FINALIZED
+            - TERMINATING
+            - TERMINATED
+        counterPartyId:
+          type: string
+        counterPartyAddress:
+          type: string
+        contractAgreementId:
+          type: string
+          description: Present when state is FINALIZED
+        createdAt:
+          type: integer
+          format: int64
+
+    ContractAgreement:
+      type: object
+      properties:
+        '@id':
+          type: string
+          description: Contract agreement ID
+        '@type':
+          type: string
+          default: ContractAgreement
+        assetId:
+          type: string
+        consumerId:
+          type: string
+        providerId:
+          type: string
+        contractSigningDate:
+          type: integer
+          format: int64
+        policy:
+          $ref: '#/components/schemas/Policy'
+
+    # Transfer Process Schemas
+    TransferRequest:
+      type: object
+      required:
+        - assetId
+        - counterPartyAddress
+        - contractId
+        - protocol
+        - transferType
+      properties:
+        '@context':
+          $ref: '#/components/schemas/JsonLdContext'
+        assetId:
+          type: string
+          description: Asset ID to transfer
+        counterPartyAddress:
+          type: string
+          format: uri
+          description: Provider DSP endpoint
+        connectorId:
+          type: string
+          description: Provider participant ID
+        contractId:
+          type: string
+          description: Contract agreement ID
+        dataDestination:
+          $ref: '#/components/schemas/DataDestination'
+        protocol:
+          type: string
+          default: dataspace-protocol-http
+        transferType:
+          type: string
+          enum: [HttpData-PULL, HttpData-PUSH]
+        privateProperties:
+          type: object
+        callbackAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CallbackAddress'
+
+    DataDestination:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Destination type (HttpProxy for PULL)
+
+    TransferProcess:
+      type: object
+      properties:
+        '@id':
+          type: string
+          description: Transfer process ID
+        '@type':
+          type: string
+          default: TransferProcess
+        correlationId:
+          type: string
+        type:
+          type: string
+          enum: [CONSUMER, PROVIDER]
+        state:
+          type: string
+          enum:
+            - INITIAL
+            - PROVISIONING
+            - PROVISIONED
+            - REQUESTING
+            - REQUESTED
+            - STARTING
+            - STARTED
+            - SUSPENDING
+            - SUSPENDED
+            - RESUMING
+            - COMPLETING
+            - COMPLETED
+            - TERMINATING
+            - TERMINATED
+            - DEPROVISIONING
+            - DEPROVISIONED
+        assetId:
+          type: string
+        contractId:
+          type: string
+        transferType:
+          type: string
+        createdAt:
+          type: integer
+          format: int64
+
+    # EDR (Endpoint Data Reference) Schemas
+    EndpointDataReference:
+      type: object
+      properties:
+        '@type':
+          type: string
+          default: EndpointDataReference
+        id:
+          type: string
+        endpoint:
+          type: string
+          format: uri
+          description: Data endpoint URL
+        authKey:
+          type: string
+          description: Authorization header name
+        authCode:
+          type: string
+          description: Authorization token
+        properties:
+          type: object
+
+    # Query Schemas
+    QuerySpec:
+      type: object
+      properties:
+        '@type':
+          type: string
+          default: QuerySpec
+        offset:
+          type: integer
+          default: 0
+        limit:
+          type: integer
+          default: 50
+        sortOrder:
+          type: string
+          enum: [ASC, DESC]
+        sortField:
+          type: string
+        filterExpression:
+          type: array
+          items:
+            $ref: '#/components/schemas/Criterion'
+
+    # Error Response
+    ApiErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+        path:
+          type: string
+        invalidValue:
+          type: string
+
+    # ID Response
+    IdResponse:
+      type: object
+      properties:
+        '@id':
+          type: string
+        createdAt:
+          type: integer
+          format: int64
+
+paths:
+  # Asset Endpoints
+  /assets:
+    post:
+      operationId: createAsset
+      summary: Create a new asset
+      tags: [Assets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Asset'
+      responses:
+        '200':
+          description: Asset created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiErrorDetail'
+        '409':
+          description: Asset already exists
+
+  /assets/request:
+    post:
+      operationId: queryAssets
+      summary: Query assets
+      tags: [Assets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: Asset list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssetOutput'
+
+  /assets/{id}:
+    get:
+      operationId: getAsset
+      summary: Get asset by ID
+      tags: [Assets]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Asset details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetOutput'
+        '404':
+          description: Asset not found
+
+    delete:
+      operationId: deleteAsset
+      summary: Delete asset
+      tags: [Assets]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Asset deleted
+        '404':
+          description: Asset not found
+
+  # Policy Definition Endpoints
+  /policydefinitions:
+    post:
+      operationId: createPolicyDefinition
+      summary: Create policy definition
+      tags: [Policies]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyDefinition'
+      responses:
+        '200':
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+
+  /policydefinitions/request:
+    post:
+      operationId: queryPolicyDefinitions
+      summary: Query policy definitions
+      tags: [Policies]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: Policy list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PolicyDefinition'
+
+  /policydefinitions/{id}:
+    get:
+      operationId: getPolicyDefinition
+      summary: Get policy definition
+      tags: [Policies]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policy details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyDefinition'
+        '404':
+          description: Policy not found
+
+    delete:
+      operationId: deletePolicyDefinition
+      summary: Delete policy definition
+      tags: [Policies]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Policy deleted
+
+  # Contract Definition Endpoints
+  /contractdefinitions:
+    post:
+      operationId: createContractDefinition
+      summary: Create contract definition
+      tags: [ContractDefinitions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractDefinition'
+      responses:
+        '200':
+          description: Contract definition created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+
+  /contractdefinitions/request:
+    post:
+      operationId: queryContractDefinitions
+      summary: Query contract definitions
+      tags: [ContractDefinitions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: Contract definition list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractDefinition'
+
+  /contractdefinitions/{id}:
+    delete:
+      operationId: deleteContractDefinition
+      summary: Delete contract definition
+      tags: [ContractDefinitions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Contract definition deleted
+
+  # Catalog Endpoints
+  /catalog/request:
+    post:
+      operationId: requestCatalog
+      summary: Request catalog from provider
+      tags: [Catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogRequest'
+      responses:
+        '200':
+          description: Catalog from provider
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+
+  # Contract Negotiation Endpoints
+  /contractnegotiations:
+    post:
+      operationId: initiateNegotiation
+      summary: Initiate contract negotiation
+      tags: [ContractNegotiations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+      responses:
+        '200':
+          description: Negotiation initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+
+  /contractnegotiations/request:
+    post:
+      operationId: queryNegotiations
+      summary: Query contract negotiations
+      tags: [ContractNegotiations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: Negotiation list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractNegotiation'
+
+  /contractnegotiations/{id}:
+    get:
+      operationId: getNegotiation
+      summary: Get negotiation by ID
+      tags: [ContractNegotiations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Negotiation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractNegotiation'
+        '404':
+          description: Negotiation not found
+
+  /contractnegotiations/{id}/terminate:
+    post:
+      operationId: terminateNegotiation
+      summary: Terminate negotiation
+      tags: [ContractNegotiations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '204':
+          description: Negotiation terminated
+
+  /contractnegotiations/{id}/agreement:
+    get:
+      operationId: getAgreementForNegotiation
+      summary: Get agreement for negotiation
+      tags: [ContractNegotiations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Contract agreement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractAgreement'
+        '404':
+          description: Agreement not found
+
+  # Transfer Process Endpoints
+  /transferprocesses:
+    post:
+      operationId: initiateTransfer
+      summary: Initiate transfer process
+      tags: [TransferProcesses]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Transfer initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+
+  /transferprocesses/request:
+    post:
+      operationId: queryTransferProcesses
+      summary: Query transfer processes
+      tags: [TransferProcesses]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: Transfer process list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransferProcess'
+
+  /transferprocesses/{id}:
+    get:
+      operationId: getTransferProcess
+      summary: Get transfer process by ID
+      tags: [TransferProcesses]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transfer process details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferProcess'
+        '404':
+          description: Transfer process not found
+
+  /transferprocesses/{id}/terminate:
+    post:
+      operationId: terminateTransfer
+      summary: Terminate transfer process
+      tags: [TransferProcesses]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '204':
+          description: Transfer terminated
+
+  # EDR Endpoints
+  /edrs/request:
+    post:
+      operationId: queryEdrs
+      summary: Query endpoint data references
+      tags: [EDR]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpec'
+      responses:
+        '200':
+          description: EDR list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EndpointDataReference'
+
+  /edrs/{transferProcessId}/dataaddress:
+    get:
+      operationId: getEdrDataAddress
+      summary: Get data address for EDR
+      tags: [EDR]
+      parameters:
+        - name: transferProcessId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data address with endpoint and auth
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndpointDataReference'
+        '404':
+          description: EDR not found
+
+  # Secrets Endpoints
+  /secrets:
+    post:
+      operationId: createSecret
+      summary: Store a secret
+      tags: [Secrets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - '@id'
+                - value
+              properties:
+                '@id':
+                  type: string
+                value:
+                  type: string
+      responses:
+        '200':
+          description: Secret stored
+
+tags:
+  - name: Assets
+    description: Asset management
+  - name: Policies
+    description: Policy definition management
+  - name: ContractDefinitions
+    description: Contract definition management
+  - name: Catalog
+    description: Catalog discovery
+  - name: ContractNegotiations
+    description: Contract negotiation state machine
+  - name: TransferProcesses
+    description: Data transfer management
+  - name: EDR
+    description: Endpoint Data Reference management
+  - name: Secrets
+    description: Secret storage

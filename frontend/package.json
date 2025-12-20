@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:local": "vite --port 4000 --mode standalone",
     "build": "tsc && vite build",
+    "build:pages": "GITHUB_PAGES=true VITE_API_MODE=mock tsc && GITHUB_PAGES=true vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "generate:types": "npm run generate:edc-types && npm run generate:identity-types && npm run generate:ehr-types",

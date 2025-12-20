@@ -31,6 +31,11 @@ The project is a multi-module Gradle project with a React frontend, Node.js back
 - **Backend Mock**: `backend-mock/` (Node.js, Express, TypeScript)
   - Simulates FHIR R4-compliant EHR system
   - 20 anonymized patient records with clinical trial metadata
+- **API Specifications**: `specs/` (OpenAPI 3.1, JSON Schema)
+  - `edc-management-api.yaml`: EDC Management API v3 with HealthDCAT-AP extensions
+  - `ehr-health-api.yaml`: Backend EHR API with FHIR R4 schemas
+  - `identity-hub-api.yaml`: Identity Hub API for DID/VC management
+  - `odrl-policies/`: JSON schemas for ODRL policy validation (membership, consent, sensitive, confidential-compute)
 - **Infrastructure**:
   - `docker-compose.health.yml`: Main orchestration file for health demo
   - `deployment/`: Terraform configurations (K8s deployment, unused for local Docker)
@@ -58,16 +63,20 @@ The backend mock simulates a FHIR R4-compliant EHR system with 20 anonymized pat
 ```bash
 cd backend-mock
 npm install                  # First time only
-npm run dev:health          # Start with hot reload (ts-node)
+npm run dev:local           # Start on port 4001 (no Docker conflict)
+# OR
+npm run dev:health          # Start on port 3001 (conflicts with Docker)
 ```
 
-**Important**: Use `npm run dev:health` (ts-node) during development, NOT `npm run start:health` (compiled), to ensure code changes are reflected immediately.
+**Important**: Use `npm run dev:local` (port 4001) to avoid conflicts with Docker containers.
 
-Backend runs on **http://localhost:3001**
+**Local mode (Option A)** runs on **http://localhost:4001**
+**Docker mode (Option B)** runs on **http://localhost:3001**
 
 **Verify backend:**
 ```bash
-curl http://localhost:3001/health
+curl http://localhost:4001/health  # Option A: local
+curl http://localhost:3001/health  # Option B: Docker
 # Expected: {"status":"healthy","service":"ehr2edc-backend","recordsCount":20}
 ```
 
@@ -82,10 +91,13 @@ The frontend provides catalog browser and EHR viewer with advanced filtering.
 ```bash
 cd frontend
 npm install                  # First time only
-npm run dev                 # Start Vite dev server with HMR
+npm run dev:local           # Start on port 4000 (no Docker conflict)
+# OR
+npm run dev                 # Start on port 3000 (conflicts with Docker)
 ```
 
-Frontend runs on **http://localhost:3000**
+**Local mode (Option A)** runs on **http://localhost:4000**
+**Docker mode (Option B)** runs on **http://localhost:3000**
 
 **Development commands:**
 ```bash
@@ -96,16 +108,19 @@ npm run preview             # Preview production build
 
 #### Starting Both Services (Options)
 
-**Option 1: Manual (recommended for development)**
+Both options can run **simultaneously** on different ports.
+
+**Option A: Local development (ports 4000/4001) - No Docker required**
 ```bash
 # Terminal 1: Backend
-cd backend-mock && npm run dev:health
+cd backend-mock && npm run dev:local
 
-# Terminal 2: Frontend
-cd frontend && npm run dev
+# Terminal 2: Frontend  
+cd frontend && npm run dev:local
+# Open http://localhost:4000
 ```
 
-**Option 2: Docker Compose (full stack)**
+**Option B: Docker Compose (ports 3000/3001/3002 - full stack)**
 ```bash
 # Start frontend + backend + all EDC infrastructure
 docker-compose -f docker-compose.health.yml up --build
@@ -118,6 +133,7 @@ docker-compose -f docker-compose.health.yml logs -f
 
 # Stop all services
 docker-compose -f docker-compose.health.yml down
+# Open http://localhost:3000
 
 # Clean volumes (removes all data)
 docker-compose -f docker-compose.health.yml down -v
@@ -128,8 +144,11 @@ docker-compose -f docker-compose.health.yml down -v
 # Wait for all containers to be healthy (check logs)
 docker-compose -f docker-compose.health.yml logs -f
 
-# Seed participants, assets, and policies
-./seed-health.sh
+# Seed everything (identity + health data) - Docker mode
+./seed-dataspace.sh --mode=docker
+
+# Or seed only health data (if identity already seeded)
+./seed-dataspace.sh --mode=docker --skip-identity
 ```
 
 ### 2. Building EDC Components
@@ -138,8 +157,8 @@ docker-compose -f docker-compose.health.yml logs -f
 # Build all Java components
 ./gradlew build
 
-# Build with Docker images
-./gradlew build dockerize
+# Build with Docker images (requires persistence for provided docker-compose)
+./gradlew -Ppersistence=true build dockerize
 
 # Build with persistence enabled
 ./gradlew -Ppersistence=true build
@@ -155,36 +174,47 @@ docker-compose -f docker-compose.health.yml logs -f
 
 #### Seeding Data
 ```bash
-# Initialize basic identities and credentials
-./seed.sh
+# Unified seeding script (recommended)
+./seed-dataspace.sh --help                    # Show all options
+./seed-dataspace.sh --mode=docker             # Docker mode (identity + health)
+./seed-dataspace.sh --mode=local              # Local/IntelliJ mode
+./seed-dataspace.sh --mode=k8s                # Kubernetes mode
+./seed-dataspace.sh --skip-identity           # Skip identity seeding
+./seed-dataspace.sh --skip-health             # Skip health asset seeding
 
-# Seed health-specific EHR catalog (requires backend on port 3001)
-./seed-health.sh
-
-# Kubernetes deployment seeding
-./seed-k8s.sh
+# Legacy wrapper scripts (deprecated, call seed-dataspace.sh internally)
+./seed.sh                                     # Local identity only
+./seed-health.sh                              # Docker health data only
+./seed-docker.sh                              # Docker identity only
+./seed-k8s.sh                                 # Kubernetes mode
 ```
 
 #### Cleaning Ports
 If you encounter "port already in use" errors:
 ```bash
-# Check what's using ports 3000 and 3001
-lsof -i:3000,3001
+# Check what's using ports (local development)
+lsof -i:4000,4001
 
-# Kill processes on these ports
-kill $(lsof -ti:3000,3001)
+# Check what's using ports (Docker)
+lsof -i:3000,3001,3002
+
+# Kill processes on local ports
+kill $(lsof -ti:4000,4001)
+
+# Kill processes on Docker ports
+kill $(lsof -ti:3000,3001,3002)
 ```
 
 #### Troubleshooting
 
 **Backend not serving updated data:**
-- Ensure you're using `npm run dev:health` (ts-node) not `npm run start:health` (compiled)
-- Check that port 3001 is not occupied: `lsof -i:3001`
+- Ensure you're using `npm run dev:local` (port 4001) or `npm run dev:health` (port 3001)
+- Check that the port is not occupied: `lsof -i:4001` or `lsof -i:3001`
 
 **Frontend shows blank page:**
 - Check browser console for errors (F12)
-- Verify Vite dev server started on port 3000 (not 3001)
-- Restart Vite: `pkill -f vite && cd frontend && npm run dev`
+- Verify Vite dev server started on correct port (4000 for local, 3000 for Docker)
+- Restart Vite: `pkill -f vite && cd frontend && npm run dev:local`
 
 **TypeScript compilation errors:**
 - Run `npm install` to ensure dependencies are up to date

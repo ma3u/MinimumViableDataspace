@@ -332,7 +332,7 @@ function AppHealth() {
                       ? 'bg-blue-500'
                       : 'bg-gray-400'
                 }`} />
-                {getApiMode() === 'full' ? 'Full EDC' : getApiMode() === 'hybrid' ? 'Hybrid' : 'Mock'}
+                {getApiMode() === 'full' ? 'Full EDC' : getApiMode() === 'hybrid' ? 'Hybrid' : 'Static Demo'}
               </div>
               {/* Backend Status Indicator */}
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
@@ -340,16 +340,16 @@ function AppHealth() {
                   ? 'bg-gray-100 text-gray-600'
                   : backendAvailable 
                     ? 'bg-green-100 text-green-700' 
-                    : 'bg-yellow-100 text-yellow-700'
+                    : 'bg-red-100 text-red-700'
               }`}>
                 <div className={`w-2 h-2 rounded-full ${
                   backendAvailable === null 
-                    ? 'bg-gray-400'
+                    ? 'bg-gray-400 animate-pulse'
                     : backendAvailable 
                       ? 'bg-green-500' 
-                      : 'bg-yellow-500'
+                      : 'bg-red-500'
                 }`} />
-                {backendAvailable === null ? 'Checking...' : backendAvailable ? 'Backend Online' : 'Demo Mode'}
+                {backendAvailable === null ? 'Checking...' : backendAvailable ? 'Backend Online' : 'Backend Offline'}
               </div>
               <a 
                 href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"

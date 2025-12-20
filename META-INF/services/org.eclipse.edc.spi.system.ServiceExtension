@@ -1,0 +1,176 @@
+#
+#  Copyright (c) 2024 Metaform Systems, Inc.
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#  SPDX-License-Identifier: Apache-2.0
+#  Contributors:
+#       Metaform Systems, Inc. - initial API and implementation
+
+org.eclipse.edc.iam.identitytrust.core.SecretsExtension
+#  Copyright (c) 2023 Metaform Systems, Inc.
+org.eclipse.edc.demo.dcp.core.DcpPatchExtension
+org.eclipse.edc.demo.dcp.policy.PolicyEvaluationExtension
+org.eclipse.edc.demo.participants.ParticipantsResolverExtension
+#  Copyright (c) 2024 Amadeus
+#       Amadeus - initial API and implementation
+org.eclipse.edc.connector.api.management.secret.SecretsApiExtension
+#  Copyright (c) 2022 Mercedes-Benz Tech Innovation GmbH
+#       Mercedes-Benz Tech Innovation GmbH - Initial ServiceExtension file
+#       Cofinity-X - implement extensible authentication
+org.eclipse.edc.vault.hashicorp.HashicorpVaultExtension
+org.eclipse.edc.vault.hashicorp.health.HashicorpVaultHealthExtension
+org.eclipse.edc.vault.hashicorp.auth.HashicorpVaultAuthenticationExtension
+org.eclipse.edc.iam.did.IdentityDidCoreExtension
+#  Copyright (c) 2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+#       Bayerische Motoren Werke Aktiengesellschaft (BMW AG) - initial API and implementation
+org.eclipse.edc.iam.identitytrust.core.DcpDefaultServicesExtension
+org.eclipse.edc.iam.identitytrust.core.DcpScopeExtractorExtension
+org.eclipse.edc.iam.identitytrust.core.IdentityAndTrustExtension
+org.eclipse.edc.iam.identitytrust.core.IdentityTrustTransformExtension
+org.eclipse.edc.iam.identitytrust.issuer.configuration.TrustedIssuerConfigurationExtension
+org.eclipse.edc.iam.identitytrust.sts.remote.client.StsRemoteClientConfigurationExtension
+org.eclipse.edc.iam.identitytrust.sts.remote.client.StsRemoteClientExtension
+org.eclipse.edc.catalog.cache.FederatedCatalogCacheExtension
+org.eclipse.edc.catalog.cache.FederatedCatalogDefaultServicesExtension
+#  Copyright (c) 2025 Metaform Systems, Inc.
+org.eclipse.edc.protocol.dsp.http.api.configuration.v2025.DspApiConfigurationV2025Extension
+#  Copyright (c) 2023 Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V.
+#       Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. - Initial API and Implementation
+org.eclipse.edc.protocol.dsp.catalog.transform.DspCatalogTransformV08Extension
+#  Copyright (c) 2025 Cofinity-X
+#        Cofinity-X - initial API and implementation
+org.eclipse.edc.protocol.dsp.catalog.transform.DspCatalogTransformV2024Extension
+org.eclipse.edc.protocol.dsp.catalog.transform.v2025.DspCatalogTransformV2025Extension
+#       Cofinity-X - initial API and implementation
+org.eclipse.edc.runtime.core.RuntimeCoreServicesExtension
+org.eclipse.edc.runtime.core.RuntimeDefaultCoreServicesExtension
+#  Copyright (c) 2022 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+#       Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+org.eclipse.edc.api.ApiCoreExtension
+org.eclipse.edc.api.ApiCoreDefaultServicesExtension
+#  Copyright (c) 2020 - 2022 Microsoft Corporation
+#       Microsoft Corporation - initial API and implementation
+org.eclipse.edc.connector.dataplane.selector.DataPlaneSelectorApiExtension
+#  Copyright (c) 2024 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+org.eclipse.edc.connector.dataplane.selector.control.api.DataplaneSelectorControlApiExtension
+org.eclipse.edc.connector.controlplane.transfer.dataplane.TransferDataPlaneSignalingExtension
+org.eclipse.edc.connector.dataplane.client.DataPlaneSignalingClientExtension
+org.eclipse.edc.connector.dataplane.client.DataPlaneSignalingClientTransformExtension
+org.eclipse.edc.connector.api.management.configuration.ManagementApiConfigurationExtension
+#       Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. - initial API and implementation
+org.eclipse.edc.protocol.dsp.http.api.configuration.DspApiConfigurationV08Extension
+org.eclipse.edc.protocol.dsp.http.api.configuration.DspApiConfigurationV2024Extension
+org.eclipse.edc.protocol.dsp.transferprocess.transform.DspTransferProcessTransformV08Extension
+org.eclipse.edc.protocol.dsp.transferprocess.transform.DspTransferProcessTransformV2024Extension
+org.eclipse.edc.protocol.dsp.transferprocess.transform.v2025.DspTransferProcessTransformV2025Extension
+org.eclipse.edc.protocol.dsp.negotiation.transform.DspNegotiationTransformV08Extension
+org.eclipse.edc.protocol.dsp.negotiation.transform.DspNegotiationTransformV2024Extension
+org.eclipse.edc.protocol.dsp.negotiation.transform.v2025.DspNegotiationTransformV2025Extension
+#  Copyright (c) 2022 Microsoft Corporation
+org.eclipse.edc.catalog.api.query.FederatedCatalogApiExtension
+org.eclipse.edc.connector.controlplane.api.management.asset.AssetApiExtension
+#  Copyright (c) 2020 - 2022 Bayerische Motoren Werke Aktiengesellschaft
+#       Bayerische Motoren Werke Aktiengesellschaft - initial implementation
+org.eclipse.edc.connector.controlplane.api.management.catalog.CatalogApiExtension
+org.eclipse.edc.connector.controlplane.api.management.contractagreement.ContractAgreementApiExtension
+org.eclipse.edc.connector.controlplane.api.management.contractdefinition.ContractDefinitionApiExtension
+# Copyright (c) 2022 ZF Friedrichshafen AG
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+# SPDX-License-Identifier: Apache-2.0
+# Contributors:
+#   ZF Friedrichshafen AG - Initial API and Implementation
+org.eclipse.edc.connector.controlplane.api.management.contractnegotiation.ContractNegotiationApiExtension
+org.eclipse.edc.connector.controlplane.api.management.edr.EdrCacheApiExtension
+org.eclipse.edc.connector.controlplane.api.management.policy.PolicyDefinitionApiExtension
+org.eclipse.edc.connector.controlplane.api.management.transferprocess.TransferProcessApiExtension
+org.eclipse.edc.protocol.dsp.catalog.http.api.DspCatalogApiV08Extension
+org.eclipse.edc.protocol.dsp.negotiation.http.api.DspNegotiationApiV08Extension
+org.eclipse.edc.protocol.dsp.transferprocess.http.api.DspTransferProcessApiV08Extension
+org.eclipse.edc.protocol.dsp.http.dispatcher.DspHttpDispatcherV2025Extension
+org.eclipse.edc.protocol.dsp.catalog.http.api.v2025.DspCatalogApi2025Extension
+org.eclipse.edc.protocol.dsp.transferprocess.http.api.v2025.DspTransferProcessApi2025Extension
+org.eclipse.edc.protocol.dsp.negotiation.http.api.v2025.DspNegotiationApi2025Extension
+org.eclipse.edc.protocol.dsp.http.api.configuration.DspApiBaseConfigurationExtension
+org.eclipse.edc.protocol.dsp.catalog.http.dispatcher.DspCatalogHttpDispatcherExtension
+org.eclipse.edc.protocol.dsp.negotiation.http.dispatcher.DspNegotiationHttpDispatcherExtension
+org.eclipse.edc.protocol.dsp.transferprocess.http.dispatcher.DspTransferProcessDispatcherExtension
+org.eclipse.edc.protocol.dsp.version.http.dispatcher.DspVersionHttpDispatcherExtension
+org.eclipse.edc.protocol.dsp.http.DspHttpCoreExtension
+org.eclipse.edc.protocol.dsp.http.dispatcher.DspHttpDispatcherV08Extension
+org.eclipse.edc.protocol.dsp.http.dispatcher.DspHttpDispatcherV2024Extension
+#       Bayerische Motoren Werke Aktiengesellschaft (BMW AG) - Initial API and Implementation
+org.eclipse.edc.protocol.dsp.version.http.api.DspVersionApiExtension
+org.eclipse.edc.protocol.dsp.catalog.http.api.DspCatalogApiV2024Extension
+org.eclipse.edc.protocol.dsp.negotiation.http.api.DspNegotiationApiV2024Extension
+org.eclipse.edc.protocol.dsp.transferprocess.http.api.DspTransferProcessApiV2024Extension
+org.eclipse.edc.jsonld.JsonLdExtension
+org.eclipse.edc.connector.controlplane.api.management.protocolversion.ProtocolVersionApiExtension
+#  Copyright (c) 2020 - 2022 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+org.eclipse.edc.connector.api.control.configuration.ControlApiConfigurationExtension
+#  Copyright (c) 2020, 2021 Microsoft Corporation
+org.eclipse.edc.web.jersey.JerseyExtension
+org.eclipse.edc.connector.policy.monitor.PolicyMonitorDefaultServicesExtension
+org.eclipse.edc.connector.policy.monitor.PolicyMonitorExtension
+org.eclipse.edc.connector.api.management.version.VersionApiExtension
+org.eclipse.edc.connector.controlplane.ControlPlaneDefaultServicesExtension
+#  Copyright (c) 2021 Daimler TSS GmbH
+#       Daimler TSS GmbH - Initial API and Implementation
+#       Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. - added command extension
+org.eclipse.edc.connector.controlplane.contract.ContractCoreExtension
+org.eclipse.edc.connector.controlplane.contract.ContractNegotiationCommandExtension
+org.eclipse.edc.connector.controlplane.contract.ContractNegotiationDefaultServicesExtension
+org.eclipse.edc.connector.controlplane.transfer.TransferCoreExtension
+org.eclipse.edc.connector.controlplane.transfer.TransferProcessCommandExtension
+org.eclipse.edc.connector.controlplane.transfer.TransferProcessDefaultServicesExtension
+org.eclipse.edc.connector.controlplane.api.ControlPlaneApiExtension
+org.eclipse.edc.connector.controlplane.callback.dispatcher.CallbackEventDispatcherExtension
+org.eclipse.edc.connector.controlplane.callback.dispatcher.http.CallbackEventDispatcherHttpExtension
+org.eclipse.edc.connector.controlplane.callback.staticendpoint.CallbackStaticEndpointExtension
+org.eclipse.edc.connector.controlplane.edr.store.receiver.EndpointDataReferenceStoreReceiverExtension
+org.eclipse.edc.connector.controlplane.services.ControlPlaneServicesExtension
+org.eclipse.edc.connector.controlplane.catalog.CatalogCoreExtension
+org.eclipse.edc.connector.controlplane.catalog.CatalogDefaultServicesExtension
+org.eclipse.edc.iam.did.web.WebDidExtension
+org.eclipse.edc.jtivalidation.store.sql.SqlJtiValidationStoreExtension
+org.eclipse.edc.token.TokenServicesExtension
+org.eclipse.edc.api.auth.delegated.DelegatedAuthenticationExtension
+#  Copyright (c) 2022 Amadeus
+org.eclipse.edc.iam.oauth2.client.Oauth2ClientExtension
+org.eclipse.edc.api.observability.ObservabilityApiExtension
+ #
+org.eclipse.edc.api.auth.token.TokenBasedAuthenticationExtension
+org.eclipse.edc.api.auth.configuration.ApiAuthenticationConfigurationExtension
+org.eclipse.edc.connector.core.CoreServicesExtension
+org.eclipse.edc.connector.core.CoreDefaultServicesExtension
+org.eclipse.edc.connector.core.SecurityDefaultServicesExtension
+org.eclipse.edc.connector.core.LocalPublicKeyDefaultExtension
+org.eclipse.edc.web.jetty.JettyExtension
+org.eclipse.edc.validator.dataaddress.httpdata.HttpDataDataAddressValidatorExtension
+#  Copyright (c) 2022 Daimler TSS GmbH
+org.eclipse.edc.connector.controlplane.store.sql.assetindex.SqlAssetIndexServiceExtension
+org.eclipse.edc.sql.SqlCoreExtension
+org.eclipse.edc.iam.verifiablecredentials.RevocationServiceRegistryExtension
+org.eclipse.edc.connector.dataplane.selector.store.sql.SqlDataPlaneInstanceStoreExtension
+org.eclipse.edc.connector.dataplane.selector.DataPlaneSelectorExtension
+org.eclipse.edc.connector.dataplane.selector.DataPlaneSelectorDefaultServicesExtension
+org.eclipse.edc.edr.store.EndpointDataReferenceStoreExtension
+org.eclipse.edc.edr.store.EndpointDataReferenceStoreDefaultServicesExtension
+org.eclipse.edc.connector.controlplane.store.sql.contractdefinition.SqlContractDefinitionStoreExtension
+org.eclipse.edc.connector.controlplane.store.sql.contractnegotiation.SqlContractNegotiationStoreExtension
+#  Copyright (c) 2022 ZF Friedrichshafen AG
+#       ZF Friedrichshafen AG - Initial API and Implementation
+#       Dailer TSS GmbH - Correct ServiceExtension name
+org.eclipse.edc.connector.controlplane.store.sql.policydefinition.SqlPolicyStoreExtension
+org.eclipse.edc.connector.controlplane.store.sql.transferprocess.SqlTransferProcessStoreExtension
+org.eclipse.edc.edr.store.index.SqlEndpointDataReferenceEntryIndexExtension
+org.eclipse.edc.connector.policy.monitor.store.sql.SqlPolicyMonitorStoreExtension
+org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapperExtension
+org.eclipse.edc.sql.pool.commons.CommonsConnectionPoolServiceExtension
+org.eclipse.edc.connector.controlplane.transfer.TransferManagerExtension
+#  Copyright (c) 2021 Microsoft Corporation
+org.eclipse.edc.transaction.local.LocalTransactionExtension
+org.eclipse.edc.connector.controlplane.contract.ContractManagerExtension
+org.eclipse.edc.boot.BootServicesExtension

@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mvd-health.io/schemas/odrl/health-sensitive-policy.schema.json",
+  "title": "Health Sensitive Data Policy",
+  "description": "ODRL policy for GDPR Article 9 special category personal data (mental health, HIV, etc.)",
+  "type": "object",
+  "required": ["@context", "@id", "@type", "policy"],
+  "properties": {
+    "@context": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": {
+        "const": "https://w3id.org/edc/connector/management/v0.0.1"
+      }
+    },
+    "@id": {
+      "type": "string",
+      "pattern": "^health-sensitive-policy(-[a-z0-9]+)?$"
+    },
+    "@type": {
+      "const": "PolicyDefinition"
+    },
+    "policy": {
+      "type": "object",
+      "required": ["@type", "permission", "obligation", "prohibition"],
+      "properties": {
+        "@type": {
+          "const": "Set"
+        },
+        "permission": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["action", "constraint"],
+            "properties": {
+              "action": {
+                "const": "use"
+              },
+              "constraint": {
+                "type": "object",
+                "required": ["leftOperand", "operator", "rightOperand"],
+                "properties": {
+                  "leftOperand": {
+                    "const": "MembershipCredential"
+                  },
+                  "operator": {
+                    "const": "eq"
+                  },
+                  "rightOperand": {
+                    "const": "active"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "obligation": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["action", "constraint"],
+            "properties": {
+              "action": {
+                "const": "use"
+              },
+              "constraint": {
+                "type": "object",
+                "required": ["leftOperand", "operator", "rightOperand"],
+                "properties": {
+                  "leftOperand": {
+                    "enum": [
+                      "DataAccess.level",
+                      "dpv:SpecialCategoryPersonalData"
+                    ]
+                  },
+                  "operator": {
+                    "const": "eq"
+                  },
+                  "rightOperand": {
+                    "oneOf": [
+                      { "const": "processing" },
+                      { "const": "acknowledged" }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "prohibition": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["action", "constraint"],
+            "properties": {
+              "action": {
+                "const": "use"
+              },
+              "constraint": {
+                "type": "object",
+                "required": ["leftOperand", "operator", "rightOperand"],
+                "properties": {
+                  "leftOperand": {
+                    "const": "DataAccess.reidentification"
+                  },
+                  "operator": {
+                    "const": "eq"
+                  },
+                  "rightOperand": {
+                    "oneOf": [
+                      { "const": "true" },
+                      { "type": "boolean", "const": true }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "@context": [
+        "https://w3id.org/edc/connector/management/v0.0.1",
+        "http://www.w3.org/ns/odrl.jsonld",
+        "https://w3id.org/dpv"
+      ],
+      "@id": "health-sensitive-policy",
+      "@type": "PolicyDefinition",
+      "policy": {
+        "@type": "Set",
+        "permission": [
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "MembershipCredential",
+              "operator": "eq",
+              "rightOperand": "active"
+            }
+          }
+        ],
+        "obligation": [
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "DataAccess.level",
+              "operator": "eq",
+              "rightOperand": "processing"
+            }
+          },
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "dpv:SpecialCategoryPersonalData",
+              "operator": "eq",
+              "rightOperand": "acknowledged"
+            }
+          }
+        ],
+        "prohibition": [
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "DataAccess.reidentification",
+              "operator": "eq",
+              "rightOperand": "true"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

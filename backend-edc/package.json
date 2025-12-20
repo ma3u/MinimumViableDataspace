@@ -1,0 +1,41 @@
+{
+  "name": "backend-edc",
+  "version": "1.0.0",
+  "description": "EDC-integrated backend for MVD Health Demo - proxies to EDC connectors",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "dev:hybrid": "BACKEND_MODE=hybrid tsx watch src/server.ts",
+    "dev:full": "BACKEND_MODE=full tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "start:hybrid": "BACKEND_MODE=hybrid node dist/server.js",
+    "start:full": "BACKEND_MODE=full node dist/server.js",
+    "generate:types": "npm run generate:edc-types && npm run generate:ehr-types",
+    "generate:edc-types": "openapi-typescript ../specs/edc-management-api.yaml -o src/types/generated/edc-api.ts",
+    "generate:ehr-types": "openapi-typescript ../specs/ehr-health-api.yaml -o src/types/generated/ehr-api.ts",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest",
+    "test:pact:verify": "vitest run --config vitest.pact.config.ts"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact": "^13.1.4",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "openapi-typescript": "^7.4.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

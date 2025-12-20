@@ -1,0 +1,411 @@
+#
+#  Copyright (c) 2025 Health Dataspace Demo - EHR2EDC
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+#
+# EDC Stack Extension for Health Dataspace Demo
+#
+# Usage:
+#   docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up --build
+#
+# This file extends docker-compose.health.yml with:
+#   - Consumer EDC (Control Plane + Data Plane + Identity Hub)
+#   - Provider EDC (Control Plane + Data Plane + Identity Hub)
+#   - Federated Catalog Server
+#   - Issuer Service
+#   - PostgreSQL databases
+#   - Backend EDC proxy service
+#   - Pact Broker (for contract testing)
+#
+
+services:
+  # ============================================================
+  # Backend EDC - Proxy service for EDC integration
+  # ============================================================
+  # NOTE: Currently disabled (needs TypeScript fixes). Use profile 'backend-edc' to enable:
+  #   docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml --profile backend-edc up
+  backend-edc:
+    profiles:
+      - backend-edc
+    build:
+      context: ./backend-edc
+      dockerfile: Dockerfile
+    container_name: backend-edc
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - BACKEND_MODE=hybrid
+      - EDC_API_KEY=password
+      - CONSUMER_MANAGEMENT_URL=http://consumer-controlplane:8081
+      - CONSUMER_DSP_URL=http://consumer-controlplane:8082/api/dsp
+      - CONSUMER_IDENTITY_HUB_URL=http://consumer-identityhub:7082
+      - PROVIDER_MANAGEMENT_URL=http://provider-controlplane:8191
+      - PROVIDER_DSP_URL=http://provider-controlplane:8192/api/dsp
+      - PROVIDER_IDENTITY_HUB_URL=http://provider-identityhub:7092
+      - PROVIDER_PARTICIPANT_ID=provider
+      - MOCK_BACKEND_URL=http://ehr-backend:3001
+    depends_on:
+      - ehr-backend
+      - consumer-controlplane
+      - provider-controlplane
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # PostgreSQL Databases
+  # ============================================================
+  consumer-postgres:
+    image: postgres:15-alpine
+    container_name: consumer-postgres
+    environment:
+      POSTGRES_USER: edc
+      POSTGRES_PASSWORD: edc
+      POSTGRES_DB: edc_consumer
+    volumes:
+      - consumer-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Hashicorp Vault
+  # ============================================================
+  health-vault:
+    image: hashicorp/vault:latest
+    container_name: health-vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  provider-postgres:
+    image: postgres:15-alpine
+    container_name: provider-postgres
+    environment:
+      POSTGRES_USER: edc
+      POSTGRES_PASSWORD: edc
+      POSTGRES_DB: edc_provider
+    volumes:
+      - provider-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  catalog-postgres:
+    image: postgres:15-alpine
+    container_name: catalog-postgres
+    environment:
+      POSTGRES_USER: edc
+      POSTGRES_PASSWORD: edc
+      POSTGRES_DB: edc_catalog
+    volumes:
+      - catalog-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Consumer EDC
+  # ============================================================
+  consumer-controlplane:
+    build:
+      context: .
+      dockerfile: launchers/controlplane/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/controlplane/build/libs/controlplane.jar
+    container_name: consumer-controlplane
+    ports:
+      - "8081:8081"   # Management API
+      - "8082:8082"   # DSP API
+      - "8083:8083"   # Control API
+      - "8084:8084"   # Catalog API
+      - "8085:8085"   # Version API
+    env_file:
+      - ./deployment/assets/env/docker/consumer_connector.env
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    volumes:
+      - ./deployment/assets/participants/participants.docker.json:/app/participants.json:ro
+      - ./deployment/assets/consumer_public.pem:/app/keys/consumer_public.pem:ro
+      - ./deployment/assets/consumer_private.pem:/app/keys/consumer_private.pem:ro
+    depends_on:
+      consumer-postgres:
+        condition: service_healthy
+      consumer-identityhub:
+        condition: service_started
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  consumer-dataplane:
+    build:
+      context: .
+      dockerfile: launchers/dataplane/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/dataplane/build/libs/dataplane.jar
+    container_name: consumer-dataplane
+    ports:
+      - "11001:11001"  # Public API
+    env_file:
+      - ./deployment/assets/env/docker/consumer_dataplane.env
+    volumes:
+      - ./deployment/assets/consumer_public.pem:/app/keys/consumer_public.pem:ro
+      - ./deployment/assets/consumer_private.pem:/app/keys/consumer_private.pem:ro
+    depends_on:
+      - consumer-controlplane
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  consumer-identityhub:
+    build:
+      context: .
+      dockerfile: launchers/identity-hub/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/identity-hub/build/libs/identity-hub.jar
+    container_name: consumer-identityhub
+    ports:
+      - "7080:7080"   # Default API
+      - "7081:7081"   # Credentials API
+      - "7082:7082"   # Identity API
+      - "7083:7083"   # DID API
+      - "7085:7085"   # Version API
+      - "7086:7086"   # STS API
+    env_file:
+      - ./deployment/assets/env/docker/consumer_identityhub.env
+    volumes:
+      - ./deployment/assets/consumer_public.pem:/app/keys/consumer_public.pem:ro
+      - ./deployment/assets/consumer_private.pem:/app/keys/consumer_private.pem:ro
+      - ./deployment/assets/credentials/docker/consumer:/app/credentials:ro
+    depends_on:
+      consumer-postgres:
+        condition: service_healthy
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Provider EDC
+  # ============================================================
+  provider-controlplane:
+    build:
+      context: .
+      dockerfile: launchers/controlplane/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/controlplane/build/libs/controlplane.jar
+    container_name: provider-controlplane
+    ports:
+      - "8191:8191"   # Management API
+      - "8192:8192"   # DSP API
+      - "8193:8193"   # Control API
+      - "8194:8194"   # Catalog API
+      - "8195:8195"   # Version API
+    env_file:
+      - ./deployment/assets/env/docker/provider_connector.env
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006
+    volumes:
+      - ./deployment/assets/participants/participants.docker.json:/app/participants.json:ro
+      - ./deployment/assets/provider_public.pem:/app/keys/provider_public.pem:ro
+      - ./deployment/assets/provider_private.pem:/app/keys/provider_private.pem:ro
+    depends_on:
+      provider-postgres:
+        condition: service_healthy
+      provider-identityhub:
+        condition: service_started
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  provider-dataplane:
+    build:
+      context: .
+      dockerfile: launchers/dataplane/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/dataplane/build/libs/dataplane.jar
+    container_name: provider-dataplane
+    ports:
+      - "12001:12001"  # Public API
+    env_file:
+      - ./deployment/assets/env/docker/provider_dataplane.env
+    volumes:
+      - ./deployment/assets/provider_public.pem:/app/keys/provider_public.pem:ro
+      - ./deployment/assets/provider_private.pem:/app/keys/provider_private.pem:ro
+    depends_on:
+      - provider-controlplane
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  provider-identityhub:
+    build:
+      context: .
+      dockerfile: launchers/identity-hub/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/identity-hub/build/libs/identity-hub.jar
+    container_name: provider-identityhub
+    ports:
+      - "7090:7090"   # Default API
+      - "7091:7091"   # Credentials API
+      - "7092:7092"   # Identity API
+      - "7093:7093"   # DID API
+      - "7095:7095"   # Version API
+      - "7096:7096"   # STS API
+    env_file:
+      - ./deployment/assets/env/docker/provider_identityhub.env
+    volumes:
+      - ./deployment/assets/provider_public.pem:/app/keys/provider_public.pem:ro
+      - ./deployment/assets/provider_private.pem:/app/keys/provider_private.pem:ro
+      - ./deployment/assets/credentials/docker/provider:/app/credentials:ro
+    depends_on:
+      provider-postgres:
+        condition: service_healthy
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Federated Catalog Server
+  # ============================================================
+  catalog-server:
+    build:
+      context: .
+      dockerfile: launchers/catalog-server/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/catalog-server/build/libs/catalog-server.jar
+    container_name: catalog-server
+    ports:
+      - "8091:8091"   # Management API
+      - "8092:8092"   # DSP API
+      - "8093:8093"   # Control API
+    env_file:
+      - ./deployment/assets/env/docker/catalogserver.env
+    volumes:
+      - ./deployment/assets/participants/participants.docker.json:/app/participants.json:ro
+      - ./deployment/assets/provider_public.pem:/app/keys/provider_public.pem:ro
+      - ./deployment/assets/provider_private.pem:/app/keys/provider_private.pem:ro
+    depends_on:
+      catalog-postgres:
+        condition: service_healthy
+      provider-controlplane:
+        condition: service_started
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Issuer Service
+  # ============================================================
+  issuer-service:
+    build:
+      context: .
+      dockerfile: launchers/issuerservice/src/main/docker/Dockerfile
+      args:
+        JAR: launchers/issuerservice/build/libs/issuerservice.jar
+    container_name: issuer-service
+    ports:
+      - "10010:10010"  # Default API
+      - "10011:10011"  # STS API
+      - "10012:10012"  # Issuance API
+      - "10013:10013"  # Admin API
+      - "10014:10014"  # Version API
+      - "10015:10015"  # Identity API
+    env_file:
+      - ./deployment/assets/env/docker/issuerservice.env
+    volumes:
+      - ./deployment/assets/issuer_public.pem:/app/keys/issuer_public.pem:ro
+      - ./deployment/assets/issuer_private.pem:/app/keys/issuer_private.pem:ro
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # DID Resolution NGINX
+  # ============================================================
+  did-nginx:
+    image: nginx:alpine
+    container_name: did-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./deployment/assets/participants:/usr/share/nginx/html:ro
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Pact Broker (Contract Testing)
+  # ============================================================
+  pact-postgres:
+    image: postgres:15-alpine
+    container_name: pact-postgres
+    environment:
+      POSTGRES_USER: pact
+      POSTGRES_PASSWORD: pact
+      POSTGRES_DB: pact
+    volumes:
+      - pact-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pact"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - health-network
+    restart: unless-stopped
+
+  pact-broker:
+    image: pactfoundation/pact-broker:latest
+    container_name: pact-broker
+    ports:
+      - "9292:9292"
+    environment:
+      - PACT_BROKER_DATABASE_URL=postgresql://pact:pact@pact-postgres/pact
+      - PACT_BROKER_BASIC_AUTH_USERNAME=admin
+      - PACT_BROKER_BASIC_AUTH_PASSWORD=admin
+      - PACT_BROKER_LOG_LEVEL=INFO
+      - PACT_BROKER_PORT=9292
+    depends_on:
+      pact-postgres:
+        condition: service_healthy
+    networks:
+      - health-network
+    restart: unless-stopped
+
+volumes:
+  consumer-postgres-data:
+  provider-postgres-data:
+  catalog-postgres-data:
+  pact-postgres-data:
+
+# Note: This extends docker-compose.health.yml
+# The health-network is defined in the base file

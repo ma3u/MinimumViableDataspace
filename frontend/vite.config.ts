@@ -11,8 +11,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// GitHub Pages base path (repository name)
+const base = process.env.GITHUB_PAGES === 'true' ? '/MinimumViableDataspace/' : '/'
+
 export default defineConfig({
   plugins: [react()],
+  base,
   server: {
     port: 3000,
     proxy: {

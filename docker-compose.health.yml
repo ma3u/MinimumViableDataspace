@@ -8,8 +8,6 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-version: '3.8'
-
 services:
   # Health Dataspace Frontend (EHR2EDC)
   health-frontend:
@@ -44,7 +42,7 @@ services:
     image: isaitb/shacl-validator:latest
     container_name: healthdcatap-editor
     ports:
-      - "8082:8080"
+      - "8880:8080"   # Changed from 8082 to avoid conflict with EDC DSP API
     networks:
       - health-network
     restart: unless-stopped
@@ -60,8 +58,10 @@ networks:
 # To use with IntelliJ deployment:
 #   1. Start NGINX for issuer DID
 #   2. Start the 'dataspace' compound run config in IntelliJ
-#   3. Run ./seed.sh
-#   4. Run EHR_BACKEND_URL=http://host.docker.internal:3001 ./seed-health.sh
+#   3. Run the unified seeding script:
+#      ./seed-dataspace.sh --mode=local
+#   4. For Docker-mode seed (if needed):
+#      ./seed-dataspace.sh --mode=docker
 #   5. docker-compose -f docker-compose.health.yml up --build
 #   6. Open http://localhost:3000
 #   7. HealthDCAT-AP Editor available at http://localhost:8082

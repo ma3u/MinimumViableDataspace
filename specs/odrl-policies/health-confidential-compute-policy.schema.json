@@ -1,0 +1,216 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mvd-health.io/schemas/odrl/health-confidential-compute-policy.schema.json",
+  "title": "Health Confidential Compute Policy",
+  "description": "ODRL policy requiring Trusted Execution Environment (TEE) for genomics and highly sensitive data",
+  "type": "object",
+  "required": ["@context", "@id", "@type", "policy"],
+  "properties": {
+    "@context": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": {
+        "const": "https://w3id.org/edc/connector/management/v0.0.1"
+      }
+    },
+    "@id": {
+      "type": "string",
+      "pattern": "^health-confidential-compute-policy(-[a-z0-9]+)?$"
+    },
+    "@type": {
+      "const": "PolicyDefinition"
+    },
+    "policy": {
+      "type": "object",
+      "required": ["@type", "permission", "obligation"],
+      "properties": {
+        "@type": {
+          "const": "Set"
+        },
+        "permission": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["action", "constraint"],
+            "properties": {
+              "action": {
+                "const": "use"
+              },
+              "constraint": {
+                "type": "object",
+                "required": ["leftOperand", "operator", "rightOperand"],
+                "properties": {
+                  "leftOperand": {
+                    "const": "MembershipCredential"
+                  },
+                  "operator": {
+                    "const": "eq"
+                  },
+                  "rightOperand": {
+                    "const": "active"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "obligation": {
+          "type": "array",
+          "minItems": 2,
+          "description": "Must include confidentialComputing and encryptionInTransit constraints",
+          "items": {
+            "type": "object",
+            "required": ["action", "constraint"],
+            "properties": {
+              "action": {
+                "const": "use"
+              },
+              "constraint": {
+                "type": "object",
+                "required": ["leftOperand", "operator", "rightOperand"],
+                "properties": {
+                  "leftOperand": {
+                    "enum": [
+                      "Security.confidentialComputing",
+                      "Security.encryptionInTransit",
+                      "Security.attestation",
+                      "DataAccess.level"
+                    ]
+                  },
+                  "operator": {
+                    "const": "eq"
+                  },
+                  "rightOperand": {
+                    "oneOf": [
+                      { "const": "true" },
+                      { "type": "boolean", "const": true },
+                      { "const": "processing" },
+                      { "const": "required" }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "constraint": {
+                    "properties": {
+                      "leftOperand": { "const": "Security.confidentialComputing" }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "constraint": {
+                    "properties": {
+                      "leftOperand": { "const": "Security.encryptionInTransit" }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "prohibition": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["action", "constraint"],
+            "properties": {
+              "action": {
+                "const": "use"
+              },
+              "constraint": {
+                "type": "object",
+                "properties": {
+                  "leftOperand": {
+                    "enum": [
+                      "DataAccess.reidentification",
+                      "DataAccess.export"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "@context": [
+        "https://w3id.org/edc/connector/management/v0.0.1",
+        "http://www.w3.org/ns/odrl.jsonld"
+      ],
+      "@id": "health-confidential-compute-policy",
+      "@type": "PolicyDefinition",
+      "policy": {
+        "@type": "Set",
+        "permission": [
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "MembershipCredential",
+              "operator": "eq",
+              "rightOperand": "active"
+            }
+          }
+        ],
+        "obligation": [
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "Security.confidentialComputing",
+              "operator": "eq",
+              "rightOperand": "true"
+            }
+          },
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "Security.encryptionInTransit",
+              "operator": "eq",
+              "rightOperand": "true"
+            }
+          },
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "DataAccess.level",
+              "operator": "eq",
+              "rightOperand": "processing"
+            }
+          }
+        ],
+        "prohibition": [
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "DataAccess.reidentification",
+              "operator": "eq",
+              "rightOperand": "true"
+            }
+          },
+          {
+            "action": "use",
+            "constraint": {
+              "leftOperand": "DataAccess.export",
+              "operator": "eq",
+              "rightOperand": "true"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

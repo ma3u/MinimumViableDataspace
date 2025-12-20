@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
     "dev:health": "ts-node src/server-health.ts",
+    "dev:local": "PORT=4001 ts-node src/server-health.ts",
     "start:health": "node dist/server-health.js",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix"

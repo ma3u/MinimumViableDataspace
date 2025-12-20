@@ -1,0 +1,985 @@
+openapi: 3.1.0
+info:
+  title: EHR Health Backend API
+  description: |
+    Backend API for Electronic Health Records in the MVD Health Demo.
+    Provides FHIR R4-compliant EHR records with HealthDCAT-AP metadata.
+  version: 1.0.0
+  contact:
+    name: MVD Health Demo
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:3001
+    description: Backend Mock (Direct Access)
+  - url: http://localhost:3002
+    description: Backend EDC (EDC-Integrated)
+
+components:
+  schemas:
+    # Health Check
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        service:
+          type: string
+        recordsCount:
+          type: integer
+        mode:
+          type: string
+          enum: [mock, edc, hybrid]
+          description: Current backend mode
+        timestamp:
+          type: string
+          format: date-time
+
+    # EHR Summary for Catalog
+    EHRCatalogSummary:
+      type: object
+      properties:
+        ehrId:
+          type: string
+          description: EHR identifier (e.g., EHR001)
+        assetId:
+          type: string
+          description: EDC asset ID (e.g., asset:ehr:EHR001)
+        diagnosis:
+          type: string
+          description: Primary diagnosis
+        ageBand:
+          type: string
+          description: Age range (e.g., 55-64)
+        biologicalSex:
+          type: string
+          enum: [male, female, other, unknown]
+        icdCode:
+          type: string
+          description: ICD-10-GM code
+        studyEligibility:
+          type: array
+          items:
+            type: string
+        consentPurposes:
+          type: array
+          items:
+            type: string
+        qualityScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        clinicalPhase:
+          type: string
+          enum: [Phase I, Phase II, Phase III, Phase IV]
+        medDRASOC:
+          type: string
+          description: MedDRA System Organ Class
+        sensitiveCategory:
+          type: string
+          enum: [standard, mental-health, hiv, genomics]
+        sponsorType:
+          type: string
+          enum: [commercial, academic, government, ngo]
+        therapeuticArea:
+          type: string
+
+    # Full EHR Record (Verifiable Credential)
+    ElectronicHealthRecord:
+      type: object
+      required:
+        - '@context'
+        - id
+        - type
+        - issuer
+        - credentialSubject
+      properties:
+        '@context':
+          type: array
+          items:
+            type: string
+          example:
+            - https://www.w3.org/2018/credentials/v1
+            - https://w3id.org/ehds/ehr/v1
+            - http://hl7.org/fhir
+        id:
+          type: string
+          description: DID-based identifier
+          example: did:web:rheinland-uklinikum.de:ehr:EHR001
+        type:
+          type: array
+          items:
+            type: string
+          example: [VerifiableCredential, ElectronicHealthRecord, FHIRBundle]
+        issuer:
+          type: string
+          description: Provider DID
+          example: did:web:rheinland-uklinikum.de
+        issuanceDate:
+          type: string
+          format: date-time
+        expirationDate:
+          type: string
+          format: date-time
+        credentialSubject:
+          $ref: '#/components/schemas/EHRCredentialSubject'
+        proof:
+          $ref: '#/components/schemas/Proof'
+
+    EHRCredentialSubject:
+      type: object
+      required:
+        - id
+        - resourceType
+      properties:
+        id:
+          type: string
+          description: Patient pseudonym DID
+        resourceType:
+          type: string
+          default: Bundle
+        studyEligibility:
+          type: array
+          items:
+            type: string
+        consentScope:
+          $ref: '#/components/schemas/ConsentScope'
+        demographicsNode:
+          $ref: '#/components/schemas/DemographicsNode'
+        conditionsNode:
+          $ref: '#/components/schemas/ConditionsNode'
+        observationsNode:
+          $ref: '#/components/schemas/ObservationsNode'
+        medicationsNode:
+          $ref: '#/components/schemas/MedicationsNode'
+        proceduresNode:
+          $ref: '#/components/schemas/ProceduresNode'
+        provenanceNode:
+          $ref: '#/components/schemas/ProvenanceNode'
+        clinicalTrialNode:
+          $ref: '#/components/schemas/ClinicalTrialNode'
+        medDRANode:
+          $ref: '#/components/schemas/MedDRANode'
+        signalVerificationNode:
+          $ref: '#/components/schemas/SignalVerificationNode'
+        anamnesisNode:
+          $ref: '#/components/schemas/AnamnesisNode'
+
+    ConsentScope:
+      type: object
+      properties:
+        purposes:
+          type: array
+          items:
+            type: string
+        dataCategories:
+          type: array
+          items:
+            type: string
+        retentionPeriod:
+          type: string
+        grantedAt:
+          type: string
+          format: date-time
+
+    DemographicsNode:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          default: Patient
+        ageBand:
+          type: string
+        biologicalSex:
+          type: string
+        ethnicity:
+          type: string
+        language:
+          type: string
+        maritalStatus:
+          type: string
+
+    ConditionsNode:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          default: Condition
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+
+    Condition:
+      type: object
+      properties:
+        id:
+          type: string
+        clinicalStatus:
+          type: string
+          enum: [active, recurrence, relapse, inactive, remission, resolved]
+        verificationStatus:
+          type: string
+          enum: [unconfirmed, provisional, differential, confirmed, refuted, entered-in-error]
+        category:
+          type: string
+        code:
+          $ref: '#/components/schemas/CodeableConcept'
+        onsetDateTime:
+          type: string
+          format: date-time
+        recordedDate:
+          type: string
+          format: date-time
+
+    CodeableConcept:
+      type: object
+      properties:
+        coding:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coding'
+        text:
+          type: string
+
+    Coding:
+      type: object
+      properties:
+        system:
+          type: string
+          description: Code system URI
+        code:
+          type: string
+        display:
+          type: string
+        version:
+          type: string
+
+    ObservationsNode:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          default: Observation
+        vitalSigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        labResults:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+
+    Observation:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [registered, preliminary, final, amended, corrected, cancelled, entered-in-error, unknown]
+        category:
+          type: string
+        code:
+          $ref: '#/components/schemas/CodeableConcept'
+        effectiveDateTime:
+          type: string
+          format: date-time
+        valueQuantity:
+          $ref: '#/components/schemas/Quantity'
+        valueString:
+          type: string
+        interpretation:
+          type: string
+
+    Quantity:
+      type: object
+      properties:
+        value:
+          type: number
+        unit:
+          type: string
+        system:
+          type: string
+        code:
+          type: string
+
+    MedicationsNode:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          default: MedicationStatement
+        medications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
+
+    Medication:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [active, completed, entered-in-error, intended, stopped, on-hold, unknown, not-taken]
+        medicationCodeableConcept:
+          $ref: '#/components/schemas/CodeableConcept'
+        dosage:
+          type: string
+        effectivePeriod:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+
+    ProceduresNode:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          default: Procedure
+        procedures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Procedure'
+
+    Procedure:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [preparation, in-progress, not-done, on-hold, stopped, completed, entered-in-error, unknown]
+        code:
+          $ref: '#/components/schemas/CodeableConcept'
+        performedDateTime:
+          type: string
+          format: date-time
+        outcome:
+          type: string
+
+    ProvenanceNode:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          default: Provenance
+        recorded:
+          type: string
+          format: date-time
+        activity:
+          type: string
+        agent:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              who:
+                type: string
+        entity:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                type: string
+              what:
+                type: string
+
+    ClinicalTrialNode:
+      type: object
+      description: EU CTR 536/2014 compliant clinical trial metadata
+      properties:
+        phase:
+          type: string
+          enum: [Phase I, Phase II, Phase III, Phase IV]
+        phaseCode:
+          type: string
+          description: NCI Thesaurus code
+        euCtNumber:
+          type: string
+          description: EU Clinical Trial number (e.g., 2024-501234-12-DE)
+        sponsor:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+              enum: [commercial, academic, government, ngo]
+            country:
+              type: string
+        therapeuticArea:
+          type: object
+          properties:
+            code:
+              type: string
+            name:
+              type: string
+        primaryEndpoint:
+          type: string
+        secondaryEndpoints:
+          type: array
+          items:
+            type: string
+        memberStatesConcerned:
+          type: array
+          items:
+            type: string
+
+    MedDRANode:
+      type: object
+      description: MedDRA v27.0 classification
+      properties:
+        version:
+          type: string
+          default: "27.0"
+        primarySOC:
+          type: object
+          properties:
+            code:
+              type: string
+              description: 10-digit MedDRA code
+            name:
+              type: string
+        preferredTerm:
+          type: object
+          properties:
+            code:
+              type: string
+            name:
+              type: string
+        llt:
+          type: object
+          description: Lowest Level Term
+          properties:
+            code:
+              type: string
+            name:
+              type: string
+
+    SignalVerificationNode:
+      type: object
+      description: Pharmacovigilance signal verification
+      properties:
+        signalStatus:
+          type: string
+          enum: [pending, verified, refuted, escalated]
+        adverseEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdverseEvent'
+        lastReviewDate:
+          type: string
+          format: date-time
+
+    AdverseEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        event:
+          type: string
+        severity:
+          type: string
+          enum: [mild, moderate, severe, life-threatening, fatal]
+        seriousness:
+          type: string
+          enum: [non-serious, serious]
+        relatedness:
+          type: string
+          enum: [unrelated, unlikely, possible, probable, definite]
+        causality:
+          type: string
+          enum: [not-assessed, unlikely, possible, probable, certain]
+        outcome:
+          type: string
+          enum: [recovered, recovering, not-recovered, recovered-with-sequelae, fatal, unknown]
+        onsetDate:
+          type: string
+          format: date-time
+        resolvedDate:
+          type: string
+          format: date-time
+
+    AnamnesisNode:
+      type: object
+      description: 5-step German anamnesis
+      properties:
+        chiefComplaint:
+          $ref: '#/components/schemas/AnamnesisStep'
+        historyOfPresentIllness:
+          $ref: '#/components/schemas/AnamnesisStep'
+        pastMedicalHistory:
+          $ref: '#/components/schemas/AnamnesisStep'
+        familyHistory:
+          $ref: '#/components/schemas/AnamnesisStep'
+        socialHistory:
+          $ref: '#/components/schemas/AnamnesisStep'
+
+    AnamnesisStep:
+      type: object
+      properties:
+        stepNumber:
+          type: integer
+          minimum: 1
+          maximum: 5
+        summary:
+          type: string
+        details:
+          type: string
+        clinicalSignificance:
+          type: string
+          enum: [low, moderate, high]
+        relatedConditions:
+          type: array
+          items:
+            type: string
+
+    Proof:
+      type: object
+      properties:
+        type:
+          type: string
+        created:
+          type: string
+          format: date-time
+        verificationMethod:
+          type: string
+        proofPurpose:
+          type: string
+        proofValue:
+          type: string
+
+    # HealthDCAT-AP Dataset
+    HealthDCATDataset:
+      type: object
+      description: HealthDCAT-AP Release 5 compliant dataset
+      properties:
+        '@context':
+          type: array
+          items:
+            type: string
+        '@id':
+          type: string
+        '@type':
+          type: string
+          default: dcat:Dataset
+        dct:identifier:
+          type: string
+        dct:title:
+          type: string
+        dct:description:
+          type: string
+        dct:accessRights:
+          type: string
+          default: http://publications.europa.eu/resource/authority/access-right/NON_PUBLIC
+        dct:conformsTo:
+          type: array
+          items:
+            type: string
+          description: FHIR profiles (R4, ISiK, KBV)
+        dcatap:applicableLegislation:
+          type: array
+          items:
+            type: string
+          description: EHDS, GDPR, DGA ELI URIs
+        healthdcatap:healthCategory:
+          type: string
+          description: Health category URI
+        healthdcatap:hdab:
+          type: object
+          description: Health Data Access Body
+          properties:
+            '@type':
+              type: string
+            foaf:name:
+              type: string
+            dcat:contactPoint:
+              type: object
+        dpv:hasPurpose:
+          type: string
+        dpv:hasLegalBasis:
+          type: string
+        dpv:hasPersonalData:
+          type: array
+          items:
+            type: string
+        dqv:hasQualityAnnotation:
+          type: object
+          description: Quality certification
+        odrl:hasPolicy:
+          type: object
+          description: ODRL policy reference
+
+    # Catalog Response
+    CatalogResponse:
+      type: object
+      properties:
+        '@context':
+          type: array
+          items:
+            type: string
+        '@type':
+          type: string
+          default: dcat:Catalog
+        dct:title:
+          type: string
+        dcat:dataset:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthDCATDataset'
+        dcat:service:
+          type: array
+          items:
+            type: object
+
+    # Error Response
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        statusCode:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+paths:
+  # Health Check
+  /health:
+    get:
+      operationId: getHealth
+      summary: Health check endpoint
+      tags: [Health]
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  # EHR Endpoints
+  /api/ehr:
+    get:
+      operationId: listEHRs
+      summary: List all EHR records
+      description: Returns summary list of all available EHR records
+      tags: [EHR]
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by medical category
+        - name: ageBand
+          in: query
+          schema:
+            type: string
+          description: Filter by age band
+        - name: phase
+          in: query
+          schema:
+            type: string
+          description: Filter by clinical trial phase
+        - name: sensitiveCategory
+          in: query
+          schema:
+            type: string
+          description: Filter by sensitive category
+      responses:
+        '200':
+          description: List of EHR records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EHRCatalogSummary'
+
+  /api/ehr/{id}:
+    get:
+      operationId: getEHRById
+      summary: Get EHR by ID
+      description: Returns complete FHIR-compliant EHR record
+      tags: [EHR]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: EHR ID (e.g., EHR001)
+      responses:
+        '200':
+          description: Full EHR record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElectronicHealthRecord'
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/ElectronicHealthRecord'
+        '404':
+          description: EHR not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/ehr/{id}/dcat:
+    get:
+      operationId: getEHRDCATMetadata
+      summary: Get HealthDCAT-AP metadata for EHR
+      description: Returns HealthDCAT-AP JSON-LD metadata for the EHR
+      tags: [EHR, DCAT]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: HealthDCAT-AP metadata
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/HealthDCATDataset'
+        '404':
+          description: EHR not found
+
+  # Catalog Endpoints
+  /api/catalog:
+    get:
+      operationId: getCatalog
+      summary: Get HealthDCAT-AP catalog
+      description: Returns full HealthDCAT-AP catalog with all datasets
+      tags: [Catalog]
+      responses:
+        '200':
+          description: HealthDCAT-AP catalog
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/CatalogResponse'
+            text/turtle:
+              schema:
+                type: string
+                description: Turtle/RDF serialization
+
+  /api/catalog/assets:
+    get:
+      operationId: getCatalogAssets
+      summary: Get catalog assets for frontend
+      description: Returns transformed catalog assets for frontend consumption
+      tags: [Catalog]
+      responses:
+        '200':
+          description: Asset list for frontend
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EHRCatalogSummary'
+                  totalCount:
+                    type: integer
+                  source:
+                    type: string
+                    enum: [mock, edc-federated, edc-cached]
+
+  # EDC Proxy Endpoints (backend-edc only)
+  /api/negotiations:
+    post:
+      operationId: initiateNegotiation
+      summary: Initiate contract negotiation
+      description: Proxies to EDC Consumer connector
+      tags: [EDC Proxy]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - assetId
+                - policyId
+              properties:
+                assetId:
+                  type: string
+                policyId:
+                  type: string
+                obligation:
+                  type: object
+      responses:
+        '200':
+          description: Negotiation initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  state:
+                    type: string
+
+  /api/negotiations/{id}:
+    get:
+      operationId: getNegotiationStatus
+      summary: Get negotiation status
+      tags: [EDC Proxy]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Negotiation status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  state:
+                    type: string
+                  contractAgreementId:
+                    type: string
+
+  /api/negotiations/{id}/poll:
+    get:
+      operationId: pollNegotiation
+      summary: Poll negotiation until finalized
+      tags: [EDC Proxy]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: timeout
+          in: query
+          schema:
+            type: integer
+            default: 30000
+      responses:
+        '200':
+          description: Final negotiation state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  state:
+                    type: string
+                  contractAgreementId:
+                    type: string
+        '408':
+          description: Polling timeout
+
+  /api/transfers:
+    post:
+      operationId: initiateTransfer
+      summary: Initiate transfer process
+      tags: [EDC Proxy]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - assetId
+                - contractId
+              properties:
+                assetId:
+                  type: string
+                contractId:
+                  type: string
+      responses:
+        '200':
+          description: Transfer initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  state:
+                    type: string
+
+  /api/transfers/{id}:
+    get:
+      operationId: getTransferStatus
+      summary: Get transfer status
+      tags: [EDC Proxy]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transfer status
+
+  /api/transfers/{id}/data:
+    get:
+      operationId: getTransferData
+      summary: Get transferred data
+      description: In full mode, fetches via EDR. In hybrid mode, fetches from mock.
+      tags: [EDC Proxy]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: EHR data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElectronicHealthRecord'
+        '404':
+          description: Transfer not found or data not available
+
+tags:
+  - name: Health
+    description: Service health check
+  - name: EHR
+    description: Electronic Health Record operations
+  - name: Catalog
+    description: HealthDCAT-AP catalog operations
+  - name: DCAT
+    description: HealthDCAT-AP metadata
+  - name: EDC Proxy
+    description: EDC connector proxy endpoints (backend-edc only)
