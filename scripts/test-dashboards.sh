@@ -351,6 +351,7 @@ check_metric "dsp_messages_total" && ((METRICS_OK++)) || ((METRICS_MISSING++))
 # Audit metrics
 check_metric "audit_events_total" && ((METRICS_OK++)) || ((METRICS_MISSING++))
 check_metric "data_access_requests_total" && ((METRICS_OK++)) || ((METRICS_MISSING++))
+check_metric "data_access_total" && ((METRICS_OK++)) || ((METRICS_MISSING++))
 
 # EHR metrics
 check_metric "ehr_records_available" && ((METRICS_OK++)) || ((METRICS_MISSING++))
@@ -466,6 +467,10 @@ test_query 'edc_data_offerings_total' "EDC - Offerings"
 # Compliance Dashboard queries
 test_query 'ehds_compliance_score' "Compliance - EHDS Score"
 test_query 'audit_events_total' "Compliance - Audit Events"
+test_query 'sum(rate(data_access_total[5m])) by (access_type)' "Compliance - Data Access by Type"
+test_query 'sum(rate(data_access_total[5m])) by (data_category)' "Compliance - Access by Data Category"
+test_query 'sum(rate(data_access_total[5m])) by (user_role)' "Compliance - Top Access by User Role"
+test_query 'sum(rate(data_access_total[5m])) by (purpose)' "Compliance - Access by Purpose"
 
 # System Resources queries
 test_query 'rate(container_cpu_usage_seconds_total[5m])' "System - CPU Usage"

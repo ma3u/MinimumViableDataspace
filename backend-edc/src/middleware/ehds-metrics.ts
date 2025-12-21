@@ -252,6 +252,17 @@ export const dataAccessRequests = new client.Counter({
 });
 
 /**
+ * Data Access Total (for compliance dashboard)
+ * Tracks data access by type, category, user role, and purpose
+ */
+export const dataAccessTotal = new client.Counter({
+  name: 'data_access_total',
+  help: 'Total data access operations with detailed labels',
+  labelNames: ['access_type', 'data_category', 'user_role', 'purpose'],
+  registers: [register],
+});
+
+/**
  * Audit Log Events
  */
 export const auditEventsTotal = new client.Counter({
@@ -373,6 +384,39 @@ export function initializeEhdsMetrics(): void {
   consentExpiring7d.set(23);
   consentExpiring24h.set(5);
 
+  // Data Access by Type, Category, Role, and Purpose (for compliance dashboards)
+  // Access Types: read, write, download, export, share
+  // Data Categories: ehr, lab_results, imaging, medications, genomics
+  // User Roles: researcher, clinician, admin, data_steward, auditor
+  // Purposes: research, treatment, secondary_use, audit, quality_improvement
+  
+  // Initialize with baseline values
+  const accessTypes = ['read', 'write', 'download', 'export', 'share'];
+  const dataCategories = ['ehr', 'lab_results', 'imaging', 'medications', 'genomics'];
+  const userRoles = ['researcher', 'clinician', 'admin', 'data_steward', 'auditor'];
+  const purposes = ['research', 'treatment', 'secondary_use', 'audit', 'quality_improvement'];
+  
+  // Create realistic distribution
+  accessTypes.forEach(accessType => {
+    const weight = accessType === 'read' ? 100 : accessType === 'download' ? 30 : 10;
+    dataAccessTotal.inc({ access_type: accessType, data_category: 'ehr', user_role: 'researcher', purpose: 'research' }, weight);
+  });
+  
+  dataCategories.forEach(category => {
+    const weight = category === 'ehr' ? 80 : category === 'lab_results' ? 40 : 15;
+    dataAccessTotal.inc({ access_type: 'read', data_category: category, user_role: 'researcher', purpose: 'research' }, weight);
+  });
+  
+  userRoles.forEach(role => {
+    const weight = role === 'researcher' ? 100 : role === 'clinician' ? 60 : role === 'data_steward' ? 25 : 10;
+    dataAccessTotal.inc({ access_type: 'read', data_category: 'ehr', user_role: role, purpose: 'research' }, weight);
+  });
+  
+  purposes.forEach(purpose => {
+    const weight = purpose === 'research' ? 120 : purpose === 'treatment' ? 80 : purpose === 'secondary_use' ? 40 : 15;
+    dataAccessTotal.inc({ access_type: 'read', data_category: 'ehr', user_role: 'researcher', purpose }, weight);
+  });
+
   // Transfer Metrics
   transferSuccessRate.set(0.97);
   activeTransfers.set({ type: 'fhir' }, 3);
@@ -444,12 +488,26 @@ function simulateDataspaceActivity(): void {
     dspMessagesTotal.inc({ type: 'contract_offer', direction: 'inbound' });
   }
 
-  // Simulate data access requests
+  // Simulate data access requests (legacy metric)
   dataAccessRequests.inc({ 
     requester_type: 'researcher', 
     data_type: 'ehr', 
     result: Math.random() > 0.1 ? 'allowed' : 'denied' 
   });
+
+  // Simulate detailed data access (for compliance dashboards)
+  const accessTypes = ['read', 'write', 'download', 'export', 'share'];
+  const dataCategories = ['ehr', 'lab_results', 'imaging', 'medications', 'genomics'];
+  const userRoles = ['researcher', 'clinician', 'admin', 'data_steward', 'auditor'];
+  const purposes = ['research', 'treatment', 'secondary_use', 'audit', 'quality_improvement'];
+  
+  // Pick random values with realistic weights
+  const accessType = Math.random() > 0.7 ? accessTypes[Math.floor(Math.random() * accessTypes.length)] : 'read';
+  const dataCategory = Math.random() > 0.6 ? dataCategories[Math.floor(Math.random() * dataCategories.length)] : 'ehr';
+  const userRole = Math.random() > 0.5 ? userRoles[Math.floor(Math.random() * userRoles.length)] : 'researcher';
+  const purpose = Math.random() > 0.6 ? purposes[Math.floor(Math.random() * purposes.length)] : 'research';
+  
+  dataAccessTotal.inc({ access_type: accessType, data_category: dataCategory, user_role: userRole, purpose });
 
   // Simulate audit events
   auditEventsTotal.inc({ event_type: 'data_access', severity: 'info' });
