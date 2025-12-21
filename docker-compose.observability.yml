@@ -137,5 +137,5 @@ volumes:
 
 networks:
   dataspace-network:
-    name: mvd-health-network
+    name: mvd-health_health-network
     external: true
