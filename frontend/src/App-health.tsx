@@ -40,6 +40,7 @@ import { api, getApiMode, isStaticDemo } from './services/apiFactory';
 import type { CatalogAsset } from './services/apiFactory';
 import { useCatalog } from './hooks/useCatalog';
 import { participantConfig, logConfig, DEBUG } from './config';
+import { ErrorBoundary, DebugPanel } from './components/observability';
 import { 
   mockEHRCatalogAssets, 
   mockEHRData, 
@@ -2529,12 +2530,15 @@ function FhirJsonHighlighter({ data }: { data: unknown }) {
   return <div className="text-slate-100">{colorize(jsonString)}</div>;
 }
 
-// Wrap AppHealth with the DSP Event Log Provider
+// Wrap AppHealth with the DSP Event Log Provider and Error Boundary
 function AppHealthWithProvider() {
   return (
-    <DspEventLogProvider>
-      <AppHealth />
-    </DspEventLogProvider>
+    <ErrorBoundary>
+      <DspEventLogProvider>
+        <AppHealth />
+        <DebugPanel />
+      </DspEventLogProvider>
+    </ErrorBoundary>
   );
 }
 
