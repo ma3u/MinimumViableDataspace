@@ -33,9 +33,12 @@ import {
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
 import { DataspaceInsiderPanel, DataspaceInsiderTrigger } from './components/DataspaceInsiderPanel';
+import { CatalogCard } from './components/CatalogCard';
 import { DspEventLogProvider, useDspEventLog } from './contexts/DspEventLogContext';
 import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
 import { api, getApiMode, isStaticDemo } from './services/apiFactory';
+import type { CatalogAsset } from './services/apiFactory';
+import { useCatalog } from './hooks/useCatalog';
 import { 
   mockEHRCatalogAssets, 
   mockEHRData, 
@@ -105,7 +108,7 @@ interface MockEHRAsset {
 
 function AppHealth() {
   const [phase, setPhase] = useState<DemoPhase>('intro');
-  const [selectedAsset, setSelectedAsset] = useState<MockEHRAsset | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<CatalogAsset | MockEHRAsset | null>(null);
   const [negotiationStep, setNegotiationStep] = useState(0);
   const [transferStep, setTransferStep] = useState(0);
   const [computeStep, setComputeStep] = useState(0);
@@ -115,6 +118,19 @@ function AppHealth() {
   const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [ageBandFilter, setAgeBandFilter] = useState<string>('all');
+  
+  // Contract agreement tracking for real EDC negotiation
+  const [contractAgreementId, setContractAgreementId] = useState<string | null>(null);
+  
+  // Use dynamic catalog hook for EDC-sourced assets
+  const { 
+    assets: catalogAssets, 
+    isLoading: catalogLoading, 
+    error: catalogError,
+    source: catalogSource,
+    enhanced: catalogEnhanced,
+    refetch: refetchCatalog 
+  } = useCatalog({ autoFetch: true });
   const [phaseFilter, setPhaseFilter] = useState<string>('all');
   const [medDRAFilter, setMedDRAFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,8 +145,38 @@ function AppHealth() {
   // DSP Event logging hook
   const { emitEvent, setCurrentPhase, completePhase, resetPhases, clearEvents } = useDspEventLog();
 
+  // Determine which assets to use: dynamic catalog or mock data
+  // In hybrid/full mode with catalog data, use catalogAssets; otherwise fall back to mock
+  const useDynamicCatalog = catalogAssets.length > 0 && !catalogLoading && !catalogError;
+  
+  // Convert CatalogAsset to MockEHRAsset-compatible format for filtering
+  const assetsToFilter = useDynamicCatalog 
+    ? catalogAssets.map(asset => ({
+        '@id': asset.assetId,
+        'dct:title': asset.title,
+        'dct:description': asset.description,
+        'healthdcatap:icdCode': asset.healthTheme?.[0] ?? '',
+        'healthdcatap:diagnosis': asset.description,
+        'healthdcatap:category': asset.healthCategory,
+        'healthdcatap:ageRange': asset.ageBand,
+        'healthdcatap:biologicalSex': asset.biologicalSex,
+        'healthdcatap:consentStatus': 'active',
+        'healthdcatap:sensitiveCategory': asset.sensitiveCategory,
+        'healthdcatap:clinicalTrialPhase': asset.clinicalPhase,
+        'healthdcatap:euCtNumber': asset.euCtNumber,
+        'healthdcatap:sponsor': asset.sponsor,
+        'healthdcatap:therapeuticArea': asset.therapeuticArea ? { 
+          code: asset.therapeuticArea, 
+          name: asset.therapeuticArea 
+        } : undefined,
+        'healthdcatap:medDRA': (asset as unknown as Record<string, unknown>)['healthdcatap:medDRA'] as MockEHRAsset['healthdcatap:medDRA'],
+        // Preserve enhanced catalog data for display
+        _catalogAsset: asset,
+      }))
+    : mockEHRCatalogAssets;
+
   // Filter assets based on category, age band, phase, MedDRA SOC, EU CTR fields, and search
-  const filteredAssets = mockEHRCatalogAssets.filter(asset => {
+  const filteredAssets = assetsToFilter.filter(asset => {
     const matchesCategory = categoryFilter === 'all' || asset['healthdcatap:category'] === categoryFilter;
     const matchesAgeBand = ageBandFilter === 'all' || asset['healthdcatap:ageRange'] === ageBandFilter;
     const matchesPhase = phaseFilter === 'all' || asset['healthdcatap:clinicalTrialPhase'] === phaseFilter;
@@ -139,14 +185,14 @@ function AppHealth() {
     const matchesTherapeuticArea = therapeuticAreaFilter === 'all' || asset['healthdcatap:therapeuticArea']?.code === therapeuticAreaFilter;
     const matchesSearch = searchTerm === '' || 
       asset['dct:title'].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['healthdcatap:icdCode'].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['healthdcatap:diagnosis'].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['healthdcatap:medDRA']?.socName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['healthdcatap:medDRA']?.ptName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:icdCode']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:diagnosis']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:medDRA']?.socName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:medDRA']?.ptName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset['healthdcatap:clinicalTrialPhase']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset['healthdcatap:euCtNumber']?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['healthdcatap:sponsor']?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset['healthdcatap:therapeuticArea']?.name.toLowerCase().includes(searchTerm.toLowerCase());
+      asset['healthdcatap:sponsor']?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset['healthdcatap:therapeuticArea']?.name?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesAgeBand && matchesPhase && matchesMedDRA && matchesSponsorType && matchesTherapeuticArea && matchesSearch;
   });
 
@@ -164,12 +210,10 @@ function AppHealth() {
     setEhrData(null);
     setIsAnimating(false);
     setShowJson(false);
+    setContractAgreementId(null);
     resetPhases(); // Reset DSP event phases
     clearEvents(); // Clear the Dataspace Insider Panel events
   };
-
-  // Contract agreement ID for EDC flow (stored across negotiation and transfer)
-  const [contractAgreementId, setContractAgreementId] = useState<string | null>(null);
 
   // Start the demo and emit catalog events
   const startDemo = () => {
@@ -1325,11 +1369,61 @@ function AppHealth() {
             {/* Catalog Results */}
             <div className="bg-white rounded-xl p-6 shadow-sm border">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-gray-900">Available EHR Datasets (Anonymized)</h3>
-                <span className="text-sm text-gray-500">{filteredAssets.length} records found</span>
+                <div className="flex items-center gap-3">
+                  <h3 className="font-semibold text-gray-900">Available EHR Datasets (Anonymized)</h3>
+                  {/* Catalog Source Indicator */}
+                  {catalogLoading ? (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Loading catalog...
+                    </span>
+                  ) : catalogError ? (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs" title={catalogError.message}>
+                      <AlertCircle className="w-3 h-3" />
+                      Using mock data
+                    </span>
+                  ) : useDynamicCatalog ? (
+                    <span className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+                      catalogEnhanced ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      <Database className="w-3 h-3" />
+                      {catalogSource === 'edc-federated' ? 'Live EDC Catalog' : catalogSource}
+                      {catalogEnhanced && ' (DCAT-AP Enhanced)'}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-500">{filteredAssets.length} records found</span>
+                  {useDynamicCatalog && (
+                    <button
+                      onClick={() => refetchCatalog()}
+                      className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      Refresh
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredAssets.map(asset => {
+                  // Check if this is an enhanced asset from dynamic catalog
+                  const catalogAsset = (asset as { _catalogAsset?: CatalogAsset })._catalogAsset;
+                  
+                  if (catalogAsset) {
+                    // Use the new CatalogCard component for enhanced assets
+                    return (
+                      <CatalogCard
+                        key={asset['@id']}
+                        asset={catalogAsset}
+                        isSelected={selectedAsset?.['@id'] === asset['@id'] || (selectedAsset as CatalogAsset | null)?.assetId === asset['@id']}
+                        onSelect={(a) => setSelectedAsset({ ...asset, _catalogAsset: a } as MockEHRAsset & { _catalogAsset: CatalogAsset })}
+                        showEnhancedInfo={catalogEnhanced}
+                      />
+                    );
+                  }
+                  
+                  // Fall back to inline rendering for mock assets
                   const category = medicalCategories[asset['healthdcatap:category'] as keyof typeof medicalCategories];
                   const bgImage = categoryBackgrounds[asset['healthdcatap:category']];
                   return (
@@ -1642,6 +1736,32 @@ function AppHealth() {
               </div>
             </div>
 
+            {/* Contract Agreement Status (Real EDC) */}
+            {contractAgreementId && (
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-green-200">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Contract Agreement Established
+                </h3>
+                <div className="bg-green-50 rounded-lg p-4">
+                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Agreement ID:</span>
+                      <code className="ml-2 bg-white px-2 py-1 rounded text-xs font-mono break-all">
+                        {contractAgreementId}
+                      </code>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Source:</span>
+                      <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                        {getApiMode() === 'full' ? 'EDC Control Plane' : 'Hybrid (EDC + Mock)'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Action Button */}
             <div className="flex justify-end">
               {negotiationStep < mockNegotiationFlow.length - 1 ? (
@@ -1737,6 +1857,30 @@ function AppHealth() {
                   </div>
                 </div>
               </div>
+              
+              {/* Real EDC Contract Reference */}
+              {contractAgreementId && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Contract Agreement:</span>
+                    <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono">
+                      {contractAgreementId.slice(0, 20)}...
+                    </code>
+                  </div>
+                  <div className="flex items-center justify-between text-sm mt-2">
+                    <span className="text-gray-600">Transfer Mode:</span>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      getApiMode() === 'full' 
+                        ? 'bg-purple-100 text-purple-700'
+                        : getApiMode() === 'hybrid'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {getApiMode() === 'full' ? 'Full EDC' : getApiMode() === 'hybrid' ? 'Hybrid' : 'Mock'}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* De-identification Notice */}
