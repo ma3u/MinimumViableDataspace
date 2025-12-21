@@ -39,7 +39,7 @@ import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
 import { api, getApiMode, isStaticDemo } from './services/apiFactory';
 import type { CatalogAsset } from './services/apiFactory';
 import { useCatalog } from './hooks/useCatalog';
-import { participantConfig, logConfig, DEBUG } from './config';
+import { participantConfig as _participantConfig, logConfig, DEBUG as _DEBUG } from './config';
 import { ErrorBoundary, DebugPanel } from './components/observability';
 import { 
   mockEHRCatalogAssets, 
@@ -111,6 +111,16 @@ interface MockEHRAsset {
   };
 }
 
+// Type guard to check if asset is a MockEHRAsset
+function isMockEHRAsset(asset: CatalogAsset | MockEHRAsset | null): asset is MockEHRAsset {
+  return asset !== null && 'healthdcatap:category' in asset;
+}
+
+// Helper to get MockEHRAsset properties safely
+function getMockAsset(asset: CatalogAsset | MockEHRAsset | null): MockEHRAsset | null {
+  return isMockEHRAsset(asset) ? asset : null;
+}
+
 function AppHealth() {
   const [phase, setPhase] = useState<DemoPhase>('intro');
   const [selectedAsset, setSelectedAsset] = useState<CatalogAsset | MockEHRAsset | null>(null);
@@ -175,15 +185,18 @@ function AppHealth() {
         'healthdcatap:sensitiveCategory': asset.sensitiveCategory,
         'healthdcatap:clinicalTrialPhase': asset.clinicalPhase,
         'healthdcatap:euCtNumber': asset.euCtNumber,
-        'healthdcatap:sponsor': asset.sponsor,
+        'healthdcatap:sponsor': asset.sponsor as MockEHRAsset['healthdcatap:sponsor'],
         'healthdcatap:therapeuticArea': asset.therapeuticArea ? { 
           code: asset.therapeuticArea, 
           name: asset.therapeuticArea 
         } : undefined,
         'healthdcatap:medDRA': (asset as unknown as Record<string, unknown>)['healthdcatap:medDRA'] as MockEHRAsset['healthdcatap:medDRA'],
+        'healthdcatap:memberStates': asset['healthdcatap:memberStates'] as string[] | undefined,
+        'healthdcatap:signalStatus': asset['healthdcatap:signalStatus'] as MockEHRAsset['healthdcatap:signalStatus'],
+        'healthdcatap:consent': asset['healthdcatap:consent'] as MockEHRAsset['healthdcatap:consent'],
         // Preserve enhanced catalog data for display
         _catalogAsset: asset,
-      }))
+      }) as MockEHRAsset & { _catalogAsset: CatalogAsset })
     : mockEHRCatalogAssets;
 
   // Filter assets based on category, age band, phase, MedDRA SOC, EU CTR fields, and search
@@ -410,7 +423,8 @@ function AppHealth() {
     setIsAnimating(false);
     
     // Check if asset requires confidential compute
-    if (selectedAsset?.['healthdcatap:sensitiveCategory'] === 'genomics' || selectedAsset?.['healthdcatap:sensitiveCategory'] === 'mental-health') {
+    const mockAsset = getMockAsset(selectedAsset);
+    if (mockAsset?.['healthdcatap:sensitiveCategory'] === 'genomics' || mockAsset?.['healthdcatap:sensitiveCategory'] === 'mental-health') {
       setPhase('compute');
       simulateCompute();
     } else {
@@ -605,7 +619,13 @@ function AppHealth() {
     // Load the EHR data - use apiFactory for consistent mode handling
     if (selectedAsset) {
       const mode = getApiMode();
-      const ehrId = selectedAsset['@id'];
+      // Get ID from either MockEHRAsset or CatalogAsset format
+      const ehrId = selectedAsset['@id'] ?? (selectedAsset as CatalogAsset).assetId ?? '';
+      
+      if (!ehrId) {
+        console.warn('No EHR ID available');
+        return;
+      }
       
       try {
         if (mode === 'mock') {
@@ -614,7 +634,7 @@ function AppHealth() {
             const data = await fetchEHRById(ehrId);
             setEhrData(data);
           } else {
-            setEhrData(mockEHRData[ehrId]);
+            setEhrData(mockEHRData[ehrId as keyof typeof mockEHRData]);
           }
         } else {
           // Hybrid/Full mode: use apiFactory
@@ -624,7 +644,7 @@ function AppHealth() {
       } catch (error) {
         console.warn('EHR fetch failed, using mock data:', error);
         // Fallback to mock data
-        setEhrData(mockEHRData[ehrId]);
+        setEhrData(mockEHRData[ehrId as keyof typeof mockEHRData]);
       }
     }
   };
@@ -1657,7 +1677,7 @@ function AppHealth() {
             </div>
 
             {/* Patient Consent Display */}
-            {selectedAsset['healthdcatap:consent'] && (
+            {getMockAsset(selectedAsset)?.['healthdcatap:consent'] && (
               <div className="bg-white rounded-xl p-6 shadow-sm border">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Shield className="w-5 h-5 text-green-600" />
@@ -1669,12 +1689,12 @@ function AppHealth() {
                       <span className="text-2xl">✅</span>
                       <div>
                         <div className="font-medium text-green-800">Consent Active</div>
-                        <div className="text-sm text-green-600">Granted by: {selectedAsset['healthdcatap:consent'].grantor}</div>
+                        <div className="text-sm text-green-600">Granted by: {getMockAsset(selectedAsset)?.['healthdcatap:consent']?.grantor}</div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm text-gray-500">Valid Until</div>
-                      <div className="font-medium text-green-800">{selectedAsset['healthdcatap:consent'].validUntil}</div>
+                      <div className="font-medium text-green-800">{getMockAsset(selectedAsset)?.['healthdcatap:consent']?.validUntil}</div>
                     </div>
                   </div>
                 </div>
@@ -1686,7 +1706,7 @@ function AppHealth() {
                       ✓ Permitted Data Use Purposes
                     </h4>
                     <div className="space-y-2">
-                      {selectedAsset['healthdcatap:consent'].purposes.map((purpose) => {
+                      {getMockAsset(selectedAsset)?.['healthdcatap:consent']?.purposes.map((purpose) => {
                         const purposeInfo = consentPurposes[purpose as keyof typeof consentPurposes];
                         return purposeInfo ? (
                           <div key={purpose} className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
@@ -1707,7 +1727,7 @@ function AppHealth() {
                       ✗ Consent Restrictions
                     </h4>
                     <div className="space-y-2">
-                      {selectedAsset['healthdcatap:consent'].restrictions.map((restriction) => {
+                      {getMockAsset(selectedAsset)?.['healthdcatap:consent']?.restrictions.map((restriction) => {
                         const restrictionInfo = consentRestrictions[restriction as keyof typeof consentRestrictions];
                         return restrictionInfo ? (
                           <div key={restriction} className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-lg p-3">
@@ -1886,7 +1906,7 @@ function AppHealth() {
                 <div className="bg-blue-50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-teal-800 mb-2">Data Address</h4>
                   <div className="bg-white rounded p-3 font-mono text-xs break-all">
-                    https://provider.rheinland-uklinikum.de/fhir/Bundle/{selectedAsset['@id'].split(':').pop()}
+                    https://provider.rheinland-uklinikum.de/fhir/Bundle/{(selectedAsset['@id'] ?? '').split(':').pop()}
                   </div>
                 </div>
               </div>
@@ -2087,13 +2107,13 @@ function AppHealth() {
                       <p className="text-blue-200 mt-1">FHIR Bundle - De-identified for Research</p>
                     </div>
                     <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                      {selectedAsset['healthdcatap:consentStatus']}
+                      {getMockAsset(selectedAsset)?.['healthdcatap:consentStatus'] || 'Unknown'}
                     </span>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-blue-200">Pseudonym ID:</span>
-                      <span className="ml-2 font-mono">{selectedAsset['healthdcatap:consent']?.grantor.match(/[A-Z0-9]+\)?$/)?.[0]?.replace(')', '') || 'ANON-' + selectedAsset['@id'].split(':').pop()}</span>
+                      <span className="ml-2 font-mono">{getMockAsset(selectedAsset)?.['healthdcatap:consent']?.grantor.match(/[A-Z0-9]+\)?$/)?.[0]?.replace(')', '') || 'ANON-' + (selectedAsset['@id'] ?? '').split(':').pop()}</span>
                     </div>
                     <div>
                       <span className="text-blue-200">Transfer Date:</span>
@@ -2104,7 +2124,7 @@ function AppHealth() {
 
                 <div className="p-6 space-y-6">
                   {/* Consent Scope */}
-                  {selectedAsset['healthdcatap:consent'] && (
+                  {getMockAsset(selectedAsset)?.['healthdcatap:consent'] && (
                     <section>
                       <div className="flex items-center gap-2 mb-4">
                         <Lock className="w-5 h-5 text-purple-600" />
@@ -2115,7 +2135,7 @@ function AppHealth() {
                           <div>
                             <span className="text-sm text-gray-600">Permitted Purposes:</span>
                             <div className="flex gap-2 mt-2 flex-wrap">
-                              {selectedAsset['healthdcatap:consent'].purposes.map((purpose) => {
+                              {getMockAsset(selectedAsset)?.['healthdcatap:consent']?.purposes.map((purpose) => {
                                 const purposeInfo = consentPurposes[purpose as keyof typeof consentPurposes];
                                 return purposeInfo ? (
                                   <span key={purpose} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded text-sm">
@@ -2129,7 +2149,7 @@ function AppHealth() {
                           <div>
                             <span className="text-sm text-gray-600">Restrictions:</span>
                             <div className="flex gap-2 mt-2 flex-wrap">
-                              {selectedAsset['healthdcatap:consent'].restrictions.map((restriction) => {
+                              {getMockAsset(selectedAsset)?.['healthdcatap:consent']?.restrictions.map((restriction) => {
                                 const restrictionInfo = consentRestrictions[restriction as keyof typeof consentRestrictions];
                                 return restrictionInfo ? (
                                   <span key={restriction} className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded text-sm">
@@ -2141,7 +2161,7 @@ function AppHealth() {
                           </div>
                           <div>
                             <span className="text-sm text-gray-600">Valid Until:</span>
-                            <div className="font-medium text-gray-900">{selectedAsset['healthdcatap:consent'].validUntil}</div>
+                            <div className="font-medium text-gray-900">{getMockAsset(selectedAsset)?.['healthdcatap:consent']?.validUntil}</div>
                           </div>
                           <div>
                             <span className="text-sm text-gray-600">Jurisdiction:</span>
@@ -2161,11 +2181,11 @@ function AppHealth() {
                     <div className="bg-blue-50 rounded-lg p-4 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Age Band</div>
-                        <div className="text-xl font-bold text-gray-900">{selectedAsset['healthdcatap:ageRange']}</div>
+                        <div className="text-xl font-bold text-gray-900">{getMockAsset(selectedAsset)?.['healthdcatap:ageRange'] || 'N/A'}</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Biological Sex</div>
-                        <div className="text-xl font-bold text-gray-900 capitalize">{selectedAsset['healthdcatap:biologicalSex']}</div>
+                        <div className="text-xl font-bold text-gray-900 capitalize">{getMockAsset(selectedAsset)?.['healthdcatap:biologicalSex'] || 'N/A'}</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Region</div>
@@ -2174,8 +2194,8 @@ function AppHealth() {
                       <div className="bg-white rounded-lg p-3 shadow-sm">
                         <div className="text-sm text-gray-600">Category</div>
                         <div className="font-medium text-gray-900 capitalize">
-                          {medicalCategories[selectedAsset['healthdcatap:category'] as keyof typeof medicalCategories]?.icon}{' '}
-                          {medicalCategories[selectedAsset['healthdcatap:category'] as keyof typeof medicalCategories]?.label}
+                          {medicalCategories[getMockAsset(selectedAsset)?.['healthdcatap:category'] as keyof typeof medicalCategories]?.icon}{' '}
+                          {medicalCategories[getMockAsset(selectedAsset)?.['healthdcatap:category'] as keyof typeof medicalCategories]?.label}
                         </div>
                       </div>
                     </div>
@@ -2192,11 +2212,11 @@ function AppHealth() {
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm font-medium text-red-800">Primary Diagnosis</span>
                           <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded text-xs font-mono">
-                            {selectedAsset['healthdcatap:icdCode']}
+                            {getMockAsset(selectedAsset)?.['healthdcatap:icdCode'] || 'N/A'}
                           </span>
                         </div>
                         <div className="text-lg font-medium text-gray-900">
-                          {selectedAsset['healthdcatap:diagnosis']}
+                          {getMockAsset(selectedAsset)?.['healthdcatap:diagnosis'] || 'N/A'}
                         </div>
                         <div className="text-sm text-gray-600 mt-2">
                           {selectedAsset['dct:description']}
@@ -2214,11 +2234,11 @@ function AppHealth() {
                     <div className="flex gap-2 flex-wrap">
                       <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-medium">
                         <CheckCircle className="w-4 h-4" />
-                        EHR-TO-EDC-{selectedAsset['healthdcatap:category'].toUpperCase()}-2025
+                        EHR-TO-EDC-{(getMockAsset(selectedAsset)?.['healthdcatap:category'] || 'UNKNOWN').toUpperCase()}-2025
                       </span>
                       <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-medium">
                         <CheckCircle className="w-4 h-4" />
-                        REGISTRY-{selectedAsset['healthdcatap:icdCode'].split('.')[0]}-2025
+                        REGISTRY-{(getMockAsset(selectedAsset)?.['healthdcatap:icdCode'] || 'N/A').split('.')[0]}-2025
                       </span>
                     </div>
                   </section>
@@ -2256,7 +2276,7 @@ function AppHealth() {
                       <span>Verifiable Credential issued by did:web:rheinland-uklinikum.de</span>
                     </div>
                     <div className="mt-2 text-xs font-mono text-gray-400 break-all">
-                      ID: did:web:rheinland-uklinikum.de:ehr:{selectedAsset['@id'].split(':').pop()}
+                      ID: did:web:rheinland-uklinikum.de:ehr:{(selectedAsset['@id'] ?? '').split(':').pop()}
                     </div>
                   </section>
                 </div>
@@ -2286,7 +2306,7 @@ function AppHealth() {
                   <div className="p-4 bg-slate-900 overflow-auto max-h-[600px]">
                     <pre className="text-sm font-mono">
                       <FhirJsonHighlighter 
-                        data={ehrData || generateFhirBundle(selectedAsset)} 
+                        data={ehrData || (getMockAsset(selectedAsset) ? generateFhirBundle(getMockAsset(selectedAsset)!) : null)} 
                       />
                     </pre>
                   </div>

@@ -130,11 +130,14 @@ export interface PolicySummary {
  * Catalog Asset with full DCAT-AP and HealthDCAT-AP properties
  */
 export interface CatalogAsset {
-  // Core identifiers
+  // Core identifiers (support both normalized and JSON-LD formats)
+  '@id'?: string;
   ehrId: string;
   assetId: string;
   
-  // DCT core properties
+  // DCT core properties (support both normalized and JSON-LD formats)
+  'dct:title'?: string;
+  'dct:description'?: string;
   title: string;
   description: string;
   language?: string[];
@@ -145,7 +148,42 @@ export interface CatalogAsset {
   publisher?: Publisher;
   contactPoint?: ContactPoint;
   
-  // HealthDCAT-AP properties
+  // HealthDCAT-AP properties (support both normalized and JSON-LD formats)
+  'healthdcatap:category'?: string;
+  'healthdcatap:ageRange'?: string;
+  'healthdcatap:biologicalSex'?: string;
+  'healthdcatap:consentStatus'?: string;
+  'healthdcatap:icdCode'?: string;
+  'healthdcatap:diagnosis'?: string;
+  'healthdcatap:sensitiveCategory'?: string;
+  'healthdcatap:clinicalTrialPhase'?: string;
+  'healthdcatap:euCtNumber'?: string;
+  'healthdcatap:memberStates'?: string[];
+  'healthdcatap:signalStatus'?: {
+    hasActiveSignal: boolean;
+    adrCount: number;
+  };
+  'healthdcatap:consent'?: {
+    purposes: string[];
+    restrictions: string[];
+    validUntil: string;
+    grantor: string;
+  };
+  'healthdcatap:sponsor'?: {
+    name: string;
+    type: 'commercial' | 'academic' | 'non-profit' | string;
+    country: string;
+  };
+  'healthdcatap:therapeuticArea'?: {
+    code: string;
+    name: string;
+  };
+  'healthdcatap:medDRA'?: {
+    socCode: string;
+    socName: string;
+    ptCode: string;
+    ptName: string;
+  };
   healthCategory: string;
   healthTheme?: string[];
   ageBand: string;

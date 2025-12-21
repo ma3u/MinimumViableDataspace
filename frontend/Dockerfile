@@ -12,7 +12,7 @@
 FROM node:20-alpine AS builder
 
 # Build argument for API mode (default to hybrid for Docker)
-ARG VITE_API_MODE=hybrid
+ARG VITE_API_MODE=full
 
 WORKDIR /app
 
