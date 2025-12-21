@@ -163,16 +163,46 @@ export class EdcClient {
 
   /**
    * Initiate contract negotiation
+   * 
+   * Supports two modes:
+   * 1. Direct policy: Pass a complete ODRL policy object
+   * 2. Offer-based: Pass offer.offerId, offer.assetId, offer.policyId to build policy
    */
   async initiateNegotiation(request: ContractRequest): Promise<IdResponse> {
+    // Build policy from offer if not provided directly
+    let policy = request.policy;
+    
+    if (!policy && request.offer) {
+      // Construct ODRL policy from offer details
+      // The offerId from the catalog already contains the policy definition
+      policy = {
+        '@type': 'Offer',
+        '@id': request.offer.offerId,
+        assigner: request.providerId || request.counterPartyId,
+        target: request.offer.assetId,
+        permission: [
+          {
+            action: 'use',
+            constraint: []
+          }
+        ]
+      };
+    }
+
+    if (!policy) {
+      throw new Error('Either policy or offer must be provided for contract negotiation');
+    }
+
     const payload = {
       '@context': [...EDC_CONTEXT, ODRL_CONTEXT],
       '@type': 'ContractRequest',
       counterPartyAddress: request.counterPartyAddress,
       counterPartyId: request.counterPartyId,
       protocol: request.protocol ?? 'dataspace-protocol-http',
-      policy: request.policy,
+      policy: policy,
     };
+
+    console.log('[EDC Client] Initiating negotiation with payload:', JSON.stringify(payload, null, 2));
 
     const response = await this.client.post('/contractnegotiations', payload);
     return response.data;
@@ -343,11 +373,33 @@ export const edcConsumerClient = new EdcClient(config.edc.consumerManagementUrl)
 export const edcProviderClient = new EdcClient(config.provider.managementUrl);
 
 export function handleEdcError(error: unknown): { status: number; message: string } {
+  console.error('[EDC Client Error]', error);
+  
   if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError<{ message?: string }>;
+    const axiosError = error as AxiosError<{ message?: string; error?: string; [key: string]: unknown }>;
+    const responseData = axiosError.response?.data;
+    
+    // Try to extract meaningful error message from EDC response
+    let message = axiosError.message;
+    if (responseData) {
+      if (typeof responseData === 'string') {
+        message = responseData;
+      } else if (responseData.message) {
+        message = responseData.message;
+      } else if (responseData.error) {
+        message = responseData.error;
+      } else if (responseData['edc:errorDetail']) {
+        message = responseData['edc:errorDetail'] as string;
+      } else {
+        // Log the full response for debugging
+        console.error('[EDC Client] Full error response:', JSON.stringify(responseData, null, 2));
+        message = JSON.stringify(responseData);
+      }
+    }
+    
     return {
       status: axiosError.response?.status ?? 500,
-      message: axiosError.response?.data?.message ?? axiosError.message,
+      message: message,
     };
   }
   
