@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Test file uses any types for mocking purposes
+
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ApiClient, getApiMode, getBaseUrl } from './apiFactory';
 

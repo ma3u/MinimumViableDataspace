@@ -91,8 +91,10 @@ const mockPhaseProgress: Record<DspPhase, { completed: boolean; current: boolean
   compute: { completed: false, current: false, steps: {} },
 };
 
-// Create wrapper with mocked context (preserved for potential future use with custom context)
+// Wrapper function preserved for potential future use with custom context
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _createWrapper = (overrides?: Partial<ReturnType<typeof useDspEventLog>>) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _contextValue = {
     events: mockEvents,
     phaseProgress: mockPhaseProgress,

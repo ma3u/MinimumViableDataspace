@@ -8,6 +8,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+/* eslint-disable react-refresh/only-export-components */
+// This file exports types, hooks, and components together by design (Context pattern)
+
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
 import { getApiMode } from '../services/apiFactory';
 

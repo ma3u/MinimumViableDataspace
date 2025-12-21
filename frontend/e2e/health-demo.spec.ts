@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// E2E test uses any for window property assignment
+
 import { test, expect } from '@playwright/test';
 
 test.describe('Health Dataspace Demo - Mock Mode', () => {
