@@ -1,0 +1,30 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Local environment files (should not be in Docker build)
+.env.local
+.env*.local
+
+# Test files
+coverage
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+e2e
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+docs
+*.md
+!README.md

@@ -11,12 +11,24 @@
 # Build stage
 FROM node:20-alpine AS builder
 
+# Build argument for API mode (default to hybrid for Docker)
+ARG VITE_API_MODE=hybrid
+
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+# Create .env file for Vite to pick up during build
+# Use empty URLs so browser uses relative paths through nginx proxy
+RUN echo "VITE_API_MODE=${VITE_API_MODE}" > .env.production && \
+    echo "VITE_EHR_BACKEND_URL=" >> .env.production && \
+    echo "VITE_MOCK_API_URL=" >> .env.production && \
+    echo "VITE_EDC_API_URL=" >> .env.production && \
+    echo "VITE_BACKEND_URL=" >> .env.production
+
 RUN npm run build
 
 # Production stage
