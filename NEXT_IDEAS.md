@@ -47,6 +47,27 @@ the panel is shown when a button is clicked on the right side of the screen
 - the panel show the steps of the dataspace protocol as a progress indicator at the top
 - The panel can be closed by clicking a close button or outside the panel area
 
+Show the inital dataspace initialization events thats seeding manually in the insider panel. 
+
+On the first page before the use case starts teh user should see the dataspace initatialization / onboarding steps in the insider panel.
+
+- each seeding type should trigger an event for the panel
+- the seeding happen outside the EDC backend to show the events later in the panel
+- show the new number of events in the panel button
+- show a loading indicator while the seeding is in progress
+- show success or error message when seeding is complete
+- show the events for:
+
+1.  Seeding assets in the catalog
+2.  Seeding data offerings  
+3.  Seeding Identities in IdentityHub
+
+In general show the DID credential verification events. Each positive and negative verification should trigger an event
+
+http://localhost:4000/api/events
+http://localhost:4000/api/events
+
+
 ## Implementing Guideline for Confidential Compute in Health Dataspaces: A Practical Guide using EDC's data visiting
 - Market Analytics for Data Clean Rooms in Health Dataspaces: Opportunities and Challenges
 
@@ -60,3 +81,24 @@ the panel is shown when a button is clicked on the right side of the screen
 - Deep Dive into ODRL Policies for Consent Management in Health Dataspaces with a Focus on EHDS Compliance
 - End-to-End Testing Strategies for Health Dataspaces: Ensuring Reliability and Compliance (Pact, Vitest, Playwright)
 - Leveraging Verifiable Credentials for Secure Identity Management in Health Dataspaces: A Step-by-Step Implementation Guide
+
+
+
+Create a comprehensive Dashboards in Grafana for Monitoring the Health Dataspace 
+
+- Show Dataspace Health (uptime, response time, error rates)
+- Show Data Transfer Metrics (volume, speed, success rates)
+- Show Consent Management Metrics (number of consents, types of consents, consent expirations
+- Show User Activity Metrics (active users, user sessions, user actions)
+- Show System Resource Metrics (CPU usage, memory usage, disk usage, network usage)
+- Show Alerting Metrics (number of alerts, types of alerts, alert resolutions)
+- Show Compliance Metrics (EHDS compliance status, data access logs, consent logs)
+- Show Data Visiting Metrics (number of data visits, data visit duration, data visit success rates)
+- Show Confidential Compute Metrics (number of confidential compute instances, instance uptime, instance resource usage)
+- Show EDC Specific Metrics (number of assets, number of data offerings, number of identities)
+- Integrate with Prometheus to collect metrics from EDC and other components of the health dataspace
+- Use Grafana's alerting features to notify when certain thresholds are met (e.g., high error rates, low data transfer speeds)
+- Create custom dashboards for different stakeholders (e.g., data providers, data consumers, system administrators)
+- Use Grafana's templating features to create dynamic dashboards that can be filtered by different dimensions (e.g., time range, data provider, data consumer)
+- Document the dashboards and their metrics for easy understanding and usage by stakeholders
+- Share the dashboards with stakeholders via Grafana's sharing features (e.g., public links, snapshots)
