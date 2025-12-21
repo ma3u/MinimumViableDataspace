@@ -130,6 +130,27 @@ services:
       - dataspace-network
     restart: unless-stopped
 
+  # ============================================================
+  # cAdvisor - Container Metrics
+  # ============================================================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: tools-cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+
 volumes:
   prometheus_data:
   grafana_data:

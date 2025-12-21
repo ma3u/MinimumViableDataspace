@@ -69,8 +69,11 @@ scrape_configs:
     honor_labels: true
     scrape_timeout: 10s
 
-  # Docker containers (via cAdvisor if enabled)
-  # Uncomment if you add cAdvisor to the stack
-  # - job_name: 'cadvisor'
-  #   static_configs:
-  #     - targets: ['cadvisor:8080']
+  # Docker containers (via cAdvisor)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['tools-cadvisor:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+    honor_labels: true
+    scrape_timeout: 10s
