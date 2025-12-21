@@ -199,6 +199,37 @@ print_status() {
   fi
 }
 
+# Emit seeding event to backend-edc for DSP Insider Panel visualization
+# Usage: emit_seeding_event <event_type> [actor] [target] [details_json]
+emit_seeding_event() {
+  local event_type=$1
+  local actor=${2:-"Seed Script"}
+  local target=${3:-""}
+  local details=${4:-"{}"}
+  
+  # Determine backend-edc URL based on mode
+  local backend_url
+  case $MODE in
+    local)
+      backend_url="http://localhost:3002"
+      ;;
+    docker)
+      backend_url="http://localhost:3002"
+      ;;
+    *)
+      backend_url="http://localhost:3002"
+      ;;
+  esac
+  
+  # Fire and forget - don't fail if backend is not running
+  curl -s -X POST "$backend_url/api/events/seeding" \
+    -H "Content-Type: application/json" \
+    -d "{\"eventType\": \"$event_type\", \"actor\": \"$actor\", \"target\": \"$target\", \"details\": $details}" \
+    >/dev/null 2>&1 || true
+  
+  log "Seeding event emitted: $event_type"
+}
+
 # Make API call with error handling
 api_call() {
   local method=$1
@@ -402,6 +433,7 @@ seed_identity() {
     "$CONSUMER_DSP_URL" \
     "deployment/assets/consumer_public.pem" \
     ""
+  emit_seeding_event "seeding.identity.consumer" "Seed Script" "Identity Hub" "{\"did\": \"$CONSUMER_DID\", \"role\": \"Research Institute (CRO)\"}"
   
   echo ""
   
@@ -417,6 +449,7 @@ seed_identity() {
     "$PROVIDER_DSP_URL" \
     "deployment/assets/provider_public.pem" \
     "$provider_extra"
+  emit_seeding_event "seeding.identity.provider" "Seed Script" "Identity Hub" "{\"did\": \"$PROVIDER_DID\", \"role\": \"Hospital (Rheinland-Universitätsklinikum)\"}"
   
   # Store provider secret in additional vaults (catalog server, etc.)
   if [ "$MODE" = "local" ]; then
@@ -437,11 +470,15 @@ seed_identity() {
   
   # Issuer
   create_issuer
+  emit_seeding_event "seeding.identity.issuer" "Seed Script" "Issuer Service" "{\"did\": \"$ISSUER_DID\", \"role\": \"Trusted Credential Issuer\"}"
   
   echo ""
   
-  # Seed issuer data via Newman
+  # Seed issuer data via Newman (this issues the credentials)
   seed_issuer_data
+  emit_seeding_event "seeding.credential.issued" "Issuer" "Consumer" "{\"credentialType\": \"MembershipCredential\", \"subject\": \"$CONSUMER_DID\"}"
+  emit_seeding_event "seeding.credential.issued" "Issuer" "Consumer" "{\"credentialType\": \"DataProcessorCredential\", \"subject\": \"$CONSUMER_DID\"}"
+  emit_seeding_event "seeding.credential.issued" "Issuer" "Provider" "{\"credentialType\": \"MembershipCredential\", \"subject\": \"$PROVIDER_DID\"}"
 }
 
 # ============================================================================
@@ -523,6 +560,7 @@ create_ehr_asset() {
   
   if [ "$http_status" = "200" ] || [ "$http_status" = "201" ]; then
     print_status "ok" "$name"
+    emit_seeding_event "seeding.asset.created" "Seed Script" "Provider" "{\"assetId\": \"$id\", \"name\": \"$name\", \"icdCode\": \"$icd_code\", \"diagnosis\": \"$diagnosis\"}"
   elif echo "$body" | grep -q "ObjectConflict" 2>/dev/null; then
     print_status "skip" "$name already exists"
   else
@@ -548,6 +586,7 @@ create_health_policies() {
       }
     }' > /dev/null
   print_status "ok" "Health Research Access Policy"
+  emit_seeding_event "seeding.policy.created" "Seed Script" "Provider" "{\"policyId\": \"health-research-access-policy\", \"type\": \"Access Policy\", \"compliance\": \"EU CTR 536/2014\"}"
   
   # Consent-Required Contract Policy
   curl -s --location "$PROVIDER_CP_URL/api/management/v3/policydefinitions" \
@@ -564,6 +603,7 @@ create_health_policies() {
       }
     }' > /dev/null
   print_status "ok" "Consent-Required Contract Policy"
+  emit_seeding_event "seeding.policy.created" "Seed Script" "Provider" "{\"policyId\": \"health-consent-contract-policy\", \"type\": \"Contract Policy\", \"compliance\": \"GDPR Art. 89\"}"
   
   # Sensitive Data Policy
   curl -s --location "$PROVIDER_CP_URL/api/management/v3/policydefinitions" \
@@ -580,6 +620,7 @@ create_health_policies() {
       }
     }' > /dev/null
   print_status "ok" "Sensitive Data Contract Policy"
+  emit_seeding_event "seeding.policy.created" "Seed Script" "Provider" "{\"policyId\": \"health-sensitive-contract-policy\", \"type\": \"Contract Policy\", \"compliance\": \"EHDS sensitive data\"}"
   
   # Confidential Compute Policy
   curl -s --location "$PROVIDER_CP_URL/api/management/v3/policydefinitions" \
@@ -598,6 +639,7 @@ create_health_policies() {
       }
     }' > /dev/null
   print_status "ok" "Confidential Compute Policy"
+  emit_seeding_event "seeding.policy.created" "Seed Script" "Provider" "{\"policyId\": \"health-confidential-compute-policy\", \"type\": \"Compute Policy\", \"compliance\": \"GDNG TEE requirement\"}"
 }
 
 create_health_contracts() {
@@ -616,6 +658,7 @@ create_health_contracts() {
       "assetsSelector": {"operandLeft": "dct:type", "operator": "=", "operandRight": "ehds:ElectronicHealthRecord"}
     }' > /dev/null
   print_status "ok" "Clinical Research Contract"
+  emit_seeding_event "seeding.contract.created" "Seed Script" "Provider" "{\"contractId\": \"health-clinical-research-contract\", \"accessPolicy\": \"health-research-access-policy\", \"contractPolicy\": \"health-consent-contract-policy\"}"
   
   # Genomics Confidential Compute Contract
   curl -s --location "$PROVIDER_CP_URL/api/management/v3/contractdefinitions" \
@@ -630,6 +673,7 @@ create_health_contracts() {
       "assetsSelector": {"operandLeft": "healthdcatap:sensitiveCategory", "operator": "=", "operandRight": "genomics"}
     }' > /dev/null
   print_status "ok" "Genomics Confidential Compute Contract"
+  emit_seeding_event "seeding.contract.created" "Seed Script" "Provider" "{\"contractId\": \"health-genomics-contract\", \"accessPolicy\": \"health-research-access-policy\", \"contractPolicy\": \"health-confidential-compute-policy\"}"
 }
 
 seed_health_assets() {
@@ -713,6 +757,9 @@ main() {
   # Configure environment based on mode
   configure_environment
   
+  # Emit seeding started event
+  emit_seeding_event "seeding.started" "Seed Script" "Dataspace" "{\"mode\": \"$MODE\", \"skipIdentity\": $SKIP_IDENTITY, \"skipHealth\": $SKIP_HEALTH}"
+  
   # Seed identity if not skipped
   if [ "$SKIP_IDENTITY" = false ]; then
     seed_identity
@@ -728,6 +775,9 @@ main() {
     echo ""
     echo "Skipping health data seeding (--skip-health)"
   fi
+  
+  # Emit seeding completed event
+  emit_seeding_event "seeding.completed" "Seed Script" "Dataspace" "{\"mode\": \"$MODE\", \"identitySeeded\": $([ "$SKIP_IDENTITY" = false ] && echo "true" || echo "false"), \"healthSeeded\": $([ "$SKIP_HEALTH" = false ] && echo "true" || echo "false")}"
   
   # Summary
   echo ""

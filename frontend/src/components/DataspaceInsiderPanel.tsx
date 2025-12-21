@@ -548,7 +548,7 @@ export function DataspaceInsiderPanel({ isOpen, isBackendOnline }: DataspaceInsi
       className={`fixed top-0 right-0 h-full bg-white shadow-2xl z-40 
         flex flex-col border-l border-gray-200
         transition-all duration-300 ease-out
-        ${isOpen ? 'w-[420px]' : 'w-0 overflow-hidden'}`}
+        ${isOpen ? 'w-[520px]' : 'w-0 overflow-hidden'}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-slate-50 to-blue-50 flex-shrink-0">
@@ -589,7 +589,7 @@ export function DataspaceInsiderPanel({ isOpen, isBackendOnline }: DataspaceInsi
 
       {/* Phase Progress */}
       <div className="px-4 py-3 border-b bg-gray-50 flex-shrink-0">
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-5 gap-2">
           {DSP_PHASES.map(phase => (
             <PhaseProgress
               key={phase.id}
@@ -688,7 +688,7 @@ export function DataspaceInsiderTrigger({ onClick, isPanelOpen }: { onClick: () 
         bg-blue-600 hover:bg-blue-700 text-white 
         rounded-l-xl shadow-lg hover:shadow-xl
         transition-all duration-300 group
-        ${isPanelOpen ? 'right-[420px]' : 'right-0'}`}
+        ${isPanelOpen ? 'right-[520px]' : 'right-0'}`}
       title={isPanelOpen ? "Close DSP Insider" : "Open DSP Insider"}
     >
       <Eye className="w-5 h-5" />

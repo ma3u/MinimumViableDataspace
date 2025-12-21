@@ -4176,6 +4176,20 @@ export const healthParticipants = {
 // ============================================================================
 
 export const healthDspPhases = {
+  seeding: {
+    title: 'Dataspace Initialization',
+    description: 'Before the DSP protocol can begin, the dataspace must be initialized. This includes creating participant identities in the Identity Hub, issuing Verifiable Credentials (MembershipCredential, DataProcessorCredential), configuring Vault secrets for secure key storage, creating ODRL policies for consent-gated access, registering EHR assets in the catalog, and creating contract definitions that link assets to policies.',
+    specLink: 'https://github.com/eclipse-edc/MinimumViableDataspace',
+    steps: [
+      { name: 'Initialize Participants', direction: 'Seed Script → Identity Hub', description: 'Create Consumer, Provider, and Issuer participant contexts' },
+      { name: 'Configure Identity Hub', direction: 'Seed Script → Identity Hub', description: 'Register DIDs and create participant contexts' },
+      { name: 'Store Vault Secrets', direction: 'Seed Script → Vault', description: 'Store encryption keys and credential secrets' },
+      { name: 'Issue Credentials', direction: 'Issuer → Participants', description: 'Issue MembershipCredential and DataProcessorCredential' },
+      { name: 'Create ODRL Policies', direction: 'Seed Script → Provider', description: 'Create consent-based access policies (EU CTR, GDPR, EHDS, GDNG)' },
+      { name: 'Register EHR Assets', direction: 'Seed Script → Provider', description: 'Register EHR datasets with HealthDCAT-AP metadata' },
+      { name: 'Create Contract Definitions', direction: 'Seed Script → Provider', description: 'Link assets to policies for automated negotiation' }
+    ]
+  },
   catalog: {
     title: 'Catalog Protocol (EHR Discovery)',
     description: 'The Catalog Protocol enables the research institute to discover available anonymized EHR datasets from the hospital. The Consumer sends a CatalogRequestMessage and receives a DCAT Catalog containing available patient cohorts and their consent-based access policies. The catalog uses the HealthDCAT-AP profile for semantic interoperability.',

@@ -18,7 +18,7 @@ import { getApiMode } from '../services/apiFactory';
 // DSP EVENT TYPES
 // ============================================================================
 
-export type DspPhase = 'catalog' | 'negotiation' | 'transfer' | 'compute';
+export type DspPhase = 'seeding' | 'catalog' | 'negotiation' | 'transfer' | 'compute';
 export type DspDirection = 'outbound' | 'inbound' | 'internal';
 export type DspStatus = 'pending' | 'in-progress' | 'success' | 'error';
 
@@ -39,6 +39,18 @@ export interface DspEvent {
 
 // DSP Protocol steps for progress indicator
 export const DSP_PHASES: { id: DspPhase; label: string; steps: string[] }[] = [
+  {
+    id: 'seeding',
+    label: 'Dataspace Initialization',
+    steps: [
+      'Initialize Participants',
+      'Configure Identity Hub',
+      'Issue Credentials',
+      'Create ODRL Policies',
+      'Register EHR Assets',
+      'Create Contract Definitions'
+    ]
+  },
   { 
     id: 'catalog', 
     label: 'Catalog Discovery', 

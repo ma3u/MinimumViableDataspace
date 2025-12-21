@@ -8,7 +8,8 @@
 import { EventEmitter } from 'events';
 
 // Event types matching frontend DspEvent interface
-export type DspPhase = 'catalog' | 'negotiation' | 'transfer' | 'compute';
+// Note: 'seeding' is a pre-protocol phase for initialization
+export type DspPhase = 'seeding' | 'catalog' | 'negotiation' | 'transfer' | 'compute';
 export type DspDirection = 'outbound' | 'inbound' | 'internal';
 export type DspStatus = 'pending' | 'in-progress' | 'success' | 'error';
 

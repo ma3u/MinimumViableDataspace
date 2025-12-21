@@ -19,6 +19,7 @@ import { transferRouter } from './routes/transfer.js';
 import { identityRouter } from './routes/identity.js';
 import { healthRouter } from './routes/health.js';
 import { eventsRouter } from './routes/events.js';
+import { participantsRouter } from './routes/participants.js';
 
 // Create Express app
 const app = express();
@@ -49,6 +50,7 @@ app.use('/api/negotiations', negotiationRouter);
 app.use('/api/transfers', transferRouter);
 app.use('/api/identity', identityRouter);
 app.use('/api/events', eventsRouter);
+app.use('/api/participants', participantsRouter);
 
 // Legacy /api/ehr routes for compatibility
 app.get('/api/ehr', async (_req: Request, res: Response) => {
@@ -160,6 +162,7 @@ app.listen(PORT, () => {
   console.log(`  Negotiations: http://localhost:${PORT}/api/negotiations`);
   console.log(`  Transfers:    http://localhost:${PORT}/api/transfers`);
   console.log(`  Identity:     http://localhost:${PORT}/api/identity`);
+  console.log(`  Participants: http://localhost:${PORT}/api/participants`);
   console.log(`  Events SSE:   http://localhost:${PORT}/api/events/stream`);
   console.log(`  Mode Info:    http://localhost:${PORT}/api/mode`);
   console.log('');

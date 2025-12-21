@@ -94,6 +94,18 @@ function mapEdcEventType(eventType: string): { phase: DspPhase; action: string; 
     // Contract Definition Events
     'contract.definition.created': { phase: 'catalog', action: 'Contract Definition Created', direction: 'internal' },
     'contract.definition.deleted': { phase: 'catalog', action: 'Contract Definition Deleted', direction: 'internal' },
+    
+    // Seeding Events (initialization phase)
+    'seeding.started': { phase: 'seeding', action: 'Seeding Started', direction: 'internal' },
+    'seeding.identity.consumer': { phase: 'seeding', action: 'Consumer Identity Created', direction: 'internal' },
+    'seeding.identity.provider': { phase: 'seeding', action: 'Provider Identity Created', direction: 'internal' },
+    'seeding.identity.issuer': { phase: 'seeding', action: 'Issuer Identity Created', direction: 'internal' },
+    'seeding.vault.secret': { phase: 'seeding', action: 'Secret Stored in Vault', direction: 'internal' },
+    'seeding.credential.issued': { phase: 'seeding', action: 'Credential Issued', direction: 'internal' },
+    'seeding.policy.created': { phase: 'seeding', action: 'ODRL Policy Created', direction: 'internal' },
+    'seeding.asset.created': { phase: 'seeding', action: 'EHR Asset Created', direction: 'internal' },
+    'seeding.contract.created': { phase: 'seeding', action: 'Contract Definition Created', direction: 'internal' },
+    'seeding.completed': { phase: 'seeding', action: 'Seeding Completed', direction: 'internal' },
   };
   
   return mappings[eventType] || null;
@@ -416,4 +428,102 @@ eventsRouter.get('/callback/test', (_req: Request, res: Response) => {
   } else {
     res.status(500).json({ error: 'Failed to map test event' });
   }
+});
+
+/**
+ * POST /seeding
+ * 
+ * Endpoint for the seeding script to emit events during initialization.
+ * This allows the Dataspace Insider Panel to show seeding progress.
+ * 
+ * @body {
+ *   eventType: string - One of the seeding event types (e.g., 'seeding.started')
+ *   actor?: string - Who is performing the action (default: 'Seed Script')
+ *   target?: string - The target of the action
+ *   details?: object - Additional details about the seeding step
+ * }
+ */
+eventsRouter.post('/seeding', (req: Request, res: Response) => {
+  try {
+    const { eventType, actor = 'Seed Script', target, details = {} } = req.body;
+    
+    if (!eventType) {
+      return res.status(400).json({ error: 'eventType is required' });
+    }
+    
+    const mapping = mapEdcEventType(eventType);
+    
+    if (!mapping) {
+      return res.status(400).json({ 
+        error: 'Unknown seeding event type',
+        eventType,
+        validTypes: [
+          'seeding.started',
+          'seeding.identity.consumer',
+          'seeding.identity.provider',
+          'seeding.identity.issuer',
+          'seeding.vault.secret',
+          'seeding.credential.issued',
+          'seeding.policy.created',
+          'seeding.asset.created',
+          'seeding.contract.created',
+          'seeding.completed'
+        ]
+      });
+    }
+    
+    const dspEvent = emitDspEvent({
+      phase: mapping.phase,
+      action: mapping.action,
+      direction: mapping.direction,
+      status: eventType === 'seeding.completed' ? 'success' : 'in-progress',
+      actor,
+      target: target || undefined,
+      dspMessageType: eventType,
+      details: {
+        source: 'seed-script',
+        ...details
+      }
+    });
+    
+    res.json({
+      message: 'Seeding event emitted successfully',
+      event: dspEvent
+    });
+  } catch (error) {
+    console.error('Error processing seeding event:', error);
+    res.status(500).json({
+      error: 'Failed to emit seeding event',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * GET /seeding/status
+ * 
+ * Get the current seeding status based on events.
+ */
+eventsRouter.get('/seeding/status', (_req: Request, res: Response) => {
+  const allEvents = getStoredEvents();
+  const seedingEvents = allEvents.filter((e: DspEvent) => e.phase === 'seeding');
+  
+  const hasStarted = seedingEvents.some((e: DspEvent) => e.dspMessageType === 'seeding.started');
+  const hasCompleted = seedingEvents.some((e: DspEvent) => e.dspMessageType === 'seeding.completed');
+  
+  const stats = {
+    identities: seedingEvents.filter((e: DspEvent) => e.dspMessageType?.startsWith('seeding.identity')).length,
+    vaultSecrets: seedingEvents.filter((e: DspEvent) => e.dspMessageType === 'seeding.vault.secret').length,
+    credentials: seedingEvents.filter((e: DspEvent) => e.dspMessageType === 'seeding.credential.issued').length,
+    policies: seedingEvents.filter((e: DspEvent) => e.dspMessageType === 'seeding.policy.created').length,
+    assets: seedingEvents.filter((e: DspEvent) => e.dspMessageType === 'seeding.asset.created').length,
+    contracts: seedingEvents.filter((e: DspEvent) => e.dspMessageType === 'seeding.contract.created').length
+  };
+  
+  res.json({
+    status: hasCompleted ? 'completed' : (hasStarted ? 'in-progress' : 'not-started'),
+    totalEvents: seedingEvents.length,
+    stats,
+    events: seedingEvents
+  });
 });

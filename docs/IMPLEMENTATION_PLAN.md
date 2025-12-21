@@ -16,6 +16,7 @@ This document provides a detailed, step-by-step implementation plan for building
 | Phase 6: Data Transfer | ✅ Complete | Secure FHIR data exchange |
 | Phase 7: Compliance & Security | ✅ Complete | EHDS compliance, de-identification |
 | Phase 8: Production Readiness | 🔄 In Progress | Monitoring, scaling, documentation |
+| Phase 9: Dynamic Data Integration | 🔄 In Progress | Replace static data with EDC/DCAT |
 
 ---
 
@@ -1085,6 +1086,40 @@ graph LR
 | `transfer.process.initiated` | TRANSFER_INITIATE | outbound |
 | `transfer.process.started` | TRANSFER_STARTED | inbound |
 | `transfer.process.completed` | TRANSFER_COMPLETE | inbound |
+| `seeding.started` | Seeding Started | internal |
+| `seeding.identity.consumer` | Consumer Identity Created | internal |
+| `seeding.identity.provider` | Provider Identity Created | internal |
+| `seeding.identity.issuer` | Issuer Identity Created | internal |
+| `seeding.credential.issued` | Credential Issued | internal |
+| `seeding.policy.created` | ODRL Policy Created | internal |
+| `seeding.asset.created` | EHR Asset Created | internal |
+| `seeding.contract.created` | Contract Definition Created | internal |
+| `seeding.completed` | Seeding Completed | internal |
+
+**Seeding Phase Visualization (January 2025):**
+
+The Dataspace Insider Panel now includes a **Seeding** phase that visualizes dataspace initialization:
+
+- **Phase Progress**: Seeding → Catalog → Negotiation → Transfer → Compute
+- **Seeding Events**: Identity creation, credential issuance, policy creation, asset registration
+- **Seed Script Integration**: `seed-dataspace.sh` emits events via POST `/api/events/seeding`
+- **API Mode Indicator**: Shows 4 states: Static Demo (GitHub Pages), Full EDC, Hybrid, Mock Mode
+
+**Seeding API Endpoint:**
+```bash
+POST /api/events/seeding
+Content-Type: application/json
+
+{
+  "eventType": "seeding.asset.created",
+  "actor": "Seed Script",
+  "target": "Provider",
+  "details": {
+    "assetId": "asset-ehr-EHR001",
+    "name": "EHR - Type 2 Diabetes with Cardiovascular Complications"
+  }
+}
+```
 
 **Related Issue:** [GitHub Issue #8](https://github.com/ma3u/MinimumViableDataspace/issues/8)
 
@@ -1321,13 +1356,272 @@ deployment/
 
 ---
 
+## Phase 9: Dynamic Data Integration 🔄
+
+### 9.1 Overview
+
+**Objective:** Replace static/mock data with real EDC and DCAT metadata throughout the frontend.
+
+**Status:** 🔄 In Progress (January 2025)
+
+**Reference:** See [DATA-SOURCES-REPORT.md](./DATA-SOURCES-REPORT.md) for complete analysis of current data sources.
+
+**Priority Matrix:**
+
+| Task | Impact | Complexity | Priority |
+|------|--------|------------|----------|
+| Catalog DCAT properties | High | Medium | P1 |
+| Participant identity from IH | Medium | Medium | P2 |
+| Environment-based config | High | Low | P1 |
+| Negotiation state display | Medium | Low | P2 |
+| Transfer EDR data | High | Medium | P1 |
+| Consent from policies | Medium | High | P3 |
+
+---
+
+### 9.2 Backend-EDC: Enhanced Catalog Response
+
+**Objective:** Extract and return all HealthDCAT-AP properties from EDC catalog responses.
+
+**Status:** 🔄 In Progress
+
+**Implementation:**
+- [ ] Parse DCAT metadata from EDC catalog response
+- [ ] Extract `healthdcatap:` namespace properties
+- [ ] Map EDC asset properties to CatalogAsset interface
+- [ ] Include publisher, contact point, distribution info
+- [ ] Add temporal/spatial coverage from DCAT
+- [ ] Return policy summaries with each asset
+
+**Files to Modify:**
+- `backend-edc/src/routes/catalog.ts` - Enhanced DCAT parsing
+- `backend-edc/src/services/catalogService.ts` - New service for DCAT mapping
+
+**CatalogAsset Enhanced Interface:**
+```typescript
+interface CatalogAsset {
+  // Existing fields
+  assetId: string;
+  title: string;
+  description: string;
+  healthCategory: string;
+  
+  // NEW: DCAT-AP core properties
+  dctPublisher: {
+    name: string;
+    identifier: string;
+    type: string;  // HEALTHDCAT_PUBLISHER_TYPES
+  };
+  dctContactPoint: {
+    email?: string;
+    url?: string;
+  };
+  dctIssued: string;  // ISO date
+  dctModified: string;
+  dctLanguage: string[];
+  
+  // NEW: HealthDCAT-AP extensions
+  healthdcatSensitiveCategory: string;  // sensitivity level
+  healthdcatMinAge?: number;
+  healthdcatMaxAge?: number;
+  healthdcatPopulationCoverage?: string;
+  healthdcatHealthTheme?: string[];
+  
+  // NEW: Distribution info
+  distributions: Array<{
+    format: string;  // 'application/fhir+json'
+    accessService?: string;
+    byteSize?: number;
+  }>;
+  
+  // NEW: Policy summary
+  policyType: 'open' | 'consent-required' | 'restricted';
+  requiredConsents?: string[];
+}
+```
+
+---
+
+### 9.3 Backend-EDC: Participant Identity Integration
+
+**Objective:** Fetch participant information from Identity Hub instead of static data.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Add `/api/participants` endpoint to backend-edc
+- [ ] Query Identity Hub for participant info
+- [ ] Cache participant data with TTL
+- [ ] Return DID, name, verification status
+
+**API Endpoints:**
+```
+GET /api/participants
+GET /api/participants/:did
+GET /api/participants/consumer
+GET /api/participants/provider
+```
+
+**Response:**
+```typescript
+interface Participant {
+  did: string;
+  name: string;
+  region: string;
+  verified: boolean;
+  membershipCredential?: {
+    issuedAt: string;
+    expiresAt: string;
+    issuer: string;
+  };
+}
+```
+
+---
+
+### 9.4 Frontend: Environment Configuration
+
+**Objective:** Move hardcoded configuration to environment variables.
+
+**Status:** ⏳ Planned
+
+**Changes:**
+- [ ] Provider Participant ID → `VITE_PROVIDER_DID` env var
+- [ ] Provider DSP URL → `VITE_PROVIDER_DSP_URL` env var
+- [ ] Consumer DID → `VITE_CONSUMER_DID` env var
+- [ ] Update `config.ts` to use environment variables
+
+**Files to Modify:**
+- `frontend/src/config.ts` - Environment variable loading
+- `frontend/.env.local`, `.env.standalone` - New variables
+
+---
+
+### 9.5 Frontend: Dynamic Catalog Display
+
+**Objective:** Display real DCAT metadata from catalog response.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Update `CatalogCard.tsx` to show publisher info
+- [ ] Add policy badge (open/consent-required/restricted)
+- [ ] Show data freshness (issued/modified dates)
+- [ ] Display distribution formats
+- [ ] Add sensitivity level indicator
+
+**UI Enhancements:**
+```
+┌─────────────────────────────────────────┐
+│ [Cardiology]              Policy: 🔒    │
+│                                         │
+│ Cardiovascular Study Dataset            │
+│ Publisher: Universitätsklinikum Berlin  │
+│                                         │
+│ 📊 FHIR R4  |  Updated: 2 days ago     │
+│ 👥 Age: 45-74  |  ♂♀ Mixed            │
+│                                         │
+│ Required Consents: Research, Secondary  │
+│                                         │
+│ [View Details]  [Request Access]        │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### 9.6 Frontend: Real Negotiation State Display
+
+**Objective:** Show actual EDC negotiation states instead of simulated progress.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Map EDC negotiation states to UI steps
+- [ ] Show real timestamps from EDC response
+- [ ] Display actual contract agreement ID
+- [ ] Show policy constraints in agreement
+
+**State Mapping:**
+| EDC State | UI Step | Icon |
+|-----------|---------|------|
+| INITIAL | Request Submitted | ⏳ |
+| REQUESTING | Sending Request | 📤 |
+| REQUESTED | Provider Processing | ⏳ |
+| OFFERING | Reviewing Offer | 📋 |
+| ACCEPTED | Accepted | ✅ |
+| AGREED | Agreement Created | 📄 |
+| VERIFIED | Credentials Verified | 🔐 |
+| FINALIZED | Complete | ✅ |
+| TERMINATED | Failed | ❌ |
+
+---
+
+### 9.7 Frontend: Real Transfer Data Display
+
+**Objective:** Display actual transfer progress and EDR token info.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Show real transfer state from EDC
+- [ ] Display EDR token metadata (not secret)
+- [ ] Show data size and transfer duration
+- [ ] Add transfer log timeline
+
+---
+
+### 9.8 Static Data That Should Remain Static
+
+Based on the DATA-SOURCES-REPORT.md analysis, these should **NOT** be made dynamic:
+
+| Category | Reason |
+|----------|--------|
+| Clinical Trial Phases | ICH E8(R1) standard (stable regulatory reference) |
+| MedDRA SOC codes | MedDRA v27.0 (stable medical terminology) |
+| EHDS Data Categories | EHDS Article 51 (regulatory reference) |
+| ADR Severity Grades | CTCAE standard (stable reference) |
+| EU Member Flags | Reference data (stable) |
+| Health Terminology URIs | Standard URIs (stable) |
+| DSP Phase Descriptions | Educational content (custom) |
+
+---
+
+### 9.9 Implementation Order
+
+**Week 1: Backend-EDC DCAT Enhancement**
+1. Create `catalogService.ts` with DCAT parsing
+2. Enhance `/api/catalog/assets` with full DCAT properties
+3. Add unit tests for DCAT property extraction
+4. Update mock fallback to include DCAT-like properties
+
+**Week 2: Frontend Catalog Enhancements**
+1. Update `CatalogAsset` type with new fields
+2. Modify `CatalogCard.tsx` for publisher/policy display
+3. Add policy badges and sensitivity indicators
+4. Test with hybrid mode
+
+**Week 3: Identity & Negotiation**
+1. Add `/api/participants` endpoint
+2. Update Intro page to fetch real participant info
+3. Enhance negotiation display with real states
+4. Add contract agreement details display
+
+**Week 4: Transfer & Polish**
+1. Enhance transfer display with EDR info
+2. Add data freshness indicators
+3. Performance optimization
+4. Documentation update
+
+---
+
 ## Next Steps
 
 ### Immediate (This Week)
-1. [ ] Complete Prometheus metrics export
-2. [ ] Create Grafana dashboards
-3. [ ] Write DPIA template
-4. [ ] Performance testing (JMeter)
+1. [ ] **Phase 9.2** - Backend-EDC DCAT enhancement
+2. [ ] Complete Prometheus metrics export
+3. [ ] Create Grafana dashboards
+4. [ ] Write DPIA template
+5. [ ] Performance testing (JMeter)
 
 ### Short Term (This Month)
 1. [ ] Kubernetes Helm charts
@@ -1367,6 +1661,6 @@ deployment/
 
 ---
 
-*Last Updated: 21 December 2025*
-*Version: 1.1*
-*Status: 90% Complete (7/8 phases complete, Dataspace Insider View added)*
+*Last Updated: 15 January 2025*
+*Version: 1.2*
+*Status: 85% Complete (7/9 phases complete, Phase 8 & 9 in progress)*

@@ -35,7 +35,7 @@ import { EHRViewer } from './components/EHRViewer';
 import { DataspaceInsiderPanel, DataspaceInsiderTrigger } from './components/DataspaceInsiderPanel';
 import { DspEventLogProvider, useDspEventLog } from './contexts/DspEventLogContext';
 import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
-import { api, getApiMode } from './services/apiFactory';
+import { api, getApiMode, isStaticDemo } from './services/apiFactory';
 import { 
   mockEHRCatalogAssets, 
   mockEHRData, 
@@ -594,20 +594,30 @@ function AppHealth() {
             <div className="flex items-center gap-4">
               {/* API Mode Indicator */}
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
-                getApiMode() === 'full' 
-                  ? 'bg-purple-100 text-purple-700'
-                  : getApiMode() === 'hybrid'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-600'
+                isStaticDemo()
+                  ? 'bg-amber-100 text-amber-700'
+                  : getApiMode() === 'full' 
+                    ? 'bg-purple-100 text-purple-700'
+                    : getApiMode() === 'hybrid'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-green-100 text-green-700'
               }`}>
                 <div className={`w-2 h-2 rounded-full ${
-                  getApiMode() === 'full' 
-                    ? 'bg-purple-500'
-                    : getApiMode() === 'hybrid'
-                      ? 'bg-blue-500'
-                      : 'bg-gray-400'
+                  isStaticDemo()
+                    ? 'bg-amber-500'
+                    : getApiMode() === 'full' 
+                      ? 'bg-purple-500'
+                      : getApiMode() === 'hybrid'
+                        ? 'bg-blue-500'
+                        : 'bg-green-500'
                 }`} />
-                {getApiMode() === 'full' ? 'Full EDC' : getApiMode() === 'hybrid' ? 'Hybrid' : 'Static Demo'}
+                {isStaticDemo() 
+                  ? 'Static Demo' 
+                  : getApiMode() === 'full' 
+                    ? 'Full EDC' 
+                    : getApiMode() === 'hybrid' 
+                      ? 'Hybrid' 
+                      : 'Mock Mode'}
               </div>
               {/* Backend Status Indicator */}
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${

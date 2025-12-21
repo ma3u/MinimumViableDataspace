@@ -16,6 +16,8 @@ interface UseCatalogReturn {
   assets: CatalogAsset[];
   isLoading: boolean;
   error: Error | null;
+  source: string | null;  // 'edc-federated' | 'mock-fallback' | 'mock'
+  enhanced: boolean;      // Whether full DCAT properties are available
   refetch: () => Promise<void>;
   retry: () => Promise<void>;
 }
@@ -26,6 +28,8 @@ export function useCatalog(options: UseCatalogOptions = {}): UseCatalogReturn {
   const [assets, setAssets] = useState<CatalogAsset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [source, setSource] = useState<string | null>(null);
+  const [enhanced, setEnhanced] = useState(false);
   
   // Use ref instead of state to avoid stale closure issues in retry logic
   const attemptCountRef = useRef(0);
@@ -63,10 +67,14 @@ export function useCatalog(options: UseCatalogOptions = {}): UseCatalogReturn {
           sensitiveCategory: ehr.sensitiveCategory || 'none',
           policies: [],
         })));
+        setSource('mock');
+        setEnhanced(false);
       } else {
-        // In hybrid/full mode, use catalog API
+        // In hybrid/full mode, use catalog API (returns enhanced DCAT properties)
         const response = await api.getCatalogAssets();
         setAssets(response.assets);
+        setSource(response.source);
+        setEnhanced(response.enhanced || false);
       }
       
       setError(null);
@@ -119,6 +127,8 @@ export function useCatalog(options: UseCatalogOptions = {}): UseCatalogReturn {
     assets,
     isLoading,
     error,
+    source,
+    enhanced,
     refetch,
     retry,
   };

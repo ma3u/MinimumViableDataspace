@@ -19,6 +19,16 @@ export function getApiMode(): ApiMode {
   return 'mock'; // Default to mock for safety
 }
 
+// Check if running as static demo (GitHub Pages)
+export function isStaticDemo(): boolean {
+  // GitHub Pages builds have base path /MinimumViableDataspace/
+  // or the mock API URL is empty (no backend available)
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const mockUrl = import.meta.env.VITE_MOCK_API_URL || '';
+  return baseUrl.includes('MinimumViableDataspace') || 
+         (getApiMode() === 'mock' && mockUrl === '');
+}
+
 // Get base URL for current mode
 export function getBaseUrl(): string {
   const mode = getApiMode();
@@ -78,18 +88,95 @@ export interface EhrRecord {
   };
 }
 
+/**
+ * Publisher information following DCAT-AP publisher requirements
+ */
+export interface Publisher {
+  name: string;
+  identifier: string;
+  type: 'public-body' | 'research-institution' | 'hospital' | 'biobank' | 'registry' | 'pharma' | 'unknown';
+  homepage?: string;
+}
+
+/**
+ * Contact point following DCAT-AP contactPoint pattern
+ */
+export interface ContactPoint {
+  email?: string;
+  url?: string;
+  name?: string;
+}
+
+/**
+ * Distribution information (how the data can be accessed)
+ */
+export interface Distribution {
+  format: string;
+  mediaType?: string;
+  accessService?: string;
+  byteSize?: number;
+}
+
+/**
+ * Policy summary derived from ODRL policies
+ */
+export interface PolicySummary {
+  type: 'open' | 'consent-required' | 'restricted';
+  requiredConsents?: string[];
+  constraints?: string[];
+}
+
+/**
+ * Catalog Asset with full DCAT-AP and HealthDCAT-AP properties
+ */
 export interface CatalogAsset {
+  // Core identifiers
   ehrId: string;
   assetId: string;
+  
+  // DCT core properties
   title: string;
   description: string;
+  language?: string[];
+  issued?: string;
+  modified?: string;
+  
+  // Publisher & contact (optional for backward compatibility)
+  publisher?: Publisher;
+  contactPoint?: ContactPoint;
+  
+  // HealthDCAT-AP properties
   healthCategory: string;
+  healthTheme?: string[];
   ageBand: string;
+  minAge?: number;
+  maxAge?: number;
   biologicalSex: string;
+  populationCoverage?: string;
   clinicalPhase: string;
   meddraVersion: string;
   sensitiveCategory: string;
-  policies: unknown[];
+  
+  // Clinical context
+  sponsor?: {
+    name: string;
+    type: string;
+    country: string;
+  };
+  therapeuticArea?: string;
+  euCtNumber?: string;
+  
+  // DCAT distribution (optional for backward compatibility)
+  distributions?: Distribution[];
+  
+  // Policy information
+  policy?: PolicySummary;
+  policies?: unknown[];  // Legacy field for backward compatibility
+  
+  // Quality & provenance
+  qualityScore?: number;
+  sourceSystem?: string;
+  deIdentificationMethod?: string;
 }
 
 export interface CatalogResponse {
@@ -97,6 +184,8 @@ export interface CatalogResponse {
   totalCount: number;
   source: string;
   providerDsp?: string;
+  enhanced?: boolean;
+  message?: string;
 }
 
 export interface NegotiationResponse {

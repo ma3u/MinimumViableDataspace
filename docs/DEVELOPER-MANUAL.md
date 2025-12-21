@@ -18,6 +18,9 @@ Comprehensive technical documentation for the Health Dataspace Demo, including a
 10. [Deployment](#10-deployment)
 11. [Troubleshooting](#11-troubleshooting)
 12. [Screenshots & Demo Flow](#12-screenshots--demo-flow)
+13. [Frontend Modes](#13-frontend-modes)
+14. [Monitoring & Debugging](#14-monitoring--debugging)
+15. [EDC Eventing & Dataspace Insider Panel](#15-edc-eventing--dataspace-insider-panel)
 
 ---
 
@@ -404,6 +407,22 @@ flowchart TD
 
 This chapter documents all REST APIs exposed by the system components. The Backend-EDC API provides a simplified interface for frontend integration, while the EDC Management APIs offer full control over assets, policies, and transfers. All examples include curl commands that can be executed directly from the terminal.
 
+### OpenAPI Specifications
+
+Formal API specifications are maintained in the `specs/` directory:
+
+| Specification | Description | Local URL |
+|---------------|-------------|-----------|
+| [edc-management-api.yaml](../specs/edc-management-api.yaml) | EDC Management API v3 with HealthDCAT-AP | Consumer `:8081`, Provider `:8191` |
+| [ehr-health-api.yaml](../specs/ehr-health-api.yaml) | EHR Backend API with FHIR R4 schemas | Mock `:3001`, EDC `:3002` |
+| [identity-hub-api.yaml](../specs/identity-hub-api.yaml) | Identity Hub API for DID/VC | Consumer `:7082`, Provider `:7092` |
+
+**Generate TypeScript types from OpenAPI:**
+```bash
+cd frontend
+npm run generate:types  # Generates from specs/*.yaml
+```
+
 ### Backend-EDC API (Port 3002)
 
 The Backend-EDC service exposes a RESTful API on port 3002 that abstracts the complexity of EDC interactions. All endpoints return JSON responses and accept JSON request bodies where applicable. Error responses follow a consistent format with status codes and descriptive messages.
@@ -509,6 +528,51 @@ Identity endpoints manage participant identity, verifiable credentials, and cons
 | POST | `/api/identity/attestation/consent` | Submit consent attestation |
 | GET | `/api/identity/consent/:patientDid` | Check consent status |
 | POST | `/api/identity/consent/:patientDid/revoke` | Revoke consent |
+
+#### Participants Endpoints
+
+Participant endpoints provide information about dataspace participants by querying the Identity Hub. Results are cached with a 1-minute TTL. When the Identity Hub is unavailable, static fallback data is returned.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/participants` | Get both consumer and provider info |
+| GET | `/api/participants/consumer` | Get consumer participant info |
+| GET | `/api/participants/provider` | Get provider participant info |
+| GET | `/api/participants/:did` | Get participant by DID |
+| POST | `/api/participants/cache/clear` | Clear participant cache |
+
+**Example: Get Participants**
+```bash
+curl http://localhost:3002/api/participants
+```
+
+**Response:**
+```json
+{
+  "consumer": {
+    "did": "did:web:consumer.local",
+    "name": "Nordstein Research Institute",
+    "verified": true,
+    "type": "consumer"
+  },
+  "provider": {
+    "did": "did:web:provider.local",
+    "name": "Rheinland Universitätsklinikum",
+    "verified": true,
+    "type": "provider"
+  },
+  "source": "identity-hub"
+}
+```
+
+#### Events Endpoints
+
+Event endpoints provide access to the DSP event stream for real-time monitoring and debugging.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/events/stream` | SSE event stream for real-time DSP events |
+| GET | `/api/events` | Get recent events (REST API) |
 
 ### EDC Management API (Ports 8081/8191)
 
@@ -1546,6 +1610,323 @@ Running the demo in Docker with full EDC infrastructure:
 
 ---
 
+## 13. Frontend Modes
+
+The frontend supports three operating modes via the `VITE_API_MODE` environment variable, enabling flexible development and testing scenarios. Each mode provides different levels of integration with the EDC infrastructure.
+
+### Mode Overview
+
+| Mode | Variable | Description | Use Case |
+|------|----------|-------------|----------|
+| **mock** | `VITE_API_MODE=mock` | Direct to backend-mock, no EDC | Rapid UI development, offline work |
+| **hybrid** | `VITE_API_MODE=hybrid` | EDC catalog + mock data | Testing EDC integration, catalog features |
+| **full** | `VITE_API_MODE=full` | Complete EDC data flow | Production-like testing, E2E validation |
+
+### Mode Configuration
+
+Configure modes via environment files:
+
+```bash
+# Option A: Local development (ports 4000/4001)
+cd frontend
+echo "VITE_API_MODE=mock" > .env.local
+echo "VITE_BACKEND_URL=http://localhost:4001" >> .env.local
+npm run dev:local
+
+# Option B: Docker with EDC (ports 3000/3001/3002)
+cd frontend
+cp .env.full .env.local  # Uses hybrid mode by default
+npm run dev
+```
+
+### Mode Comparison
+
+```mermaid
+graph TB
+    subgraph "Mock Mode"
+        FE1[Frontend :4000] --> Mock1[Backend-Mock :4001]
+    end
+    
+    subgraph "Hybrid Mode"
+        FE2[Frontend :3000] --> EDC2[Backend-EDC :3002]
+        EDC2 -->|Catalog| Consumer2[Consumer EDC]
+        EDC2 -->|Data| Mock2[Backend-Mock :3001]
+    end
+    
+    subgraph "Full Mode"
+        FE3[Frontend :3000] --> EDC3[Backend-EDC :3002]
+        EDC3 --> Consumer3[Consumer EDC]
+        Consumer3 -->|DSP| Provider3[Provider EDC]
+        Provider3 --> FHIR3[FHIR Server]
+    end
+```
+
+### API Factory Pattern
+
+The `apiFactory.ts` abstracts mode differences, providing a unified interface:
+
+```typescript
+import { getApiConfig } from './apiFactory';
+
+const config = getApiConfig();
+// Returns correct URLs based on VITE_API_MODE
+// - mock: backend-mock endpoints
+// - hybrid: backend-edc for catalog, mock for data
+// - full: backend-edc for everything
+```
+
+### Environment Variables
+
+| Variable | Mock | Hybrid | Full |
+|----------|------|--------|------|
+| `VITE_API_MODE` | `mock` | `hybrid` | `full` |
+| `VITE_BACKEND_URL` | `:4001` | `:3002` | `:3002` |
+| `VITE_PROVIDER_DID` | - | Required | Required |
+| `VITE_CONSUMER_DID` | - | - | Required |
+
+---
+
+## 14. Monitoring & Debugging
+
+This section covers monitoring, observability, and debugging tools available in the Health Dataspace Demo.
+
+### Current Monitoring Capabilities
+
+The demo provides built-in monitoring through health endpoints and event logging. Full Prometheus/Grafana integration is planned for Phase 8 but not yet implemented.
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Health Endpoints | ✅ Available | `/health`, `/health/detailed`, `/health/ready`, `/health/live` |
+| Event Logging | ✅ Available | DSP events via SSE stream |
+| Dataspace Insider Panel | ✅ Available | Real-time event visualization |
+| Docker Logs | ✅ Available | Container log aggregation |
+| Prometheus Metrics | 🔄 Planned | Phase 8 - not yet implemented |
+| Grafana Dashboards | 🔄 Planned | Phase 8 - not yet implemented |
+
+### Health Endpoints
+
+Each service exposes Kubernetes-compatible health probes:
+
+```bash
+# Backend-Mock health
+curl http://localhost:4001/health
+curl http://localhost:4001/health/detailed
+
+# Backend-EDC health (Docker mode)
+curl http://localhost:3002/health
+curl http://localhost:3002/health/detailed
+
+# EDC Control Plane health
+curl http://localhost:8081/api/check/health   # Consumer
+curl http://localhost:8191/api/check/health   # Provider
+```
+
+### Service URLs (Local Development)
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| Frontend | http://localhost:4000 | React UI |
+| Backend-Mock | http://localhost:4001 | FHIR mock server |
+| Backend-Mock Health | http://localhost:4001/health/detailed | Dependency status |
+
+### Service URLs (Docker/EDC Mode)
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| Frontend | http://localhost:3000 | React UI |
+| Backend-Mock | http://localhost:3001 | FHIR mock server |
+| Backend-EDC | http://localhost:3002 | EDC proxy |
+| Consumer Control Plane | http://localhost:8081 | Management API |
+| Provider Control Plane | http://localhost:8191 | Management API |
+| Consumer Identity Hub | http://localhost:7082 | DID/VC management |
+| Provider Identity Hub | http://localhost:7092 | DID/VC management |
+| Pact Broker | http://localhost:9292 | Contract testing |
+
+### Event Stream
+
+Backend-EDC provides a Server-Sent Events (SSE) stream for real-time event monitoring:
+
+```bash
+# Subscribe to event stream
+curl -N http://localhost:3002/api/events/stream
+
+# Events include:
+# - DSP protocol messages (catalog, negotiation, transfer)
+# - State transitions
+# - Error notifications
+```
+
+### Docker Log Aggregation
+
+```bash
+# View all container logs
+docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml logs -f
+
+# Filter by service
+docker-compose -f docker-compose.health.yml logs -f backend-mock
+docker-compose -f docker-compose.edc.yml logs -f consumer-controlplane
+
+# Save logs to file
+docker-compose -f docker-compose.health.yml logs > health-logs.txt
+```
+
+### Debugging Tips
+
+**Frontend Debugging:**
+```bash
+# Enable verbose API logging
+VITE_DEBUG_API=true npm run dev:local
+
+# Check React DevTools for state
+# Install React Developer Tools browser extension
+
+# Network tab filtering
+# Filter by "api/" to see backend requests
+```
+
+**Backend Debugging:**
+```bash
+# Enable debug logging
+DEBUG=* npm run dev:local
+
+# Check TypeScript compilation
+npm run build 2>&1 | grep error
+
+# Test specific endpoint
+curl -v http://localhost:4001/api/ehr | jq
+```
+
+**EDC Debugging:**
+```bash
+# Verbose EDC logs
+docker-compose -f docker-compose.edc.yml logs -f | grep -i error
+
+# Check DSP communication
+curl http://localhost:8192/api/dsp/.well-known/dspace-version
+
+# Verify credentials
+curl -H "X-Api-Key: password" \
+  http://localhost:8191/api/management/v3/assets/request \
+  -d '{"offset":0,"limit":1}'
+```
+
+---
+
+## 15. EDC Eventing & Dataspace Insider Panel
+
+The Dataspace Insider Panel provides real-time visibility into EDC operations, showing DSP protocol messages, negotiation states, and transfer progress.
+
+### Dataspace Insider Panel
+
+The panel is a slide-out component in the frontend that displays:
+
+- **Real-time DSP Events**: Protocol messages as they occur
+- **Event Timeline**: Chronological view with phase grouping
+- **Identity Details**: DIDs, JWTs, contract IDs, transfer IDs
+- **State Transitions**: Visual representation of DSP state machines
+- **Connection Status**: Backend connectivity indicator
+
+```typescript
+// Panel component usage
+import { DataspaceInsiderPanel } from './components/DataspaceInsiderPanel';
+
+<DataspaceInsiderPanel 
+  isOpen={isPanelOpen}
+  isBackendOnline={backendStatus}
+/>
+```
+
+### Event Structure
+
+Events follow the DSP protocol phases:
+
+```typescript
+interface DspEvent {
+  id: string;
+  phase: 'catalog' | 'negotiation' | 'transfer' | 'identity';
+  action: string;
+  direction: 'outbound' | 'inbound' | 'internal';
+  status: 'pending' | 'in-progress' | 'success' | 'error';
+  timestamp: Date;
+  dspMessageType?: string;  // e.g., 'CatalogRequestMessage'
+  actor?: string;
+  target?: string;
+  source?: 'mock' | 'edc' | 'sse';
+  details?: Record<string, unknown>;
+}
+```
+
+### DSP Protocol Phases
+
+| Phase | Events | DSP Messages |
+|-------|--------|--------------|
+| **Catalog** | Browse, Search | `CatalogRequestMessage`, `CatalogMessage` |
+| **Negotiation** | Request, Offer, Accept, Finalize | `ContractRequestMessage`, `ContractOfferMessage`, `ContractAgreementMessage` |
+| **Transfer** | Start, Provision, Complete | `TransferRequestMessage`, `TransferStartMessage`, `TransferCompletionMessage` |
+| **Identity** | Resolve, Verify | DID resolution, VC verification |
+
+### SSE Event Stream
+
+The backend provides a Server-Sent Events stream at `/api/events/stream`:
+
+```typescript
+// Frontend subscription (in DspEventLogContext.tsx)
+useEffect(() => {
+  const eventSource = new EventSource('/api/events/stream');
+  
+  eventSource.onmessage = (event) => {
+    const dspEvent = JSON.parse(event.data);
+    addEvent(dspEvent);
+  };
+  
+  eventSource.onerror = () => {
+    setConnectionStatus('disconnected');
+  };
+  
+  return () => eventSource.close();
+}, []);
+```
+
+### Event Visualization
+
+The panel displays events with:
+
+- **Direction Icons**: Outbound (→), Inbound (←), Internal (↻)
+- **Status Indicators**: Success (✓), Error (✗), In-Progress (spinner)
+- **Source Badges**: EDC (⚡), SSE (📡), Mock (🎭)
+- **Identity Badges**: DID, JWT, Contract, Transfer
+- **Expandable Details**: Full event payload on click
+
+### Observability Links
+
+The panel includes quick links to observability tools:
+
+```typescript
+const OBSERVABILITY_LINKS = {
+  apiDocs: 'https://ma3u.github.io/MinimumViableDataspace/api/',
+  logs: '/api/events',
+  dockerLogs: '/health/detailed',
+};
+```
+
+### Event Log Context
+
+Events are managed via React Context:
+
+```typescript
+import { useDspEventLog } from './contexts/DspEventLogContext';
+
+const { 
+  events,           // All events
+  addEvent,         // Add new event
+  clearEvents,      // Clear log
+  filterByPhase,    // Filter by DSP phase
+  connectionStatus  // 'connected' | 'disconnected'
+} = useDspEventLog();
+```
+
+---
+
 ## Quick Reference
 
 This section provides quick access to frequently used commands and endpoints. Keep this reference handy during development and troubleshooting. For detailed explanations, refer to the relevant chapters above.
@@ -1590,9 +1971,21 @@ Bookmark these endpoints for quick access during development. Health endpoints r
 | Frontend | http://localhost:3000 | - |
 | Backend-Mock | http://localhost:3001/health | http://localhost:3001/api/ehr |
 | Backend-EDC | http://localhost:3002/health | http://localhost:3002/api/catalog |
+| Backend-EDC Events | - | http://localhost:3002/api/events/stream |
+| Backend-EDC Participants | - | http://localhost:3002/api/participants |
 | Consumer EDC | http://localhost:8081 | http://localhost:8081/api/management/v3 |
 | Provider EDC | http://localhost:8191 | http://localhost:8191/api/management/v3 |
+| Consumer Identity Hub | http://localhost:7082 | http://localhost:7082/api/identity |
+| Provider Identity Hub | http://localhost:7092 | http://localhost:7092/api/identity |
 | Pact Broker | http://localhost:9292 | - |
+
+### OpenAPI Specifications
+
+| Spec | Path | View Online |
+|------|------|-------------|
+| EDC Management API | [specs/edc-management-api.yaml](../specs/edc-management-api.yaml) | [API Docs](https://ma3u.github.io/MinimumViableDataspace/api/) |
+| EHR Health API | [specs/ehr-health-api.yaml](../specs/ehr-health-api.yaml) | - |
+| Identity Hub API | [specs/identity-hub-api.yaml](../specs/identity-hub-api.yaml) | - |
 
 ---
 

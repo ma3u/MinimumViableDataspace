@@ -85,6 +85,7 @@ const mockEvents: DspEvent[] = [
 ];
 
 const mockPhaseProgress: Record<DspPhase, { completed: boolean; current: boolean; steps: Record<string, 'pending' | 'in-progress' | 'complete' | 'error'> }> = {
+  seeding: { completed: true, current: false, steps: { INIT_PARTICIPANTS: 'complete', ISSUE_CREDENTIALS: 'complete' } },
   catalog: { completed: true, current: false, steps: { BROWSE: 'complete' } },
   negotiation: { completed: true, current: false, steps: { REQUEST_SENT: 'complete', ACCEPTED: 'complete' } },
   transfer: { completed: false, current: true, steps: { INITIATE: 'in-progress', FAILED: 'error' } },
@@ -389,8 +390,8 @@ describe('DataspaceInsiderTrigger', () => {
     );
 
     const button = screen.getByRole('button');
-    // Button should have right-[420px] when panel is open (moves left)
-    expect(button).toHaveClass('right-[420px]');
+    // Button should have right-[520px] when panel is open (moves left)
+    expect(button).toHaveClass('right-[520px]');
   });
 });
 
