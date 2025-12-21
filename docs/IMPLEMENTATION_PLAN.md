@@ -979,10 +979,114 @@ graph LR
 **Implementation:**
 - [x] Add health check endpoints to all services
 - [x] Implement readiness/liveness probes
+- [x] **Dataspace Insider View** - Real-time DSP protocol visualization panel
 - [ ] Set up Prometheus metrics export
 - [ ] Configure Grafana dashboards
 - [ ] Add distributed tracing (Jaeger/Zipkin)
 - [ ] Implement log aggregation (ELK stack)
+
+#### 8.1.1 Dataspace Insider View ✅
+
+**Objective:** Provide real-time visibility into DSP protocol interactions.
+
+**Status:** ✅ Complete (December 2025)
+
+**Implementation:**
+- [x] `DataspaceInsiderPanel` component with slide-out animation
+- [x] `DataspaceInsiderTrigger` FAB button with event count badge
+- [x] `DspEventLogContext` for event state management
+- [x] `EventCard` component showing event details with expand/collapse
+- [x] Phase progress indicator (Catalog → Negotiation → Transfer → Compute)
+- [x] Filter tabs for event types (All/Catalog/Contract/Data/Confidential)
+- [x] **Side-by-side layout** - panel doesn't overlay content
+- [x] **Connection status indicator** (Live SSE / Connecting / Offline localStorage)
+- [x] **Observability links dropdown** (Logs API, Grafana, Prometheus)
+- [x] **Source indicator badges** (🎭 Mock / ⚡ EDC / 📡 SSE)
+- [x] Consumer/Provider name badges in event cards
+- [x] DID and JWT display in expanded events
+- [x] Console logging for all events
+- [x] localStorage persistence for offline viewing
+- [x] SSE endpoint (`/api/events/stream`)
+- [x] EDC callback endpoint (`POST /api/events/callback`)
+- [x] EDC event type mapping (20+ event types)
+- [x] Unit tests (20 tests covering panel behavior)
+
+**Architecture:**
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         Frontend (React)                                  │
+│  ┌─────────────────┐     ┌─────────────────────────────────────────────┐ │
+│  │ DspEventLog     │◄────│ DataspaceInsiderPanel (Timeline + Progress) │ │
+│  │ Context         │     └─────────────────────────────────────────────┘ │
+│  │                 │                        ▲                             │
+│  │ • emitEvent()   │                        │ SSE: dsp-event              │
+│  │ • clearEvents() │                        │                             │
+│  │ • connectToSSE()│                        │                             │
+│  └────────┬────────┘                        │                             │
+│           │ localStorage                    │                             │
+│           ▼                                 │                             │
+│  ┌─────────────────┐                        │                             │
+│  │ Browser Storage │                        │                             │
+│  └─────────────────┘                        │                             │
+└─────────────────────────────────────────────│─────────────────────────────┘
+                                              │
+┌─────────────────────────────────────────────│─────────────────────────────┐
+│                    Backend-EDC (:3002)      │                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐ │
+│  │                        /api/events                                   │ │
+│  │  ┌─────────────────┐   ┌─────────────────┐   ┌───────────────────┐  │ │
+│  │  │ GET /stream     │   │ POST /callback  │   │ REST endpoints    │  │ │
+│  │  │ (SSE endpoint)  │   │ (EDC webhook)   │   │ (history/stats)   │  │ │
+│  │  └────────┬────────┘   └────────┬────────┘   └───────────────────┘  │ │
+│  │           │                     │                                    │ │
+│  │           └──────────┬──────────┘                                    │ │
+│  │                      ▼                                               │ │
+│  │           ┌─────────────────────┐                                    │ │
+│  │           │  dspEventService    │                                    │ │
+│  │           │  • emitDspEvent()   │                                    │ │
+│  │           │  • source: 'edc'    │                                    │ │
+│  │           └─────────────────────┘                                    │ │
+│  └──────────────────────────────────────────────────────────────────────┘ │
+└───────────────────────────────────────────────────────────────────────────┘
+                                              ▲
+                                              │ HTTP POST (EventEnvelope)
+                                              │
+┌─────────────────────────────────────────────│─────────────────────────────┐
+│                   EDC Control Planes        │                             │
+│  ┌──────────────────────────────────────────│───────────────────────────┐│
+│  │  Consumer CP (:8081)  |  Provider CP (:8191)                          ││
+│  │                                                                        ││
+│  │  Extensions: callback-event-dispatcher, callback-http-dispatcher,     ││
+│  │              callback-static-endpoint                                  ││
+│  │                                                                        ││
+│  │  Configuration:                                                        ││
+│  │  EDC_CALLBACK_INSIDER_URI=http://backend-edc:3002/api/events/callback ││
+│  │  EDC_CALLBACK_INSIDER_EVENTS=contract.negotiation,transfer.process    ││
+│  └────────────────────────────────────────────────────────────────────────┘│
+└───────────────────────────────────────────────────────────────────────────┘
+```
+
+**Files Created:**
+- `frontend/src/components/DataspaceInsiderPanel.tsx` - Main panel component (703 lines)
+- `frontend/src/components/DataspaceInsiderPanel.test.tsx` - Test suite (20 tests)
+- `frontend/src/contexts/DspEventLogContext.tsx` - Event state management
+- `backend-edc/src/routes/events.ts` - SSE + callback endpoints
+- `backend-edc/src/services/dspEventService.ts` - Event service
+
+**EDC Event Type Mapping:**
+| EDC Event Type | Frontend Action | Direction |
+|----------------|-----------------|-----------|
+| `contract.negotiation.initiated` | CONTRACT_REQUEST | outbound |
+| `contract.negotiation.requested` | REQUEST_RECEIVED | inbound |
+| `contract.negotiation.accepted` | ACCEPTED | inbound |
+| `contract.negotiation.agreed` | AGREEMENT_SENT | outbound |
+| `contract.negotiation.verified` | VERIFIED | outbound |
+| `contract.negotiation.finalized` | FINALIZED | inbound |
+| `transfer.process.initiated` | TRANSFER_INITIATE | outbound |
+| `transfer.process.started` | TRANSFER_STARTED | inbound |
+| `transfer.process.completed` | TRANSFER_COMPLETE | inbound |
+
+**Related Issue:** [GitHub Issue #8](https://github.com/ma3u/MinimumViableDataspace/issues/8)
 
 **Metrics to Track:**
 - Catalog request latency
@@ -1263,6 +1367,6 @@ deployment/
 
 ---
 
-*Last Updated: 20 December 2024*
-*Version: 1.0*
-*Status: 87% Complete (7/8 phases complete)*
+*Last Updated: 21 December 2025*
+*Version: 1.1*
+*Status: 90% Complete (7/8 phases complete, Dataspace Insider View added)*

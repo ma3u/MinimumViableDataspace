@@ -115,6 +115,11 @@ edc-bom-identityhub-sql = { module = "org.eclipse.edc:identityhub-feature-sql-bo
 edc-bom-issuerservice = { module = "org.eclipse.edc:issuerservice-bom", version.ref = "edc" }
 edc-bom-issuerservice-sql = { module = "org.eclipse.edc:issuerservice-feature-sql-bom", version.ref = "edc" }
 
+# Callback extensions for Dataspace Insider View event forwarding
+edc-callback-event-dispatcher = { module = "org.eclipse.edc:callback-event-dispatcher", version.ref = "edc" }
+edc-callback-http-dispatcher = { module = "org.eclipse.edc:callback-http-dispatcher", version.ref = "edc" }
+edc-callback-static-endpoint = { module = "org.eclipse.edc:callback-static-endpoint", version.ref = "edc" }
+
 [bundles]
 connector = [
     "edc-boot",

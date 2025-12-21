@@ -19,7 +19,7 @@ interface ServiceStatus {
  * GET /health
  * Basic health check
  */
-healthRouter.get('/', (req: Request, res: Response) => {
+healthRouter.get('/', (_req: Request, res: Response) => {
   res.json({
     status: 'healthy',
     service: 'ehr2edc-backend-edc',
@@ -32,13 +32,13 @@ healthRouter.get('/', (req: Request, res: Response) => {
  * GET /health/detailed
  * Detailed health check with dependency status
  */
-healthRouter.get('/detailed', async (req: Request, res: Response) => {
+healthRouter.get('/detailed', async (_req: Request, res: Response) => {
   const checks: Record<string, ServiceStatus> = {};
   let overallStatus: 'healthy' | 'unhealthy' | 'degraded' = 'healthy';
 
   // Check mock backend (only in hybrid mode)
   if (config.mode === 'hybrid') {
-    const mockCheck = await checkService(config.mock.baseUrl, '/health');
+    const mockCheck = await checkService(config.backendMock.url, '/health');
     checks.mockBackend = mockCheck;
     if (mockCheck.status !== 'healthy') {
       overallStatus = 'degraded';
@@ -47,7 +47,7 @@ healthRouter.get('/detailed', async (req: Request, res: Response) => {
 
   // Check Consumer Control Plane
   const consumerCheck = await checkService(
-    config.consumer.managementUrl,
+    config.edc.consumerManagementUrl,
     '/api/management/v3/assets/request',
     'POST',
     { offset: 0, limit: 1 }
@@ -90,10 +90,10 @@ healthRouter.get('/detailed', async (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     checks,
     config: {
-      consumerManagement: config.consumer.managementUrl,
+      consumerManagement: config.edc.consumerManagementUrl,
       providerManagement: config.provider.managementUrl,
       providerDsp: config.provider.dspUrl,
-      mockBackend: config.mode === 'hybrid' ? config.mock.baseUrl : 'disabled',
+      mockBackend: config.mode === 'hybrid' ? config.backendMock.url : 'disabled',
     },
   });
 });
@@ -102,11 +102,11 @@ healthRouter.get('/detailed', async (req: Request, res: Response) => {
  * GET /health/ready
  * Readiness check for container orchestration
  */
-healthRouter.get('/ready', async (req: Request, res: Response) => {
+healthRouter.get('/ready', async (_req: Request, res: Response) => {
   try {
     // Quick check of consumer control plane
     const response = await fetch(
-      `${config.consumer.managementUrl}/api/management/v3/assets/request`,
+      `${config.edc.consumerManagementUrl}/api/management/v3/assets/request`,
       {
         method: 'POST',
         headers: {
@@ -135,7 +135,7 @@ healthRouter.get('/ready', async (req: Request, res: Response) => {
  * GET /health/live
  * Liveness check for container orchestration
  */
-healthRouter.get('/live', (req: Request, res: Response) => {
+healthRouter.get('/live', (_req: Request, res: Response) => {
   res.json({ alive: true });
 });
 

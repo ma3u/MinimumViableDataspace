@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/19</span>
+                <span class='fraction'>23/23</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>19/19</span>
+                <span class='fraction'>23/23</span>
             </div>
         
             
@@ -86,13 +86,21 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -113,24 +121,28 @@
 &nbsp;
 export type ApiMode = 'mock' | 'hybrid' | 'full';
 &nbsp;
-export const getApiMode = vi.fn&lt;[], ApiMode&gt;().mockReturnValue('mock');
-export const getBaseUrl = vi.fn&lt;[], string&gt;().mockReturnValue('http://localhost:3001');
+export const getApiMode = vi.fn().mockReturnValue('mock' as ApiMode);
+export const getBaseUrl = vi.fn().mockReturnValue('http://localhost:3001');
 &nbsp;
 export const api = {
-  getMode: vi.fn&lt;[], ApiMode&gt;().mockReturnValue('mock'),
-  setMode: vi.fn&lt;[ApiMode], void&gt;(),
-  getEhrList: vi.fn&lt;[], Promise&lt;any[]&gt;&gt;().mockResolvedValue([]),
-  getEhr: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({}),
-  checkHealth: vi.fn&lt;[], Promise&lt;any&gt;&gt;().mockResolvedValue({ status: 'healthy' }),
-  getCatalogAssets: vi.fn&lt;[], Promise&lt;any&gt;&gt;().mockResolvedValue({ assets: [], totalCount: 0, source: 'mock' }),
-  initiateNegotiation: vi.fn&lt;[string, string], Promise&lt;any&gt;&gt;().mockResolvedValue({ negotiationId: 'test-neg-id' }),
-  getNegotiationState: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({ state: 'FINALIZED' }),
-  getNegotiation: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({ state: 'FINALIZED', contractAgreementId: 'test-agreement' }),
-  initiateTransfer: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({ transferProcessId: 'test-transfer-id' }),
-  getTransferState: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({ state: 'COMPLETED' }),
-  getTransfer: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({ state: 'COMPLETED', endpointDataReference: { endpoint: 'http://test' } }),
-  getEndpointDataReference: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({ endpoint: 'http://test', authKey: 'key', authCode: 'code' }),
-  fetchTransferData: vi.fn&lt;[string], Promise&lt;any&gt;&gt;().mockResolvedValue({ data: 'test-data' }),
+  getMode: vi.fn().mockReturnValue('mock' as ApiMode),
+  setMode: vi.fn(),
+  getEhrList: vi.fn().mockResolvedValue([]),
+  getEhr: vi.fn().mockResolvedValue({}),
+  checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
+  getCatalogAssets: vi.fn().mockResolvedValue({ assets: [], totalCount: 0, source: 'mock' }),
+  initiateNegotiation: vi.fn().mockResolvedValue({ negotiationId: 'test-neg-id', state: 'REQUESTED' }),
+  getNegotiationState: vi.fn().mockResolvedValue({ state: 'FINALIZED' }),
+  getNegotiation: vi.fn().mockResolvedValue({ state: 'FINALIZED', contractAgreementId: 'test-agreement' }),
+  pollNegotiation: vi.fn().mockResolvedValue({ state: 'FINALIZED', contractAgreementId: 'test-agreement' }),
+  initiateTransfer: vi.fn().mockResolvedValue({ transferId: 'test-transfer-id', state: 'STARTED' }),
+  getTransferState: vi.fn().mockResolvedValue({ state: 'COMPLETED' }),
+  getTransfer: vi.fn().mockResolvedValue({ state: 'COMPLETED', endpointDataReference: { endpoint: 'http://test' } }),
+  pollTransfer: vi.fn().mockResolvedValue({ state: 'COMPLETED' }),
+  getEndpointDataReference: vi.fn().mockResolvedValue({ endpoint: 'http://test', authKey: 'key', authCode: 'code' }),
+  fetchTransferData: vi.fn().mockResolvedValue({ data: 'test-data' }),
+  refresh: vi.fn(),
+  health: vi.fn().mockResolvedValue({ status: 'healthy' }),
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -139,7 +151,7 @@ export const api = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-20T15:02:21.766Z
+                at 2025-12-21T06:45:05.532Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

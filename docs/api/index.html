@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2025 Health Dataspace Demo - EHR2EDC
+  SPDX-License-Identifier: Apache-2.0
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MVD Health - API Documentation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+  <style>
+    :root {
+      --primary-color: #059669;
+      --dark-color: #1e293b;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--dark-color), #334155);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-bottom: 3px solid var(--primary-color);
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .header .subtitle {
+      margin-top: 0.5rem;
+      opacity: 0.85;
+      font-size: 0.95rem;
+    }
+    
+    .nav-tabs {
+      background: #f1f5f9;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .nav-tab {
+      padding: 0.875rem 1.5rem;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #64748b;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .nav-tab:hover {
+      color: var(--primary-color);
+      background: #e2e8f0;
+    }
+    
+    .nav-tab.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+      background: white;
+    }
+    
+    .api-container {
+      display: none;
+    }
+    
+    .api-container.active {
+      display: block;
+    }
+    
+    .swagger-ui .topbar {
+      display: none;
+    }
+    
+    .swagger-ui .info {
+      margin: 30px 0;
+    }
+    
+    .api-info {
+      padding: 1rem 2rem;
+      background: #f0fdf4;
+      border-left: 4px solid var(--primary-color);
+      margin: 1rem 2rem;
+      font-size: 0.9rem;
+    }
+    
+    .footer {
+      background: var(--dark-color);
+      color: #94a3b8;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      margin-top: 2rem;
+    }
+    
+    .footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+    }
+    
+    .badge-edc { background: #dbeafe; color: #1e40af; }
+    .badge-fhir { background: #fee2e2; color: #991b1b; }
+    .badge-sse { background: #f0fdf4; color: #166534; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>
+      🏥 MVD Health API Documentation
+    </h1>
+    <div class="subtitle">
+      EHDS-compliant Health Dataspace Demo • Eclipse Dataspace Components 0.14.x • FHIR R4
+    </div>
+  </div>
+  
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showAPI('edc')">
+      EDC Management <span class="badge badge-edc">EDC 0.14</span>
+    </button>
+    <button class="nav-tab" onclick="showAPI('ehr')">
+      EHR Backend <span class="badge badge-fhir">FHIR R4</span>
+    </button>
+    <button class="nav-tab" onclick="showAPI('identity')">
+      Identity Hub <span class="badge badge-edc">DCP</span>
+    </button>
+    <button class="nav-tab" onclick="showAPI('events')">
+      Events API <span class="badge badge-sse">SSE</span>
+    </button>
+  </div>
+  
+  <div id="api-edc" class="api-container active">
+    <div class="api-info">
+      <strong>EDC Management API</strong> — Control Plane endpoints for catalog queries, contract negotiations, and transfer processes.
+      Extends standard EDC Management API v3 with HealthDCAT-AP properties.
+    </div>
+    <div id="swagger-ui-edc"></div>
+  </div>
+  
+  <div id="api-ehr" class="api-container">
+    <div class="api-info">
+      <strong>EHR Backend API</strong> — Electronic Health Records service providing FHIR R4-compliant data with HealthDCAT-AP metadata.
+      Available in mock mode (port 3001) or EDC-integrated mode (port 3002).
+    </div>
+    <div id="swagger-ui-ehr"></div>
+  </div>
+  
+  <div id="api-identity" class="api-container">
+    <div class="api-info">
+      <strong>Identity Hub API</strong> — Decentralized Claims Protocol (DCP) endpoints for Verifiable Credentials,
+      DID resolution, and participant identity management.
+    </div>
+    <div id="swagger-ui-identity"></div>
+  </div>
+  
+  <div id="api-events" class="api-container">
+    <div class="api-info">
+      <strong>Events API</strong> — Real-time event streaming and callback endpoints for the Dataspace Insider Panel.
+      Includes SSE stream for live DSP protocol visualization.
+    </div>
+    <div id="swagger-ui-events"></div>
+  </div>
+  
+  <div class="footer">
+    <p>
+      <a href="https://github.com/your-org/MVD-health">GitHub Repository</a> •
+      <a href="https://eclipse-edc.github.io/docs/">EDC Documentation</a> •
+      <a href="https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space_en">EHDS Info</a>
+    </p>
+    <p>© 2025 MVD Health Demo • Apache License 2.0</p>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    // API spec URLs (relative paths for GitHub Pages)
+    const apiSpecs = {
+      edc: '../specs/edc-management-api.yaml',
+      ehr: '../specs/ehr-health-api.yaml',
+      identity: '../specs/identity-hub-api.yaml',
+      events: './events-api.yaml'
+    };
+    
+    // Initialize Swagger UIs
+    const swaggerInstances = {};
+    
+    function initSwaggerUI(containerId, specUrl) {
+      return SwaggerUIBundle({
+        url: specUrl,
+        dom_id: '#' + containerId,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: 'BaseLayout',
+        deepLinking: true,
+        tryItOutEnabled: true,
+        requestInterceptor: (req) => {
+          // Add API key header for EDC requests
+          if (req.url.includes('/api/management/')) {
+            req.headers['X-Api-Key'] = 'password';
+          }
+          return req;
+        }
+      });
+    }
+    
+    // Show selected API
+    function showAPI(apiName) {
+      // Update tabs
+      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.nav-tab')[Object.keys(apiSpecs).indexOf(apiName)].classList.add('active');
+      
+      // Update containers
+      document.querySelectorAll('.api-container').forEach(container => container.classList.remove('active'));
+      document.getElementById('api-' + apiName).classList.add('active');
+      
+      // Lazy-load Swagger UI
+      const containerId = 'swagger-ui-' + apiName;
+      if (!swaggerInstances[apiName]) {
+        swaggerInstances[apiName] = initSwaggerUI(containerId, apiSpecs[apiName]);
+      }
+    }
+    
+    // Initialize first API on page load
+    window.onload = () => {
+      showAPI('edc');
+    };
+  </script>
+</body>
+</html>

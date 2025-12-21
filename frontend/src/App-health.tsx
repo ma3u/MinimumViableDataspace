@@ -32,6 +32,8 @@ import {
   Download
 } from 'lucide-react';
 import { EHRViewer } from './components/EHRViewer';
+import { DataspaceInsiderPanel, DataspaceInsiderTrigger } from './components/DataspaceInsiderPanel';
+import { DspEventLogProvider, useDspEventLog } from './contexts/DspEventLogContext';
 import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
 import { api, getApiMode } from './services/apiFactory';
 import { 
@@ -117,11 +119,15 @@ function AppHealth() {
   const [medDRAFilter, setMedDRAFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFhirJson, setShowFhirJson] = useState(false);
+  const [showInsiderPanel, setShowInsiderPanel] = useState(false);
   
   // Advanced EU CTR 536/2014 Filters (persist across demo phases)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [sponsorTypeFilter, setSponsorTypeFilter] = useState<string>('all');
   const [therapeuticAreaFilter, setTherapeuticAreaFilter] = useState<string>('all');
+  
+  // DSP Event logging hook
+  const { emitEvent, setCurrentPhase, completePhase, resetPhases, clearEvents } = useDspEventLog();
 
   // Filter assets based on category, age band, phase, MedDRA SOC, EU CTR fields, and search
   const filteredAssets = mockEHRCatalogAssets.filter(asset => {
@@ -158,20 +164,83 @@ function AppHealth() {
     setEhrData(null);
     setIsAnimating(false);
     setShowJson(false);
+    resetPhases(); // Reset DSP event phases
+    clearEvents(); // Clear the Dataspace Insider Panel events
   };
 
   // Contract agreement ID for EDC flow (stored across negotiation and transfer)
   const [contractAgreementId, setContractAgreementId] = useState<string | null>(null);
 
+  // Start the demo and emit catalog events
+  const startDemo = () => {
+    setPhase('catalog');
+    setCurrentPhase('catalog');
+    
+    // Emit catalog discovery events
+    emitEvent({
+      phase: 'catalog',
+      action: 'Catalog Request',
+      direction: 'outbound',
+      status: 'success',
+      dspMessageType: 'CatalogRequestMessage',
+      actor: 'Consumer (Nordstein Research)',
+      target: 'Provider (Rheinland Klinikum)',
+      details: { filter: 'healthdcatap:studyEligibility' },
+      source: 'mock'
+    });
+    
+    // Simulate catalog response after short delay
+    setTimeout(() => {
+      emitEvent({
+        phase: 'catalog',
+        action: 'Catalog Response',
+        direction: 'inbound',
+        status: 'success',
+        dspMessageType: 'CatalogResponse',
+        actor: 'Provider (Rheinland Klinikum)',
+        target: 'Consumer (Nordstein Research)',
+        details: { datasetsCount: 21, format: 'HealthDCAT-AP' },
+        source: 'mock'
+      });
+      completePhase('catalog');
+    }, 500);
+  };
+
   const simulateNegotiation = async () => {
     setIsAnimating(true);
+    setCurrentPhase('negotiation');
     const mode = getApiMode();
     
     try {
       if (mode === 'mock') {
-        // Mock mode: simulate with timeouts
+        // Mock mode: simulate with timeouts and emit DSP events
+        const negotiationEvents = [
+          { action: 'Contract Request', direction: 'outbound' as const, dspMessageType: 'ContractRequestMessage' },
+          { action: 'Contract Offer', direction: 'inbound' as const, dspMessageType: 'ContractOfferMessage' },
+          { action: 'Negotiation Accepted', direction: 'outbound' as const, dspMessageType: 'ContractNegotiationEventMessage' },
+          { action: 'Contract Agreement', direction: 'inbound' as const, dspMessageType: 'ContractAgreementMessage' },
+          { action: 'Agreement Verification', direction: 'outbound' as const, dspMessageType: 'ContractAgreementVerificationMessage' },
+          { action: 'Negotiation Finalized', direction: 'inbound' as const, dspMessageType: 'ContractNegotiationEventMessage' },
+        ];
+        
         for (let i = 0; i < mockNegotiationFlow.length; i++) {
           setNegotiationStep(i);
+          
+          // Emit DSP event for this step
+          if (negotiationEvents[i]) {
+            emitEvent({
+              phase: 'negotiation',
+              action: negotiationEvents[i].action,
+              direction: negotiationEvents[i].direction,
+              status: 'success',
+              dspMessageType: negotiationEvents[i].dspMessageType,
+              actor: negotiationEvents[i].direction === 'outbound' ? 'Consumer (Nordstein)' : 'Provider (Rheinland)',
+              target: negotiationEvents[i].direction === 'outbound' ? 'Provider (Rheinland)' : 'Consumer (Nordstein)',
+              details: { assetId: selectedAsset?.['@id'], step: i + 1 },
+              source: 'mock'
+            });
+          }
+          
           await new Promise(resolve => setTimeout(resolve, 800));
         }
       } else {
@@ -181,23 +250,94 @@ function AppHealth() {
         
         // Step through mock UI while negotiation happens
         setNegotiationStep(0); // Requesting
+        emitEvent({ 
+          phase: 'negotiation', 
+          action: 'Contract Request', 
+          direction: 'outbound', 
+          status: 'in-progress', 
+          dspMessageType: 'ContractRequestMessage',
+          actor: healthParticipants.consumer.name,
+          target: healthParticipants.provider.name,
+          details: {
+            consumer: healthParticipants.consumer.name,
+            provider: healthParticipants.provider.name,
+            consumerDid: healthParticipants.consumer.did,
+            providerDid: healthParticipants.provider.did,
+            assetId,
+            offerId
+          }
+        });
+        
         const negResponse = await api.initiateNegotiation(assetId, offerId);
+        emitEvent({ 
+          phase: 'negotiation', 
+          action: 'Contract Request Sent', 
+          direction: 'outbound', 
+          status: 'success', 
+          actor: healthParticipants.consumer.name,
+          target: healthParticipants.provider.name,
+          details: { 
+            negotiationId: negResponse.negotiationId,
+            consumer: healthParticipants.consumer.name,
+            consumerDid: healthParticipants.consumer.did 
+          } 
+        });
         
         setNegotiationStep(1); // Processing
         
         if (negResponse.state !== 'FINALIZED') {
           // Poll for completion
           setNegotiationStep(2); // Verifying
+          emitEvent({ 
+            phase: 'negotiation', 
+            action: 'Polling Negotiation Status', 
+            direction: 'internal', 
+            status: 'in-progress',
+            details: { negotiationId: negResponse.negotiationId }
+          });
+          
           const finalStatus = await api.pollNegotiation(negResponse.negotiationId, 30000);
           setContractAgreementId(finalStatus.contractAgreementId || null);
           setNegotiationStep(3); // Completed
+          
+          emitEvent({ 
+            phase: 'negotiation', 
+            action: 'Contract Agreement Received', 
+            direction: 'inbound', 
+            status: 'success', 
+            dspMessageType: 'ContractAgreementMessage', 
+            actor: healthParticipants.provider.name,
+            target: healthParticipants.consumer.name,
+            details: { 
+              contractAgreementId: finalStatus.contractAgreementId,
+              provider: healthParticipants.provider.name,
+              providerDid: healthParticipants.provider.did,
+              consumer: healthParticipants.consumer.name
+            } 
+          });
         } else {
           setContractAgreementId(negResponse.contractAgreementId || null);
           setNegotiationStep(mockNegotiationFlow.length - 1); // Jump to complete
+          emitEvent({ 
+            phase: 'negotiation', 
+            action: 'Negotiation Finalized', 
+            direction: 'inbound', 
+            status: 'success', 
+            dspMessageType: 'ContractNegotiationEventMessage',
+            actor: healthParticipants.provider.name,
+            target: healthParticipants.consumer.name,
+            details: { 
+              contractAgreementId: negResponse.contractAgreementId,
+              provider: healthParticipants.provider.name,
+              providerDid: healthParticipants.provider.did
+            } 
+          });
         }
       }
     } catch (error) {
       console.error('Negotiation failed:', error);
+      emitEvent({ phase: 'negotiation', action: 'Negotiation Failed', direction: 'internal', status: 'error', details: { error: String(error) } });
+      
       // Fall back to completing the mock flow for demo purposes
       for (let i = negotiationStep; i < mockNegotiationFlow.length; i++) {
         setNegotiationStep(i);
@@ -205,6 +345,7 @@ function AppHealth() {
       }
     }
     
+    completePhase('negotiation');
     setIsAnimating(false);
     
     // Check if asset requires confidential compute
@@ -218,10 +359,34 @@ function AppHealth() {
 
   const simulateCompute = async () => {
     setIsAnimating(true);
+    setCurrentPhase('compute');
+    
+    const computeEvents = [
+      { action: 'Compute Request', direction: 'outbound' as const },
+      { action: 'Enclave Attestation', direction: 'internal' as const },
+      { action: 'Encrypted Ingestion', direction: 'internal' as const },
+      { action: 'Secure Execution', direction: 'internal' as const },
+      { action: 'Result Delivery', direction: 'inbound' as const },
+    ];
+    
     for (let i = 0; i < mockComputeFlow.length; i++) {
       setComputeStep(i);
+      
+      if (computeEvents[i]) {
+        emitEvent({
+          phase: 'compute',
+          action: computeEvents[i].action,
+          direction: computeEvents[i].direction,
+          status: 'success',
+          actor: computeEvents[i].direction === 'internal' ? 'Enclave' : computeEvents[i].direction === 'outbound' ? 'Consumer' : 'Provider',
+          details: { step: i + 1, assetId: selectedAsset?.['@id'] }
+        });
+      }
+      
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
+    
+    completePhase('compute');
     setIsAnimating(false);
     setPhase('complete');
     loadEhrData();
@@ -229,13 +394,35 @@ function AppHealth() {
 
   const simulateTransfer = async () => {
     setIsAnimating(true);
+    setCurrentPhase('transfer');
     const mode = getApiMode();
     
     try {
       if (mode === 'mock') {
-        // Mock mode: simulate with timeouts
+        // Mock mode: simulate with timeouts and emit DSP events
+        const transferEvents = [
+          { action: 'Transfer Request', direction: 'outbound' as const, dspMessageType: 'TransferRequestMessage' },
+          { action: 'De-identification Pipeline', direction: 'internal' as const },
+          { action: 'Transfer Start + EDR', direction: 'inbound' as const, dspMessageType: 'TransferStartMessage' },
+          { action: 'FHIR Bundle Pull', direction: 'inbound' as const },
+          { action: 'Transfer Complete', direction: 'outbound' as const, dspMessageType: 'TransferCompletionMessage' },
+        ];
+        
         for (let i = 0; i < mockTransferFlow.length; i++) {
           setTransferStep(i);
+          
+          if (transferEvents[i]) {
+            emitEvent({
+              phase: 'transfer',
+              action: transferEvents[i].action,
+              direction: transferEvents[i].direction,
+              status: 'success',
+              dspMessageType: transferEvents[i].dspMessageType,
+              actor: transferEvents[i].direction === 'internal' ? 'Provider (De-ID)' : transferEvents[i].direction === 'outbound' ? 'Consumer' : 'Provider',
+              details: { assetId: selectedAsset?.['@id'], step: i + 1 }
+            });
+          }
+          
           await new Promise(resolve => setTimeout(resolve, 800));
         }
       } else {
@@ -244,20 +431,100 @@ function AppHealth() {
         const agreementId = contractAgreementId || `mock-agreement-${Date.now()}`;
         
         setTransferStep(0); // Initiating
+        emitEvent({ 
+          phase: 'transfer', 
+          action: 'Transfer Request', 
+          direction: 'outbound', 
+          status: 'in-progress', 
+          dspMessageType: 'TransferRequestMessage',
+          actor: healthParticipants.consumer.name,
+          target: healthParticipants.provider.name,
+          details: {
+            consumer: healthParticipants.consumer.name,
+            consumerDid: healthParticipants.consumer.did,
+            provider: healthParticipants.provider.name,
+            providerDid: healthParticipants.provider.did,
+            assetId,
+            agreementId
+          }
+        });
+        
         const transferResponse = await api.initiateTransfer(agreementId, assetId);
+        emitEvent({ 
+          phase: 'transfer', 
+          action: 'Transfer Initiated', 
+          direction: 'outbound', 
+          status: 'success',
+          actor: healthParticipants.consumer.name,
+          target: healthParticipants.provider.name, 
+          details: { 
+            transferId: transferResponse.transferId,
+            consumer: healthParticipants.consumer.name,
+            consumerDid: healthParticipants.consumer.did
+          } 
+        });
         
         setTransferStep(1); // Provisioning
+        emitEvent({ 
+          phase: 'transfer', 
+          action: 'Data Provisioning', 
+          direction: 'internal', 
+          status: 'in-progress',
+          details: { 
+            transferId: transferResponse.transferId,
+            provider: healthParticipants.provider.name 
+          }
+        });
         
         if (transferResponse.state !== 'COMPLETED') {
           setTransferStep(2); // Transferring
+          emitEvent({ 
+            phase: 'transfer', 
+            action: 'Polling Transfer Status', 
+            direction: 'internal', 
+            status: 'in-progress',
+            details: { transferId: transferResponse.transferId }
+          });
+          
           await api.pollTransfer(transferResponse.transferId, 30000);
           setTransferStep(3); // Completing
+          
+          emitEvent({ 
+            phase: 'transfer', 
+            action: 'Data Received via EDR', 
+            direction: 'inbound', 
+            status: 'success', 
+            dspMessageType: 'TransferStartMessage',
+            actor: healthParticipants.provider.name,
+            target: healthParticipants.consumer.name,
+            details: {
+              transferId: transferResponse.transferId,
+              provider: healthParticipants.provider.name,
+              providerDid: healthParticipants.provider.did
+            }
+          });
         }
         
         setTransferStep(mockTransferFlow.length - 1); // Complete
+        emitEvent({ 
+          phase: 'transfer', 
+          action: 'Transfer Complete', 
+          direction: 'outbound', 
+          status: 'success', 
+          dspMessageType: 'TransferCompletionMessage',
+          actor: healthParticipants.consumer.name,
+          target: healthParticipants.provider.name,
+          details: {
+            transferId: transferResponse.transferId,
+            consumer: healthParticipants.consumer.name,
+            provider: healthParticipants.provider.name
+          }
+        });
       }
     } catch (error) {
       console.error('Transfer failed:', error);
+      emitEvent({ phase: 'transfer', action: 'Transfer Failed', direction: 'internal', status: 'error', details: { error: String(error) } });
+      
       // Fall back to completing the mock flow for demo purposes
       for (let i = transferStep; i < mockTransferFlow.length; i++) {
         setTransferStep(i);
@@ -265,6 +532,7 @@ function AppHealth() {
       }
     }
     
+    completePhase('transfer');
     setIsAnimating(false);
     setPhase('complete');
     loadEhrData();
@@ -299,7 +567,15 @@ function AppHealth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 transition-all duration-300 ${showInsiderPanel ? 'mr-[420px]' : ''}`}>
+      {/* Dataspace Insider Panel */}
+      <DataspaceInsiderPanel 
+        isOpen={showInsiderPanel} 
+        onClose={() => setShowInsiderPanel(false)}
+        isBackendOnline={backendAvailable ?? false}
+      />
+      <DataspaceInsiderTrigger onClick={() => setShowInsiderPanel(true)} isPanelOpen={showInsiderPanel} />
+      
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-blue-100">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -432,7 +708,7 @@ function AppHealth() {
                 </p>
                 <div className="flex gap-4 flex-wrap">
                   <button
-                    onClick={() => setPhase('catalog')}
+                    onClick={startDemo}
                     className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
                   >
                     <Play className="w-5 h-5" />
@@ -2054,4 +2330,13 @@ function FhirJsonHighlighter({ data }: { data: unknown }) {
   return <div className="text-slate-100">{colorize(jsonString)}</div>;
 }
 
-export default AppHealth;
+// Wrap AppHealth with the DSP Event Log Provider
+function AppHealthWithProvider() {
+  return (
+    <DspEventLogProvider>
+      <AppHealth />
+    </DspEventLogProvider>
+  );
+}
+
+export default AppHealthWithProvider;

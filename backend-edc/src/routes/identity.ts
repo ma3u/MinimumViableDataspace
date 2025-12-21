@@ -18,7 +18,7 @@ const providerIdentityHubUrl = config.provider.identityHubUrl;
  * GET /api/identity/participant
  * Get participant information from Identity Hub
  */
-identityRouter.get('/participant', async (req: Request, res: Response) => {
+identityRouter.get('/participant', async (_req: Request, res: Response) => {
   try {
     const response = await fetch(`${identityHubUrl}/api/identity/v1alpha/participants`, {
       headers: {
@@ -269,7 +269,7 @@ identityRouter.post('/consent/:patientDid/revoke', async (req: Request, res: Res
  * GET /api/identity/provider/verify
  * Verify provider's dataspace membership and credentials
  */
-identityRouter.get('/provider/verify', async (req: Request, res: Response) => {
+identityRouter.get('/provider/verify', async (_req: Request, res: Response) => {
   try {
     // Query provider's Identity Hub for membership credential
     const response = await fetch(

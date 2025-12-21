@@ -21,8 +21,9 @@ export interface CatalogRequest {
 export interface ContractRequest {
   counterPartyAddress: string;
   counterPartyId: string;
+  providerId?: string;  // Optional for backwards compatibility
   protocol?: string;
-  policy: {
+  policy?: {
     '@type': string;
     '@id': string;
     assigner: string;
@@ -31,12 +32,17 @@ export interface ContractRequest {
     prohibition?: unknown[];
     obligation?: unknown;
   };
+  offer?: {
+    offerId: string;
+    assetId: string;
+    policyId?: string;
+  };
 }
 
 export interface TransferRequest {
   assetId: string;
   counterPartyAddress: string;
-  connectorId: string;
+  connectorId?: string;  // Optional
   contractId: string;
   dataDestination: {
     type: string;
@@ -53,6 +59,8 @@ export interface NegotiationState {
   counterPartyAddress: string;
   contractAgreementId?: string;
   createdAt: number;
+  // Allow JSON-LD style property access for EDC responses
+  [key: string]: unknown;
 }
 
 export interface TransferState {
@@ -63,6 +71,8 @@ export interface TransferState {
   contractId: string;
   transferType: string;
   createdAt: number;
+  // Allow JSON-LD style property access for EDC responses
+  [key: string]: unknown;
 }
 
 export interface EndpointDataReference {
@@ -72,11 +82,30 @@ export interface EndpointDataReference {
   authKey: string;
   authCode: string;
   properties?: Record<string, unknown>;
+  // Allow JSON-LD style property access for EDC responses
+  [key: string]: unknown;
 }
 
 export interface IdResponse {
   '@id': string;
   createdAt?: number;
+  // Allow JSON-LD style property access for EDC responses
+  [key: string]: unknown;
+}
+
+export interface ContractAgreement {
+  '@id': string;
+  '@type': string;
+  assetId: string;
+  providerId: string;
+  consumerId: string;
+  [key: string]: unknown;
+}
+
+export interface FetchResult {
+  data: unknown;
+  fromCache?: boolean;
+  [key: string]: unknown;
 }
 
 export class EdcClient {
@@ -162,10 +191,11 @@ export class EdcClient {
    */
   async pollNegotiation(
     negotiationId: string,
-    maxWaitMs: number = config.timeouts.negotiationMaxWaitMs
+    maxWaitMs: number = config.timeouts.negotiationMaxWaitMs,
+    _pollIntervalMs?: number  // Kept for API compatibility
   ): Promise<NegotiationState> {
     const startTime = Date.now();
-    const pollInterval = config.timeouts.negotiationPollMs;
+    const pollInterval = _pollIntervalMs ?? config.timeouts.negotiationPollMs;
 
     while (Date.now() - startTime < maxWaitMs) {
       const state = await this.getNegotiation(negotiationId);
@@ -178,6 +208,28 @@ export class EdcClient {
     }
 
     throw new Error(`Negotiation ${negotiationId} did not complete within ${maxWaitMs}ms`);
+  }
+
+  /**
+   * Query all negotiations
+   */
+  async queryNegotiations(querySpec?: { offset?: number; limit?: number }): Promise<NegotiationState[]> {
+    const payload = {
+      '@context': EDC_CONTEXT,
+      '@type': 'QuerySpec',
+      ...querySpec,
+    };
+
+    const response = await this.client.post('/contractnegotiations/request', payload);
+    return response.data;
+  }
+
+  /**
+   * Get contract agreement by ID
+   */
+  async getAgreement(agreementId: string): Promise<ContractAgreement> {
+    const response = await this.client.get(`/contractagreements/${agreementId}`);
+    return response.data;
   }
 
   /**
@@ -212,10 +264,11 @@ export class EdcClient {
    */
   async pollTransfer(
     transferId: string,
-    maxWaitMs: number = config.timeouts.transferMaxWaitMs
+    maxWaitMs: number = config.timeouts.transferMaxWaitMs,
+    _pollIntervalMs?: number  // Kept for API compatibility
   ): Promise<TransferState> {
     const startTime = Date.now();
-    const pollInterval = config.timeouts.transferPollMs;
+    const pollInterval = _pollIntervalMs ?? config.timeouts.transferPollMs;
 
     while (Date.now() - startTime < maxWaitMs) {
       const state = await this.getTransfer(transferId);
@@ -228,6 +281,20 @@ export class EdcClient {
     }
 
     throw new Error(`Transfer ${transferId} did not start within ${maxWaitMs}ms`);
+  }
+
+  /**
+   * Query all transfers
+   */
+  async queryTransfers(querySpec?: { offset?: number; limit?: number }): Promise<TransferState[]> {
+    const payload = {
+      '@context': EDC_CONTEXT,
+      '@type': 'QuerySpec',
+      ...querySpec,
+    };
+
+    const response = await this.client.post('/transferprocesses/request', payload);
+    return response.data;
   }
 
   /**

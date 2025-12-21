@@ -14,6 +14,12 @@ export interface Config {
   port: number;
   mode: BackendMode;
   
+  // Consumer settings
+  consumer: {
+    identityHubUrl: string;
+    participantId: string;
+  };
+  
   // EDC Consumer Connector
   edc: {
     consumerManagementUrl: string;
@@ -27,6 +33,7 @@ export interface Config {
     managementUrl: string;
     dspUrl: string;
     participantId: string;
+    identityHubUrl: string;
   };
   
   // Backend Mock (for hybrid mode)
@@ -64,6 +71,17 @@ export const config: Config = {
   port: getEnvAsInt('PORT', 3002),
   mode: (getEnvOrDefault('BACKEND_MODE', 'hybrid') as BackendMode),
   
+  consumer: {
+    identityHubUrl: getEnvOrDefault(
+      'EDC_CONSUMER_IDENTITYHUB_URL',
+      'http://localhost:7080'
+    ),
+    participantId: getEnvOrDefault(
+      'EDC_CONSUMER_PARTICIPANT_ID',
+      'did:web:localhost%3A7083'
+    ),
+  },
+  
   edc: {
     consumerManagementUrl: getEnvOrDefault(
       'EDC_CONSUMER_MANAGEMENT_URL',
@@ -92,6 +110,10 @@ export const config: Config = {
     participantId: getEnvOrDefault(
       'EDC_PROVIDER_PARTICIPANT_ID',
       'did:web:localhost%3A7093'
+    ),
+    identityHubUrl: getEnvOrDefault(
+      'EDC_PROVIDER_IDENTITYHUB_URL',
+      'http://localhost:7090'
     ),
   },
   

@@ -1,0 +1,344 @@
+openapi: 3.1.0
+info:
+  title: Dataspace Events API
+  description: |
+    Real-time event streaming API for the Dataspace Insider Panel.
+    Provides SSE stream for live DSP protocol visualization and EDC callback endpoints.
+    
+    ## Features
+    - **SSE Stream**: Real-time events from EDC callbacks
+    - **Event History**: REST API for past events
+    - **EDC Callbacks**: Webhook endpoint for EDC event notifications
+    
+    ## Event Types
+    Events follow the DSP (Dataspace Protocol) phases:
+    - `catalog`: Catalog discovery and queries
+    - `negotiation`: Contract negotiation flow
+    - `transfer`: Data transfer process
+    - `compute`: Confidential compute (future)
+  version: 1.0.0
+  contact:
+    name: MVD Health Demo
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:3002
+    description: Backend EDC (Docker)
+  - url: http://localhost:4002
+    description: Backend EDC (Local Dev)
+
+paths:
+  /api/events/stream:
+    get:
+      summary: SSE Event Stream
+      description: |
+        Server-Sent Events stream for real-time DSP protocol events.
+        Connect with an EventSource to receive live updates.
+        
+        ```javascript
+        const eventSource = new EventSource('/api/events/stream');
+        eventSource.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          console.log('DSP Event:', data);
+        };
+        ```
+      tags:
+        - Events
+      responses:
+        '200':
+          description: SSE stream established
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                example: |
+                  data: {"type":"dsp-event","id":"evt-001","phase":"catalog","action":"CatalogRequestMessage"}
+                  
+                  data: {"type":"dsp-event","id":"evt-002","phase":"catalog","action":"CatalogResponse"}
+                  
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/events:
+    get:
+      summary: Get Event History
+      description: Retrieve historical DSP events with optional filtering
+      tags:
+        - Events
+      parameters:
+        - name: phase
+          in: query
+          description: Filter by DSP phase
+          schema:
+            $ref: '#/components/schemas/DspPhase'
+        - name: since
+          in: query
+          description: Return events after this timestamp (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          description: Maximum number of events to return
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+      responses:
+        '200':
+          description: Event list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DspEvent'
+                  totalCount:
+                    type: integer
+                    description: Total matching events
+
+  /api/events/callback:
+    post:
+      summary: EDC Event Callback
+      description: |
+        Webhook endpoint for EDC callback notifications.
+        Register this URL with EDC callback extensions to receive real-time events.
+        
+        Supported EDC callback types:
+        - `ContractNegotiation.INITIATED`
+        - `ContractNegotiation.AGREED`
+        - `ContractNegotiation.FINALIZED`
+        - `TransferProcess.REQUESTED`
+        - `TransferProcess.STARTED`
+        - `TransferProcess.COMPLETED`
+      tags:
+        - Callbacks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EdcCallbackPayload'
+            examples:
+              negotiation_finalized:
+                summary: Contract Negotiation Finalized
+                value:
+                  type: ContractNegotiation.FINALIZED
+                  payload:
+                    contractNegotiationId: "negotiation-123"
+                    contractAgreementId: "agreement-456"
+                    state: FINALIZED
+              transfer_started:
+                summary: Transfer Started
+                value:
+                  type: TransferProcess.STARTED
+                  payload:
+                    transferProcessId: "transfer-789"
+                    state: STARTED
+                    dataAddress:
+                      type: HttpData
+                      baseUrl: "http://provider:12001/api/public"
+      responses:
+        '200':
+          description: Callback processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                  eventId:
+                    type: string
+        '400':
+          description: Invalid callback payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/events/clear:
+    post:
+      summary: Clear Event History
+      description: Clear all stored events (for testing/demo reset)
+      tags:
+        - Events
+      responses:
+        '200':
+          description: Events cleared
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cleared:
+                    type: boolean
+                  count:
+                    type: integer
+                    description: Number of events cleared
+
+  /health:
+    get:
+      summary: Health Check
+      description: Service health status
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+components:
+  schemas:
+    DspPhase:
+      type: string
+      enum:
+        - catalog
+        - negotiation
+        - transfer
+        - compute
+      description: DSP protocol phase
+
+    DspDirection:
+      type: string
+      enum:
+        - outbound
+        - inbound
+        - internal
+      description: Message direction relative to consumer
+
+    DspStatus:
+      type: string
+      enum:
+        - pending
+        - in-progress
+        - success
+        - error
+      description: Event status
+
+    DspEvent:
+      type: object
+      required:
+        - id
+        - timestamp
+        - phase
+        - action
+        - direction
+        - status
+      properties:
+        id:
+          type: string
+          description: Unique event identifier
+          example: "evt-abc123"
+        timestamp:
+          type: string
+          format: date-time
+          description: Event timestamp
+        phase:
+          $ref: '#/components/schemas/DspPhase'
+        action:
+          type: string
+          description: DSP message type or action
+          example: "ContractRequestMessage"
+        direction:
+          $ref: '#/components/schemas/DspDirection'
+        status:
+          $ref: '#/components/schemas/DspStatus'
+        actor:
+          type: string
+          description: Entity that triggered the event
+          example: "did:web:consumer.localhost"
+        target:
+          type: string
+          description: Target entity or resource
+          example: "did:web:provider.localhost"
+        details:
+          type: object
+          description: Additional event details
+          additionalProperties: true
+        dspMessageType:
+          type: string
+          description: Full DSP message type URI
+          example: "https://w3id.org/dspace/2024/1/ContractRequestMessage"
+        source:
+          type: string
+          enum:
+            - mock
+            - edc
+            - sse
+          description: Source of the event
+        errorMessage:
+          type: string
+          description: Error details if status is 'error'
+
+    EdcCallbackPayload:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          description: EDC callback event type
+          example: "ContractNegotiation.FINALIZED"
+        payload:
+          type: object
+          description: Event-specific payload
+          additionalProperties: true
+
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+            - degraded
+        service:
+          type: string
+          example: "backend-edc"
+        mode:
+          type: string
+          enum:
+            - hybrid
+            - full
+        sseConnections:
+          type: integer
+          description: Number of active SSE connections
+        timestamp:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error type
+        message:
+          type: string
+          description: Error details
+        timestamp:
+          type: string
+          format: date-time
+
+tags:
+  - name: Events
+    description: Event streaming and history
+  - name: Callbacks
+    description: EDC callback webhooks
+  - name: Health
+    description: Service health endpoints

@@ -28,11 +28,7 @@ services:
   # ============================================================
   # Backend EDC - Proxy service for EDC integration
   # ============================================================
-  # NOTE: Currently disabled (needs TypeScript fixes). Use profile 'backend-edc' to enable:
-  #   docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml --profile backend-edc up
   backend-edc:
-    profiles:
-      - backend-edc
     build:
       context: ./backend-edc
       dockerfile: Dockerfile

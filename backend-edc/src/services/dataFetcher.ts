@@ -24,6 +24,7 @@ export interface FetchResult {
   source: 'edc' | 'mock';
   transferId?: string;
   fetchTimeMs: number;
+  fromCache?: boolean;
 }
 
 export class DataFetcher {

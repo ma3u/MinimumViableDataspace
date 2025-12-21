@@ -18,6 +18,7 @@ import { negotiationRouter } from './routes/negotiation.js';
 import { transferRouter } from './routes/transfer.js';
 import { identityRouter } from './routes/identity.js';
 import { healthRouter } from './routes/health.js';
+import { eventsRouter } from './routes/events.js';
 
 // Create Express app
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/catalog', catalogRouter);
 app.use('/api/negotiations', negotiationRouter);
 app.use('/api/transfers', transferRouter);
 app.use('/api/identity', identityRouter);
+app.use('/api/events', eventsRouter);
 
 // Legacy /api/ehr routes for compatibility
 app.get('/api/ehr', async (_req: Request, res: Response) => {
@@ -117,6 +119,10 @@ app.use((req: Request, res: Response) => {
       'GET /api/identity/consent/:patientDid',
       'POST /api/identity/consent/:patientDid/revoke',
       'GET /api/identity/provider/verify',
+      'GET /api/events',
+      'GET /api/events/stream',
+      'GET /api/events/stats',
+      'DELETE /api/events',
     ],
   });
 });
@@ -154,6 +160,7 @@ app.listen(PORT, () => {
   console.log(`  Negotiations: http://localhost:${PORT}/api/negotiations`);
   console.log(`  Transfers:    http://localhost:${PORT}/api/transfers`);
   console.log(`  Identity:     http://localhost:${PORT}/api/identity`);
+  console.log(`  Events SSE:   http://localhost:${PORT}/api/events/stream`);
   console.log(`  Mode Info:    http://localhost:${PORT}/api/mode`);
   console.log('');
 });

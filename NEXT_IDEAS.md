@@ -38,6 +38,14 @@ Read the full article here: [link to the article]
 ## Dataspace Insider View panel in the frontend 
 
 - to show the interaction between data provider and data consumer based on the dataspace protocol. Use a centralied logging system to capture all interactions.
+- if the backend is online show live interactions
+- The panel is hidden
+the panel is shown when a button is clicked on the right side of the screen
+- The panel shows a timeline of interactions between data provider and data consumer
+- Each interaction is represented as a card with details such as timestamp, action type, and status from the central logging system
+- The panel is scrollable to view more interactions
+- the panel show the steps of the dataspace protocol as a progress indicator at the top
+- The panel can be closed by clicking a close button or outside the panel area
 
 ## Implementing Guideline for Confidential Compute in Health Dataspaces: A Practical Guide using EDC's data visiting
 - Market Analytics for Data Clean Rooms in Health Dataspaces: Opportunities and Challenges

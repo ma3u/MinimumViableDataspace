@@ -24,6 +24,12 @@ dependencies {
     runtimeOnly(project(":extensions:catalog-node-resolver")) // to trigger the federated catalog
     runtimeOnly(libs.edc.bom.controlplane)
     runtimeOnly(libs.edc.api.secrets)
+    
+    // Callback extensions for Dataspace Insider View event forwarding
+    // @see https://github.com/eclipse-edc/Connector/tree/main/extensions/control-plane/callback
+    runtimeOnly(libs.edc.callback.event.dispatcher)
+    runtimeOnly(libs.edc.callback.http.dispatcher)
+    runtimeOnly(libs.edc.callback.static.endpoint)
 
     if (project.properties.getOrDefault("persistence", "false") == "true") {
         runtimeOnly(libs.edc.vault.hashicorp)

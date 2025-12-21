@@ -158,9 +158,11 @@ transferRouter.get('/:id/edr', async (req: Request, res: Response) => {
  * Fetch the actual data using the EDR
  */
 transferRouter.get('/:id/data', async (req: Request, res: Response) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-    const data = await edcConsumerClient.fetchDataViaEdr(id);
+    // First get the EDR, then fetch data using it
+    const edr = await edcConsumerClient.getEdrDataAddress(id);
+    const data = await edcConsumerClient.fetchDataViaEdr(edr);
 
     res.json({
       transferId: id,

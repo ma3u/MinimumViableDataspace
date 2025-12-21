@@ -20,6 +20,12 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      // Backend-EDC Events API (SSE + REST for Dataspace Insider Panel)
+      '/api/events': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+        ws: true
+      },
       // Consumer Management API
       '/consumer/api': {
         target: 'http://localhost:8081',
