@@ -10,7 +10,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { 
-  X, 
   Eye, 
   Trash2, 
   Wifi, 
@@ -41,18 +40,14 @@ import {
 
 interface DataspaceInsiderPanelProps {
   isOpen: boolean;
-  onClose: () => void;
   isBackendOnline: boolean;
 }
 
 // Observability links configuration
 const OBSERVABILITY_LINKS = {
-  apiDocs: 'https://your-org.github.io/MVD-health/api/#api-events', // API documentation on GitHub Pages
+  apiDocs: 'https://ma3u.github.io/MinimumViableDataspace/api/', // API documentation on GitHub Pages
   logs: '/api/events', // Backend events API (local)
-  dockerLogs: 'http://localhost:3002/health/detailed', // Backend-EDC health/logs
-  grafana: 'http://localhost:3000/d/edc-health', // Grafana dashboard (if available)
-  prometheus: 'http://localhost:9090', // Prometheus (if available)
-  jaeger: 'http://localhost:16686', // Jaeger tracing (if available)
+  dockerLogs: '/health/detailed', // Backend-EDC health/logs (proxied)
 };
 
 // Format timestamp for display
@@ -454,7 +449,7 @@ function ObservabilityLinks() {
             <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
           </a>
           <div className="px-3 py-1.5 text-[10px] font-medium text-gray-400 uppercase mt-1">
-            Observability
+            Logs & Debug
           </div>
           <a
             href={OBSERVABILITY_LINKS.logs}
@@ -467,23 +462,13 @@ function ObservabilityLinks() {
             <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
           </a>
           <a
-            href={OBSERVABILITY_LINKS.grafana}
+            href={OBSERVABILITY_LINKS.dockerLogs}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
-            <Activity className="w-4 h-4 text-orange-500" />
-            Grafana Dashboard
-            <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
-          </a>
-          <a
-            href={OBSERVABILITY_LINKS.prometheus}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-          >
-            <Activity className="w-4 h-4 text-red-500" />
-            Prometheus
+            <Activity className="w-4 h-4 text-blue-500" />
+            Backend Health
             <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
           </a>
           <div className="border-t border-gray-100 mt-1 pt-1">
@@ -497,7 +482,7 @@ function ObservabilityLinks() {
   );
 }
 
-export function DataspaceInsiderPanel({ isOpen, onClose, isBackendOnline }: DataspaceInsiderPanelProps) {
+export function DataspaceInsiderPanel({ isOpen, isBackendOnline }: DataspaceInsiderPanelProps) {
   const { 
     events, 
     isConnected, 
@@ -598,14 +583,6 @@ export function DataspaceInsiderPanel({ isOpen, onClose, isBackendOnline }: Data
             title="Clear all events"
           >
             <Trash2 className="w-4 h-4" />
-          </button>
-
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -712,7 +689,7 @@ export function DataspaceInsiderTrigger({ onClick, isPanelOpen }: { onClick: () 
         rounded-l-xl shadow-lg hover:shadow-xl
         transition-all duration-300 group
         ${isPanelOpen ? 'right-[420px]' : 'right-0'}`}
-      title="Open Dataspace Insider"
+      title={isPanelOpen ? "Close DSP Insider" : "Open DSP Insider"}
     >
       <Eye className="w-5 h-5" />
       <span className="text-sm font-medium hidden group-hover:inline transition-all">

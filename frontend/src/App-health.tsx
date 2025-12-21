@@ -571,10 +571,9 @@ function AppHealth() {
       {/* Dataspace Insider Panel */}
       <DataspaceInsiderPanel 
         isOpen={showInsiderPanel} 
-        onClose={() => setShowInsiderPanel(false)}
         isBackendOnline={backendAvailable ?? false}
       />
-      <DataspaceInsiderTrigger onClick={() => setShowInsiderPanel(true)} isPanelOpen={showInsiderPanel} />
+      <DataspaceInsiderTrigger onClick={() => setShowInsiderPanel(!showInsiderPanel)} isPanelOpen={showInsiderPanel} />
       
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-blue-100">

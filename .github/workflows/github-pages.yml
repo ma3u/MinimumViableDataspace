@@ -58,6 +58,12 @@ jobs:
           GITHUB_PAGES: 'true'
           VITE_API_MODE: 'mock'
 
+      - name: Copy API documentation
+        run: |
+          mkdir -p ./frontend/dist/api
+          cp -r ./docs/api/* ./frontend/dist/api/
+          cp -r ./specs/*.yaml ./frontend/dist/api/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
