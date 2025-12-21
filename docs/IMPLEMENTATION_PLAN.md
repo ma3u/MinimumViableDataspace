@@ -16,7 +16,8 @@ This document provides a detailed, step-by-step implementation plan for building
 | Phase 6: Data Transfer | ✅ Complete | Secure FHIR data exchange |
 | Phase 7: Compliance & Security | ✅ Complete | EHDS compliance, de-identification |
 | Phase 8: Production Readiness | 🔄 In Progress | Monitoring, scaling, documentation |
-| Phase 9: Dynamic Data Integration | 🔄 In Progress | Replace static data with EDC/DCAT |
+| Phase 9: Dynamic Data Integration | ✅ Complete | Replace static data with EDC/DCAT |
+| Phase 14: Monitoring & Debugging | 📋 Planned | Observability, tracing, debugging infrastructure |
 
 ---
 
@@ -1356,13 +1357,13 @@ deployment/
 
 ---
 
-## Phase 9: Dynamic Data Integration 🔄
+## Phase 9: Dynamic Data Integration ✅
 
 ### 9.1 Overview
 
 **Objective:** Replace static/mock data with real EDC and DCAT metadata throughout the frontend.
 
-**Status:** 🔄 In Progress (January 2025)
+**Status:** ✅ Complete (January 2025)
 
 **Reference:** See [DATA-SOURCES-REPORT.md](./DATA-SOURCES-REPORT.md) for complete analysis of current data sources.
 
@@ -1383,15 +1384,15 @@ deployment/
 
 **Objective:** Extract and return all HealthDCAT-AP properties from EDC catalog responses.
 
-**Status:** 🔄 In Progress
+**Status:** ✅ Complete
 
 **Implementation:**
-- [ ] Parse DCAT metadata from EDC catalog response
-- [ ] Extract `healthdcatap:` namespace properties
-- [ ] Map EDC asset properties to CatalogAsset interface
-- [ ] Include publisher, contact point, distribution info
-- [ ] Add temporal/spatial coverage from DCAT
-- [ ] Return policy summaries with each asset
+- [x] Parse DCAT metadata from EDC catalog response
+- [x] Extract `healthdcatap:` namespace properties
+- [x] Map EDC asset properties to CatalogAsset interface
+- [x] Include publisher, contact point, distribution info
+- [x] Add temporal/spatial coverage from DCAT
+- [x] Return policy summaries with each asset
 
 **Files to Modify:**
 - `backend-edc/src/routes/catalog.ts` - Enhanced DCAT parsing
@@ -1446,13 +1447,13 @@ interface CatalogAsset {
 
 **Objective:** Fetch participant information from Identity Hub instead of static data.
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete
 
 **Implementation:**
-- [ ] Add `/api/participants` endpoint to backend-edc
-- [ ] Query Identity Hub for participant info
-- [ ] Cache participant data with TTL
-- [ ] Return DID, name, verification status
+- [x] Add `/api/participants` endpoint to backend-edc
+- [x] Query Identity Hub for participant info
+- [x] Cache participant data with TTL
+- [x] Return DID, name, verification status
 
 **API Endpoints:**
 ```
@@ -1483,17 +1484,17 @@ interface Participant {
 
 **Objective:** Move hardcoded configuration to environment variables.
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete
 
 **Changes:**
-- [ ] Provider Participant ID → `VITE_PROVIDER_DID` env var
-- [ ] Provider DSP URL → `VITE_PROVIDER_DSP_URL` env var
-- [ ] Consumer DID → `VITE_CONSUMER_DID` env var
-- [ ] Update `config.ts` to use environment variables
+- [x] Provider Participant ID → `VITE_PROVIDER_DID` env var
+- [x] Provider DSP URL → `VITE_PROVIDER_DSP_URL` env var
+- [x] Consumer DID → `VITE_CONSUMER_DID` env var
+- [x] Update `config.ts` to use environment variables
 
-**Files to Modify:**
-- `frontend/src/config.ts` - Environment variable loading
-- `frontend/.env.local`, `.env.standalone` - New variables
+**Files Created/Modified:**
+- `frontend/src/config.ts` - Environment variable loading with type-safe exports
+- `frontend/.env.local`, `.env.full`, `.env.hybrid`, `.env.example` - New variables
 
 ---
 
@@ -1501,14 +1502,15 @@ interface Participant {
 
 **Objective:** Display real DCAT metadata from catalog response.
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete
 
 **Implementation:**
-- [ ] Update `CatalogCard.tsx` to show publisher info
-- [ ] Add policy badge (open/consent-required/restricted)
-- [ ] Show data freshness (issued/modified dates)
-- [ ] Display distribution formats
-- [ ] Add sensitivity level indicator
+- [x] Update `CatalogCard.tsx` to show publisher info
+- [x] Add policy badge (open/consent-required/restricted)
+- [x] Show data freshness (issued/modified dates)
+- [x] Display distribution formats
+- [x] Add sensitivity level indicator
+- [x] Created reusable sub-components (PolicyBadge, DataFreshness, DistributionFormats, PublisherInfo, SensitivityIndicator)
 
 **UI Enhancements:**
 ```
@@ -1533,13 +1535,15 @@ interface Participant {
 
 **Objective:** Show actual EDC negotiation states instead of simulated progress.
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete
 
 **Implementation:**
-- [ ] Map EDC negotiation states to UI steps
-- [ ] Show real timestamps from EDC response
-- [ ] Display actual contract agreement ID
-- [ ] Show policy constraints in agreement
+- [x] Map EDC negotiation states to UI steps
+- [x] Show real timestamps from EDC response
+- [x] Display actual contract agreement ID
+- [x] Show policy constraints in agreement
+- [x] Added negotiationStartTime, negotiationEndTime state tracking
+- [x] Display duration calculation in UI
 
 **State Mapping:**
 | EDC State | UI Step | Icon |
@@ -1560,13 +1564,14 @@ interface Participant {
 
 **Objective:** Display actual transfer progress and EDR token info.
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete
 
 **Implementation:**
-- [ ] Show real transfer state from EDC
-- [ ] Display EDR token metadata (not secret)
-- [ ] Show data size and transfer duration
-- [ ] Add transfer log timeline
+- [x] Show real transfer state from EDC
+- [x] Display EDR token metadata (not secret)
+- [x] Show data size and transfer duration
+- [x] Add transfer log timeline
+- [x] Added transferStartTime, transferEndTime state tracking
 
 ---
 
@@ -1586,42 +1591,260 @@ Based on the DATA-SOURCES-REPORT.md analysis, these should **NOT** be made dynam
 
 ---
 
-### 9.9 Implementation Order
 
-**Week 1: Backend-EDC DCAT Enhancement**
-1. Create `catalogService.ts` with DCAT parsing
-2. Enhance `/api/catalog/assets` with full DCAT properties
-3. Add unit tests for DCAT property extraction
-4. Update mock fallback to include DCAT-like properties
+---
 
-**Week 2: Frontend Catalog Enhancements**
-1. Update `CatalogAsset` type with new fields
-2. Modify `CatalogCard.tsx` for publisher/policy display
-3. Add policy badges and sensitivity indicators
-4. Test with hybrid mode
+## Phase 14: Monitoring & Debugging 📋
 
-**Week 3: Identity & Negotiation**
-1. Add `/api/participants` endpoint
-2. Update Intro page to fetch real participant info
-3. Enhance negotiation display with real states
-4. Add contract agreement details display
+### 14.1 Overview
 
-**Week 4: Transfer & Polish**
-1. Enhance transfer display with EDR info
-2. Add data freshness indicators
-3. Performance optimization
-4. Documentation update
+**Objective:** Implement comprehensive observability, monitoring, and debugging infrastructure for the Health Dataspace.
+
+**Status:** 📋 Planned (GitHub Issue #10)
+
+**Reference:** See [GitHub Issue #10](https://github.com/ma3u/MinimumViableDataspace/issues/10) for detailed requirements.
+
+---
+
+### 14.2 Monitoring Stack
+
+**Objective:** Set up Prometheus + Grafana monitoring infrastructure.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Deploy Prometheus with EDC metrics scraping
+- [ ] Configure Grafana with custom dashboards
+- [ ] Set up Loki for log aggregation
+- [ ] Create alerting rules for critical events
+
+**Dashboards Required:**
+| Dashboard | Metrics |
+|-----------|---------|
+| EDC Overview | Catalog queries, negotiations, transfers |
+| DSP Protocol | State transitions, timing, errors |
+| Health Data | FHIR requests, consent checks, access patterns |
+| Infrastructure | CPU, memory, network, disk |
+
+**Alert Rules:**
+- Negotiation failure rate > 5%
+- Transfer timeouts > 10s
+- Vault connectivity issues
+- Database connection pool exhaustion
+
+---
+
+### 14.3 Distributed Tracing
+
+**Objective:** Implement OpenTelemetry-based distributed tracing.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Add OpenTelemetry SDK to EDC extensions
+- [ ] Configure trace propagation across services
+- [ ] Set up Jaeger/Tempo for trace visualization
+- [ ] Instrument backend-edc and backend-mock
+- [ ] Add frontend performance tracing
+
+**Trace Contexts:**
+- Catalog discovery flow (Consumer → Provider)
+- Contract negotiation (multi-step state machine)
+- Data transfer (EDR → data delivery)
+- Identity verification (DID resolution, VC validation)
+
+**Key Spans:**
+```
+[Catalog Request] ─┬─ [DSP Protocol Request]
+                   ├─ [Provider Catalog Query]
+                   ├─ [DCAT Parsing]
+                   └─ [Response Serialization]
+```
+
+---
+
+### 14.4 Frontend Debugging Tools
+
+**Objective:** Add developer-facing debugging capabilities to the frontend.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Create debug panel showing raw EDC responses
+- [ ] Add DSP message inspector
+- [ ] Implement timeline visualization for negotiations
+- [ ] Add network request waterfall view
+- [ ] Create DCAT-AP property inspector
+
+**Debug Panel Features:**
+- Toggle visibility with keyboard shortcut (Ctrl+Shift+D)
+- Tab-based view: Network | State | DCAT | Logs
+- Export debug session as JSON
+- Copy curl commands for failed requests
+
+---
+
+### 14.5 EDC Connector Tracing
+
+**Objective:** Enable comprehensive logging and tracing in EDC components.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Configure EDC logging levels dynamically
+- [ ] Add custom log markers for dataspace operations
+- [ ] Implement request/response correlation IDs
+- [ ] Create audit log for compliance events
+- [ ] Set up log shipping to central aggregator
+
+**Log Levels:**
+| Level | Use Case |
+|-------|----------|
+| ERROR | Failures requiring investigation |
+| WARN | Degraded performance, retry events |
+| INFO | State transitions, business events |
+| DEBUG | Request/response details |
+| TRACE | Wire-level protocol messages |
+
+**Correlation ID Flow:**
+```
+Frontend → backend-edc → Control Plane → Data Plane → Provider
+         │              │              │
+         └──────────────┴──────────────┴── X-Correlation-Id
+```
+
+---
+
+### 14.6 DSP Protocol Debugging
+
+**Objective:** Provide visibility into Dataspace Protocol message exchanges.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Log all DSP messages with timestamps
+- [ ] Create DSP message replay capability
+- [ ] Add protocol state machine visualization
+- [ ] Implement ODRL policy debugging
+- [ ] Show DID resolution timeline
+
+**DSP Message Inspector:**
+```
+┌─────────────────────────────────────────────┐
+│ DSP Message Flow (Agreement AG-1234)        │
+├─────────────────────────────────────────────┤
+│ 00:00.000  → ContractRequestMessage         │
+│ 00:00.150  ← ContractOfferMessage           │
+│ 00:00.200  → ContractNegotiationEventMsg    │
+│ 00:00.350  ← ContractAgreementMessage       │
+│ 00:00.400  → ContractNegotiationEventMsg    │
+│ 00:00.500  ✓ FINALIZED                      │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+### 14.7 Health Check Infrastructure
+
+**Objective:** Implement comprehensive health checks for all services.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Add deep health checks beyond simple ping
+- [ ] Check database connectivity with query execution
+- [ ] Verify Vault accessibility and key availability
+- [ ] Test Identity Hub reachability
+- [ ] Validate DSP endpoint connectivity
+
+**Health Check Endpoints:**
+```
+GET /health         → Basic liveness
+GET /health/ready   → Readiness (dependencies ok)
+GET /health/deep    → Full dependency check (authenticated)
+```
+
+**Response Format:**
+```json
+{
+  "status": "healthy",
+  "checks": {
+    "database": { "status": "up", "latency_ms": 5 },
+    "vault": { "status": "up", "latency_ms": 12 },
+    "identity_hub": { "status": "up", "latency_ms": 45 },
+    "provider_dsp": { "status": "up", "latency_ms": 120 }
+  },
+  "version": "1.0.0",
+  "uptime_seconds": 3600
+}
+```
+
+---
+
+### 14.8 Metrics Export
+
+**Objective:** Export application metrics for monitoring systems.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Add Prometheus metrics endpoint to backend-edc
+- [ ] Export EDC metrics via JMX or Micrometer
+- [ ] Create custom business metrics
+- [ ] Implement SLI/SLO tracking
+
+**Custom Metrics:**
+| Metric | Type | Labels |
+|--------|------|--------|
+| `catalog_queries_total` | Counter | participant, status |
+| `negotiation_duration_seconds` | Histogram | outcome |
+| `transfer_bytes_total` | Counter | direction, asset_type |
+| `consent_verifications_total` | Counter | result |
+| `policy_evaluations_total` | Counter | policy_type, result |
+
+---
+
+### 14.9 Error Tracking & Alerting
+
+**Objective:** Implement centralized error tracking and alerting.
+
+**Status:** ⏳ Planned
+
+**Implementation:**
+- [ ] Integrate Sentry or similar error tracking
+- [ ] Configure error grouping and deduplication
+- [ ] Set up PagerDuty/Slack alerting integration
+- [ ] Create runbooks for common errors
+- [ ] Implement error budget tracking
+
+**Alert Channels:**
+- Slack: Non-critical warnings
+- PagerDuty: Critical failures (on-call rotation)
+- Email: Daily digest of issues
+
+---
+
+### 14.10 Acceptance Criteria
+
+- [ ] Prometheus successfully scrapes all EDC metrics
+- [ ] Grafana dashboards show real-time dataspace activity
+- [ ] Distributed traces span across all services
+- [ ] Frontend debug panel accessible in development mode
+- [ ] Health checks return comprehensive status
+- [ ] Correlation IDs propagate through entire request flow
+- [ ] Alert rules trigger on simulated failures
+- [ ] Documentation covers debugging workflows
 
 ---
 
 ## Next Steps
 
 ### Immediate (This Week)
-1. [ ] **Phase 9.2** - Backend-EDC DCAT enhancement
-2. [ ] Complete Prometheus metrics export
-3. [ ] Create Grafana dashboards
-4. [ ] Write DPIA template
-5. [ ] Performance testing (JMeter)
+1. [ ] **Phase 14.2** - Set up Prometheus + Grafana stack
+2. [ ] **Phase 14.3** - Add OpenTelemetry to backend services
+3. [ ] **Phase 14.4** - Create frontend debug panel
+4. [ ] Complete Prometheus metrics export
+5. [ ] Create Grafana dashboards
 
 ### Short Term (This Month)
 1. [ ] Kubernetes Helm charts
@@ -1661,6 +1884,6 @@ Based on the DATA-SOURCES-REPORT.md analysis, these should **NOT** be made dynam
 
 ---
 
-*Last Updated: 15 January 2025*
-*Version: 1.2*
-*Status: 85% Complete (7/9 phases complete, Phase 8 & 9 in progress)*
+*Last Updated: 20 January 2025*
+*Version: 1.3*
+*Status: 90% Complete (8/10 phases complete, Phase 8 & 14 in progress)*
