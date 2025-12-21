@@ -6,14 +6,14 @@ datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus:9090
+    url: http://tools-prometheus:9090
     isDefault: true
     editable: false
 
   - name: Loki
     type: loki
     access: proxy
-    url: http://loki:3100
+    url: http://tools-loki:3100
     editable: false
     jsonData:
       maxLines: 1000
@@ -21,5 +21,5 @@ datasources:
   - name: Jaeger
     type: jaeger
     access: proxy
-    url: http://jaeger:16686
+    url: http://tools-jaeger:16686
     editable: false
