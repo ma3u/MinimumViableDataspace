@@ -39,6 +39,7 @@ import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
 import { api, getApiMode, isStaticDemo } from './services/apiFactory';
 import type { CatalogAsset } from './services/apiFactory';
 import { useCatalog } from './hooks/useCatalog';
+import { participantConfig, logConfig, DEBUG } from './config';
 import { 
   mockEHRCatalogAssets, 
   mockEHRData, 
@@ -58,6 +59,9 @@ import {
 } from './services/mockData-health';
 import { fetchEHRById, checkBackendHealth } from './services/ehrApi';
 import type { ElectronicHealthRecord } from './types/health';
+
+// Log configuration on startup
+logConfig();
 
 // GitHub repository URL
 const GITHUB_REPO_URL = 'https://github.com/ma3u/MinimumViableDataspace/tree/health-demo';
@@ -121,6 +125,12 @@ function AppHealth() {
   
   // Contract agreement tracking for real EDC negotiation
   const [contractAgreementId, setContractAgreementId] = useState<string | null>(null);
+  
+  // Negotiation and transfer timestamps for real EDC flow
+  const [negotiationStartTime, setNegotiationStartTime] = useState<Date | null>(null);
+  const [negotiationEndTime, setNegotiationEndTime] = useState<Date | null>(null);
+  const [transferStartTime, setTransferStartTime] = useState<Date | null>(null);
+  const [transferEndTime, setTransferEndTime] = useState<Date | null>(null);
   
   // Use dynamic catalog hook for EDC-sourced assets
   const { 
@@ -211,6 +221,10 @@ function AppHealth() {
     setIsAnimating(false);
     setShowJson(false);
     setContractAgreementId(null);
+    setNegotiationStartTime(null);
+    setNegotiationEndTime(null);
+    setTransferStartTime(null);
+    setTransferEndTime(null);
     resetPhases(); // Reset DSP event phases
     clearEvents(); // Clear the Dataspace Insider Panel events
   };
@@ -253,6 +267,7 @@ function AppHealth() {
   const simulateNegotiation = async () => {
     setIsAnimating(true);
     setCurrentPhase('negotiation');
+    setNegotiationStartTime(new Date());
     const mode = getApiMode();
     
     try {
@@ -389,6 +404,7 @@ function AppHealth() {
       }
     }
     
+    setNegotiationEndTime(new Date());
     completePhase('negotiation');
     setIsAnimating(false);
     
@@ -439,6 +455,7 @@ function AppHealth() {
   const simulateTransfer = async () => {
     setIsAnimating(true);
     setCurrentPhase('transfer');
+    setTransferStartTime(new Date());
     const mode = getApiMode();
     
     try {
@@ -576,6 +593,7 @@ function AppHealth() {
       }
     }
     
+    setTransferEndTime(new Date());
     completePhase('transfer');
     setIsAnimating(false);
     setPhase('complete');
@@ -1757,6 +1775,20 @@ function AppHealth() {
                         {getApiMode() === 'full' ? 'EDC Control Plane' : 'Hybrid (EDC + Mock)'}
                       </span>
                     </div>
+                    {negotiationStartTime && negotiationEndTime && (
+                      <>
+                        <div>
+                          <span className="text-gray-600">Started:</span>
+                          <span className="ml-2 text-xs">{negotiationStartTime.toLocaleTimeString()}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Duration:</span>
+                          <span className="ml-2 text-xs font-medium text-green-700">
+                            {((negotiationEndTime.getTime() - negotiationStartTime.getTime()) / 1000).toFixed(2)}s
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1879,6 +1911,20 @@ function AppHealth() {
                       {getApiMode() === 'full' ? 'Full EDC' : getApiMode() === 'hybrid' ? 'Hybrid' : 'Mock'}
                     </span>
                   </div>
+                  {transferStartTime && (
+                    <div className="flex items-center justify-between text-sm mt-2">
+                      <span className="text-gray-600">Transfer Started:</span>
+                      <span className="text-xs">{transferStartTime.toLocaleTimeString()}</span>
+                    </div>
+                  )}
+                  {transferEndTime && transferStartTime && (
+                    <div className="flex items-center justify-between text-sm mt-2">
+                      <span className="text-gray-600">Transfer Duration:</span>
+                      <span className="text-xs font-medium text-green-700">
+                        {((transferEndTime.getTime() - transferStartTime.getTime()) / 1000).toFixed(2)}s
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
