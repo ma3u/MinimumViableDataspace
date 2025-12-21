@@ -1,0 +1,133 @@
+# Prometheus Alerting Rules for Health Dataspace
+#
+# Defines alerts for:
+# - High error rates
+# - Slow response times
+# - Failed negotiations
+# - Service unavailability
+# - EDC connectivity issues
+
+groups:
+  - name: health-dataspace-alerts
+    rules:
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (job)
+          /
+          sum(rate(http_requests_total[5m])) by (job)
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.job }}"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      # Slow Response Times
+      - alert: SlowResponseTime
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job)
+          ) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow response time on {{ $labels.job }}"
+          description: "P95 latency is {{ $value | humanizeDuration }} (threshold: 2s)"
+
+      # Failed Negotiations Rate
+      - alert: HighNegotiationFailureRate
+        expr: |
+          sum(rate(negotiations_total{status="failure"}[5m]))
+          /
+          sum(rate(negotiations_total[5m]))
+          > 0.10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High negotiation failure rate"
+          description: "Negotiation failure rate is {{ $value | humanizePercentage }} (threshold: 10%)"
+
+      # Service Down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "The service {{ $labels.job }} has been unreachable for more than 1 minute"
+
+      # High Active Requests (potential overload)
+      - alert: HighActiveRequests
+        expr: http_requests_active > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active requests"
+          description: "{{ $labels.job }} has {{ $value }} active requests"
+
+      # No Catalog Requests (potential connectivity issue)
+      - alert: NoCatalogRequests
+        expr: |
+          absent(rate(catalog_requests_total[10m]) > 0)
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No catalog requests in the last 30 minutes"
+          description: "The catalog has not received any requests. Check if consumers are connected."
+
+      # Transfer Failures
+      - alert: HighTransferFailureRate
+        expr: |
+          sum(rate(transfers_total{status="failed"}[5m]))
+          /
+          sum(rate(transfers_total[5m]))
+          > 0.10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High transfer failure rate"
+          description: "Transfer failure rate is {{ $value | humanizePercentage }}"
+
+      # Memory Usage (for Node.js processes)
+      - alert: HighMemoryUsage
+        expr: |
+          process_resident_memory_bytes / 1024 / 1024 > 512
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.job }}"
+          description: "Memory usage is {{ $value | humanize }}MB"
+
+  - name: edc-alerts
+    rules:
+      # EDC Connector Disconnected
+      - alert: EDCConnectorDisconnected
+        expr: edc_connectivity_status == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "EDC Connector {{ $labels.connector }} disconnected"
+          description: "The {{ $labels.type }} {{ $labels.connector }} has been disconnected for more than 2 minutes"
+
+      # Slow EDC Requests
+      - alert: SlowEDCRequests
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(edc_request_duration_seconds_bucket[5m])) by (le, connector)
+          ) > 5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow EDC requests to {{ $labels.connector }}"
+          description: "P95 latency for EDC requests is {{ $value | humanizeDuration }}"

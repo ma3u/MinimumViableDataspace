@@ -8,16 +8,36 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+// Initialize OpenTelemetry tracing FIRST (before other imports)
+import { initTracing, shutdownTracing } from './middleware/tracing';
+initTracing();
+
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import { metricsMiddleware, register, recordEhrAccess, measureDataAccess } from './middleware/metrics';
+import { loggingMiddleware, logger } from './middleware/logging';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
+// Observability middleware
+app.use(loggingMiddleware);
+app.use(metricsMiddleware);
+
+// Prometheus metrics endpoint
+app.get('/metrics', async (_req: Request, res: Response) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (err) {
+    res.status(500).end(err instanceof Error ? err.message : 'Error generating metrics');
+  }
+});
 
 // Interfaces for EHR records (Verifiable Credential structure)
 interface DemographicsNode {
@@ -3296,19 +3316,32 @@ const ehrCatalog = Object.entries(healthRecords).map(([id, record]) => ({
 // Dynamic endpoint for any EHR
 app.get('/api/ehr/:id', (req: Request, res: Response) => {
   const ehrId = req.params.id;
+  const endTimer = measureDataAccess('get_ehr_by_id');
   const record = healthRecords[ehrId];
   
   if (record) {
-    console.log(`[${new Date().toISOString()}] GET /api/ehr/${ehrId} - Serving ${record.credentialSubject.conditionsNode.primaryDiagnosis.display} EHR`);
+    logger.info(`Serving EHR record`, {
+      correlationId: req.correlationId,
+      ehrId,
+      diagnosis: record.credentialSubject.conditionsNode.primaryDiagnosis.display,
+    });
+    recordEhrAccess(ehrId, record.credentialSubject.conditionsNode.primaryDiagnosis.code);
+    endTimer();
     res.json(record);
   } else {
+    endTimer();
     res.status(404).json({ error: 'Electronic Health Record not found', ehrId });
   }
 });
 
 // List all available EHRs
 app.get('/api/ehr', (req: Request, res: Response) => {
-  console.log(`[${new Date().toISOString()}] GET /api/ehr - Listing all ${ehrCatalog.length} EHRs`);
+  const endTimer = measureDataAccess('list_all_ehr');
+  logger.info(`Listing all EHR records`, {
+    correlationId: req.correlationId,
+    count: ehrCatalog.length,
+  });
+  endTimer();
   res.json({
     totalCount: ehrCatalog.length,
     records: ehrCatalog
@@ -3567,7 +3600,8 @@ app.get('/api/catalog', (req: Request, res: Response) => {
   });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
+  logger.info('Server started', { port: PORT, recordsCount: ehrCatalog.length });
   console.log(`
 ╔═══════════════════════════════════════════════════════════════════════╗
 ║     EHR2EDC Health Data Exchange Backend Service                      ║
@@ -3586,11 +3620,31 @@ app.listen(PORT, () => {
 ║    GET /api/catalog         - Catalog metadata (JSON)                 ║
 ║    GET /api/catalog.ttl     - Full catalog (Turtle/RDF)               ║
 ║                                                                       ║
-║  Health & Monitoring:                                                 ║
+║  Observability Endpoints:                                             ║
 ║    GET /health              - Health check                            ║
+║    GET /metrics             - Prometheus metrics                      ║
 ║                                                                       ║
 ║  Compliance: GDPR Art. 89, EHDS Reg. 2025/327, HealthDCAT-AP R5       ║
 ║  Server running on port ${PORT}                                         ║
 ╚═══════════════════════════════════════════════════════════════════════╝
   `);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  await shutdownTracing();
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  await shutdownTracing();
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
 });

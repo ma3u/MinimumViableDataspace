@@ -1,0 +1,67 @@
+# Alertmanager Configuration for Health Dataspace
+#
+# Routes alerts to appropriate channels
+
+global:
+  resolve_timeout: 5m
+  # Uncomment and configure for email notifications
+  # smtp_smarthost: 'smtp.example.com:587'
+  # smtp_from: 'alertmanager@health-dataspace.example.com'
+  # smtp_auth_username: 'alertmanager'
+  # smtp_auth_password: 'password'
+
+route:
+  group_by: ['alertname', 'job', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver: 'default-receiver'
+  
+  routes:
+    # Critical alerts - immediate attention
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 10s
+      repeat_interval: 1h
+    
+    # Warning alerts - less urgent
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 1m
+      repeat_interval: 4h
+
+receivers:
+  - name: 'default-receiver'
+    # Placeholder - logs alerts to stdout (visible in alertmanager logs)
+    webhook_configs: []
+
+  - name: 'critical-alerts'
+    # Uncomment to enable Slack notifications
+    # slack_configs:
+    #   - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+    #     channel: '#dataspace-alerts'
+    #     send_resolved: true
+    #     title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+    #     text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+    webhook_configs: []
+
+  - name: 'warning-alerts'
+    # Uncomment to enable Slack notifications
+    # slack_configs:
+    #   - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+    #     channel: '#dataspace-monitoring'
+    #     send_resolved: true
+    #     title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
+    #     text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+    webhook_configs: []
+
+# Inhibition rules
+inhibit_rules:
+  # If a critical alert fires, suppress related warnings
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'job']

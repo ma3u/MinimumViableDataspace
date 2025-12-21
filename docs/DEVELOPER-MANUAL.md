@@ -1688,126 +1688,460 @@ const config = getApiConfig();
 
 ## 14. Monitoring & Debugging
 
-This section covers monitoring, observability, and debugging tools available in the Health Dataspace Demo.
+This section covers the comprehensive observability stack for the Health Dataspace Demo, including metrics collection, distributed tracing, structured logging, and debugging workflows.
 
-### Current Monitoring Capabilities
+### 14.1 Observability Stack Overview
 
-The demo provides built-in monitoring through health endpoints and event logging. Full Prometheus/Grafana integration is planned for Phase 8 but not yet implemented.
+The Health Dataspace provides a complete observability solution:
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Health Endpoints | ✅ Available | `/health`, `/health/detailed`, `/health/ready`, `/health/live` |
-| Event Logging | ✅ Available | DSP events via SSE stream |
-| Dataspace Insider Panel | ✅ Available | Real-time event visualization |
-| Docker Logs | ✅ Available | Container log aggregation |
-| Prometheus Metrics | 🔄 Planned | Phase 8 - not yet implemented |
-| Grafana Dashboards | 🔄 Planned | Phase 8 - not yet implemented |
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Observability Stack                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐     │
+│  │  Prometheus │   │   Grafana   │   │   Jaeger    │   │    Loki     │     │
+│  │   :9090     │   │    :3003    │   │   :16686    │   │    :3100    │     │
+│  │   Metrics   │   │ Dashboards  │   │   Tracing   │   │    Logs     │     │
+│  └──────┬──────┘   └──────┬──────┘   └──────┬──────┘   └──────┬──────┘     │
+│         │                 │                 │                 │             │
+│         └─────────────────┴─────────────────┴─────────────────┘             │
+│                                    ▲                                         │
+│                                    │                                         │
+├────────────────────────────────────┼────────────────────────────────────────┤
+│                          Instrumented Services                               │
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐     │
+│  │  Frontend   │   │ Backend-EDC │   │ Backend-Mock│   │     EDC     │     │
+│  │   React     │   │   :3002     │   │   :3001     │   │ Connectors  │     │
+│  │  (metrics)  │   │ (OTel SDK)  │   │ (OTel SDK)  │   │  (JMX)      │     │
+│  └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-### Health Endpoints
+| Feature | Status | Port | Description |
+|---------|--------|------|-------------|
+| Health Endpoints | ✅ Available | `/health`, `/metrics` | Kubernetes-compatible probes |
+| Prometheus Metrics | ✅ Available | 9090 | Request latency, counts, business metrics |
+| Grafana Dashboards | ✅ Available | 3003 | Pre-built Health Dataspace dashboard |
+| Distributed Tracing | ✅ Available | 16686 | OpenTelemetry → Jaeger |
+| Structured Logging | ✅ Available | 3100 | JSON logs → Loki |
+| Event Stream | ✅ Available | SSE | Real-time DSP events |
+| Alerting | ✅ Available | 9093 | Prometheus Alertmanager |
+
+### 14.2 Starting the Observability Stack
+
+```bash
+# Create the network if it doesn't exist
+docker network create mvd-health-network 2>/dev/null || true
+
+# Start observability stack
+docker-compose -f docker-compose.observability.yml up -d
+
+# Start with health services
+docker-compose -f docker-compose.health.yml -f docker-compose.observability.yml up -d
+
+# Verify services are running
+docker-compose -f docker-compose.observability.yml ps
+```
+
+**Accessing the Observability Tools:**
+
+| Tool | URL | Credentials |
+|------|-----|-------------|
+| Grafana | http://localhost:3003 | admin / dataspace |
+| Prometheus | http://localhost:9090 | - |
+| Jaeger | http://localhost:16686 | - |
+| Alertmanager | http://localhost:9093 | - |
+
+### 14.3 Prometheus Metrics
+
+Both backend services expose Prometheus metrics at `/metrics`:
+
+```bash
+# Backend-Mock metrics (local dev)
+curl http://localhost:4001/metrics
+
+# Backend-EDC metrics (Docker)
+curl http://localhost:3002/metrics
+```
+
+**Available Metrics:**
+
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `http_request_duration_seconds` | Histogram | method, path, status | Request latency |
+| `http_requests_total` | Counter | method, path, status | Total requests |
+| `http_requests_active` | Gauge | - | Currently processing |
+| `catalog_requests_total` | Counter | provider, status | Catalog operations |
+| `catalog_response_time_seconds` | Histogram | provider | Catalog latency |
+| `negotiations_total` | Counter | status, asset_type | Negotiations |
+| `negotiation_duration_seconds` | Histogram | outcome | Negotiation time |
+| `active_negotiations` | Gauge | - | In-progress negotiations |
+| `transfers_total` | Counter | status, format | Data transfers |
+| `transfer_duration_seconds` | Histogram | format | Transfer time |
+| `ehr_records_served_total` | Counter | record_id, category | EHR access count |
+| `ehr_data_access_duration_seconds` | Histogram | operation | Data access latency |
+| `identity_verifications_total` | Counter | type, result | VC verifications |
+| `consent_verifications_total` | Counter | result | Consent checks |
+
+**Example Prometheus Queries:**
+
+```promql
+# Request rate per service
+sum(rate(http_requests_total[5m])) by (job)
+
+# P95 latency
+histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+
+# Error rate
+sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+
+# Negotiation success rate
+sum(rate(negotiations_total{status="success"}[5m])) / sum(rate(negotiations_total[5m]))
+
+# Active EHR categories being accessed
+topk(5, sum(increase(ehr_records_served_total[1h])) by (category))
+```
+
+### 14.4 Distributed Tracing with OpenTelemetry
+
+Traces propagate across services using W3C Trace Context headers. View traces in Jaeger at http://localhost:16686.
+
+**Trace Flow Example:**
+
+```
+[Frontend Request]
+    │
+    ├── [backend-edc: GET /api/catalog]
+    │       │
+    │       ├── [HTTP: Consumer Control Plane]
+    │       │       └── [DSP: Catalog Request to Provider]
+    │       │
+    │       └── [Parse DCAT Response]
+    │
+    └── [Response to Frontend]
+```
+
+**Searching Traces:**
+
+1. Open Jaeger: http://localhost:16686
+2. Select Service: `backend-edc` or `backend-mock`
+3. Set Operation (optional): e.g., `GET /api/catalog`
+4. Click "Find Traces"
+
+**Correlation ID Propagation:**
+
+All requests include a `X-Correlation-Id` header that links logs and traces:
+
+```bash
+# Make a request with correlation ID
+curl -H "X-Correlation-Id: debug-123" http://localhost:3002/api/catalog
+
+# Search logs by correlation ID in Grafana/Loki
+{service="backend-edc"} |= "debug-123"
+```
+
+### 14.5 Structured Logging
+
+Backend services emit JSON-structured logs with correlation context:
+
+```json
+{
+  "timestamp": "2025-12-21T10:30:00.000Z",
+  "level": "info",
+  "service": "backend-edc",
+  "correlationId": "abc-123",
+  "traceId": "4bf92f3577b34da6",
+  "spanId": "00f067aa0ba902b7",
+  "message": "Catalog request completed",
+  "method": "GET",
+  "path": "/api/catalog",
+  "statusCode": 200,
+  "duration_ms": 145
+}
+```
+
+**Log Levels:**
+
+| Level | Use Case |
+|-------|----------|
+| ERROR | Failures requiring investigation |
+| WARN | Degraded performance, retries |
+| INFO | State transitions, business events |
+| DEBUG | Request/response details |
+
+**Viewing Logs:**
+
+```bash
+# Docker logs (raw)
+docker-compose -f docker-compose.health.yml logs -f backend-mock
+
+# Loki via Grafana
+# Go to Explore → Select Loki → Query: {service="backend-edc"}
+
+# Filter by correlation ID
+{service="backend-edc"} |= "correlation-id-here"
+
+# Filter by error level
+{service="backend-mock"} | json | level="error"
+```
+
+### 14.6 Developer Debugging Journey
+
+This section provides step-by-step workflows for investigating common issues during dataspace activities.
+
+#### Journey 1: Investigating a Failed Catalog Request
+
+**Symptoms:** Frontend shows "Failed to load catalog" or empty catalog.
+
+**Step 1: Check Backend-EDC Logs**
+```bash
+# Real-time logs
+docker-compose -f docker-compose.health.yml logs -f backend-edc
+
+# Or in local dev
+LOG_LEVEL=debug npm run dev
+```
+
+**Step 2: Check Metrics**
+```bash
+# Are catalog requests being made?
+curl -s http://localhost:3002/metrics | grep catalog_requests
+
+# Check error rate in Prometheus
+# Query: sum(rate(catalog_requests_total{status="error"}[5m]))
+```
+
+**Step 3: Trace the Request**
+1. Open Jaeger at http://localhost:16686
+2. Service: `backend-edc`, Operation: `GET /api/catalog`
+3. Find spans with errors (marked in red)
+4. Check span attributes and events for error details
+
+**Step 4: Check EDC Connectivity**
+```bash
+# Is the provider reachable?
+curl -H "X-Api-Key: password" \
+  http://localhost:8191/api/management/v3/assets/request \
+  -d '{"offset":0,"limit":1}'
+
+# Check DSP endpoint
+curl http://localhost:8192/api/dsp/.well-known/dspace-version
+```
+
+#### Journey 2: Debugging a Stuck Negotiation
+
+**Symptoms:** Negotiation progress bar stuck, "Timeout" error.
+
+**Step 1: Check Negotiation State**
+```bash
+# Get negotiation status from backend-edc
+curl http://localhost:3002/api/negotiations/{negotiation-id}
+
+# Check active negotiations metric
+curl -s http://localhost:3002/metrics | grep active_negotiations
+```
+
+**Step 2: View EDC Events**
+```bash
+# Subscribe to event stream
+curl -N http://localhost:3002/api/events/stream
+
+# Or check event history
+curl http://localhost:3002/api/events
+```
+
+**Step 3: Trace the Negotiation**
+1. Open Jaeger
+2. Search for traces with the negotiation ID in tags
+3. Look for `DSP:` spans showing protocol messages
+4. Check for timeout or error events
+
+**Step 4: Check EDC Negotiation State**
+```bash
+# Query EDC directly
+curl -H "X-Api-Key: password" \
+  http://localhost:8081/api/management/v3/contractnegotiations/{id}
+```
+
+#### Journey 3: Tracing a Complete Data Transfer
+
+**Goal:** Understand the full flow from catalog browse to data receipt.
+
+**Step 1: Enable Verbose Logging**
+```bash
+# Set log level to debug
+LOG_LEVEL=debug npm run dev
+
+# Or in Docker
+docker-compose -f docker-compose.health.yml up -d \
+  -e LOG_LEVEL=debug backend-edc backend-mock
+```
+
+**Step 2: Generate Traffic with Correlation ID**
+```bash
+CORR_ID="trace-$(date +%s)"
+echo "Using correlation ID: $CORR_ID"
+
+# Step 1: Browse catalog
+curl -H "X-Correlation-Id: $CORR_ID" \
+  http://localhost:3002/api/catalog/assets
+
+# Step 2: Start negotiation
+curl -X POST -H "X-Correlation-Id: $CORR_ID" \
+  -H "Content-Type: application/json" \
+  http://localhost:3002/api/negotiations \
+  -d '{"assetId":"EHR001","providerId":"provider"}'
+
+# Step 3: Poll for completion
+curl -H "X-Correlation-Id: $CORR_ID" \
+  http://localhost:3002/api/negotiations/{id}
+
+# Step 4: Initiate transfer
+curl -X POST -H "X-Correlation-Id: $CORR_ID" \
+  http://localhost:3002/api/transfers \
+  -d '{"agreementId":"...", "assetId":"EHR001"}'
+```
+
+**Step 3: View End-to-End Trace**
+1. Open Jaeger
+2. Search: Service=`backend-edc`, Tags=`correlationId=$CORR_ID`
+3. View the complete trace showing all service interactions
+
+**Step 4: Analyze Metrics**
+```bash
+# Check timing breakdown
+curl -s http://localhost:3002/metrics | grep -E "(negotiation|transfer)_duration"
+```
+
+### 14.7 Grafana Dashboards
+
+Pre-configured dashboards are available in Grafana:
+
+**Health Dataspace Overview Dashboard:**
+
+Access at: http://localhost:3003/d/health-dataspace-overview
+
+Panels include:
+- **Services Up**: Number of healthy services
+- **Request Rate**: Requests per second by service
+- **Error Rate**: Percentage of 5xx responses
+- **P95 Latency**: 95th percentile response time
+- **Active Negotiations**: Currently processing
+- **Catalog Requests**: Success/error breakdown
+- **Contract Negotiations**: Success/failure rate
+- **Data Transfers**: Completion status
+- **EHR Access**: Records accessed by category
+
+### 14.8 Alerting
+
+Prometheus alerting rules are configured in `observability/prometheus/alerts.yml`.
+
+**Default Alerts:**
+
+| Alert | Threshold | Severity |
+|-------|-----------|----------|
+| HighErrorRate | >5% errors | Critical |
+| SlowResponseTime | P95 >2s | Warning |
+| HighNegotiationFailureRate | >10% failures | Warning |
+| ServiceDown | Service unreachable | Critical |
+| EDCConnectorDisconnected | Connector offline | Critical |
+
+**View Active Alerts:**
+- Prometheus: http://localhost:9090/alerts
+- Alertmanager: http://localhost:9093
+
+### 14.9 Health Endpoints
 
 Each service exposes Kubernetes-compatible health probes:
 
 ```bash
 # Backend-Mock health
 curl http://localhost:4001/health
-curl http://localhost:4001/health/detailed
+curl http://localhost:4001/metrics
 
 # Backend-EDC health (Docker mode)
 curl http://localhost:3002/health
 curl http://localhost:3002/health/detailed
+curl http://localhost:3002/metrics
 
 # EDC Control Plane health
 curl http://localhost:8081/api/check/health   # Consumer
 curl http://localhost:8191/api/check/health   # Provider
 ```
 
-### Service URLs (Local Development)
-
-| Service | URL | Purpose |
-|---------|-----|---------|
-| Frontend | http://localhost:4000 | React UI |
-| Backend-Mock | http://localhost:4001 | FHIR mock server |
-| Backend-Mock Health | http://localhost:4001/health/detailed | Dependency status |
-
-### Service URLs (Docker/EDC Mode)
-
-| Service | URL | Purpose |
-|---------|-----|---------|
-| Frontend | http://localhost:3000 | React UI |
-| Backend-Mock | http://localhost:3001 | FHIR mock server |
-| Backend-EDC | http://localhost:3002 | EDC proxy |
-| Consumer Control Plane | http://localhost:8081 | Management API |
-| Provider Control Plane | http://localhost:8191 | Management API |
-| Consumer Identity Hub | http://localhost:7082 | DID/VC management |
-| Provider Identity Hub | http://localhost:7092 | DID/VC management |
-| Pact Broker | http://localhost:9292 | Contract testing |
-
-### Event Stream
-
-Backend-EDC provides a Server-Sent Events (SSE) stream for real-time event monitoring:
-
-```bash
-# Subscribe to event stream
-curl -N http://localhost:3002/api/events/stream
-
-# Events include:
-# - DSP protocol messages (catalog, negotiation, transfer)
-# - State transitions
-# - Error notifications
+**Health Response Format:**
+```json
+{
+  "status": "healthy",
+  "service": "backend-edc",
+  "mode": "hybrid",
+  "timestamp": "2025-12-21T10:30:00.000Z",
+  "checks": {
+    "consumerControlPlane": { "status": "healthy", "latencyMs": 45 },
+    "providerControlPlane": { "status": "healthy", "latencyMs": 120 },
+    "mockBackend": { "status": "healthy", "latencyMs": 5 }
+  }
+}
 ```
 
-### Docker Log Aggregation
+### 14.10 Troubleshooting Runbook
+
+#### Issue: "Connection refused" to EDC
 
 ```bash
-# View all container logs
-docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml logs -f
+# 1. Check if containers are running
+docker-compose -f docker-compose.edc.yml ps
 
-# Filter by service
-docker-compose -f docker-compose.health.yml logs -f backend-mock
-docker-compose -f docker-compose.edc.yml logs -f consumer-controlplane
+# 2. Check container health
+docker inspect consumer-controlplane --format='{{.State.Health.Status}}'
 
-# Save logs to file
-docker-compose -f docker-compose.health.yml logs > health-logs.txt
+# 3. View container logs
+docker logs consumer-controlplane --tail 100
+
+# 4. Verify network connectivity
+docker exec backend-edc ping consumer-controlplane
 ```
 
-### Debugging Tips
+#### Issue: Metrics endpoint returns empty
 
-**Frontend Debugging:**
 ```bash
-# Enable verbose API logging
-VITE_DEBUG_API=true npm run dev:local
+# 1. Verify service is running
+curl http://localhost:3002/health
 
-# Check React DevTools for state
-# Install React Developer Tools browser extension
+# 2. Check for errors in logs
+docker-compose logs backend-edc | grep -i error
 
-# Network tab filtering
-# Filter by "api/" to see backend requests
+# 3. Verify prom-client is loaded
+docker exec backend-edc npm ls prom-client
 ```
 
-**Backend Debugging:**
+#### Issue: Traces not appearing in Jaeger
+
 ```bash
-# Enable debug logging
-DEBUG=* npm run dev:local
+# 1. Check if Jaeger is running
+curl http://localhost:16686/api/services
 
-# Check TypeScript compilation
-npm run build 2>&1 | grep error
+# 2. Verify OTLP endpoint is reachable
+curl http://localhost:4318/v1/traces
 
-# Test specific endpoint
-curl -v http://localhost:4001/api/ehr | jq
+# 3. Check tracing is enabled
+docker exec backend-edc printenv | grep TRACING
+
+# 4. View service logs for tracing errors
+docker logs backend-edc | grep -i "tracing\|otel"
 ```
 
-**EDC Debugging:**
+#### Issue: Logs not appearing in Loki
+
 ```bash
-# Verbose EDC logs
-docker-compose -f docker-compose.edc.yml logs -f | grep -i error
+# 1. Check Promtail is running
+docker logs promtail
 
-# Check DSP communication
-curl http://localhost:8192/api/dsp/.well-known/dspace-version
+# 2. Verify Loki is receiving logs
+curl http://localhost:3100/ready
 
-# Verify credentials
-curl -H "X-Api-Key: password" \
-  http://localhost:8191/api/management/v3/assets/request \
-  -d '{"offset":0,"limit":1}'
+# 3. Check Promtail targets
+curl http://localhost:9080/targets
 ```
 
 ---

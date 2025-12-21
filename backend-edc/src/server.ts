@@ -10,6 +10,10 @@
  *   npm run dev:full     # Full EDC mode (no mock fallback)
  */
 
+// Initialize OpenTelemetry tracing FIRST (before other imports)
+import { initTracing, shutdownTracing } from './middleware/tracing.js';
+initTracing();
+
 import express, { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import { config, logConfig } from './config.js';
@@ -20,25 +24,31 @@ import { identityRouter } from './routes/identity.js';
 import { healthRouter } from './routes/health.js';
 import { eventsRouter } from './routes/events.js';
 import { participantsRouter } from './routes/participants.js';
+import { metricsMiddleware, register } from './middleware/metrics.js';
+import { loggingMiddleware, logger } from './middleware/logging.js';
 
 // Create Express app
 const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:4000'],
   credentials: true,
 }));
 app.use(express.json());
 
-// Request logging middleware
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    console.log(`${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
-  });
-  next();
+// Observability middleware
+app.use(loggingMiddleware);
+app.use(metricsMiddleware);
+
+// Prometheus metrics endpoint
+app.get('/metrics', async (_req: Request, res: Response) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (err) {
+    res.status(500).end(err instanceof Error ? err.message : 'Error generating metrics');
+  }
 });
 
 // Health check routes (no /api prefix)
@@ -132,15 +142,20 @@ app.use((req: Request, res: Response) => {
 // Error handler
 const errorHandler: ErrorRequestHandler = (
   err: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ) => {
-  console.error('Unhandled error:', err);
+  logger.error('Unhandled error', {
+    correlationId: req.correlationId,
+    error: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+  });
   res.status(500).json({
     error: 'Internal Server Error',
     message: process.env.NODE_ENV === 'development' ? err.message : 'An unexpected error occurred',
+    correlationId: req.correlationId,
   });
 };
 app.use(errorHandler);
@@ -148,7 +163,8 @@ app.use(errorHandler);
 // Start server
 const PORT = process.env.PORT ?? 3002;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
+  logger.info('Server started', { port: PORT, mode: config.mode });
   console.log('================================================');
   console.log('    EHR2EDC Backend (EDC Integration)');
   console.log('================================================');
@@ -158,6 +174,7 @@ app.listen(PORT, () => {
   console.log('');
   console.log('Endpoints:');
   console.log(`  Health:       http://localhost:${PORT}/health`);
+  console.log(`  Metrics:      http://localhost:${PORT}/metrics`);
   console.log(`  Catalog:      http://localhost:${PORT}/api/catalog`);
   console.log(`  Negotiations: http://localhost:${PORT}/api/negotiations`);
   console.log(`  Transfers:    http://localhost:${PORT}/api/transfers`);
@@ -166,6 +183,25 @@ app.listen(PORT, () => {
   console.log(`  Events SSE:   http://localhost:${PORT}/api/events/stream`);
   console.log(`  Mode Info:    http://localhost:${PORT}/api/mode`);
   console.log('');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  await shutdownTracing();
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  await shutdownTracing();
+  server.close(() => {
+    logger.info('Server closed');
+    process.exit(0);
+  });
 });
 
 export default app;

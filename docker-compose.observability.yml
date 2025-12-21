@@ -1,0 +1,141 @@
+# Docker Compose: Observability Stack for Health Dataspace
+#
+# Provides monitoring, tracing, and logging infrastructure:
+# - Prometheus: Metrics collection and alerting
+# - Grafana: Dashboards and visualization
+# - Jaeger: Distributed tracing
+# - Loki: Log aggregation
+#
+# Usage:
+#   docker-compose -f docker-compose.observability.yml up -d
+#
+# Combine with health stack:
+#   docker-compose -f docker-compose.health.yml -f docker-compose.observability.yml up -d
+#
+
+services:
+  # ============================================================
+  # Prometheus - Metrics Collection
+  # ============================================================
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Grafana - Dashboards & Visualization
+  # ============================================================
+  grafana:
+    image: grafana/grafana:10.4.1
+    container_name: grafana
+    ports:
+      - "3003:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=dataspace
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Jaeger - Distributed Tracing
+  # ============================================================
+  jaeger:
+    image: jaegertracing/all-in-one:1.54
+    container_name: jaeger
+    ports:
+      - "16686:16686"  # UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+      - "14268:14268"  # Jaeger thrift
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=info
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Loki - Log Aggregation
+  # ============================================================
+  loki:
+    image: grafana/loki:2.9.4
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./observability/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Promtail - Log Shipper (collects Docker logs)
+  # ============================================================
+  promtail:
+    image: grafana/promtail:2.9.4
+    container_name: promtail
+    volumes:
+      - ./observability/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+
+  # ============================================================
+  # Alertmanager - Alert Routing (optional)
+  # ============================================================
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./observability/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+
+networks:
+  dataspace-network:
+    name: mvd-health-network
+    external: true
