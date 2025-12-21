@@ -26,6 +26,11 @@ import { eventsRouter } from './routes/events.js';
 import { participantsRouter } from './routes/participants.js';
 import { metricsMiddleware, register } from './middleware/metrics.js';
 import { loggingMiddleware, logger } from './middleware/logging.js';
+import { initializeEhdsMetrics, startMetricsSimulation } from './middleware/ehds-metrics.js';
+
+// Initialize EHDS metrics with baseline values
+initializeEhdsMetrics();
+startMetricsSimulation();
 
 // Create Express app
 const app = express();

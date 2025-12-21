@@ -18,6 +18,11 @@ import fs from 'fs';
 import path from 'path';
 import { metricsMiddleware, register, recordEhrAccess, measureDataAccess } from './middleware/metrics';
 import { loggingMiddleware, logger } from './middleware/logging';
+import { initializeEhrMetrics, startEhrMetricsSimulation } from './middleware/ehds-metrics';
+
+// Initialize EHDS/EHR metrics with baseline values
+initializeEhrMetrics();
+startEhrMetricsSimulation();
 
 const app = express();
 const PORT = process.env.PORT || 3001;

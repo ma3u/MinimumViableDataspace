@@ -1975,6 +1975,34 @@ GET /health/deep    → Full dependency check (authenticated)
 - Jaeger: http://localhost:16686
 - cAdvisor: http://localhost:8080
 
+### 15.7 EHDS-Specific Metrics Implementation
+
+**Files Created:**
+- `backend-edc/src/middleware/ehds-metrics.ts` - EHDS compliance and EDC metrics
+- `backend-mock/src/middleware/ehds-metrics.ts` - EHR access and data quality metrics
+
+**36 EHDS/Dataspace Metrics Available:**
+
+| Category | Metrics |
+|----------|---------|
+| EHDS Compliance | `ehds_compliance_score`, `ehds_data_access_compliance`, `ehds_audit_trail_completeness` |
+| Consent Management | `consent_total`, `consent_by_type`, `consent_expiring_7d`, `consent_expiring_24h` |
+| Data Transfer | `transfer_volume_bytes`, `transfer_speed_bytes_per_second`, `transfer_success_rate`, `active_transfers` |
+| EDC Operations | `edc_assets_total`, `edc_data_offerings_total`, `edc_identities_total`, `edc_contract_definitions_total`, `edc_policy_definitions_total`, `edc_catalog_sync_status` |
+| DSP Protocol | `dsp_messages_total`, `dsp_message_latency_seconds` |
+| Audit Trail | `audit_events_total`, `data_access_requests_total`, `policy_enforcement_total` |
+| Identity/VC | `did_resolution_total`, `credential_verification_total`, `vc_issuance_total` |
+| EHR Access | `ehr_access_total`, `fhir_resource_access_total`, `ehr_records_available`, `ehr_data_volume_bytes` |
+| Data Quality | `ehr_data_completeness_score`, `ehr_ehds_format_compliance`, `ehr_validation_errors_total` |
+| Service Health | `service_uptime_seconds`, `service_health_status`, `ehr_service_uptime_seconds` |
+
+**Metrics Flow:**
+```
+backend-mock (/metrics) ─┐
+                         ├─▶ Prometheus (scrapes/15s) ─▶ Grafana (dashboards)
+backend-edc (/metrics) ──┘
+```
+
 ---
 
 ## References
