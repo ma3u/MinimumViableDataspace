@@ -12,7 +12,7 @@
       }
     ]
   },
-  "description": "Eclipse Dataspace Connector (EDC) specific monitoring for the Health Dataspace",
+  "description": "Eclipse Dataspace Connector (EDC) operations monitoring for the Health Dataspace",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -35,7 +35,7 @@
       "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
       "id": 100,
       "panels": [],
-      "title": "EDC Overview",
+      "title": "EDC Service Status",
       "type": "row"
     },
     {
@@ -50,8 +50,7 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
@@ -69,12 +68,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "up{job=\"provider-controlplane\"}",
-          "legendFormat": "Provider CP",
+          "expr": "up{job=\"backend-edc\"} or vector(0)",
+          "legendFormat": "Backend-EDC",
           "refId": "A"
         }
       ],
-      "title": "Provider Control Plane",
+      "title": "Backend-EDC Proxy",
       "type": "stat"
     },
     {
@@ -83,14 +82,13 @@
         "defaults": {
           "color": {"mode": "thresholds"},
           "mappings": [
-            {"options": {"0": {"color": "red", "index": 0, "text": "DOWN"}}, "type": "value"},
-            {"options": {"from": 1, "result": {"color": "green", "index": 1, "text": "UP"}, "to": 999}, "type": "range"}
+            {"options": {"0": {"color": "red", "index": 0, "text": "OFFLINE"}}, "type": "value"},
+            {"options": {"from": 1, "result": {"color": "green", "index": 1, "text": "SYNCED"}, "to": 999}, "type": "range"}
           ],
           "thresholds": {
             "mode": "absolute",
             "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
@@ -108,12 +106,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "up{job=\"consumer-controlplane\"}",
-          "legendFormat": "Consumer CP",
+          "expr": "edc_catalog_sync_status or vector(0)",
+          "legendFormat": "Catalog Sync",
           "refId": "A"
         }
       ],
-      "title": "Consumer Control Plane",
+      "title": "Catalog Sync Status",
       "type": "stat"
     },
     {
@@ -180,12 +178,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(edc_contract_definitions_total) or vector(0)",
-          "legendFormat": "Contract Defs",
+          "expr": "sum(edc_data_offerings_total) or vector(0)",
+          "legendFormat": "Offerings",
           "refId": "A"
         }
       ],
-      "title": "Contract Definitions",
+      "title": "Data Offerings",
       "type": "stat"
     },
     {
@@ -216,12 +214,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(edc_policy_definitions_total) or vector(0)",
-          "legendFormat": "Policy Defs",
+          "expr": "sum(edc_contract_definitions_total) or vector(0)",
+          "legendFormat": "Contracts",
           "refId": "A"
         }
       ],
-      "title": "Policy Definitions",
+      "title": "Contract Definitions",
       "type": "stat"
     },
     {
@@ -252,12 +250,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(edc_catalog_entries_total) or vector(0)",
-          "legendFormat": "Catalog Entries",
+          "expr": "sum(edc_policy_definitions_total) or vector(0)",
+          "legendFormat": "Policies",
           "refId": "A"
         }
       ],
-      "title": "Catalog Entries",
+      "title": "Policy Definitions",
       "type": "stat"
     },
     {
@@ -265,7 +263,7 @@
       "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5},
       "id": 101,
       "panels": [],
-      "title": "Catalog Operations",
+      "title": "Assets & Offerings",
       "type": "row"
     },
     {
@@ -274,52 +272,31 @@
         "defaults": {
           "color": {"mode": "palette-classic"},
           "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {"group": "A", "mode": "none"},
-            "thresholdsStyle": {"mode": "off"}
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false}
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
-          },
-          "unit": "reqps"
+          "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
-      "id": 7,
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 6},
+      "id": 10,
       "options": {
-        "legend": {"calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": {"displayMode": "list", "placement": "right", "showLegend": true},
+        "pieType": "pie",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "tooltip": {"mode": "single", "sort": "none"}
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(rate(edc_catalog_requests_total[5m])) by (participant)",
-          "legendFormat": "{{participant}}",
+          "expr": "edc_assets_total",
+          "legendFormat": "{{type}}",
           "refId": "A"
         }
       ],
-      "title": "Catalog Request Rate",
-      "type": "timeseries"
+      "title": "Assets by Type",
+      "type": "piechart"
     },
     {
       "datasource": {"type": "prometheus", "uid": "prometheus"},
@@ -327,75 +304,70 @@
         "defaults": {
           "color": {"mode": "palette-classic"},
           "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {"group": "A", "mode": "none"},
-            "thresholdsStyle": {"mode": "line"}
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false}
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 500},
-              {"color": "red", "value": 1000}
-            ]
-          },
-          "unit": "ms"
+          "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
-      "id": 8,
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 6},
+      "id": 11,
       "options": {
-        "legend": {"calcs": ["mean", "max", "p99"], "displayMode": "table", "placement": "bottom", "showLegend": true},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": {"displayMode": "list", "placement": "right", "showLegend": true},
+        "pieType": "pie",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "tooltip": {"mode": "single", "sort": "none"}
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "histogram_quantile(0.50, sum(rate(edc_catalog_request_duration_seconds_bucket[5m])) by (le)) * 1000",
-          "legendFormat": "p50",
+          "expr": "edc_policy_definitions_total",
+          "legendFormat": "{{type}}",
           "refId": "A"
-        },
-        {
-          "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "histogram_quantile(0.95, sum(rate(edc_catalog_request_duration_seconds_bucket[5m])) by (le)) * 1000",
-          "legendFormat": "p95",
-          "refId": "B"
-        },
-        {
-          "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "histogram_quantile(0.99, sum(rate(edc_catalog_request_duration_seconds_bucket[5m])) by (le)) * 1000",
-          "legendFormat": "p99",
-          "refId": "C"
         }
       ],
-      "title": "Catalog Request Latency",
-      "type": "timeseries"
+      "title": "Policies by Type",
+      "type": "piechart"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false}
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 6},
+      "id": 12,
+      "options": {
+        "legend": {"displayMode": "list", "placement": "right", "showLegend": true},
+        "pieType": "pie",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "tooltip": {"mode": "single", "sort": "none"}
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "expr": "edc_identities_total",
+          "legendFormat": "{{type}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Identities by Type",
+      "type": "piechart"
     },
     {
       "collapsed": false,
       "gridPos": {"h": 1, "w": 24, "x": 0, "y": 14},
       "id": 102,
       "panels": [],
-      "title": "Contract Negotiations",
+      "title": "DSP Protocol Messages",
       "type": "row"
     },
     {
@@ -404,22 +376,20 @@
         "defaults": {
           "color": {"mode": "palette-classic"},
           "custom": {
-            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 10,
+            "fillOpacity": 20,
             "gradientMode": "none",
             "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
+            "showPoints": "never",
             "spanNulls": false,
             "stacking": {"group": "A", "mode": "none"},
             "thresholdsStyle": {"mode": "off"}
@@ -431,30 +401,24 @@
           },
           "unit": "short"
         },
-        "overrides": [
-          {"matcher": {"id": "byName", "options": "FINALIZED"}, "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "TERMINATED"}, "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "REQUESTED"}, "properties": [{"id": "color", "value": {"fixedColor": "blue", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "AGREED"}, "properties": [{"id": "color", "value": {"fixedColor": "purple", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "VERIFIED"}, "properties": [{"id": "color", "value": {"fixedColor": "yellow", "mode": "fixed"}}]}
-        ]
+        "overrides": []
       },
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 15},
-      "id": 9,
+      "id": 20,
       "options": {
-        "legend": {"calcs": ["sum", "mean"], "displayMode": "table", "placement": "bottom", "showLegend": true},
+        "legend": {"calcs": ["sum"], "displayMode": "table", "placement": "right", "showLegend": true},
         "tooltip": {"mode": "multi", "sort": "desc"}
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(rate(edc_negotiation_total[5m])) by (state)",
-          "legendFormat": "{{state}}",
+          "expr": "dsp_messages_total",
+          "legendFormat": "{{type}} ({{direction}})",
           "refId": "A"
         }
       ],
-      "title": "Negotiation Rate by State",
+      "title": "DSP Messages by Type",
       "type": "timeseries"
     },
     {
@@ -465,19 +429,14 @@
           "custom": {
             "hideFrom": {"legend": false, "tooltip": false, "viz": false}
           },
-          "mappings": [],
-          "unit": "short"
+          "mappings": []
         },
-        "overrides": [
-          {"matcher": {"id": "byName", "options": "FINALIZED"}, "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "TERMINATED"}, "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "REQUESTED"}, "properties": [{"id": "color", "value": {"fixedColor": "blue", "mode": "fixed"}}]}
-        ]
+        "overrides": []
       },
       "gridPos": {"h": 8, "w": 6, "x": 12, "y": 15},
-      "id": 10,
+      "id": 21,
       "options": {
-        "legend": {"displayMode": "table", "placement": "right", "showLegend": true, "values": ["value", "percent"]},
+        "legend": {"displayMode": "list", "placement": "right", "showLegend": true},
         "pieType": "donut",
         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
         "tooltip": {"mode": "single", "sort": "none"}
@@ -486,12 +445,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(edc_negotiation_total) by (state)",
-          "legendFormat": "{{state}}",
+          "expr": "sum(dsp_messages_total) by (type)",
+          "legendFormat": "{{type}}",
           "refId": "A"
         }
       ],
-      "title": "Negotiation State Distribution",
+      "title": "Message Distribution",
       "type": "piechart"
     },
     {
@@ -502,219 +461,14 @@
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 10000},
-              {"color": "red", "value": 30000}
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 15},
-      "id": 11,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {"calcs": ["mean"], "fields": "", "values": false},
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.4.1",
-      "targets": [
-        {
-          "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "histogram_quantile(0.95, sum(rate(edc_negotiation_duration_seconds_bucket[5m])) by (le)) * 1000",
-          "legendFormat": "p95 Duration",
-          "refId": "A"
-        }
-      ],
-      "title": "Negotiation Duration (p95)",
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 23},
-      "id": 103,
-      "panels": [],
-      "title": "Transfer Process",
-      "type": "row"
-    },
-    {
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "palette-classic"},
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {"group": "A", "mode": "none"},
-            "thresholdsStyle": {"mode": "off"}
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
-          },
-          "unit": "short"
-        },
-        "overrides": [
-          {"matcher": {"id": "byName", "options": "COMPLETED"}, "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "TERMINATED"}, "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "STARTED"}, "properties": [{"id": "color", "value": {"fixedColor": "blue", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "REQUESTED"}, "properties": [{"id": "color", "value": {"fixedColor": "yellow", "mode": "fixed"}}]}
-        ]
-      },
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
-      "id": 12,
-      "options": {
-        "legend": {"calcs": ["sum", "mean"], "displayMode": "table", "placement": "bottom", "showLegend": true},
-        "tooltip": {"mode": "multi", "sort": "desc"}
-      },
-      "pluginVersion": "10.4.1",
-      "targets": [
-        {
-          "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(rate(edc_transfer_total[5m])) by (status)",
-          "legendFormat": "{{status}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Transfer Rate by Status",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 90},
-              {"color": "green", "value": 98}
-            ]
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
-      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 24},
-      "id": 13,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.4.1",
-      "targets": [
-        {
-          "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(edc_transfer_total{status=\"COMPLETED\"}) / sum(edc_transfer_total) or vector(1)",
-          "legendFormat": "Success Rate",
-          "refId": "A"
-        }
-      ],
-      "title": "Transfer Success Rate",
-      "type": "gauge"
-    },
-    {
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "palette-classic"},
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {"group": "A", "mode": "none"},
-            "thresholdsStyle": {"mode": "off"}
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
-          },
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 24},
-      "id": 14,
-      "options": {
-        "legend": {"calcs": ["sum"], "displayMode": "table", "placement": "bottom", "showLegend": true},
-        "tooltip": {"mode": "multi", "sort": "desc"}
-      },
-      "pluginVersion": "10.4.1",
-      "targets": [
-        {
-          "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(rate(edc_transfer_bytes_total[5m])) by (direction)",
-          "legendFormat": "{{direction}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Transfer Data Volume",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 32},
-      "id": 104,
-      "panels": [],
-      "title": "Identity & DCP",
-      "type": "row"
-    },
-    {
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
             "steps": [{"color": "green", "value": null}]
           },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 33},
-      "id": 15,
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 15},
+      "id": 22,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -727,12 +481,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(dcp_participants_total) or vector(0)",
-          "legendFormat": "Participants",
+          "expr": "sum(dsp_messages_total{type=\"catalog_request\"})",
+          "legendFormat": "Catalog Requests",
           "refId": "A"
         }
       ],
-      "title": "Registered Participants",
+      "title": "Catalog Requests",
       "type": "stat"
     },
     {
@@ -749,8 +503,8 @@
         },
         "overrides": []
       },
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 33},
-      "id": 16,
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 19},
+      "id": 23,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -763,13 +517,21 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(identity_hub_credentials_total) or vector(0)",
-          "legendFormat": "VCs",
+          "expr": "sum(dsp_messages_total{type=\"contract_offer\"})",
+          "legendFormat": "Contract Offers",
           "refId": "A"
         }
       ],
-      "title": "Stored Credentials",
+      "title": "Contract Offers",
       "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 23},
+      "id": 103,
+      "panels": [],
+      "title": "Transfers & Negotiations",
+      "type": "row"
     },
     {
       "datasource": {"type": "prometheus", "uid": "prometheus"},
@@ -778,21 +540,21 @@
           "color": {"mode": "thresholds"},
           "mappings": [],
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 95},
-              {"color": "green", "value": 99}
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 3},
+              {"color": "red", "value": 5}
             ]
           },
-          "unit": "percentunit"
+          "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 33},
-      "id": 17,
+      "gridPos": {"h": 6, "w": 4, "x": 0, "y": 24},
+      "id": 30,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -803,12 +565,12 @@
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(dcp_verification_total{result=\"success\"}) / sum(dcp_verification_total) or vector(1)",
-          "legendFormat": "Verification Success",
+          "expr": "active_negotiations or vector(0)",
+          "legendFormat": "Active",
           "refId": "A"
         }
       ],
-      "title": "DID Verification Rate",
+      "title": "Active Negotiations",
       "type": "stat"
     },
     {
@@ -821,205 +583,148 @@
             "mode": "absolute",
             "steps": [
               {"color": "green", "value": null},
-              {"color": "yellow", "value": 100},
-              {"color": "red", "value": 200}
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 10}
             ]
           },
-          "unit": "ms"
+          "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 33},
-      "id": 18,
+      "gridPos": {"h": 6, "w": 4, "x": 4, "y": 24},
+      "id": 31,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {"calcs": ["mean"], "fields": "", "values": false},
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
         "textMode": "auto"
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "histogram_quantile(0.95, sum(rate(dcp_resolution_duration_seconds_bucket[5m])) by (le)) * 1000",
-          "legendFormat": "p95 Resolution",
+          "expr": "sum(active_transfers) or vector(0)",
+          "legendFormat": "Active",
           "refId": "A"
         }
       ],
-      "title": "DID Resolution Latency (p95)",
+      "title": "Active Transfers",
       "type": "stat"
     },
     {
       "datasource": {"type": "prometheus", "uid": "prometheus"},
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {"group": "A", "mode": "none"},
-            "thresholdsStyle": {"mode": "off"}
-          },
+          "color": {"mode": "thresholds"},
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 0.9},
+              {"color": "green", "value": 0.95}
+            ]
           },
-          "unit": "short"
+          "unit": "percentunit"
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 37},
-      "id": 19,
+      "gridPos": {"h": 6, "w": 4, "x": 8, "y": 24},
+      "id": 32,
       "options": {
-        "legend": {"calcs": ["sum"], "displayMode": "table", "placement": "bottom", "showLegend": true},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "auto"
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(rate(dcp_operations_total[5m])) by (operation)",
-          "legendFormat": "{{operation}}",
+          "expr": "transfer_success_rate or vector(0.95)",
+          "legendFormat": "Success Rate",
           "refId": "A"
         }
       ],
-      "title": "DCP Operations Rate",
-      "type": "timeseries"
+      "title": "Transfer Success Rate",
+      "type": "stat"
     },
     {
       "datasource": {"type": "prometheus", "uid": "prometheus"},
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {"group": "A", "mode": "none"},
-            "thresholdsStyle": {"mode": "off"}
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [{"color": "green", "value": null}]
           },
-          "unit": "short"
+          "unit": "decbytes"
         },
-        "overrides": [
-          {"matcher": {"id": "byName", "options": "success"}, "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]},
-          {"matcher": {"id": "byName", "options": "failure"}, "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]}
-        ]
+        "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 37},
-      "id": 20,
+      "gridPos": {"h": 6, "w": 4, "x": 12, "y": 24},
+      "id": 33,
       "options": {
-        "legend": {"calcs": ["sum"], "displayMode": "table", "placement": "bottom", "showLegend": true},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "auto"
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(rate(identity_hub_operations_total[5m])) by (operation, result)",
-          "legendFormat": "{{operation}} - {{result}}",
+          "expr": "sum(transfer_volume_bytes) or vector(0)",
+          "legendFormat": "Volume",
           "refId": "A"
         }
       ],
-      "title": "Identity Hub Operations",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 45},
-      "id": 105,
-      "panels": [],
-      "title": "DSP Protocol",
-      "type": "row"
+      "title": "Transfer Volume",
+      "type": "stat"
     },
     {
       "datasource": {"type": "prometheus", "uid": "prometheus"},
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {"type": "linear"},
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {"group": "A", "mode": "none"},
-            "thresholdsStyle": {"mode": "off"}
-          },
+          "color": {"mode": "thresholds"},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
+            "steps": [{"color": "blue", "value": null}]
           },
-          "unit": "short"
+          "unit": "Bps"
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 46},
-      "id": 21,
+      "gridPos": {"h": 6, "w": 4, "x": 16, "y": 24},
+      "id": 34,
       "options": {
-        "legend": {"calcs": ["sum"], "displayMode": "table", "placement": "right", "showLegend": true},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "auto"
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(rate(dsp_messages_total[5m])) by (message_type)",
-          "legendFormat": "{{message_type}}",
+          "expr": "sum(transfer_speed_bytes_per_second) or vector(0)",
+          "legendFormat": "Speed",
           "refId": "A"
         }
       ],
-      "title": "DSP Message Rate by Type",
-      "type": "timeseries"
+      "title": "Transfer Speed",
+      "type": "stat"
     },
     {
       "datasource": {"type": "prometheus", "uid": "prometheus"},
@@ -1029,81 +734,258 @@
           "custom": {
             "hideFrom": {"legend": false, "tooltip": false, "viz": false}
           },
-          "mappings": [],
-          "unit": "short"
+          "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 46},
-      "id": 22,
+      "gridPos": {"h": 6, "w": 4, "x": 20, "y": 24},
+      "id": 35,
       "options": {
-        "legend": {"displayMode": "table", "placement": "right", "showLegend": true, "values": ["value", "percent"]},
-        "pieType": "donut",
-        "reduceOptions": {"calcs": ["sum"], "fields": "", "values": false},
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true},
+        "pieType": "pie",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
         "tooltip": {"mode": "single", "sort": "none"}
       },
       "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "expr": "sum(increase(dsp_messages_total[24h])) by (message_type)",
-          "legendFormat": "{{message_type}}",
+          "expr": "active_transfers",
+          "legendFormat": "{{type}}",
           "refId": "A"
         }
       ],
-      "title": "DSP Message Distribution (24h)",
+      "title": "Transfers by Type",
       "type": "piechart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 30},
+      "id": 104,
+      "panels": [],
+      "title": "HTTP Requests (Backend-EDC)",
+      "type": "row"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "green", "value": null}]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 31},
+      "id": 40,
+      "options": {
+        "legend": {"calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "expr": "sum(rate(http_requests_total{job=\"backend-edc\"}[5m])) by (route)",
+          "legendFormat": "{{route}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Request Rate by Route",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "none"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "green", "value": null}]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 31},
+      "id": 41,
+      "options": {
+        "legend": {"calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"backend-edc\"}[5m])) by (le, route)) * 1000",
+          "legendFormat": "p95 {{route}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Response Time (p95) by Route",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 39},
+      "id": 105,
+      "panels": [],
+      "title": "Credential & DID Operations",
+      "type": "row"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "normal"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "green", "value": null}]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40},
+      "id": 50,
+      "options": {
+        "legend": {"calcs": ["sum"], "displayMode": "table", "placement": "right", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "expr": "credential_verification_total",
+          "legendFormat": "{{result}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Credential Verifications",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {"type": "linear"},
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {"group": "A", "mode": "normal"},
+            "thresholdsStyle": {"mode": "off"}
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "green", "value": null}]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40},
+      "id": 51,
+      "options": {
+        "legend": {"calcs": ["sum"], "displayMode": "table", "placement": "right", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "expr": "did_resolution_total",
+          "legendFormat": "{{result}}",
+          "refId": "A"
+        }
+      ],
+      "title": "DID Resolutions",
+      "type": "timeseries"
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["health-dataspace", "edc", "dsp", "dcp", "identity-hub"],
-  "templating": {
-    "list": [
-      {
-        "current": {"selected": false, "text": "All", "value": "$__all"},
-        "datasource": {"type": "prometheus", "uid": "prometheus"},
-        "definition": "label_values(edc_negotiation_total, participant)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Participant",
-        "multi": true,
-        "name": "participant",
-        "options": [],
-        "query": {"query": "label_values(edc_negotiation_total, participant)", "refId": "StandardVariableQuery"},
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "auto": true,
-        "auto_count": 30,
-        "auto_min": "10s",
-        "current": {"selected": false, "text": "auto", "value": "$__auto_interval_interval"},
-        "hide": 0,
-        "label": "Interval",
-        "name": "interval",
-        "options": [
-          {"selected": true, "text": "auto", "value": "$__auto_interval_interval"},
-          {"selected": false, "text": "1m", "value": "1m"},
-          {"selected": false, "text": "5m", "value": "5m"},
-          {"selected": false, "text": "10m", "value": "10m"},
-          {"selected": false, "text": "30m", "value": "30m"},
-          {"selected": false, "text": "1h", "value": "1h"}
-        ],
-        "query": "1m,5m,10m,30m,1h",
-        "queryValue": "",
-        "refresh": 2,
-        "skipUrlSync": false,
-        "type": "interval"
-      }
-    ]
-  },
-  "time": {"from": "now-6h", "to": "now"},
+  "tags": ["health-dataspace", "edc", "dataspace"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
   "timepicker": {},
-  "timezone": "browser",
+  "timezone": "",
   "title": "EDC Operations Dashboard",
   "uid": "edc-operations-dashboard",
   "version": 1,
