@@ -8,8 +8,9 @@ A comprehensive demonstration of secure, interoperable, and consent-managed acce
 - 🛠 [**Developer Manual**](docs/DEVELOPER-MANUAL.md) - Technical architecture and API reference
 
 🐛 **Issue Tracking:**
-- [#7 - Frontend Integration: Connect all components to EDC API flow](https://github.com/ma3u/MinimumViableDataspace/issues/7)
-- [#6 - Docker images missing Hashicorp Vault extension (RESOLVED)](https://github.com/ma3u/MinimumViableDataspace/issues/6)
+- [#13 - Migrate to EDC Virtual-Connector for Multi-Tenancy](https://github.com/ma3u/MinimumViableDataspace/issues/13)
+- [#10 - Phase 14: Monitoring & Debugging](https://github.com/ma3u/MinimumViableDataspace/issues/10)
+- [#8 - Dataspace Insider View - Real-time DSP Protocol Visualization](https://github.com/ma3u/MinimumViableDataspace/issues/8)
 
 [![EHDS Compliant](https://img.shields.io/badge/EHDS-EU%202025%2F327-blue)](https://eur-lex.europa.eu/eli/reg/2025/327)
 [![DCAT-AP Health](https://img.shields.io/badge/DCAT--AP-Health-green)](https://healthdcat-ap.github.io/)
@@ -28,6 +29,7 @@ This demo showcases how easy it is to create an **EHDS-compliant dataspace for h
 - DCAT-AP for Health metadata for seamless data discovery and interoperability
 - Flexible deployment modes: Mock backend, Hybrid EDC integration, Full EDC flow
 
+🌐 **[Live Demo](https://ma3u.github.io/MinimumViableDataspace/)** (mock mode, no EDC required)
 
 
 ## Quick Start
@@ -197,6 +199,14 @@ See [Developer Manual](docs/DEVELOPER-MANUAL.md) for detailed instructions.
 
 ---
 
+## Roadmap
+
+🚀 **[EDC Virtual-Connector Migration](https://github.com/ma3u/MinimumViableDataspace/issues/13)** - Multi-tenancy support for 80% cost reduction at scale (100+ hospitals).
+
+See [docs/issues/](docs/issues/) for detailed planning documents.
+
+---
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
@@ -205,7 +215,7 @@ This project is licensed under the Apache License, Version 2.0. See [LICENSE](LI
 
 ## Contributing
 
-1. Fork the repository
+1. Fork the repository with the branch health-demo:  https://github.com/ma3u/MinimumViableDataspace/tree/health-demo
 2. Create a feature branch
 3. Make your changes
 4. Run tests: `./gradlew test && cd frontend && npm test`
