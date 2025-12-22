@@ -217,6 +217,61 @@ export const edcCatalogSyncStatus = new client.Gauge({
 });
 
 /**
+ * Contract Negotiations Total
+ * Tracks all contract negotiations in the EDC flow
+ */
+export const contractNegotiationsTotal = new client.Counter({
+  name: 'contract_negotiations_total',
+  help: 'Total contract negotiations by status',
+  labelNames: ['status'],
+  registers: [register],
+});
+
+/**
+ * Asset Transfers Total
+ * Tracks all asset transfers in the EDC flow
+ */
+export const assetTransfersTotal = new client.Counter({
+  name: 'asset_transfers_total',
+  help: 'Total asset transfers by status',
+  labelNames: ['status'],
+  registers: [register],
+});
+
+/**
+ * Catalog Queries Total
+ * Tracks catalog discovery and query operations
+ */
+export const catalogQueriesTotal = new client.Counter({
+  name: 'catalog_queries_total',
+  help: 'Total catalog queries by status',
+  labelNames: ['status', 'provider'],
+  registers: [register],
+});
+
+/**
+ * EHDS Consent Requests Total
+ * Tracks consent requests in the EHDS flow
+ */
+export const ehdsConsentRequestsTotal = new client.Counter({
+  name: 'ehds_consent_requests_total',
+  help: 'Total EHDS consent requests by status',
+  labelNames: ['status', 'purpose'],
+  registers: [register],
+});
+
+/**
+ * EHR Records Accessed Total
+ * Tracks electronic health records accessed
+ */
+export const ehrRecordsAccessedTotal = new client.Counter({
+  name: 'ehr_records_accessed_total',
+  help: 'Total EHR records accessed by type',
+  labelNames: ['record_type', 'access_type'],
+  registers: [register],
+});
+
+/**
  * DSP Protocol Messages
  */
 export const dspMessagesTotal = new client.Counter({
@@ -435,6 +490,45 @@ export function initializeEhdsMetrics(): void {
   edcPolicyDefinitions.set({ type: 'usage' }, 4);
   edcCatalogSyncStatus.set({ provider: 'health-provider' }, 1);
 
+  // EDC Flow Metrics (for dashboard panels)
+  // Contract Negotiations
+  contractNegotiationsTotal.inc({ status: 'completed' }, 145);
+  contractNegotiationsTotal.inc({ status: 'pending' }, 12);
+  contractNegotiationsTotal.inc({ status: 'rejected' }, 8);
+  contractNegotiationsTotal.inc({ status: 'failed' }, 3);
+  contractNegotiationsTotal.inc({ status: 'terminated' }, 5);
+  
+  // Asset Transfers
+  assetTransfersTotal.inc({ status: 'completed' }, 132);
+  assetTransfersTotal.inc({ status: 'in_progress' }, 5);
+  assetTransfersTotal.inc({ status: 'failed' }, 7);
+  assetTransfersTotal.inc({ status: 'cancelled' }, 2);
+  
+  // Catalog Queries
+  catalogQueriesTotal.inc({ status: 'success', provider: 'health-provider' }, 1250);
+  catalogQueriesTotal.inc({ status: 'success', provider: 'federated' }, 430);
+  catalogQueriesTotal.inc({ status: 'error', provider: 'health-provider' }, 15);
+  catalogQueriesTotal.inc({ status: 'timeout', provider: 'federated' }, 8);
+  
+  // EHDS Consent Requests
+  ehdsConsentRequestsTotal.inc({ status: 'approved', purpose: 'research' }, 156);
+  ehdsConsentRequestsTotal.inc({ status: 'approved', purpose: 'treatment' }, 287);
+  ehdsConsentRequestsTotal.inc({ status: 'approved', purpose: 'secondary_use' }, 89);
+  ehdsConsentRequestsTotal.inc({ status: 'denied', purpose: 'research' }, 12);
+  ehdsConsentRequestsTotal.inc({ status: 'denied', purpose: 'treatment' }, 4);
+  ehdsConsentRequestsTotal.inc({ status: 'pending', purpose: 'research' }, 23);
+  ehdsConsentRequestsTotal.inc({ status: 'expired', purpose: 'research' }, 45);
+  ehdsConsentRequestsTotal.inc({ status: 'revoked', purpose: 'research' }, 8);
+  
+  // EHR Records Accessed
+  ehrRecordsAccessedTotal.inc({ record_type: 'patient_summary', access_type: 'read' }, 890);
+  ehrRecordsAccessedTotal.inc({ record_type: 'lab_results', access_type: 'read' }, 567);
+  ehrRecordsAccessedTotal.inc({ record_type: 'medications', access_type: 'read' }, 432);
+  ehrRecordsAccessedTotal.inc({ record_type: 'imaging', access_type: 'read' }, 234);
+  ehrRecordsAccessedTotal.inc({ record_type: 'genomics', access_type: 'read' }, 78);
+  ehrRecordsAccessedTotal.inc({ record_type: 'patient_summary', access_type: 'export' }, 145);
+  ehrRecordsAccessedTotal.inc({ record_type: 'lab_results', access_type: 'export' }, 89);
+
   // Service Health
   serviceHealthStatus.set({ service: 'backend-edc', component: 'api' }, 1);
   serviceHealthStatus.set({ service: 'backend-edc', component: 'edc_proxy' }, 1);
@@ -486,6 +580,53 @@ function simulateDataspaceActivity(): void {
   }
   if (Math.random() > 0.7) {
     dspMessagesTotal.inc({ type: 'contract_offer', direction: 'inbound' });
+  }
+
+  // Simulate EDC flow metrics (for dashboard panels)
+  // Contract negotiations - mostly completed, occasional other states
+  if (Math.random() > 0.6) {
+    contractNegotiationsTotal.inc({ status: 'completed' });
+  }
+  if (Math.random() > 0.9) {
+    contractNegotiationsTotal.inc({ status: 'pending' });
+  }
+  if (Math.random() > 0.97) {
+    contractNegotiationsTotal.inc({ status: 'rejected' });
+  }
+  if (Math.random() > 0.99) {
+    contractNegotiationsTotal.inc({ status: 'failed' });
+  }
+  
+  // Asset transfers
+  if (Math.random() > 0.5) {
+    assetTransfersTotal.inc({ status: 'completed' });
+  }
+  if (Math.random() > 0.95) {
+    assetTransfersTotal.inc({ status: 'failed' });
+  }
+  
+  // Catalog queries - frequent operation
+  catalogQueriesTotal.inc({ status: 'success', provider: 'health-provider' });
+  if (Math.random() > 0.5) {
+    catalogQueriesTotal.inc({ status: 'success', provider: 'federated' });
+  }
+  if (Math.random() > 0.98) {
+    catalogQueriesTotal.inc({ status: 'error', provider: 'health-provider' });
+  }
+  
+  // EHDS consent requests
+  if (Math.random() > 0.7) {
+    const consentPurpose = Math.random() > 0.5 ? 'research' : Math.random() > 0.5 ? 'treatment' : 'secondary_use';
+    const consentStatus = Math.random() > 0.1 ? 'approved' : Math.random() > 0.5 ? 'denied' : 'pending';
+    ehdsConsentRequestsTotal.inc({ status: consentStatus, purpose: consentPurpose });
+  }
+  
+  // EHR records accessed
+  if (Math.random() > 0.4) {
+    const recordTypes = ['patient_summary', 'lab_results', 'medications', 'imaging', 'genomics'];
+    const recordType = recordTypes[Math.floor(Math.random() * recordTypes.length)];
+    const accessType = Math.random() > 0.8 ? 'export' : 'read';
+    ehrRecordsAccessedTotal.inc({ record_type: recordType, access_type: accessType });
   }
 
   // Simulate data access requests (legacy metric)
