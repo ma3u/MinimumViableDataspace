@@ -134,20 +134,31 @@ services:
   # ============================================================
   # cAdvisor - Container Metrics
   # ============================================================
+  # NOTE: On Docker Desktop for macOS, cAdvisor needs explicit Docker socket
+  # access to resolve container IDs to names. Without this, metrics only show
+  # container IDs like /docker/abc123... instead of friendly names.
+  # See: https://github.com/google/cadvisor/issues/3194
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.2
     container_name: tools-cadvisor
     ports:
       - "8080:8080"
+    privileged: true  # Required for macOS to access necessary devices
+    devices:
+      - /dev/kmsg
     volumes:
+      # Docker socket for container name resolution
+      # NOTE: On Docker Desktop for macOS, container names may not resolve
+      # due to VM architecture differences. See GitHub Issue #10 for workarounds.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Standard system mounts
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
-    privileged: true
-    devices:
-      - /dev/kmsg
+    command:
+      - "-housekeeping_interval=10s"  # More frequent updates
     networks:
       - dataspace-network
     restart: unless-stopped
