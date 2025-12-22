@@ -78,3 +78,13 @@ scrape_configs:
     scrape_interval: 15s
     honor_labels: true
     scrape_timeout: 10s
+
+  # Docker Name Exporter (provides container ID -> name mapping for macOS)
+  # This service queries Docker API directly to resolve container names
+  # that cAdvisor cannot resolve on Docker Desktop for macOS.
+  - job_name: 'docker-name-exporter'
+    static_configs:
+      - targets: ['tools-docker-name-exporter:9417']
+    metrics_path: /metrics
+    scrape_interval: 15s
+    scrape_timeout: 10s

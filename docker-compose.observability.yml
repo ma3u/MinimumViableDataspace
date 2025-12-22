@@ -163,6 +163,32 @@ services:
       - dataspace-network
     restart: unless-stopped
 
+  # ============================================================
+  # Docker Name Exporter - Container Name Resolution for macOS
+  # ============================================================
+  # This service solves cAdvisor's inability to resolve container names
+  # on Docker Desktop for macOS. It queries the Docker API directly
+  # and exports metrics with proper container name labels.
+  docker-name-exporter:
+    build:
+      context: ./observability/docker-name-exporter
+    container_name: tools-docker-name-exporter
+    ports:
+      - "9417:9417"
+    volumes:
+      # Docker socket mounted directly - works on macOS
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - PORT=9417
+    networks:
+      - dataspace-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9417/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   prometheus_data:
   grafana_data:

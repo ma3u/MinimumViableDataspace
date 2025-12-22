@@ -1,0 +1,14 @@
+{
+  "name": "docker-name-exporter",
+  "version": "1.0.0",
+  "description": "Prometheus exporter that maps Docker container IDs to names for macOS developers",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dockerode": "^4.0.2",
+    "express": "^4.18.2",
+    "prom-client": "^15.1.0"
+  }
+}
