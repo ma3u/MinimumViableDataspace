@@ -12,7 +12,7 @@
       }
     ]
   },
-  "description": "Container and system resource monitoring via cAdvisor for the Health Dataspace",
+  "description": "Infrastructure Health Dashboard - Container CPU/memory usage, Network I/O, and Disk usage via cAdvisor for the Health Dataspace",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -1079,8 +1079,8 @@
   "time": {"from": "now-1h", "to": "now"},
   "timepicker": {},
   "timezone": "browser",
-  "title": "System Resources Dashboard",
-  "uid": "system-resources-dashboard",
+  "title": "Infrastructure Health Dashboard",
+  "uid": "infrastructure-health",
   "version": 1,
   "weekStart": ""
 }
