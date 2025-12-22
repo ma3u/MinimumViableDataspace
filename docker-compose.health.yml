@@ -35,6 +35,10 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
+      # OpenTelemetry tracing configuration
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tools-jaeger:4318/v1/traces
+      - OTEL_SERVICE_NAME=ehr-backend
+      - OTEL_TRACES_EXPORTER=otlp
     networks:
       - health-network
     restart: unless-stopped

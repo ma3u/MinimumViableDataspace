@@ -1,0 +1,210 @@
+# Prometheus Recording Rules for Health Dataspace
+#
+# Pre-computed metrics for dashboard performance and consistency.
+# These rules run every 15s and create new time series.
+#
+# Categories:
+# 1. HTTP Request Metrics (5 rules)
+# 2. EDC/Dataspace Metrics (5 rules)
+# 3. EHDS Compliance Metrics (5 rules)
+# 4. Resource Utilization Metrics (5 rules)
+#
+
+groups:
+  # ============================================================
+  # Group 1: HTTP Request Metrics
+  # ============================================================
+  - name: http_request_metrics
+    interval: 15s
+    rules:
+      # Rule 1: Request rate per service (5m average)
+      - record: job:http_requests:rate5m
+        expr: sum(rate(http_requests_total[5m])) by (job)
+        labels:
+          category: "http"
+
+      # Rule 2: Request rate by status code
+      - record: job:http_requests_by_status:rate5m
+        expr: sum(rate(http_requests_total[5m])) by (job, status_code)
+        labels:
+          category: "http"
+
+      # Rule 3: Error rate percentage
+      - record: job:http_error_rate:ratio5m
+        expr: |
+          sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (job) /
+          sum(rate(http_requests_total[5m])) by (job)
+        labels:
+          category: "http"
+
+      # Rule 4: P95 latency per endpoint
+      - record: job:http_request_duration_p95:5m
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (job, le))
+        labels:
+          category: "http"
+
+      # Rule 5: Request throughput (requests per second)
+      - record: job:http_throughput:rate1m
+        expr: sum(rate(http_requests_total[1m])) by (job)
+        labels:
+          category: "http"
+
+  # ============================================================
+  # Group 2: EDC/Dataspace Metrics
+  # ============================================================
+  - name: edc_dataspace_metrics
+    interval: 15s
+    rules:
+      # Rule 6: Contract negotiation rate
+      - record: edc:contract_negotiations:rate5m
+        expr: sum(rate(contract_negotiations_total[5m])) by (status)
+        labels:
+          category: "edc"
+
+      # Rule 7: Contract negotiation success ratio
+      - record: edc:contract_success:ratio5m
+        expr: |
+          sum(rate(contract_negotiations_total{status="completed"}[5m])) /
+          sum(rate(contract_negotiations_total[5m]))
+        labels:
+          category: "edc"
+
+      # Rule 8: Asset transfer rate
+      - record: edc:asset_transfers:rate5m
+        expr: sum(rate(asset_transfers_total[5m])) by (status)
+        labels:
+          category: "edc"
+
+      # Rule 9: Active negotiations gauge
+      - record: edc:active_negotiations:current
+        expr: sum(active_negotiations)
+        labels:
+          category: "edc"
+
+      # Rule 10: Data exchange volume (if available)
+      - record: edc:data_exchange:rate5m
+        expr: sum(rate(data_exchange_bytes_total[5m]))
+        labels:
+          category: "edc"
+
+  # ============================================================
+  # Group 3: EHDS Compliance Metrics
+  # ============================================================
+  - name: ehds_compliance_metrics
+    interval: 15s
+    rules:
+      # Rule 11: Consent verification rate
+      - record: ehds:consent_requests:rate5m
+        expr: sum(rate(ehds_consent_requests_total[5m])) by (status)
+        labels:
+          category: "ehds"
+
+      # Rule 12: Consent approval ratio
+      - record: ehds:consent_approval:ratio5m
+        expr: |
+          sum(rate(ehds_consent_requests_total{status="approved"}[5m])) /
+          sum(rate(ehds_consent_requests_total[5m]))
+        labels:
+          category: "ehds"
+
+      # Rule 13: Data access by type rate
+      - record: ehds:data_access_by_type:rate5m
+        expr: sum(rate(data_access_total[5m])) by (access_type)
+        labels:
+          category: "ehds"
+
+      # Rule 14: Data access by category rate
+      - record: ehds:data_access_by_category:rate5m
+        expr: sum(rate(data_access_total[5m])) by (data_category)
+        labels:
+          category: "ehds"
+
+      # Rule 15: Data access by purpose rate
+      - record: ehds:data_access_by_purpose:rate5m
+        expr: sum(rate(data_access_total[5m])) by (purpose)
+        labels:
+          category: "ehds"
+
+  # ============================================================
+  # Group 4: Resource Utilization Metrics
+  # ============================================================
+  - name: resource_utilization_metrics
+    interval: 15s
+    rules:
+      # Rule 16: Container CPU usage percentage
+      - record: container:cpu_usage:percent
+        expr: |
+          sum(rate(container_cpu_usage_seconds_total{name=~".+"}[5m])) by (name) * 100
+        labels:
+          category: "resource"
+
+      # Rule 17: Container memory usage percentage
+      - record: container:memory_usage:percent
+        expr: |
+          sum(container_memory_usage_bytes{name=~".+"}) by (name) /
+          sum(container_spec_memory_limit_bytes{name=~".+"}) by (name) * 100
+        labels:
+          category: "resource"
+
+      # Rule 18: Container network receive rate
+      - record: container:network_receive:rate5m
+        expr: sum(rate(container_network_receive_bytes_total{name=~".+"}[5m])) by (name)
+        labels:
+          category: "resource"
+
+      # Rule 19: Container network transmit rate
+      - record: container:network_transmit:rate5m
+        expr: sum(rate(container_network_transmit_bytes_total{name=~".+"}[5m])) by (name)
+        labels:
+          category: "resource"
+
+      # Rule 20: Total running containers
+      - record: cluster:containers:running
+        expr: count(container_last_seen{name=~".+"})
+        labels:
+          category: "resource"
+
+  # ============================================================
+  # Additional Business Metrics
+  # ============================================================
+  - name: business_metrics
+    interval: 30s
+    rules:
+      # Catalog query success rate
+      - record: catalog:queries:success_ratio5m
+        expr: |
+          sum(rate(catalog_queries_total{status="success"}[5m])) /
+          sum(rate(catalog_queries_total[5m]))
+        labels:
+          category: "business"
+
+      # EHR record access rate
+      - record: ehr:records_accessed:rate5m
+        expr: sum(rate(ehr_records_accessed_total[5m])) by (record_type)
+        labels:
+          category: "business"
+
+      # Policy evaluation success rate
+      - record: policy:evaluations:success_ratio5m
+        expr: |
+          sum(rate(policy_evaluations_total{result="permit"}[5m])) /
+          sum(rate(policy_evaluations_total[5m]))
+        labels:
+          category: "business"
+
+      # Average data access by role
+      - record: ehds:access_by_role:rate5m
+        expr: sum(rate(data_access_total[5m])) by (user_role)
+        labels:
+          category: "business"
+
+      # Overall system health score (composite)
+      - record: system:health_score:current
+        expr: |
+          (
+            (1 - clamp_max(sum(rate(http_requests_total{status_code=~"5.."}[5m])) / sum(rate(http_requests_total[5m])), 1)) * 0.4 +
+            clamp_max(sum(rate(contract_negotiations_total{status="completed"}[5m])) / sum(rate(contract_negotiations_total[5m])), 1) * 0.3 +
+            clamp_max(sum(rate(ehds_consent_requests_total{status="approved"}[5m])) / sum(rate(ehds_consent_requests_total[5m])), 1) * 0.3
+          ) * 100
+        labels:
+          category: "business"

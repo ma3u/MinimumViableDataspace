@@ -47,6 +47,10 @@ services:
       - PROVIDER_IDENTITY_HUB_URL=http://provider-identityhub:7092
       - PROVIDER_PARTICIPANT_ID=provider
       - MOCK_BACKEND_URL=http://ehr-backend:3001
+      # OpenTelemetry tracing configuration
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tools-jaeger:4318/v1/traces
+      - OTEL_SERVICE_NAME=backend-edc
+      - OTEL_TRACES_EXPORTER=otlp
     depends_on:
       - ehr-backend
       - consumer-controlplane

@@ -18,9 +18,10 @@ alerting:
         - targets:
             - tools-alertmanager:9093
 
-# Load alerting rules
+# Load alerting rules and recording rules
 rule_files:
   - /etc/prometheus/alerts.yml
+  - /etc/prometheus/recording-rules.yml
 
 # Scrape configurations
 scrape_configs:
