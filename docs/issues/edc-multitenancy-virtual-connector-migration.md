@@ -4,25 +4,27 @@
 
 **Issue Type**: Architecture / Infrastructure  
 **Priority**: High  
-**Effort Estimate**: Large (requires significant refactoring)
+**Effort Estimate**: Large (requires significant refactoring)  
+**GitHub Issue**: [#13](https://github.com/ma3u/MinimumViableDataspace/issues/13)  
+**Repository**: [ma3u/MinimumViableDataspace (health-demo)](https://github.com/ma3u/MinimumViableDataspace/tree/health-demo)
 
 ---
 
 ## Problem Statement
 
-### The Cost Challenge
+### The Cost Challenge (Azure AKS)
 
 Running EDC in production is **expensive** when each participant requires a dedicated connector instance:
 
 - **Per-participant costs**: Each Consumer/Provider EDC connector requires:
-  - Control Plane instance
-  - Data Plane instance  
-  - Identity Hub instance
-  - Dedicated PostgreSQL database (or schema)
-  - HashiCorp Vault namespace/path for secrets
-  - Kubernetes pods, networking, certificates
+  - Control Plane container (D2s v3)
+  - Data Plane container (D2s v3)
+  - Identity Hub container (B2s)
+  - Azure Database for PostgreSQL (Burstable)
+  - Azure Key Vault namespace
+  - Container Registry, Networking, Ingress
 
-- **Estimated cost**: >$1,000/year per participant just for infrastructure (as calculated in [eclipse-edc/discussions#25](https://github.com/orgs/eclipse-edc/discussions/25))
+- **Estimated cost**: **€215/month (~€2,580/year)** per participant on Azure AKS
 
 - **Operational overhead**: Each instance requires independent:
   - Updates and security patches
