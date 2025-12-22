@@ -1649,30 +1649,142 @@ Based on the DATA-SOURCES-REPORT.md analysis, these should **NOT** be made dynam
 
 ### 14.3 Distributed Tracing
 
-**Objective:** Implement OpenTelemetry-based distributed tracing.
+**Objective:** Implement OpenTelemetry-based distributed tracing for all EDC components.
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete
 
 **Implementation:**
-- [ ] Add OpenTelemetry SDK to EDC extensions
-- [ ] Configure trace propagation across services
-- [ ] Set up Jaeger/Tempo for trace visualization
-- [ ] Instrument backend-edc and backend-mock
-- [ ] Add frontend performance tracing
+- [x] Add OpenTelemetry configuration to all EDC services
+- [x] Configure trace propagation across services
+- [x] Set up Jaeger for trace visualization
+- [x] Instrument backend-edc and backend-mock
+- [x] Configure EDC Control Planes, Data Planes, Identity Hubs
 
-**Trace Contexts:**
-- Catalog discovery flow (Consumer → Provider)
-- Contract negotiation (multi-step state machine)
-- Data transfer (EDR → data delivery)
-- Identity verification (DID resolution, VC validation)
+**Access Jaeger UI:** http://localhost:16686
 
-**Key Spans:**
+---
+
+#### 14.3.1 EDC Services Configured for Tracing
+
+All EDC services now export traces to Jaeger:
+
+| Service | OTEL Service Name | Description |
+|---------|-------------------|-------------|
+| Consumer Control Plane | `consumer-controlplane` | Contract negotiation initiator |
+| Consumer Data Plane | `consumer-dataplane` | Data transfer client |
+| Consumer Identity Hub | `consumer-identityhub` | DID/VC management |
+| Provider Control Plane | `provider-controlplane` | Contract negotiation responder |
+| Provider Data Plane | `provider-dataplane` | Data transfer server |
+| Provider Identity Hub | `provider-identityhub` | DID/VC management |
+| Catalog Server | `catalog-server` | Federated catalog |
+| Issuer Service | `issuer-service` | VC issuance |
+| Backend-EDC | `backend-edc` | API proxy layer |
+| EHR Backend | `ehr-backend` | FHIR data source |
+
+---
+
+#### 14.3.2 Tracing a Contract Negotiation Flow in Jaeger
+
+**Step-by-step guide to follow a contract negotiation:**
+
+1. **Open Jaeger UI**: http://localhost:16686
+
+2. **Select Service**: Choose `consumer-controlplane` from the Service dropdown
+
+3. **Search for Negotiations**: Use operation filter:
+   - `POST /api/management/v3/contractnegotiations` - Initiate negotiation
+   - `ContractNegotiationListenerImpl` - State transitions
+   
+4. **Follow the Trace**: A complete negotiation includes these spans:
+
 ```
-[Catalog Request] ─┬─ [DSP Protocol Request]
-                   ├─ [Provider Catalog Query]
-                   ├─ [DCAT Parsing]
-                   └─ [Response Serialization]
+[consumer-controlplane] POST /contractnegotiations
+├── [consumer-controlplane] ContractNegotiationInitiate
+│   ├── [consumer-identityhub] STS Token Request
+│   │   └── [consumer-identityhub] Sign JWT
+│   └── [consumer-controlplane] DSP ContractRequestMessage
+│       └── [provider-controlplane] POST /api/dsp/negotiations/request
+│           ├── [provider-identityhub] Verify Token
+│           ├── [provider-controlplane] PolicyEngine.evaluate
+│           └── [provider-controlplane] ContractNegotiationStore.save
+├── [provider-controlplane] ContractNegotiationEventMessage (OFFERED)
+│   └── [consumer-controlplane] Process Offer
+├── [consumer-controlplane] ContractNegotiationEventMessage (ACCEPTED)
+│   └── [provider-controlplane] Process Acceptance
+├── [provider-controlplane] ContractAgreementMessage
+│   ├── [provider-controlplane] Sign Agreement
+│   └── [consumer-controlplane] Verify & Store Agreement
+└── [consumer-controlplane] ContractNegotiationEventMessage (FINALIZED)
 ```
+
+---
+
+#### 14.3.3 Key Trace Patterns to Observe
+
+**1. Successful Negotiation** (5-10 spans, ~500ms-2s):
+- Look for: Green/success status on all spans
+- Service flow: consumer-cp → consumer-ih → provider-cp → provider-ih → consumer-cp
+
+**2. Policy Rejection** (3-5 spans, ~100-300ms):
+- Look for: Error on `PolicyEngine.evaluate` span
+- Tags: `policy.result=DENY`, `policy.reason=...`
+
+**3. Identity Verification Failure** (2-4 spans, ~50-200ms):
+- Look for: Error on Identity Hub spans
+- Tags: `verification.result=INVALID`, `did.method=...`
+
+**4. Timeout/Network Issues** (variable spans, >5s):
+- Look for: Long duration spans, missing child spans
+- Tags: `error=true`, `http.status_code=5xx`
+
+---
+
+#### 14.3.4 Useful Jaeger Queries
+
+**Find all negotiations:**
+```
+service=consumer-controlplane operation="POST /api/management/v3/contractnegotiations"
+```
+
+**Find failed negotiations:**
+```
+service=consumer-controlplane error=true
+```
+
+**Find by asset ID:**
+```
+service=provider-controlplane tags={"asset.id": "EHR001"}
+```
+
+**Find slow operations (>1s):**
+```
+service=consumer-controlplane minDuration=1s
+```
+
+---
+
+#### 14.3.5 OpenTelemetry Configuration
+
+All EDC services use these environment variables:
+
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=http://tools-jaeger:4317
+OTEL_SERVICE_NAME=<service-name>
+OTEL_TRACES_EXPORTER=otlp
+OTEL_METRICS_EXPORTER=none
+OTEL_LOGS_EXPORTER=none
+OTEL_RESOURCE_ATTRIBUTES=service.namespace=health-dataspace,service.version=1.0.0,deployment.environment=docker
+```
+
+**Configuration files:**
+- `deployment/assets/env/docker/consumer_connector.env`
+- `deployment/assets/env/docker/provider_connector.env`
+- `deployment/assets/env/docker/consumer_dataplane.env`
+- `deployment/assets/env/docker/provider_dataplane.env`
+- `deployment/assets/env/docker/consumer_identityhub.env`
+- `deployment/assets/env/docker/provider_identityhub.env`
+- `deployment/assets/env/docker/catalogserver.env`
+- `deployment/assets/env/docker/issuerservice.env`
 
 ---
 
