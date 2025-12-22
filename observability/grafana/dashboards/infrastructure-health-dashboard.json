@@ -168,7 +168,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "avg(sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m])))",
+          "expr": "((avg(sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m])))) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
           "legendFormat": "Avg CPU",
           "refId": "A"
         }
@@ -470,8 +470,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m]))",
-          "legendFormat": "{{id}}",
+          "expr": "((sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m]))) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
@@ -539,8 +539,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "topk(10, sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m])))",
-          "legendFormat": "{{id}}",
+          "expr": "((topk(10, sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m])))) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
@@ -645,8 +645,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "container_memory_usage_bytes{id=~\"/docker/.+\"}",
-          "legendFormat": "{{id}}",
+          "expr": "((container_memory_usage_bytes{id=~\"/docker/.+\"}) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
@@ -714,8 +714,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "topk(10, container_memory_usage_bytes{id=~\"/docker/.+\"})",
-          "legendFormat": "{{id}}",
+          "expr": "((topk(10, container_memory_usage_bytes{id=~\"/docker/.+\"})) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
@@ -807,8 +807,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "container_memory_working_set_bytes{id=~\"/docker/.+\"}",
-          "legendFormat": "{{id}} working set",
+          "expr": "((container_memory_working_set_bytes{id=~\"/docker/.+\"}) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}} working set",
           "refId": "A"
         }
       ],
@@ -900,8 +900,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "container_memory_cache{id=~\"/docker/.+\"}",
-          "legendFormat": "{{id}} cache",
+          "expr": "((container_memory_cache{id=~\"/docker/.+\"}) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}} cache",
           "refId": "A"
         }
       ],
@@ -1007,7 +1007,7 @@
             "uid": "prometheus"
           },
           "expr": "sum by (id) (rate(container_network_receive_bytes_total{id=~\".+\"}[5m]))",
-          "legendFormat": "{{id}} RX",
+          "legendFormat": "{{name}} RX",
           "refId": "A"
         }
       ],
@@ -1100,7 +1100,7 @@
             "uid": "prometheus"
           },
           "expr": "sum by (id) (rate(container_network_transmit_bytes_total{id=~\".+\"}[5m]))",
-          "legendFormat": "{{id}} TX",
+          "legendFormat": "{{name}} TX",
           "refId": "A"
         }
       ],
@@ -1192,7 +1192,7 @@
             "uid": "prometheus"
           },
           "expr": "sum by (id) (rate(container_network_receive_errors_total{id=~\".+\"}[5m]))",
-          "legendFormat": "{{id}} RX errors",
+          "legendFormat": "{{name}} RX errors",
           "refId": "A"
         }
       ],
@@ -1284,7 +1284,7 @@
             "uid": "prometheus"
           },
           "expr": "sum by (id) (rate(container_network_transmit_errors_total{id=~\".+\"}[5m]))",
-          "legendFormat": "{{id}} TX errors",
+          "legendFormat": "{{name}} TX errors",
           "refId": "A"
         }
       ],
@@ -1389,8 +1389,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (id) (rate(container_fs_reads_bytes_total{id=~\"/docker/.+\"}[5m]))",
-          "legendFormat": "{{id}} read",
+          "expr": "((sum by (id) (rate(container_fs_reads_bytes_total{id=~\"/docker/.+\"}[5m]))) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}} read",
           "refId": "A"
         }
       ],
@@ -1482,8 +1482,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (id) (rate(container_fs_writes_bytes_total{id=~\"/docker/.+\"}[5m]))",
-          "legendFormat": "{{id}} write",
+          "expr": "((sum by (id) (rate(container_fs_writes_bytes_total{id=~\"/docker/.+\"}[5m]))) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}} write",
           "refId": "A"
         }
       ],
@@ -1551,7 +1551,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (device) (container_fs_usage_bytes{id=~\"/docker/.+\"}) / sum by (device) (container_fs_limit_bytes{id=~\"/docker/.+\"})",
+          "expr": "((sum by (device) (container_fs_usage_bytes{id=~\"/docker/.+\"}) / sum by (device) (container_fs_limit_bytes{id=~\"/docker/.+\"})) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
           "legendFormat": "{{device}}",
           "refId": "A"
         }
@@ -1657,8 +1657,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m]))",
-          "legendFormat": "{{id}}",
+          "expr": "((sum by (id) (rate(container_cpu_usage_seconds_total{id=~\"/docker/.+\"}[5m]))) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
@@ -1750,8 +1750,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "container_memory_usage_bytes{id=~\"/docker/.+\"}",
-          "legendFormat": "{{id}}",
+          "expr": "((container_memory_usage_bytes{id=~\"/docker/.+\"}) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")) * on(id) group_left(name) label_replace(docker_container_id_mapping, \"id\", \"$1\", \"cadvisor_id\", \"(.*)\")",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
