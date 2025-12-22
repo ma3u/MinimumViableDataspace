@@ -1837,7 +1837,48 @@ GET /health/deep    → Full dependency check (authenticated)
 
 ---
 
-### 14.10 Acceptance Criteria
+### 14.10 Prometheus PromQL Reference
+
+**Objective:** Provide ready-to-use PromQL expressions for monitoring EDC and EHDS flows.
+
+**Status:** ✅ Complete
+
+**Access:** http://localhost:9090/graph
+
+**EDC Flow Metrics:**
+
+| # | Name | PromQL Expression |
+|---|------|-------------------|
+| 1 | Contract Negotiations by Status | `sum by (status) (contract_negotiations_total)` |
+| 2 | Asset Transfer Success Rate (%) | `sum(asset_transfers_total{status="completed"}) / sum(asset_transfers_total) * 100` |
+| 3 | Catalog Query Rate (per minute) | `rate(catalog_queries_total[5m]) * 60` |
+
+**EHDS Consent Metrics:**
+
+| # | Name | PromQL Expression |
+|---|------|-------------------|
+| 4 | EHDS Consent Requests by Status | `sum by (status) (ehds_consent_requests_total)` |
+| 5 | Consent Approval Rate (%) | `sum(ehds_consent_requests_total{status="approved"}) / sum(ehds_consent_requests_total) * 100` |
+| 6 | EHR Records Accessed by Type | `sum by (record_type) (ehr_records_accessed_total)` |
+
+**Service Health Metrics:**
+
+| # | Name | PromQL Expression |
+|---|------|-------------------|
+| 7 | All Services Status (up/down) | `up` |
+| 8 | HTTP Request Rate per Service | `sum by (job) (rate(http_requests_total[5m]))` |
+| 9 | Data Access by User Role | `sum by (user_role) (data_access_total)` |
+| 10 | Active Transfers | `active_transfers` |
+
+**How to Use:**
+1. Go to http://localhost:9090/graph
+2. Paste expression into the **Expression** text box
+3. Click **Execute**
+4. Switch to **Graph** tab for visualization
+
+---
+
+### 14.11 Acceptance Criteria
 
 - [ ] Prometheus successfully scrapes all EDC metrics
 - [ ] Grafana dashboards show real-time dataspace activity
