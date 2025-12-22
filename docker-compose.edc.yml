@@ -37,7 +37,7 @@ services:
       - "3002:3002"
     environment:
       - PORT=3002
-      - BACKEND_MODE=hybrid
+      - BACKEND_MODE=full
       - EDC_API_KEY=password
       - CONSUMER_MANAGEMENT_URL=http://consumer-controlplane:8081
       - CONSUMER_DSP_URL=http://consumer-controlplane:8082/api/dsp

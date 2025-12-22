@@ -15,7 +15,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_MODE=hybrid
+        - VITE_API_MODE=full
     container_name: health-frontend
     ports:
       - "3000:80"
