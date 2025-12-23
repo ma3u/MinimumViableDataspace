@@ -10,7 +10,8 @@ A step-by-step guide for using the Health Dataspace Demo to securely exchange El
 2. [Demo Modes](#2-demo-modes)
 3. [Step-by-Step Demo Walkthrough](#3-step-by-step-demo-walkthrough)
 4. [Understanding the Data Flow](#4-understanding-the-data-flow)
-5. [Troubleshooting](#5-troubleshooting)
+5. [Observability & Monitoring](#5-observability--monitoring)
+6. [Troubleshooting](#6-troubleshooting)
 
 ---
 
@@ -349,7 +350,83 @@ sequenceDiagram
 
 ---
 
-## 5. Troubleshooting
+## 5. Observability & Monitoring
+
+The Health Dataspace includes a complete observability stack for monitoring, tracing, and debugging.
+
+### Starting the Observability Stack
+
+```bash
+# Start observability tools alongside the health stack
+docker-compose -f docker-compose.health.yml -f docker-compose.observability.yml up -d
+```
+
+### Observability Tools
+
+| Tool | URL | Credentials | Purpose |
+|------|-----|-------------|---------|
+| **Grafana** | http://localhost:3003 | admin / dataspace | Dashboards & visualization |
+| **Prometheus** | http://localhost:9090 | - | Metrics collection |
+| **Jaeger** | http://localhost:16686 | - | Distributed tracing |
+| **Loki** | http://localhost:3100 | - | Log aggregation |
+| **Alertmanager** | http://localhost:9093 | - | Alert routing |
+
+### Grafana Dashboards
+
+Pre-built dashboards are available at http://localhost:3003:
+
+![Grafana Dashboard Overview](../observability/screenshots/grafana-overview.png)
+*Health Dataspace Overview dashboard showing request rates, latencies, and error rates*
+
+| Dashboard | Purpose |
+|-----------|---------|
+| **Health Dataspace Overview** | High-level system health and KPIs |
+| **EDC Operations** | Negotiation and transfer metrics |
+| **Data Transfer** | Transfer throughput and latencies |
+| **Consent Management** | Consent verification statistics |
+| **Compliance Audit** | EHDS compliance tracking |
+
+### Prometheus Metrics
+
+View raw metrics at http://localhost:9090. Key metrics:
+
+![Prometheus Metrics](../observability/screenshots/prometheus-metrics.png)
+*Prometheus showing catalog request rates and negotiation success rates*
+
+- `http_requests_total` - Total HTTP requests by endpoint
+- `negotiations_total` - Contract negotiations by status
+- `transfers_total` - Data transfers by format
+- `ehr_records_served_total` - EHR access count by category
+
+### Jaeger Tracing
+
+View distributed traces at http://localhost:16686:
+
+![Jaeger Tracing](../observability/screenshots/jaeger-traces.png)
+*Jaeger showing a complete negotiation trace across services*
+
+Traces show the full request path:
+1. Frontend → Backend-EDC
+2. Backend-EDC → Consumer Control Plane
+3. Consumer → Provider (DSP protocol)
+4. Provider → EHR Backend (data fetch)
+
+### Loki Logs
+
+Access logs via Grafana's Explore view:
+
+![Loki Logs](../observability/screenshots/loki-logs.png)
+*Loki log aggregation showing correlated logs across services*
+
+Query logs by service:
+```logql
+{job="backend-edc"} |= "negotiation"
+{job="ehr-backend"} |= "EHR-"
+```
+
+---
+
+## 6. Troubleshooting
 
 ### Common Issues
 

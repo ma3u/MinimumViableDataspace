@@ -164,7 +164,16 @@ function AppHealth() {
   const [therapeuticAreaFilter, setTherapeuticAreaFilter] = useState<string>('all');
   
   // DSP Event logging hook
-  const { emitEvent, setCurrentPhase, completePhase, resetPhases, clearEvents } = useDspEventLog();
+  const { emitEvent, setCurrentPhase, completePhase, resetPhases, clearEvents, events: dspEvents, seedingStatus } = useDspEventLog();
+
+  // Auto-open Insider Panel if seeding events exist and demo hasn't started
+  useEffect(() => {
+    const hasSeedingEvents = dspEvents.some(e => e.phase === 'seeding');
+    if (phase === 'intro' && hasSeedingEvents && seedingStatus === 'completed' && !showInsiderPanel) {
+      console.log('[App-health] Auto-opening Insider Panel - seeding completed with', dspEvents.filter(e => e.phase === 'seeding').length, 'events');
+      setShowInsiderPanel(true);
+    }
+  }, [phase, dspEvents, seedingStatus, showInsiderPanel]);
 
   // Determine which assets to use: dynamic catalog or mock data
   // In hybrid/full mode with catalog data, use catalogAssets; otherwise fall back to mock

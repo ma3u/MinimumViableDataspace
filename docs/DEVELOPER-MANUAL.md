@@ -171,6 +171,105 @@ graph TB
     ApiFactory --> MockData
 ```
 
+#### React Component Patterns
+
+The frontend uses several key patterns for state management and data flow:
+
+**1. API Factory Pattern** (`services/apiFactory.ts`)
+
+Provides a unified API interface that works across all modes (mock, hybrid, full):
+
+```typescript
+import { api, getApiMode } from './services/apiFactory';
+
+// Always use the api object - it automatically routes to the correct backend
+const assets = await api.fetchCatalogAssets();  // Works in all modes
+const ehrData = await api.getEhrById('EHR-001');
+```
+
+**2. useCatalog Hook** (`hooks/useCatalog.ts`)
+
+Custom hook for fetching and caching catalog data with automatic retry:
+
+```typescript
+import { useCatalog } from './hooks/useCatalog';
+
+function CatalogBrowser() {
+  const { 
+    assets,       // CatalogAsset[] - list of available EHR assets
+    isLoading,    // boolean - loading state
+    error,        // Error | null - fetch error
+    source,       // 'edc-federated' | 'mock-fallback' | 'mock'
+    enhanced,     // boolean - whether DCAT properties are available
+    refetch,      // () => Promise<void> - manual refresh
+    retry         // () => Promise<void> - retry after error
+  } = useCatalog({ autoFetch: true, retryAttempts: 3 });
+  
+  // Render assets...
+}
+```
+
+**3. DSP Event Log Context** (`contexts/DspEventLogContext.tsx`)
+
+Provides real-time visibility into DSP protocol events for debugging:
+
+```typescript
+import { useDspEventLog, DspEventLogProvider } from './contexts/DspEventLogContext';
+
+// Wrap your app with the provider
+<DspEventLogProvider>
+  <App />
+</DspEventLogProvider>
+
+// Use the hook in components
+function DataspaceInsider() {
+  const { 
+    events,           // DspEvent[] - all logged events
+    addEvent,         // (event: DspEvent) => void
+    clearEvents,      // () => void
+    filterByPhase,    // (phase: DspPhase) => DspEvent[]
+    connectionStatus  // 'connected' | 'disconnected'
+  } = useDspEventLog();
+  
+  // Display events timeline...
+}
+```
+
+**4. DSP Event Structure**
+
+Events follow the DSP protocol phases:
+
+```typescript
+interface DspEvent {
+  id: string;
+  timestamp: Date;
+  phase: 'seeding' | 'catalog' | 'negotiation' | 'transfer' | 'compute';
+  action: string;
+  direction: 'outbound' | 'inbound' | 'internal';
+  status: 'pending' | 'in-progress' | 'success' | 'error';
+  dspMessageType?: string;  // e.g., 'CatalogRequestMessage'
+  actor?: string;
+  target?: string;
+  source?: 'mock' | 'edc' | 'sse';
+  details?: Record<string, unknown>;
+}
+```
+
+**5. Error Boundary Pattern** (`components/observability/ErrorBoundary.tsx`)
+
+Graceful error handling with debug panel:
+
+```typescript
+import { ErrorBoundary, DebugPanel } from './components/observability';
+
+<ErrorBoundary fallback={<ErrorFallback />}>
+  <YourComponent />
+</ErrorBoundary>
+
+// DebugPanel shows in development mode
+{process.env.NODE_ENV === 'development' && <DebugPanel />}
+```
+
 ### Backend-EDC (Node.js + Express)
 
 The Backend-EDC service acts as a middleware layer between the frontend and the EDC Control Plane. It simplifies the complex EDC APIs into RESTful endpoints that the frontend can easily consume. The service handles authentication, request transformation, and response mapping, abstracting away the JSON-LD complexity from the UI layer.

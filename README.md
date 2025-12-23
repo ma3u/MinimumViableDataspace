@@ -132,6 +132,63 @@ Configure via `VITE_API_MODE` environment variable.
 
 ---
 
+## EDC Negotiation & Transfer Flow (DSP Protocol)
+
+The Dataspace Protocol (DSP) defines how participants discover, negotiate, and transfer data. This demo implements the full DSP 2025 specification:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Frontend
+    participant Consumer as Consumer EDC
+    participant Provider as Provider EDC
+    participant Backend as EHR Backend
+
+    Note over Frontend,Backend: Phase 1: Catalog Discovery
+    Frontend->>Consumer: POST /catalog/request
+    Consumer->>Provider: CatalogRequestMessage + VP
+    Provider-->>Consumer: CatalogMessage (DCAT)
+    Consumer-->>Frontend: Asset list with policies
+
+    Note over Frontend,Backend: Phase 2: Contract Negotiation
+    Frontend->>Consumer: POST /contractnegotiations
+    Consumer->>Provider: ContractRequestMessage + VP
+    Provider->>Provider: Verify credentials, evaluate ODRL policy
+    Provider-->>Consumer: ContractOfferMessage
+    Consumer->>Provider: ContractNegotiationEventMessage (ACCEPTED)
+    Provider-->>Consumer: ContractAgreementMessage
+    Consumer->>Provider: ContractAgreementVerificationMessage
+    Provider-->>Consumer: ContractNegotiationEventMessage (FINALIZED)
+
+    Note over Frontend,Backend: Phase 3: Data Transfer (HTTP-PULL)
+    Frontend->>Consumer: POST /transferprocesses
+    Consumer->>Provider: TransferRequestMessage
+    Provider-->>Consumer: TransferStartMessage + EDR (token)
+    Consumer-->>Frontend: Endpoint Data Reference
+    Frontend->>Provider: GET /public/{assetId} + Bearer token
+    Provider->>Backend: Fetch EHR data (FHIR R4)
+    Backend-->>Provider: De-identified health record
+    Provider-->>Frontend: EHR JSON response
+```
+
+**Key DSP Messages:**
+
+| Phase | Message | Direction | Purpose |
+|-------|---------|-----------|---------|
+| Catalog | `CatalogRequestMessage` | Consumer → Provider | Request available datasets |
+| Catalog | `CatalogMessage` | Provider → Consumer | DCAT-AP catalog response |
+| Negotiation | `ContractRequestMessage` | Consumer → Provider | Initiate negotiation with offer |
+| Negotiation | `ContractAgreementMessage` | Provider → Consumer | Signed contract agreement |
+| Transfer | `TransferRequestMessage` | Consumer → Provider | Request data transfer |
+| Transfer | `TransferStartMessage` | Provider → Consumer | EDR with access token |
+
+**Credential Verification:**
+Each DSP message includes a Verifiable Presentation (VP) containing credentials issued by the dataspace authority. The provider verifies:
+- `MembershipCredential` - Proves participant is a dataspace member
+- `ConsentCredential` - Proves patient consent for data access (for health data)
+
+---
+
 ## Key Features
 
 - ✅ **EHDS Art. 51 Compliance** - Health categories and access rights
