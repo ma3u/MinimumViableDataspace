@@ -208,3 +208,96 @@ groups:
           ) * 100
         labels:
           category: "business"
+
+  # ============================================================
+  # Group 5: PromQL Reference Queries (from IMPLEMENTATION_PLAN.md 14.10)
+  # Pre-computed for Prometheus UI "Explore" and quick access
+  # ============================================================
+  - name: promql_reference_queries
+    interval: 15s
+    rules:
+      # EDC Flow Metrics (1-3)
+      
+      # Query 1: Contract Negotiations by Status
+      - record: dashboard:contract_negotiations:by_status
+        expr: sum by (status) (contract_negotiations_total)
+        labels:
+          category: "dashboard"
+          query_id: "1"
+          description: "Contract Negotiations by Status"
+
+      # Query 2: Asset Transfer Success Rate (%)
+      - record: dashboard:asset_transfer:success_rate
+        expr: sum(asset_transfers_total{status="completed"}) / sum(asset_transfers_total) * 100
+        labels:
+          category: "dashboard"
+          query_id: "2"
+          description: "Asset Transfer Success Rate"
+
+      # Query 3: Catalog Query Rate (per minute)
+      - record: dashboard:catalog_queries:rate_per_min
+        expr: rate(catalog_queries_total[5m]) * 60
+        labels:
+          category: "dashboard"
+          query_id: "3"
+          description: "Catalog Query Rate per Minute"
+
+      # EHDS Consent Metrics (4-6)
+
+      # Query 4: EHDS Consent Requests by Status
+      - record: dashboard:ehds_consent:by_status
+        expr: sum by (status) (ehds_consent_requests_total)
+        labels:
+          category: "dashboard"
+          query_id: "4"
+          description: "EHDS Consent Requests by Status"
+
+      # Query 5: Consent Approval Rate (%)
+      - record: dashboard:consent:approval_rate
+        expr: sum(ehds_consent_requests_total{status="approved"}) / sum(ehds_consent_requests_total) * 100
+        labels:
+          category: "dashboard"
+          query_id: "5"
+          description: "Consent Approval Rate"
+
+      # Query 6: EHR Records Accessed by Type
+      - record: dashboard:ehr_records:by_type
+        expr: sum by (record_type) (ehr_records_accessed_total)
+        labels:
+          category: "dashboard"
+          query_id: "6"
+          description: "EHR Records Accessed by Type"
+
+      # Service Health Metrics (7-10)
+
+      # Query 7: All Services Status (up/down)
+      - record: dashboard:services:status
+        expr: up
+        labels:
+          category: "dashboard"
+          query_id: "7"
+          description: "All Services Status"
+
+      # Query 8: HTTP Request Rate per Service
+      - record: dashboard:http_requests:rate_by_job
+        expr: sum by (job) (rate(http_requests_total[5m]))
+        labels:
+          category: "dashboard"
+          query_id: "8"
+          description: "HTTP Request Rate per Service"
+
+      # Query 9: Data Access by User Role
+      - record: dashboard:data_access:by_role
+        expr: sum by (user_role) (data_access_total)
+        labels:
+          category: "dashboard"
+          query_id: "9"
+          description: "Data Access by User Role"
+
+      # Query 10: Active Transfers
+      - record: dashboard:active_transfers:current
+        expr: active_transfers
+        labels:
+          category: "dashboard"
+          query_id: "10"
+          description: "Currently Active Transfers"
