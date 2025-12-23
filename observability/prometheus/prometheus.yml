@@ -37,12 +37,13 @@ scrape_configs:
     metrics_path: /metrics
     scrape_interval: 10s
 
-  # Backend-Mock (Local development mode)
-  - job_name: 'backend-mock-local'
-    static_configs:
-      - targets: ['host.docker.internal:4001']
-    metrics_path: /metrics
-    scrape_interval: 10s
+  # Backend-Mock (Local development mode) - only used when running outside Docker
+  # Uncomment when using: cd backend-mock && npm run dev:local
+  # - job_name: 'backend-mock-local'
+  #   static_configs:
+  #     - targets: ['host.docker.internal:4001']
+  #   metrics_path: /metrics
+  #   scrape_interval: 10s
 
   # Backend-EDC
   - job_name: 'backend-edc'
@@ -51,24 +52,21 @@ scrape_configs:
     metrics_path: /metrics
     scrape_interval: 10s
 
-  # Consumer Control Plane (if metrics are exposed)
-  - job_name: 'consumer-controlplane'
-    static_configs:
-      - targets: ['consumer-controlplane:8081']
-    metrics_path: /metrics
-    scrape_interval: 30s
-    # EDC may not expose Prometheus metrics by default
-    honor_labels: true
-    scrape_timeout: 10s
-
-  # Provider Control Plane (if metrics are exposed)
-  - job_name: 'provider-controlplane'
-    static_configs:
-      - targets: ['provider-controlplane:8191']
-    metrics_path: /metrics
-    scrape_interval: 30s
-    honor_labels: true
-    scrape_timeout: 10s
+  # NOTE: EDC Control Planes don't expose Prometheus metrics by default.
+  # These would need the Micrometer extension to be enabled in EDC builds.
+  # Keeping commented for future enablement:
+  #
+  # - job_name: 'consumer-controlplane'
+  #   static_configs:
+  #     - targets: ['consumer-controlplane:8081']
+  #   metrics_path: /metrics
+  #   scrape_interval: 30s
+  #
+  # - job_name: 'provider-controlplane'
+  #   static_configs:
+  #     - targets: ['provider-controlplane:8191']
+  #   metrics_path: /metrics
+  #   scrape_interval: 30s
 
   # Docker containers (via cAdvisor)
   - job_name: 'cadvisor'
