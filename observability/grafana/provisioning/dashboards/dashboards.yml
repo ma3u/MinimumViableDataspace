@@ -1,4 +1,12 @@
 # Grafana Dashboard Provisioning
+# NOTE: Provisioned dashboards are read-only from JSON files.
+# To persist manual changes:
+# 1. Export dashboard JSON from Grafana UI (Share > Export > Save to file)
+# 2. Save to observability/grafana/dashboards/ directory
+# 3. Commit to git - dashboards will be automatically reloaded
+#
+# For quick prototyping, create dashboards in the "General" folder - 
+# these are stored in the grafana_data volume and persist across restarts.
 
 apiVersion: 1
 
@@ -10,6 +18,9 @@ providers:
     type: file
     disableDeletion: false
     editable: true
-    updateIntervalSeconds: 30
+    # Check for dashboard updates every 10 seconds
+    updateIntervalSeconds: 10
+    # Allow editing provisioned dashboards (changes won't persist without export)
+    allowUiUpdates: true
     options:
       path: /var/lib/grafana/dashboards
