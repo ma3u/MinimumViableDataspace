@@ -1960,47 +1960,50 @@ GET /health/deep    → Full dependency check (authenticated)
 
 **EDC Flow Metrics:**
 
-| # | Name | PromQL Expression |
-|---|------|-------------------|
-| 1 | Contract Negotiations by Status | `sum by (status) (contract_negotiations_total)` |
-| 2 | Asset Transfer Success Rate (%) | `sum(asset_transfers_total{status="completed"}) / sum(asset_transfers_total) * 100` |
-| 3 | Catalog Query Rate (per minute) | `rate(catalog_queries_total[5m]) * 60` |
+| # | Name | PromQL Expression | Recording Rule |
+|---|------|-------------------|----------------|
+| 1 | Contract Negotiations by Status | `sum by (status) (contract_negotiations_total)` | `dashboard:contract_negotiations:by_status` |
+| 2 | Asset Transfer Success Rate (%) | `sum(asset_transfers_total{status="completed"}) / sum(asset_transfers_total) * 100` | `dashboard:asset_transfer:success_rate` |
+| 3 | Catalog Query Rate (per minute) | `rate(catalog_queries_total[5m]) * 60` | `dashboard:catalog_queries:rate_per_min` |
 
 **EHDS Consent Metrics:**
 
-| # | Name | PromQL Expression |
-|---|------|-------------------|
-| 4 | EHDS Consent Requests by Status | `sum by (status) (ehds_consent_requests_total)` |
-| 5 | Consent Approval Rate (%) | `sum(ehds_consent_requests_total{status="approved"}) / sum(ehds_consent_requests_total) * 100` |
-| 6 | EHR Records Accessed by Type | `sum by (record_type) (ehr_records_accessed_total)` |
+| # | Name | PromQL Expression | Recording Rule |
+|---|------|-------------------|----------------|
+| 4 | EHDS Consent Requests by Status | `sum by (status) (ehds_consent_requests_total)` | `dashboard:ehds_consent:by_status` |
+| 5 | Consent Approval Rate (%) | `sum(ehds_consent_requests_total{status="approved"}) / sum(ehds_consent_requests_total) * 100` | `dashboard:consent:approval_rate` |
+| 6 | EHR Records Accessed by Type | `sum by (record_type) (ehr_records_accessed_total)` | `dashboard:ehr_records:by_type` |
 
 **Service Health Metrics:**
 
-| # | Name | PromQL Expression |
-|---|------|-------------------|
-| 7 | All Services Status (up/down) | `up` |
-| 8 | HTTP Request Rate per Service | `sum by (job) (rate(http_requests_total[5m]))` |
-| 9 | Data Access by User Role | `sum by (user_role) (data_access_total)` |
-| 10 | Active Transfers | `active_transfers` |
+| # | Name | PromQL Expression | Recording Rule |
+|---|------|-------------------|----------------|
+| 7 | All Services Status (up/down) | `up` | `dashboard:services:status` |
+| 8 | HTTP Request Rate per Service | `sum by (job) (rate(http_requests_total[5m]))` | `dashboard:http_requests:rate_by_job` |
+| 9 | Data Access by User Role | `sum by (user_role) (data_access_total)` | `dashboard:data_access:by_role` |
+| 10 | Active Transfers | `active_transfers` | `dashboard:active_transfers:current` |
 
 **How to Use:**
 1. Go to http://localhost:9090/graph
-2. Paste expression into the **Expression** text box
+2. Paste expression OR recording rule name into the **Expression** text box
 3. Click **Execute**
 4. Switch to **Graph** tab for visualization
+
+> **Note:** All queries are stored as permanent recording rules in `observability/prometheus/recording-rules.yml` and will persist across Prometheus restarts.
 
 ---
 
 ### 14.11 Acceptance Criteria
 
-- [ ] Prometheus successfully scrapes all EDC metrics
-- [ ] Grafana dashboards show real-time dataspace activity
-- [ ] Distributed traces span across all services
+- [x] Prometheus successfully scrapes all EDC metrics ✅
+- [x] Grafana dashboards show real-time dataspace activity ✅
+- [x] Distributed traces span across all services ✅
 - [ ] Frontend debug panel accessible in development mode
 - [ ] Health checks return comprehensive status
 - [ ] Correlation IDs propagate through entire request flow
-- [ ] Alert rules trigger on simulated failures
-- [ ] Documentation covers debugging workflows
+- [x] Alert rules trigger on simulated failures ✅
+- [x] Documentation covers debugging workflows ✅
+- [x] PromQL reference queries stored as permanent recording rules ✅
 
 ---
 
