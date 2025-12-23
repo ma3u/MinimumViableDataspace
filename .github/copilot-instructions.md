@@ -118,9 +118,24 @@ cd frontend && npm run test:pact         # Contract tests
 ```bash
 ./seed-dataspace.sh --mode=docker          # Full Docker seeding
 ./seed-dataspace.sh --mode=local           # IntelliJ local dev
+./seed-dataspace.sh --mode=k8s             # Kubernetes (on-prem/cloud)
 ./seed-dataspace.sh --skip-identity        # Only health assets
 ./seed-dataspace.sh --verbose              # Debug output
 ```
+
+## Observability Stack
+
+Start with: `docker-compose -f docker-compose.observability.yml up -d`
+
+| Tool | Port | Purpose |
+|------|------|--------|
+| Grafana | 3003 | Dashboards (admin/dataspace) |
+| Prometheus | 9090 | Metrics collection |
+| Jaeger | 16686 | Distributed tracing (OTLP) |
+| Loki | 3100 | Log aggregation |
+| Alertmanager | 9093 | Alert routing |
+
+Pre-built dashboards in `observability/grafana/dashboards/`.
 
 ## ⚠️ Common Pitfalls
 
@@ -130,4 +145,6 @@ cd frontend && npm run test:pact         # Contract tests
 4. **Container networking**: Inside Docker, use service names (`provider-controlplane`), not `localhost`
 5. **Seeding timing**: Wait for containers to be healthy before running `seed-dataspace.sh`
 6. **Type regeneration**: After changing `specs/*.yaml`, run `npm run generate:types`
-7. **OpenTelemetry**: Both backends have tracing middleware - check Jaeger at tools-jaeger:4318
+7. **Grafana port**: Grafana runs on :3003 (not :3000) to avoid frontend conflict
+8. **Docker volumes**: Don't use `docker-compose down -v` as it removes persistent data (Grafana dashboards, Postgres). Use `docker-compose down` or `docker-compose restart` instead
+9. **Grafana dashboard persistence**: Dashboards in "Health Dataspace" folder are provisioned from JSON files. Export manual changes to `observability/grafana/dashboards/` and commit to git
