@@ -126,3 +126,15 @@ use the IMPLEMENTATION_PLAN.md as basis
 - Create a set of best practices and guidelines for implementing a specific dataspace based on EDC
 - Create a set of sample data and use cases that demonstrate the capabilities of a specific dataspace based on EDC
 - Create a community
+
+
+That is very hard to solve the contract negotiontion issue with unauthorized access. Create a new Github issue and describe the existing problems and add a comment the solution with one common secret handling in Hashicorp Vault. Find a clean solution in the Hashicop vault and with one common encoding. Also add anothe rcomment with a recommendation to the EDC team to implement it more error proof. Also check the current implementation for details: https://github.com/eclipse-edc/IdentityHub
+develop a best practise when you switch from in-memory to Hashisop vault persistent key storage.
+
+The Electronic health record page dont have many information of the Mock like anamnese. Explain why its not their anymore. And implement the missing view.
+
+compare the final page of the moch with the full integrated EDC intergration for missing features.
+
+in the insider panel I see many event with the spinning wheel icon. It seems its not done.
+
+PLease update the implementation plan. It seems some tasks are still open. Please check and implement.
