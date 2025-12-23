@@ -48,10 +48,13 @@ const OBSERVABILITY_LINKS = {
   apiDocs: 'https://ma3u.github.io/MinimumViableDataspace/api/', // API documentation on GitHub Pages
   logs: '/api/events', // Backend events API (local)
   dockerLogs: '/health/detailed', // Backend-EDC health/logs (proxied)
-  grafana: 'http://localhost:3003', // Grafana dashboards
-  grafanaEdcOperations: 'http://localhost:3003/d/edc-operations/edc-operations', // EDC Operations Dashboard
-  grafanaEdcFlows: 'http://localhost:3003/d/edc-ehds-flows/edc-ehds-flows', // EDC EHDS Flows Dashboard
-  grafanaDataTransfer: 'http://localhost:3003/d/data-transfer/data-transfer', // Data Transfer Dashboard
+  // Grafana Dashboards - 5 most important for business
+  grafana: 'http://localhost:3003/dashboards/f/health-dataspace/', // Grafana folder
+  grafanaOverview: 'http://localhost:3003/d/health-dataspace-overview/health-dataspace-overview', // Health Dataspace Overview
+  grafanaConsent: 'http://localhost:3003/d/consent-management-dashboard/consent-management-dashboard', // Consent Management
+  grafanaDataTransfer: 'http://localhost:3003/d/data-transfer-dashboard/data-transfer-dashboard', // Data Transfer
+  grafanaCompliance: 'http://localhost:3003/d/compliance-audit-dashboard/compliance-and-audit-dashboard', // Compliance & Audit
+  grafanaOperations: 'http://localhost:3003/d/edc-operations-dashboard/edc-operations-dashboard', // EDC Operations
   prometheus: 'http://localhost:9090', // Prometheus metrics
   jaeger: 'http://localhost:16686', // Jaeger tracing
 };
@@ -465,27 +468,27 @@ function ObservabilityLinks() {
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             <Activity className="w-4 h-4 text-orange-500" />
-            Grafana Home
+            All Dashboards
             <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
           </a>
           <a
-            href={OBSERVABILITY_LINKS.grafanaEdcOperations}
+            href={OBSERVABILITY_LINKS.grafanaOverview}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 pl-5"
           >
             <Activity className="w-3 h-3 text-orange-400" />
-            EDC Operations
+            Health Overview
             <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
           </a>
           <a
-            href={OBSERVABILITY_LINKS.grafanaEdcFlows}
+            href={OBSERVABILITY_LINKS.grafanaConsent}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 pl-5"
           >
-            <Activity className="w-3 h-3 text-orange-400" />
-            EDC EHDS Flows
+            <Activity className="w-3 h-3 text-green-400" />
+            Consent Management
             <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
           </a>
           <a
@@ -494,8 +497,28 @@ function ObservabilityLinks() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 pl-5"
           >
-            <Activity className="w-3 h-3 text-orange-400" />
+            <Activity className="w-3 h-3 text-blue-400" />
             Data Transfer
+            <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
+          </a>
+          <a
+            href={OBSERVABILITY_LINKS.grafanaCompliance}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 pl-5"
+          >
+            <Activity className="w-3 h-3 text-purple-400" />
+            Compliance & Audit
+            <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
+          </a>
+          <a
+            href={OBSERVABILITY_LINKS.grafanaOperations}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 pl-5"
+          >
+            <Activity className="w-3 h-3 text-red-400" />
+            EDC Operations
             <ExternalLink className="w-3 h-3 ml-auto text-gray-400" />
           </a>
           
