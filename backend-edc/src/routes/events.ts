@@ -12,6 +12,9 @@ import {
   clearEvents, 
   subscribeToDspEvents,
   emitDspEvent,
+  registerSseConnection,
+  unregisterSseConnection,
+  getSseConnectionStats,
   type DspEvent,
   type DspPhase,
   type DspDirection,
@@ -163,11 +166,15 @@ eventsRouter.get('/stream', (req: Request, res: Response) => {
   // CORS headers for SSE
   res.setHeader('Access-Control-Allow-Origin', '*');
   
+  // Register this SSE connection
+  const clientInfo = req.headers['user-agent'] || 'unknown';
+  const connectionId = registerSseConnection(clientInfo);
+  
   console.log('[SSE] Client connected for event stream');
 
   // Send initial connection event
   res.write(`event: connected\n`);
-  res.write(`data: ${JSON.stringify({ message: 'Connected to DSP event stream' })}\n\n`);
+  res.write(`data: ${JSON.stringify({ message: 'Connected to DSP event stream', connectionId })}\n\n`);
 
   // Send heartbeat every 30 seconds to keep connection alive
   const heartbeatInterval = setInterval(() => {
@@ -191,7 +198,17 @@ eventsRouter.get('/stream', (req: Request, res: Response) => {
     console.log('[SSE] Client disconnected from event stream');
     clearInterval(heartbeatInterval);
     unsubscribe();
+    unregisterSseConnection(connectionId);
   });
+});
+
+/**
+ * GET /connections
+ * 
+ * Get active SSE connection stats.
+ */
+eventsRouter.get('/connections', (_req: Request, res: Response) => {
+  res.json(getSseConnectionStats());
 });
 
 /**

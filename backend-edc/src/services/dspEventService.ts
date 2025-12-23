@@ -6,6 +6,11 @@
  */
 
 import { EventEmitter } from 'events';
+import { 
+  sseActiveConnections, 
+  sseTotalConnections, 
+  dspEventsEmitted 
+} from '../middleware/ehds-metrics.js';
 
 // Event types matching frontend DspEvent interface
 // Note: 'seeding' is a pre-protocol phase for initialization
@@ -27,6 +32,16 @@ export interface DspEvent {
   errorMessage?: string;
   source?: 'mock' | 'edc' | 'sse'; // Source of the event
 }
+
+// SSE Connection tracking
+interface SseConnection {
+  id: string;
+  connectedAt: Date;
+  clientInfo?: string;
+}
+
+const sseConnections: Map<string, SseConnection> = new Map();
+let connectionCounter = 0;
 
 // Event store with max capacity
 const MAX_EVENTS = 500;
@@ -69,6 +84,13 @@ export function emitDspEvent(
 
   // Broadcast to all SSE listeners
   eventEmitter.emit('dsp-event', fullEvent);
+  
+  // Update Prometheus metrics
+  dspEventsEmitted.inc({ 
+    phase: fullEvent.phase, 
+    action: fullEvent.action.replace(/\s+/g, '_').toLowerCase(),
+    status: fullEvent.status 
+  });
 
   // Log for debugging
   console.log(`[DSP] ${fullEvent.phase}/${fullEvent.action} (${fullEvent.direction}) - ${fullEvent.status}`);
@@ -112,6 +134,77 @@ export function subscribeToDspEvents(
  */
 export function getEventEmitter(): DspEventEmitter {
   return eventEmitter;
+}
+
+// ============================================================================
+// SSE CONNECTION TRACKING
+// ============================================================================
+
+/**
+ * Register a new SSE connection
+ */
+export function registerSseConnection(clientInfo?: string): string {
+  connectionCounter++;
+  const connectionId = `sse-${connectionCounter}-${Date.now()}`;
+  sseConnections.set(connectionId, {
+    id: connectionId,
+    connectedAt: new Date(),
+    clientInfo
+  });
+  
+  // Update Prometheus metrics
+  sseActiveConnections.inc();
+  sseTotalConnections.inc();
+  
+  console.log(`[SSE] Connection registered: ${connectionId} (total: ${sseConnections.size})`);
+  return connectionId;
+}
+
+/**
+ * Unregister an SSE connection
+ */
+export function unregisterSseConnection(connectionId: string): void {
+  if (sseConnections.delete(connectionId)) {
+    // Update Prometheus metrics
+    sseActiveConnections.dec();
+    
+    console.log(`[SSE] Connection unregistered: ${connectionId} (total: ${sseConnections.size})`);
+  }
+}
+
+/**
+ * Get current SSE connection count
+ */
+export function getSseConnectionCount(): number {
+  return sseConnections.size;
+}
+
+/**
+ * Get all SSE connections info
+ */
+export function getSseConnections(): SseConnection[] {
+  return Array.from(sseConnections.values());
+}
+
+/**
+ * Get SSE connection stats
+ */
+export function getSseConnectionStats(): {
+  activeConnections: number;
+  totalConnectionsEver: number;
+  connections: Array<{ id: string; connectedAt: string; durationSeconds: number; clientInfo?: string }>;
+} {
+  const now = new Date();
+  return {
+    activeConnections: sseConnections.size,
+    totalConnectionsEver: connectionCounter,
+    connections: Array.from(sseConnections.values()).map(conn => ({
+      id: conn.id,
+      connectedAt: conn.connectedAt.toISOString(),
+      durationSeconds: Math.floor((now.getTime() - conn.connectedAt.getTime()) / 1000),
+      clientInfo: conn.clientInfo
+    }))
+  };
 }
 
 // ============================================================================

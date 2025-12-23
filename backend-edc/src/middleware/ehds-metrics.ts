@@ -292,6 +292,37 @@ export const dspMessageLatency = new client.Histogram({
   registers: [register],
 });
 
+/**
+ * SSE Active Connections
+ * Tracks number of active SSE (Server-Sent Events) subscribers
+ */
+export const sseActiveConnections = new client.Gauge({
+  name: 'sse_active_connections',
+  help: 'Number of active SSE connections (event subscribers)',
+  registers: [register],
+});
+
+/**
+ * SSE Total Connections
+ * Tracks total SSE connections ever made
+ */
+export const sseTotalConnections = new client.Counter({
+  name: 'sse_connections_total',
+  help: 'Total SSE connections ever made',
+  registers: [register],
+});
+
+/**
+ * DSP Events Emitted
+ * Tracks DSP events emitted by phase
+ */
+export const dspEventsEmitted = new client.Counter({
+  name: 'dsp_events_emitted_total',
+  help: 'Total DSP events emitted',
+  labelNames: ['phase', 'action', 'status'],
+  registers: [register],
+});
+
 // ============================================================================
 // DATA ACCESS & AUDIT METRICS
 // ============================================================================
