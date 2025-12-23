@@ -19,6 +19,7 @@ This document provides a detailed, step-by-step implementation plan for building
 | Phase 9: Dynamic Data Integration | ✅ Complete | Replace static data with EDC/DCAT |
 | Phase 14: Monitoring & Debugging | ✅ Complete | Observability, tracing, debugging infrastructure |
 | Phase 15: Comprehensive Dashboards | ✅ Complete | Full Grafana dashboard suite for dataspace monitoring |
+| Phase 16: Insider Panel Enhancements | ✅ Complete | Seeding events display (GitHub #15) |
 
 ---
 
@@ -2158,6 +2159,53 @@ backend-edc (/metrics) ──┘
 
 ---
 
+## Phase 16: Dataspace Insider Panel Enhancements ✅
+
+### 16.1 Seeding Events Display (GitHub Issue #15)
+
+**Objective:** Display dataspace initialization (seeding) events in the Insider Panel so users can see what happened during dataspace setup.
+
+**Status:** ✅ Complete
+
+**Problem Solved:**
+When the frontend loads after seeding completes, seeding events were not visible because they occurred before the SSE connection was established. The solution fetches existing events from the backend on component mount.
+
+**Implementation:**
+
+**DspEventLogContext.tsx Enhancements:**
+- [x] Added `isLoading` and `seedingStatus` state fields
+- [x] Added `fetchExistingEvents()` function to GET `/api/events`
+- [x] Added `LOAD_FROM_BACKEND` reducer action to merge events without duplicates
+- [x] Automatic seeding status detection (not-started/in-progress/completed/error)
+
+**DataspaceInsiderPanel.tsx Enhancements:**
+- [x] Added `fetchExistingEvents()` call on component mount when backend is online
+- [x] Added Seeding Status Banner with loading/success/error states
+- [x] Updated trigger badge color based on seeding status
+
+**Backend events.ts:**
+- [x] Added 'seeding' to phase filter list for GET `/api/events` endpoint
+
+**Files Modified:**
+- `frontend/src/contexts/DspEventLogContext.tsx`
+- `frontend/src/components/DataspaceInsiderPanel.tsx`
+- `backend-edc/src/routes/events.ts`
+
+**Test Results:**
+- Frontend Tests: 6 passed (69 tests total)
+- Backend-EDC Tests: 2 passed (120 tests total)
+
+### 16.2 Acceptance Criteria
+
+- [x] Panel displays seeding events when opened after seeding completes
+- [x] Phase progress shows 'Seeding' phase with correct event counts
+- [x] Seeding events include: started, identity creation, credentials, assets, policies, completed
+- [x] Badge color indicates seeding status (green for completed, pulsing blue for in-progress)
+- [x] Loading indicator shows while fetching existing events
+- [x] Success/error banner displays seeding completion status
+
+---
+
 ## References
 
 ### Specifications
@@ -2182,6 +2230,6 @@ backend-edc (/metrics) ──┘
 
 ---
 
-*Last Updated: 19 June 2025*
-*Version: 1.5*
-*Status: 95% Complete (10/11 phases complete, Phase 8 in progress)*
+*Last Updated: 14 July 2025*
+*Version: 1.6*
+*Status: 96% Complete (11/12 phases complete, Phase 8 in progress)*

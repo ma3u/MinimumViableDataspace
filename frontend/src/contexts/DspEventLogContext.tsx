@@ -99,6 +99,8 @@ export const DSP_PHASES: { id: DspPhase; label: string; steps: string[] }[] = [
 interface DspEventLogState {
   events: DspEvent[];
   isConnected: boolean;
+  isLoading: boolean;
+  seedingStatus: 'not-started' | 'in-progress' | 'completed' | 'error';
   currentPhase: DspPhase | null;
   completedPhases: DspPhase[];
 }
@@ -108,10 +110,13 @@ type DspEventLogAction =
   | { type: 'ADD_EVENTS'; payload: DspEvent[] }
   | { type: 'CLEAR_EVENTS' }
   | { type: 'SET_CONNECTED'; payload: boolean }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SEEDING_STATUS'; payload: 'not-started' | 'in-progress' | 'completed' | 'error' }
   | { type: 'SET_CURRENT_PHASE'; payload: DspPhase | null }
   | { type: 'COMPLETE_PHASE'; payload: DspPhase }
   | { type: 'RESET_PHASES' }
-  | { type: 'LOAD_FROM_STORAGE'; payload: DspEvent[] };
+  | { type: 'LOAD_FROM_STORAGE'; payload: DspEvent[] }
+  | { type: 'LOAD_FROM_BACKEND'; payload: DspEvent[] };
 
 const STORAGE_KEY = 'dsp-event-log';
 
@@ -139,6 +144,16 @@ function dspEventLogReducer(state: DspEventLogState, action: DspEventLogAction):
         ...state,
         isConnected: action.payload
       };
+    case 'SET_LOADING':
+      return {
+        ...state,
+        isLoading: action.payload
+      };
+    case 'SET_SEEDING_STATUS':
+      return {
+        ...state,
+        seedingStatus: action.payload
+      };
     case 'SET_CURRENT_PHASE':
       return {
         ...state,
@@ -162,6 +177,16 @@ function dspEventLogReducer(state: DspEventLogState, action: DspEventLogAction):
         ...state,
         events: action.payload
       };
+    case 'LOAD_FROM_BACKEND':
+      // Merge backend events with existing events, avoiding duplicates
+      const existingIds = new Set(state.events.map(e => e.id));
+      const newEvents = action.payload.filter(e => !existingIds.has(e.id));
+      return {
+        ...state,
+        events: [...newEvents, ...state.events].sort(
+          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        )
+      };
     default:
       return state;
   }
@@ -174,6 +199,8 @@ function dspEventLogReducer(state: DspEventLogState, action: DspEventLogAction):
 interface DspEventLogContextValue {
   events: DspEvent[];
   isConnected: boolean;
+  isLoading: boolean;
+  seedingStatus: 'not-started' | 'in-progress' | 'completed' | 'error';
   currentPhase: DspPhase | null;
   completedPhases: DspPhase[];
   emitEvent: (event: Omit<DspEvent, 'id' | 'timestamp'>) => void;
@@ -183,6 +210,7 @@ interface DspEventLogContextValue {
   resetPhases: () => void;
   connectToSSE: (url: string) => void;
   disconnectSSE: () => void;
+  fetchExistingEvents: () => Promise<void>;
 }
 
 const DspEventLogContext = createContext<DspEventLogContextValue | null>(null);
@@ -199,6 +227,8 @@ export function DspEventLogProvider({ children }: DspEventLogProviderProps) {
   const [state, dispatch] = useReducer(dspEventLogReducer, {
     events: [],
     isConnected: false,
+    isLoading: false,
+    seedingStatus: 'not-started',
     currentPhase: null,
     completedPhases: []
   });
@@ -338,6 +368,64 @@ export function DspEventLogProvider({ children }: DspEventLogProviderProps) {
     }
   }, []);
 
+  // Fetch existing events from backend (for seeding events that occurred before frontend loaded)
+  const fetchExistingEvents = useCallback(async () => {
+    const mode = getApiMode();
+    if (mode === 'mock') {
+      console.log('fetchExistingEvents not available in mock mode');
+      return;
+    }
+
+    dispatch({ type: 'SET_LOADING', payload: true });
+
+    try {
+      const baseUrl = import.meta.env.VITE_BACKEND_EDC_URL || 'http://localhost:3002';
+      const response = await fetch(`${baseUrl}/api/events`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch events: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const events: DspEvent[] = (data.events || []).map((e: Record<string, unknown>) => ({
+        id: e.id as string || generateId(),
+        timestamp: new Date(e.timestamp as string || Date.now()),
+        phase: e.phase as DspPhase,
+        action: e.action as string,
+        direction: e.direction as 'inbound' | 'outbound',
+        status: e.status as 'pending' | 'success' | 'error',
+        actor: e.actor as { id: string; name: string; type: 'consumer' | 'provider' | 'issuer' },
+        target: e.target as { id: string; name: string; type: 'consumer' | 'provider' | 'issuer' } | undefined,
+        details: e.details as Record<string, unknown> | undefined,
+        dspMessageType: e.dspMessageType as string | undefined
+      }));
+
+      dispatch({ type: 'LOAD_FROM_BACKEND', payload: events });
+
+      // Determine seeding status from events
+      const hasStarted = events.some((e: DspEvent) => e.action === 'seeding.started');
+      const hasCompleted = events.some((e: DspEvent) => e.action === 'seeding.completed');
+      const hasError = events.some((e: DspEvent) => e.phase === 'seeding' && e.status === 'error');
+
+      if (hasError) {
+        dispatch({ type: 'SET_SEEDING_STATUS', payload: 'error' });
+      } else if (hasCompleted) {
+        dispatch({ type: 'SET_SEEDING_STATUS', payload: 'completed' });
+        dispatch({ type: 'COMPLETE_PHASE', payload: 'seeding' });
+      } else if (hasStarted) {
+        dispatch({ type: 'SET_SEEDING_STATUS', payload: 'in-progress' });
+        dispatch({ type: 'SET_CURRENT_PHASE', payload: 'seeding' });
+      }
+
+      console.log(`Loaded ${events.length} existing events from backend`);
+    } catch (error) {
+      console.error('Failed to fetch existing events:', error);
+      dispatch({ type: 'SET_SEEDING_STATUS', payload: 'error' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, [generateId]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -350,6 +438,8 @@ export function DspEventLogProvider({ children }: DspEventLogProviderProps) {
   const value: DspEventLogContextValue = {
     events: state.events,
     isConnected: state.isConnected,
+    isLoading: state.isLoading,
+    seedingStatus: state.seedingStatus,
     currentPhase: state.currentPhase,
     completedPhases: state.completedPhases,
     emitEvent,
@@ -358,7 +448,8 @@ export function DspEventLogProvider({ children }: DspEventLogProviderProps) {
     completePhase,
     resetPhases,
     connectToSSE,
-    disconnectSSE
+    disconnectSSE,
+    fetchExistingEvents
   };
 
   return (

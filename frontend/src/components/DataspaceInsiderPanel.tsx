@@ -485,16 +485,29 @@ function ObservabilityLinks() {
 export function DataspaceInsiderPanel({ isOpen, isBackendOnline }: DataspaceInsiderPanelProps) {
   const { 
     events, 
-    isConnected, 
+    isConnected,
+    isLoading,
+    seedingStatus,
     currentPhase, 
     completedPhases,
     clearEvents,
     connectToSSE,
-    disconnectSSE
+    disconnectSSE,
+    fetchExistingEvents
   } = useDspEventLog();
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<DspPhase | 'all'>('all');
+  const hasFetchedRef = useRef(false);
+
+  // Fetch existing events on mount (for seeding events that occurred before frontend loaded)
+  useEffect(() => {
+    if (isBackendOnline && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      console.log('[Dataspace Insider] Fetching existing events from backend...');
+      fetchExistingEvents();
+    }
+  }, [isBackendOnline, fetchExistingEvents]);
 
   // Determine event source for status display
   const eventSource: 'sse' | 'localStorage' | 'mock' = isConnected 
@@ -602,6 +615,38 @@ export function DataspaceInsiderPanel({ isOpen, isBackendOnline }: DataspaceInsi
         </div>
       </div>
 
+      {/* Seeding Status Banner */}
+      {(isLoading || seedingStatus !== 'not-started') && (
+        <div className={`px-4 py-2 border-b flex items-center gap-2 text-sm flex-shrink-0 ${
+          seedingStatus === 'completed' ? 'bg-green-50 text-green-700' :
+          seedingStatus === 'error' ? 'bg-red-50 text-red-700' :
+          seedingStatus === 'in-progress' ? 'bg-blue-50 text-blue-700' :
+          'bg-gray-50 text-gray-600'
+        }`}>
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Loading seeding events...</span>
+            </>
+          ) : seedingStatus === 'completed' ? (
+            <>
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Dataspace seeding completed</span>
+            </>
+          ) : seedingStatus === 'error' ? (
+            <>
+              <AlertCircle className="w-4 h-4" />
+              <span>Seeding encountered errors</span>
+            </>
+          ) : seedingStatus === 'in-progress' ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Dataspace seeding in progress...</span>
+            </>
+          ) : null}
+        </div>
+      )}
+
       {/* Filter tabs */}
       <div className="flex items-center gap-1 px-4 py-2 border-b overflow-x-auto flex-shrink-0">
         <button
@@ -677,8 +722,18 @@ export function DataspaceInsiderPanel({ isOpen, isBackendOnline }: DataspaceInsi
 
 // Trigger button component (FAB style) - positioned to avoid overlap with panel
 export function DataspaceInsiderTrigger({ onClick, isPanelOpen }: { onClick: () => void; isPanelOpen?: boolean }) {
-  const { events } = useDspEventLog();
-  const hasNewEvents = events.length > 0;
+  const { events, seedingStatus, isLoading } = useDspEventLog();
+  const hasEvents = events.length > 0;
+  const seedingEventCount = events.filter(e => e.phase === 'seeding').length;
+
+  // Determine badge color based on seeding status
+  const getBadgeColor = () => {
+    if (isLoading) return 'bg-blue-500 animate-pulse';
+    if (seedingStatus === 'completed') return 'bg-green-500';
+    if (seedingStatus === 'error') return 'bg-red-500';
+    if (seedingStatus === 'in-progress') return 'bg-blue-500 animate-pulse';
+    return 'bg-red-500 animate-pulse';
+  };
 
   return (
     <button
@@ -695,10 +750,10 @@ export function DataspaceInsiderTrigger({ onClick, isPanelOpen }: { onClick: () 
       <span className="text-sm font-medium hidden group-hover:inline transition-all">
         DSP Insider
       </span>
-      {hasNewEvents && (
-        <span className="absolute -top-1 -left-1 w-5 h-5 bg-red-500 rounded-full 
-          flex items-center justify-center text-[10px] font-bold animate-pulse">
-          {events.length > 99 ? '99+' : events.length}
+      {hasEvents && (
+        <span className={`absolute -top-1 -left-1 w-5 h-5 ${getBadgeColor()} rounded-full 
+          flex items-center justify-center text-[10px] font-bold`}>
+          {seedingEventCount > 0 ? (seedingEventCount > 99 ? '99+' : seedingEventCount) : (events.length > 99 ? '99+' : events.length)}
         </span>
       )}
     </button>

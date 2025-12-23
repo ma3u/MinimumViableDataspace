@@ -207,7 +207,7 @@ eventsRouter.get('/', (req: Request, res: Response) => {
   let events = getStoredEvents();
 
   // Filter by phase if specified
-  if (phase && ['catalog', 'negotiation', 'transfer', 'compute'].includes(phase)) {
+  if (phase && ['catalog', 'negotiation', 'transfer', 'compute', 'seeding'].includes(phase)) {
     events = events.filter(e => e.phase === phase);
   }
 
