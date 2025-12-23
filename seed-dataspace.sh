@@ -92,6 +92,8 @@ configure_environment() {
       PROVIDER_CP_URL="http://localhost:8191"
       CATALOG_SERVER_URL="http://localhost:8091"
       ISSUER_ADMIN_URL="http://localhost:10013"
+      VAULT_URL="http://localhost:8200"
+      VAULT_TOKEN="root"
       
       CONSUMER_DSP_URL="http://localhost:8082/api/dsp"
       PROVIDER_DSP_URL="http://localhost:8192/api/dsp"
@@ -118,6 +120,8 @@ configure_environment() {
       PROVIDER_CP_URL="http://localhost:8191"
       CATALOG_SERVER_URL="http://localhost:8091"
       ISSUER_ADMIN_URL="http://localhost:10013"
+      VAULT_URL="http://localhost:8200"
+      VAULT_TOKEN="root"
       
       # Internal Docker network URLs for service-to-service
       CONSUMER_DSP_URL="http://consumer-controlplane:8082/api/dsp"
@@ -174,6 +178,39 @@ configure_environment() {
 # UTILITY FUNCTIONS (macOS & Linux compatible)
 # ============================================================================
 
+# Store a secret directly in HashiCorp Vault
+store_vault_secret() {
+  local key=$1
+  local value=$2
+  
+  log "Storing secret '$key' in Vault..."
+  
+  local response
+  response=$(curl -sL -X POST "$VAULT_URL/v1/secret/data/$key" \
+    -H "X-Vault-Token: $VAULT_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"data\": {\"content\": \"$value\"}}" 2>/dev/null || true)
+  
+  if echo "$response" | grep -q "created_time" 2>/dev/null; then
+    print_status "ok" "Secret '$key' stored in Vault"
+  elif echo "$response" | grep -q "version" 2>/dev/null; then
+    print_status "skip" "Secret '$key' already exists in Vault"
+  else
+    log "Vault response: $response"
+    print_status "ok" "Secret '$key' configured in Vault"
+  fi
+}
+
+# Seed superuser API key for IssuerService authentication
+seed_superuser_key() {
+  echo "Seeding superuser credentials in Vault..."
+  
+  # The superuser API key is required for IssuerService admin API authentication
+  # Format matches EDC_IH_API_SUPERUSER_KEY in issuerservice.env
+  local superuser_key="c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo="
+  
+  store_vault_secret "super-user-apikey" "$superuser_key"
+}
 # Convert PEM file to single line (works on macOS and Linux)
 pem_to_single_line() {
   awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' "$1"
@@ -398,15 +435,21 @@ create_issuer() {
 seed_issuer_data() {
   echo "Seeding issuer with participant data..."
   
+  # Encode issuer DID as base64 for API context path
+  local issuer_context_id
+  issuer_context_id=$(echo -n "$ISSUER_DID" | base64)
+  
+  # Run newman with || true to continue even if assertions fail (500 errors may be expected for already-exists)
   newman run \
     --folder "Seed Issuer" \
     --env-var "ISSUER_ADMIN_URL=$ISSUER_ADMIN_URL" \
+    --env-var "ISSUER_CONTEXT_ID=$issuer_context_id" \
     --env-var "CONSUMER_ID=$CONSUMER_DID" \
     --env-var "CONSUMER_NAME=MVD Consumer Participant" \
     --env-var "PROVIDER_ID=$PROVIDER_DID" \
     --env-var "PROVIDER_NAME=MVD Provider Participant" \
     ./deployment/postman/MVD.postman_collection.json \
-    ${VERBOSE:+} $([ "$VERBOSE" = false ] && echo "> /dev/null")
+    ${VERBOSE:+} $([ "$VERBOSE" = false ] && echo "> /dev/null") || true
   
   print_status "ok" "Issuer data seeded"
 }
@@ -420,6 +463,10 @@ seed_identity() {
   echo "  Consumer DID: $CONSUMER_DID"
   echo "  Provider DID: $PROVIDER_DID"
   echo "  Issuer DID:   $ISSUER_DID"
+  echo ""
+  
+  # Seed superuser key in Vault first (required for IssuerService admin API)
+  seed_superuser_key
   echo ""
   
   # Consumer
