@@ -55,7 +55,7 @@ const OBSERVABILITY_LINKS = {
   grafanaDataTransfer: 'http://localhost:3003/d/data-transfer-dashboard/data-transfer-dashboard', // Data Transfer
   grafanaCompliance: 'http://localhost:3003/d/compliance-audit-dashboard/compliance-and-audit-dashboard', // Compliance & Audit
   grafanaOperations: 'http://localhost:3003/d/edc-operations-dashboard/edc-operations-dashboard', // EDC Operations
-  prometheus: 'http://localhost:9090', // Prometheus metrics
+  prometheus: 'http://localhost:9090/consoles/health-dataspace.html', // Prometheus 20-panel dashboard
   jaeger: 'http://localhost:16686', // Jaeger tracing
 };
 
