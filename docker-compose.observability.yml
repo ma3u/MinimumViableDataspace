@@ -26,6 +26,7 @@ services:
       - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./observability/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
       - ./observability/prometheus/recording-rules.yml:/etc/prometheus/recording-rules.yml:ro
+      - ./observability/prometheus/consoles:/etc/prometheus/consoles:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'

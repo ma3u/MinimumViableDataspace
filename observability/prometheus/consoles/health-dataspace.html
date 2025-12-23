@@ -1,0 +1,420 @@
+{{template "head" .}}
+
+{{template "prom_content_head" .}}
+
+<h1>Health Dataspace Overview</h1>
+<p>Real-time monitoring of EHDS-compliant Health Dataspace components.</p>
+
+<h2>Service Status</h2>
+
+<div id="services-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
+    <div class="panel">
+        <h3>🟢 Services Up</h3>
+        <span class="big-number" id="services-up">-</span>
+    </div>
+    <div class="panel">
+        <h3>🔴 Services Down</h3>
+        <span class="big-number" id="services-down">-</span>
+    </div>
+    <div class="panel">
+        <h3>📊 Total Metrics</h3>
+        <span class="big-number" id="total-metrics">-</span>
+    </div>
+    <div class="panel">
+        <h3>⏱️ Uptime</h3>
+        <span class="big-number" id="uptime">-</span>
+    </div>
+</div>
+
+<style>
+.panel {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+.panel h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #666;
+}
+.big-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+}
+.graph-container {
+    margin-bottom: 30px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+}
+.graph-container h3 {
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+</style>
+
+<h2>📈 EDC Flow Metrics</h2>
+
+<div class="graph-container">
+    <h3>1. Contract Negotiations by Status</h3>
+    <div id="contractNegotiationsGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>2. Asset Transfer Success Rate (%)</h3>
+    <div id="assetTransferGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>3. Catalog Query Rate (per minute)</h3>
+    <div id="catalogQueryGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>4. Active Negotiations</h3>
+    <div id="activeNegotiationsGraph"></div>
+</div>
+
+<h2>🏥 EHDS Consent Metrics</h2>
+
+<div class="graph-container">
+    <h3>5. EHDS Consent Requests by Status</h3>
+    <div id="consentByStatusGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>6. Consent Approval Rate (%)</h3>
+    <div id="consentApprovalGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>7. EHR Records Accessed by Type</h3>
+    <div id="ehrRecordsGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>8. Data Access by Purpose</h3>
+    <div id="dataAccessPurposeGraph"></div>
+</div>
+
+<h2>🖥️ Service Health Metrics</h2>
+
+<div class="graph-container">
+    <h3>9. All Services Status (up=1, down=0)</h3>
+    <div id="servicesStatusGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>10. HTTP Request Rate per Service</h3>
+    <div id="httpRequestRateGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>11. HTTP Error Rate (%)</h3>
+    <div id="httpErrorRateGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>12. P95 Request Latency (seconds)</h3>
+    <div id="p95LatencyGraph"></div>
+</div>
+
+<h2>📡 SSE & Real-time Metrics</h2>
+
+<div class="graph-container">
+    <h3>13. Active SSE Connections</h3>
+    <div id="sseConnectionsGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>14. DSP Events Emitted</h3>
+    <div id="dspEventsGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>15. Active Transfers</h3>
+    <div id="activeTransfersGraph"></div>
+</div>
+
+<h2>🔒 Security & Identity Metrics</h2>
+
+<div class="graph-container">
+    <h3>16. DID Resolutions</h3>
+    <div id="didResolutionsGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>17. Credential Verifications</h3>
+    <div id="credentialVerificationsGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>18. Policy Evaluations</h3>
+    <div id="policyEvaluationsGraph"></div>
+</div>
+
+<h2>📦 Container Resources</h2>
+
+<div class="graph-container">
+    <h3>19. Container CPU Usage (%)</h3>
+    <div id="containerCpuGraph"></div>
+</div>
+
+<div class="graph-container">
+    <h3>20. Container Memory Usage</h3>
+    <div id="containerMemoryGraph"></div>
+</div>
+
+<script>
+// Panel 1: Contract Negotiations by Status
+new PromConsole.Graph({
+    node: document.querySelector("#contractNegotiationsGraph"),
+    expr: "sum by (status) (contract_negotiations_total)",
+    name: "[[status]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Negotiations"
+});
+
+// Panel 2: Asset Transfer Success Rate
+new PromConsole.Graph({
+    node: document.querySelector("#assetTransferGraph"),
+    expr: "dashboard:asset_transfer:success_rate",
+    name: "Success Rate",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Percentage"
+});
+
+// Panel 3: Catalog Query Rate
+new PromConsole.Graph({
+    node: document.querySelector("#catalogQueryGraph"),
+    expr: "dashboard:catalog_queries:rate_per_min",
+    name: "Queries/min",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Queries/min"
+});
+
+// Panel 4: Active Negotiations
+new PromConsole.Graph({
+    node: document.querySelector("#activeNegotiationsGraph"),
+    expr: "edc:active_negotiations:current",
+    name: "Active",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Count"
+});
+
+// Panel 5: Consent by Status
+new PromConsole.Graph({
+    node: document.querySelector("#consentByStatusGraph"),
+    expr: "sum by (status) (ehds_consent_requests_total)",
+    name: "[[status]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Requests"
+});
+
+// Panel 6: Consent Approval Rate
+new PromConsole.Graph({
+    node: document.querySelector("#consentApprovalGraph"),
+    expr: "dashboard:consent:approval_rate",
+    name: "Approval Rate",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Percentage"
+});
+
+// Panel 7: EHR Records by Type
+new PromConsole.Graph({
+    node: document.querySelector("#ehrRecordsGraph"),
+    expr: "sum by (record_type) (ehr_records_accessed_total)",
+    name: "[[record_type]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Records"
+});
+
+// Panel 8: Data Access by Purpose
+new PromConsole.Graph({
+    node: document.querySelector("#dataAccessPurposeGraph"),
+    expr: "ehds:data_access_by_purpose:rate5m",
+    name: "[[purpose]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Rate"
+});
+
+// Panel 9: Services Status
+new PromConsole.Graph({
+    node: document.querySelector("#servicesStatusGraph"),
+    expr: "up",
+    name: "[[job]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Status"
+});
+
+// Panel 10: HTTP Request Rate
+new PromConsole.Graph({
+    node: document.querySelector("#httpRequestRateGraph"),
+    expr: "dashboard:http_requests:rate_by_job",
+    name: "[[job]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Req/s"
+});
+
+// Panel 11: HTTP Error Rate
+new PromConsole.Graph({
+    node: document.querySelector("#httpErrorRateGraph"),
+    expr: "job:http_error_rate:ratio5m * 100",
+    name: "[[job]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Error %"
+});
+
+// Panel 12: P95 Latency
+new PromConsole.Graph({
+    node: document.querySelector("#p95LatencyGraph"),
+    expr: "job:http_request_duration_p95:5m",
+    name: "[[job]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Seconds"
+});
+
+// Panel 13: SSE Connections
+new PromConsole.Graph({
+    node: document.querySelector("#sseConnectionsGraph"),
+    expr: "sse_active_connections",
+    name: "Active SSE",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Connections"
+});
+
+// Panel 14: DSP Events
+new PromConsole.Graph({
+    node: document.querySelector("#dspEventsGraph"),
+    expr: "sum by (phase) (dsp_events_emitted_total)",
+    name: "[[phase]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Events"
+});
+
+// Panel 15: Active Transfers
+new PromConsole.Graph({
+    node: document.querySelector("#activeTransfersGraph"),
+    expr: "active_transfers",
+    name: "Transfers",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Count"
+});
+
+// Panel 16: DID Resolutions
+new PromConsole.Graph({
+    node: document.querySelector("#didResolutionsGraph"),
+    expr: "sum by (result) (did_resolution_total)",
+    name: "[[result]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Resolutions"
+});
+
+// Panel 17: Credential Verifications
+new PromConsole.Graph({
+    node: document.querySelector("#credentialVerificationsGraph"),
+    expr: "sum by (result) (credential_verification_total)",
+    name: "[[result]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Verifications"
+});
+
+// Panel 18: Policy Evaluations
+new PromConsole.Graph({
+    node: document.querySelector("#policyEvaluationsGraph"),
+    expr: "sum by (result) (policy_enforcement_total)",
+    name: "[[result]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "Evaluations"
+});
+
+// Panel 19: Container CPU
+new PromConsole.Graph({
+    node: document.querySelector("#containerCpuGraph"),
+    expr: "container:cpu_usage:percent",
+    name: "[[name]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanize,
+    yHoverFormatter: PromConsole.NumberFormatter.humanize,
+    yTitle: "CPU %"
+});
+
+// Panel 20: Container Memory
+new PromConsole.Graph({
+    node: document.querySelector("#containerMemoryGraph"),
+    expr: "container_memory_usage_bytes{name=~'.+'}",
+    name: "[[name]]",
+    yAxisFormatter: PromConsole.NumberFormatter.humanizeNoSmallPrefix,
+    yHoverFormatter: PromConsole.NumberFormatter.humanizeNoSmallPrefix,
+    yTitle: "Bytes"
+});
+
+// Update stat boxes
+function updateStats() {
+    fetch('/api/v1/query?query=count(up==1)')
+        .then(r => r.json())
+        .then(d => {
+            if (d.data.result[0]) {
+                document.getElementById('services-up').textContent = d.data.result[0].value[1];
+            }
+        });
+    
+    fetch('/api/v1/query?query=count(up==0)')
+        .then(r => r.json())
+        .then(d => {
+            if (d.data.result[0]) {
+                document.getElementById('services-down').textContent = d.data.result[0].value[1];
+            } else {
+                document.getElementById('services-down').textContent = '0';
+            }
+        });
+    
+    fetch('/api/v1/query?query=count({__name__=~".+"})')
+        .then(r => r.json())
+        .then(d => {
+            if (d.data.result[0]) {
+                document.getElementById('total-metrics').textContent = d.data.result[0].value[1];
+            }
+        });
+    
+    fetch('/api/v1/query?query=process_uptime_seconds{job="prometheus"}')
+        .then(r => r.json())
+        .then(d => {
+            if (d.data.result[0]) {
+                const secs = parseFloat(d.data.result[0].value[1]);
+                const hours = Math.floor(secs / 3600);
+                const mins = Math.floor((secs % 3600) / 60);
+                document.getElementById('uptime').textContent = hours + 'h ' + mins + 'm';
+            }
+        });
+}
+
+updateStats();
+setInterval(updateStats, 30000);
+</script>
+
+{{template "prom_content_tail" .}}
+
+{{template "tail"}}

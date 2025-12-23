@@ -1,0 +1,13 @@
+{{/* vim: set ft=html: */}}
+{{/* Prom content head: Common Prometheus console header */}}
+{{ define "prom_content_head" }}
+<link type="text/css" rel="stylesheet" href="{{ pathPrefix }}/static/vendor/rickshaw/rickshaw.min.css">
+<link type="text/css" rel="stylesheet" href="{{ pathPrefix }}/static/vendor/bootstrap/css/bootstrap.min.css">
+<script src="{{ pathPrefix }}/static/vendor/rickshaw/vendor/d3.v3.js"></script>
+<script src="{{ pathPrefix }}/static/vendor/rickshaw/vendor/d3.layout.min.js"></script>
+<script src="{{ pathPrefix }}/static/vendor/rickshaw/rickshaw.min.js"></script>
+<script src="{{ pathPrefix }}/static/js/prom_console.js"></script>
+{{ end }}
+
+{{ define "prom_content_tail" }}
+{{ end }}
