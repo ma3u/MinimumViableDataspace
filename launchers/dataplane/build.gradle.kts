@@ -20,7 +20,12 @@ plugins {
 
 dependencies {
     runtimeOnly(libs.edc.bom.dataplane)
-    runtimeOnly(libs.edc.dataplane.v2)
+    
+    // Micrometer metrics for Prometheus monitoring
+    // Exposes JVM, OkHttp, and executor metrics via /metrics endpoint
+    runtimeOnly(libs.edc.micrometer.core)
+    runtimeOnly(libs.edc.jetty.micrometer)
+    runtimeOnly(libs.edc.jersey.micrometer)
 
     if (project.properties.getOrDefault("persistence", "false") == "true") {
         runtimeOnly(libs.edc.vault.hashicorp)

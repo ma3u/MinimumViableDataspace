@@ -1384,6 +1384,8 @@ docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml down
 docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml down -v
 ```
 
+![Docker Desktop EDC Services](image-2.png)
+
 ### Kubernetes (Production)
 
 Production deployment uses Terraform to provision Kubernetes resources. The Terraform modules in the `deployment/` directory define all required infrastructure including pods, services, ingresses, and secrets. Always run `terraform plan` before `apply` to review changes.
@@ -1597,7 +1599,7 @@ const callback = useCallback(() => {
 # Clean and rebuild
 ./gradlew clean build -x test
 
-# Check Java version (requires 17+)
+# Check Java version (requires 21+)
 java -version
 
 # Use verbose output for debugging

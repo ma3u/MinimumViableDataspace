@@ -12,8 +12,6 @@ plugins {
     id("org.openapi.generator")
 }
 
-val edcVersion: String by extra("0.5.1")
-
 dependencies {
     // OpenAPI generator runtime dependencies
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
@@ -27,8 +25,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     
     // EDC SPI for integration with policy evaluation
-    implementation("org.eclipse.edc:policy-model:${edcVersion}")
-    implementation("org.eclipse.edc:json-ld-spi:${edcVersion}")
+    implementation(libs.edc.policy.model)
+    implementation(libs.edc.json.ld.spi)
 }
 
 // OpenAPI Generator configuration for EDC Management API

@@ -387,6 +387,17 @@ create_participant() {
       print_status "ok" "$name secret stored in vault"
     fi
   fi
+  
+  # Publish the DID document
+  local publish_data
+  publish_data=$(jq -n --arg did "$did" '{"did": $did}')
+  local publish_response
+  publish_response=$(curl -sL -X POST "$ih_url/api/identity/v1alpha/participants/$participant_id/dids/publish" \
+    -H "x-api-key: $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "$publish_data" 2>/dev/null || true)
+  log "DID publish response: $publish_response"
+  print_status "ok" "$name DID published"
 }
 
 create_issuer() {

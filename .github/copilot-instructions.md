@@ -48,7 +48,7 @@ docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up --build
 Both use Express + TypeScript. The `dev:local` scripts use different ports to allow simultaneous Docker runs.
 
 ### EDC Extensions (`extensions/`)
-Java extensions following EDC SPI patterns (EDC version 0.14.1):
+Java extensions following EDC SPI patterns (EDC version 0.15.1):
 - `dcp-impl` - Decentralized Claims Protocol
 - `catalog-node-resolver` - Federated catalog discovery
 - `did-example-resolver` - Demo DID resolution

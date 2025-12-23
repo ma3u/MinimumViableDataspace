@@ -25,6 +25,12 @@ dependencies {
     runtimeOnly(libs.edc.bom.controlplane)
     runtimeOnly(libs.edc.api.secrets)
     
+    // Micrometer metrics for Prometheus monitoring
+    // Exposes JVM, OkHttp, and executor metrics via /metrics endpoint
+    runtimeOnly(libs.edc.micrometer.core)
+    runtimeOnly(libs.edc.jetty.micrometer)
+    runtimeOnly(libs.edc.jersey.micrometer)
+    
     // Callback extensions for Dataspace Insider View event forwarding
     // @see https://github.com/eclipse-edc/Connector/tree/main/extensions/control-plane/callback
     runtimeOnly(libs.edc.callback.event.dispatcher)

@@ -1991,6 +1991,9 @@ GET /health/deep    → Full dependency check (authenticated)
 
 > **Note:** All queries are stored as permanent recording rules in `observability/prometheus/recording-rules.yml` and will persist across Prometheus restarts.
 
+![Prometheus Console(image-3.png)
+Prometheus Web UI showing sample query results: http://localhost:9090/consoles/health-dataspace.html
+
 ---
 
 ### 14.11 Acceptance Criteria

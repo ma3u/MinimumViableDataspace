@@ -149,6 +149,7 @@ services:
       - "8083:8083"   # Control API
       - "8084:8084"   # Catalog API
       - "8085:8085"   # Version API
+      - "9464:9464"   # Prometheus Metrics (via OpenTelemetry)
     env_file:
       - ./deployment/assets/env/docker/consumer_connector.env
     environment:
@@ -229,6 +230,7 @@ services:
       - "8193:8193"   # Control API
       - "8194:8194"   # Catalog API
       - "8195:8195"   # Version API
+      - "9465:9464"   # Prometheus Metrics (via OpenTelemetry)
     env_file:
       - ./deployment/assets/env/docker/provider_connector.env
     environment:

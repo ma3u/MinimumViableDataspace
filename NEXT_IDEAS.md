@@ -35,7 +35,7 @@ Read the full article here: [link to the article]
 
 # Other Ideas for the Health demospace project:
 
-## Dataspace Insider View panel in the frontend 
+## Dataspace Insider View panel in the frontend (done partially)
 
 - to show the interaction between data provider and data consumer based on the dataspace protocol. Use a centralied logging system to capture all interactions.
 - if the backend is online show live interactions
@@ -46,6 +46,8 @@ the panel is shown when a button is clicked on the right side of the screen
 - The panel is scrollable to view more interactions
 - the panel show the steps of the dataspace protocol as a progress indicator at the top
 - The panel can be closed by clicking a close button or outside the panel area
+
+## Show Dataspace Initialization Events in the Insider Panel (new)
 
 Show the inital dataspace initialization events thats seeding manually in the insider panel. 
 
@@ -84,7 +86,7 @@ http://localhost:4000/api/events
 
 
 
-Create a comprehensive Dashboards in Grafana for Monitoring the Health Dataspace 
+# Create a comprehensive Dashboards in Grafana for Monitoring the Health Dataspace (done partially)
 
 - Show Dataspace Health (uptime, response time, error rates)
 - Show Data Transfer Metrics (volume, speed, success rates)
@@ -102,3 +104,25 @@ Create a comprehensive Dashboards in Grafana for Monitoring the Health Dataspace
 - Use Grafana's templating features to create dynamic dashboards that can be filtered by different dimensions (e.g., time range, data provider, data consumer)
 - Document the dashboards and their metrics for easy understanding and usage by stakeholders
 - Share the dashboards with stakeholders via Grafana's sharing features (e.g., public links, snapshots)
+
+
+# Create a starting point for implementaion a new dataspace based on Dataspace Protocol and Eclipse Dataspace Minimum Viable Dataspace project
+
+use the IMPLEMENTATION_PLAN.md as basis
+
+- Create a project template that includes the necessary components and configurations for a health dataspace based on EDC in main branch
+- instruct the user how to use Github Copilot to adapt the template to their specific use case (which model he should use, which data types, which consent policies, which deployment mode)
+- Create a step-by-step guide that walks users through the process of setting up and customizing the specific dataspace based on EDC using the project template and Github Copilot
+- Create Prompt templates for Github Copilot to generate code for specific functionalities in the specific use case for each step of the implementation
+
+- Create a setup script that automates the installation and configuration of the necessary components for a specific dataspace based on EDC
+- Get familiear with the specific requirements and regulations for health dataspaces in the target region (e.g., EHDS in Europe, HIPAA in the US)
+- Mockup the frontend with a Backend-Mock to define the user experience and data flows
+- Define the data models and consent policies based on the specific use case and regulations
+- Implement the backend using EDC, integrating the defined data models and consent policies
+- Define the User Journey and implement the frontend to interact with the backend
+
+- Create a comprehensive documentation that guides users through the process of setting up and using a specific dataspace based on EDC
+- Create a set of best practices and guidelines for implementing a specific dataspace based on EDC
+- Create a set of sample data and use cases that demonstrate the capabilities of a specific dataspace based on EDC
+- Create a community

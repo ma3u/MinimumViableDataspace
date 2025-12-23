@@ -56,17 +56,21 @@ scrape_configs:
   # These would need the Micrometer extension to be enabled in EDC builds.
   # Keeping commented for future enablement:
   #
-  # - job_name: 'consumer-controlplane'
-  #   static_configs:
-  #     - targets: ['consumer-controlplane:8081']
-  #   metrics_path: /metrics
-  #   scrape_interval: 30s
-  #
-  # - job_name: 'provider-controlplane'
-  #   static_configs:
-  #     - targets: ['provider-controlplane:8191']
-  #   metrics_path: /metrics
-  #   scrape_interval: 30s
+  # EDC Control Planes with Micrometer metrics enabled via OpenTelemetry
+  # Metrics exposed on port 9464 (OTEL_METRICS_EXPORTER=prometheus)
+  - job_name: 'consumer-controlplane'
+    static_configs:
+      - targets: ['consumer-controlplane:9464']
+    metrics_path: /metrics
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'provider-controlplane'
+    static_configs:
+      - targets: ['provider-controlplane:9464']
+    metrics_path: /metrics
+    scrape_interval: 15s
+    scrape_timeout: 10s
 
   # Docker containers (via cAdvisor)
   - job_name: 'cadvisor'

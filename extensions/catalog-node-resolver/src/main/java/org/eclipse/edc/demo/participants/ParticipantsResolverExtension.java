@@ -21,6 +21,7 @@ import org.eclipse.edc.iam.did.spi.resolution.DidResolverRegistry;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Provider;
+import org.eclipse.edc.runtime.metamodel.annotation.Setting;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
@@ -29,12 +30,16 @@ import org.eclipse.edc.spi.types.TypeManager;
 import java.io.File;
 
 import static org.eclipse.edc.demo.participants.ParticipantsResolverExtension.NAME;
+import static org.eclipse.edc.spi.system.ServiceExtensionContext.ANONYMOUS_PARTICIPANT;
 
 @Extension(value = NAME)
 public class ParticipantsResolverExtension implements ServiceExtension {
     public static final String NAME = "MVD Participant Resolver Extension";
 
     public static final String PARTICIPANT_LIST_FILE_PATH = "edc.mvd.participants.list.file";
+
+    @Setting(description = "Configures the participant id this runtime is operating on behalf of", key = "edc.participant.id", defaultValue = ANONYMOUS_PARTICIPANT)
+    private String participantId;
 
     @Inject
     private TypeManager typeManager;
@@ -71,11 +76,11 @@ public class ParticipantsResolverExtension implements ServiceExtension {
     }
 
     @Provider
-    public TargetNodeFilter skipSelfNodeFilter(ServiceExtensionContext context) {
+    public TargetNodeFilter skipSelfNodeFilter() {
         return targetNode -> {
-            var predicateTest = !targetNode.id().equals(context.getParticipantId());
+            var predicateTest = !targetNode.id().equals(participantId);
             if (!predicateTest) {
-                monitor.debug("Node filter: skipping node '%s' for participant '%s'".formatted(targetNode.id(), context.getParticipantId()));
+                monitor.debug("Node filter: skipping node '%s' for participant '%s'".formatted(targetNode.id(), participantId));
             }
             return predicateTest;
         };
