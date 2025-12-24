@@ -5904,7 +5904,13 @@
 							"name": "Create consumer participant",
 							"request": {
 								"method": "POST",
-								"header": [],
+								"header": [
+									{
+										"key": "x-api-key",
+										"value": "{{API_KEY}}",
+										"type": "text"
+									}
+								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"did\": \"{{CONSUMER_ID}}\",\n    \"holderId\": \"{{CONSUMER_ID}}\",\n    \"name\": \"{{CONSUMER_NAME}}\"\n}",
@@ -5936,7 +5942,7 @@
 							"name": "Create provider participant",
 							"request": {
 								"method": "POST",
-								"header": [],
+								"header": [{"key": "x-api-key", "value": "{{API_KEY}}", "type": "text"}],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"did\": \"{{PROVIDER_ID}}\",\n    \"holderId\": \"{{PROVIDER_ID}}\",\n    \"name\": \"{{PROVIDER_NAME}}\"\n}",
@@ -5968,7 +5974,7 @@
 							"name": "Create attestation definitions",
 							"request": {
 								"method": "POST",
-								"header": [],
+								"header": [{"key": "x-api-key", "value": "{{API_KEY}}", "type": "text"}],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"attestationType\": \"demo\",\n    \"configuration\": {\n    },\n    \"id\": \"demo-attestation-def-1\"\n}",
@@ -6000,7 +6006,7 @@
 							"name": "Create credential definitions",
 							"request": {
 								"method": "POST",
-								"header": [],
+								"header": [{"key": "x-api-key", "value": "{{API_KEY}}", "type": "text"}],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"attestations\": [\n        \"demo-attestation-def-1\"\n    ],\n    \"credentialType\": \"DemoCredential\",\n    \"id\": \"demo-credential-def-1\",\n    \"jsonSchema\": \"{}\",\n    \"jsonSchemaUrl\": \"https://example.com/schema/demo-credential.json\",\n    \"mappings\": [\n        {\n            \"input\": \"participant.name\",\n            \"output\": \"credentialSubject.participant_name\",\n            \"required\": \"true\"\n        }\n    ],\n    \"rules\": [],\n    \"format\": \"VC1_0_JWT\"\n}",

@@ -3902,11 +3902,101 @@ export const mockEHRData: Record<string, ElectronicHealthRecord> = {
           { code: 'C10AA05', system: 'ATC', display: 'Atorvastatin', durationCategory: '>2-years' }
         ]
       },
+      clinicalTrialNode: {
+        phase: 'Phase III',
+        phaseCode: 'C15602',
+        studyType: 'interventional',
+        interventionModel: 'parallel',
+        primaryEndpoint: 'HbA1c reduction at 52 weeks',
+        euCtNumber: '2024-501234-12-DE',
+        sponsor: { name: 'NordPharma AG', type: 'commercial', country: 'DE' },
+        therapeuticArea: { code: 'ENDOCRINE', name: 'Endocrinology/Diabetology' },
+        investigationalProduct: { name: 'NP-DM-2024', atcCode: 'A10BX' },
+        memberStatesConcerned: ['DE', 'FR', 'NL', 'ES']
+      },
+      medDRANode: {
+        version: '27.0',
+        primarySOC: {
+          code: '10027433',
+          name: 'Metabolism and nutrition disorders',
+          abbreviation: 'Metab'
+        },
+        preferredTerm: {
+          code: '10012601',
+          name: 'Diabetes mellitus',
+          hltCode: '10012608'
+        }
+      },
+      signalVerificationNode: {
+        adverseEvents: [
+          {
+            id: 'AE-001-001',
+            medDRAPT: 'Hypoglycaemia',
+            medDRACode: '10020993',
+            severity: 'moderate',
+            seriousness: ['hospitalization'],
+            outcome: 'recovered',
+            onsetPeriod: '2024-Q3',
+            suspectedDrug: 'A10BA02',
+            relatedness: 'probable',
+            expectedness: 'expected',
+            actionTaken: 'dose-reduced'
+          }
+        ],
+        signalStatus: {
+          hasActiveSignal: false,
+          signalCategory: 'closed',
+          lastReviewDate: '2025-10'
+        },
+        reportingStatus: 'not-required'
+      },
       provenanceNode: {
         sourceSystem: 'Rheinland-UK-EHR-v4',
         extractionDate: '2025-11',
         deIdentificationMethod: 'k-anonymity-k5',
         qualityScore: 0.94
+      },
+      anamnesisNode: {
+        chiefComplaint: {
+          stepNumber: 1,
+          stepName: 'Chief Complaint',
+          stepNameDE: 'Hauptbeschwerde',
+          summary: 'Progressive fatigue and increased thirst over 6 months',
+          relevantFindings: ['Polyuria', 'Polydipsia', 'Unintentional weight loss'],
+          clinicalSignificance: 'high'
+        },
+        historyOfPresentIllness: {
+          stepNumber: 2,
+          stepName: 'History of Present Illness',
+          stepNameDE: 'Jetzige Anamnese',
+          summary: 'Gradual onset of symptoms, initially attributed to stress; elevated fasting glucose detected during routine screening',
+          relevantFindings: ['Symptom duration >6 months', 'No ketoacidosis episodes', 'Lifestyle modifications attempted'],
+          clinicalSignificance: 'high'
+        },
+        pastMedicalHistory: {
+          stepNumber: 3,
+          stepName: 'Past Medical History',
+          stepNameDE: 'Eigenanamnese',
+          summary: 'History of hypertension (diagnosed 2015), hypercholesterolemia (2017); no prior diabetes diagnosis',
+          relevantFindings: ['Hypertension controlled with ACE inhibitor', 'Statin therapy initiated', 'No surgical history'],
+          clinicalSignificance: 'moderate'
+        },
+        familyHistory: {
+          stepNumber: 4,
+          stepName: 'Family History',
+          stepNameDE: 'Familienanamnese',
+          summary: 'Strong family history of metabolic disorders; mother with T2DM, father with coronary artery disease',
+          relevantFindings: ['First-degree relative with T2DM', 'Cardiovascular disease in family', 'No known genetic conditions'],
+          clinicalSignificance: 'high'
+        },
+        socialHistory: {
+          stepNumber: 5,
+          stepName: 'Social History',
+          stepNameDE: 'Sozialanamnese',
+          summary: 'Sedentary occupation, former smoker (quit 5 years ago), moderate alcohol consumption',
+          relevantFindings: ['Office work >8h/day', 'Limited physical activity', 'BMI in overweight category'],
+          clinicalSignificance: 'moderate'
+        }
       }
     }
   },

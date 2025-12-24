@@ -118,16 +118,15 @@ function mapEdcEventType(eventType: string): { phase: DspPhase; action: string; 
  * Determine status based on event type
  */
 function determineStatus(eventType: string): DspStatus {
-  if (eventType.includes('terminated') || eventType.includes('deleted')) {
+  if (eventType.includes('terminated') || eventType.includes('deleted') || eventType.includes('failed')) {
     return 'error';
-  }
-  if (eventType.includes('completed') || eventType.includes('finalized') || eventType.includes('created')) {
-    return 'success';
   }
   if (eventType.includes('initiated') || eventType.includes('requested')) {
     return 'pending';
   }
-  return 'in-progress';
+  // Default to success for all other events (started, agreed, verified, etc.)
+  // This avoids "in-progress" spinning wheels for intermediate events that have already occurred
+  return 'success';
 }
 
 /**

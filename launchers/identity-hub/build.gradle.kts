@@ -29,6 +29,8 @@ dependencies {
     if (project.properties.getOrDefault("persistence", "false") == "true") {
         runtimeOnly(libs.edc.vault.hashicorp)
         runtimeOnly(libs.edc.bom.identityhub.sql)
+        // Multi-tenant vault requires participant context config store
+        runtimeOnly(libs.edc.sql.participantcontext.config)
         println("This runtime compiles with a remote STS, Hashicorp Vault and PostgreSQL. You will need properly configured STS, Postgres and HCV instances.")
     }
 

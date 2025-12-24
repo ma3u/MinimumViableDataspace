@@ -133,8 +133,16 @@ develop a best practise when you switch from in-memory to Hashisop vault persist
 
 The Electronic health record page dont have many information of the Mock like anamnese. Explain why its not their anymore. And implement the missing view.
 
-compare the final page of the moch with the full integrated EDC intergration for missing features.
+compare the final page of the mock with the full integrated EDC intergration for missing features.
 
 in the insider panel I see many event with the spinning wheel icon. It seems its not done.
 
 PLease update the implementation plan. It seems some tasks are still open. Please check and implement.
+
+We should upgrade the EDC components earlier in the implementation plan to avoid complications, right?
+
+We need to check the respective APIs and implementations in the repositories: https://github.com/orgs/eclipse-edc/repositories we are using.
+
+document the changes in seeding, APIs and others in issue #16 and implementation plan.
+
+Developing a plan to often update, beause the EDC components will developing fast.

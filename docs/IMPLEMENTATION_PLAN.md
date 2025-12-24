@@ -8,7 +8,7 @@ This document provides a detailed, step-by-step implementation plan for building
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| Phase 1: Foundation | ✅ Complete | Fork EDC MVD, create frontend & backend-mock |
+| Phase 1: Foundation | ✅ Complete | Fork EDC MVD, upgrade to 0.15.1, create frontend & backend-mock |
 | Phase 2: EDC Infrastructure | ✅ Complete | Deploy EDC components with persistence |
 | Phase 3: Identity & Trust | ✅ Complete | Implement DID/VC architecture |
 | Phase 4: Data Discovery | ✅ Complete | HealthDCAT-AP catalog with FHIR metadata |
@@ -20,7 +20,6 @@ This document provides a detailed, step-by-step implementation plan for building
 | Phase 14: Monitoring & Debugging | ✅ Complete | Observability, tracing, debugging infrastructure |
 | Phase 15: Comprehensive Dashboards | ✅ Complete | Full Grafana dashboard suite for dataspace monitoring |
 | Phase 16: Insider Panel Enhancements | ✅ Complete | Seeding events display (GitHub #15) |
-| Phase 17: EDC 0.15.1 Upgrade | ✅ Complete | Upgrade EDC components to latest stable (GitHub #16) |
 
 ---
 
@@ -45,7 +44,7 @@ This document provides a detailed, step-by-step implementation plan for building
 - `gradle.properties` - Version and build properties
 - `gradle/libs.versions.toml` - Dependency catalog
 
-**Key Decision:** Use EDC `0.15.1` (latest stable) for latest DCP features and IdentityHub improvements. See Phase 17 for upgrade details.
+**Key Decision:** Use EDC `0.15.1` (latest stable) for latest DCP features and IdentityHub improvements. See Phase 1.4 for upgrade details.
 
 ---
 
@@ -143,6 +142,71 @@ This document provides a detailed, step-by-step implementation plan for building
     }
   }
 }
+```
+
+---
+
+### 1.4 EDC 0.15.1 Upgrade
+
+**Objective:** Upgrade EDC components from 0.14.1 to 0.15.1 for latest features and security improvements.
+
+**Status:** ✅ Complete (December 2025)
+
+**GitHub Issue:** #16 - EDC Component Upgrade & Dependency Management
+
+**Implementation:**
+- [x] Update `gradle/libs.versions.toml` with EDC 0.15.1
+- [x] Rename DCP modules (`identity-trust-*` → `decentralized-claims-*`)
+- [x] Update package imports (`iam.identitytrust.spi` → `iam.decentralizedclaims.spi`)
+- [x] Remove deprecated `data-plane-public-api-v2` module
+- [x] Fix `getParticipantId()` API removal (use `@Setting` annotation)
+- [x] Fix `ParticipantManifest.Builder` API (`participantId()` → `participantContextId()`)
+- [x] Remove `RequestVersionPolicyContext` class registration
+- [x] Update `.github/copilot-instructions.md` with new version
+
+**Breaking Changes Addressed:**
+
+| Change | Before (0.14.1) | After (0.15.1) |
+|--------|-----------------|----------------|
+| DCP Modules | `identity-trust-service` | `decentralized-claims-service` |
+| DCP Core | `identity-trust-core` | `decentralized-claims-core` |
+| DCP SPI | `identity-trust-spi` | `decentralized-claims-spi` |
+| STS Client | `identity-trust-sts-remote-client` | `decentralized-claims-sts-remote-client` |
+| Package | `iam.identitytrust.spi.*` | `iam.decentralizedclaims.spi.*` |
+| Participant ID | `context.getParticipantId()` | `@Setting` annotation |
+| ParticipantManifest | `.participantId()` | `.participantContextId()` |
+| Dataplane V2 | `data-plane-public-api-v2` | Removed (use v3) |
+
+**Files Modified:**
+- `gradle/libs.versions.toml` - Version and module name updates
+- `extensions/catalog-node-resolver/src/.../ParticipantsResolverExtension.java`
+- `extensions/dcp-impl/src/.../DcpPatchExtension.java`
+- `extensions/dcp-impl/src/.../DataAccessCredentialScopeExtractor.java`
+- `extensions/superuser-seed/src/.../ParticipantContextSeedExtension.java`
+- `launchers/dataplane/build.gradle.kts`
+
+**Database Schema Changes:**
+- New `usage` column in credentials store table
+- **Requires fresh database volumes** - old Postgres data incompatible
+
+**Test Results:**
+- ✅ Java build: SUCCESS (114 tasks)
+- ✅ Java tests: 13 passed
+- ✅ Frontend tests: 69 passed
+- ✅ Backend-EDC tests: 120 passed
+- ✅ Docker stack: All containers healthy
+- ✅ Seeding: 21 assets, 4 policies, 2 contracts
+
+**Upgrade Command:**
+```bash
+# Rebuild with persistence (required for Vault/Postgres)
+./gradlew -Ppersistence=true clean build -x test
+
+# Remove old volumes (schema changed)
+docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml down -v
+
+# Start fresh
+docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up --build -d
 ```
 
 ---
@@ -2237,76 +2301,6 @@ When the frontend loads after seeding completes, seeding events were not visible
 
 ---
 
-## Phase 17: EDC 0.15.1 Upgrade ✅
-
-### 17.1 Version Upgrade
-
-**Objective:** Upgrade EDC components from 0.14.1 to 0.15.1 for latest features and security improvements.
-
-**Status:** ✅ Complete (December 2025)
-
-**GitHub Issue:** #16 - STS Client Secret Authentication Fails with HashiCorp Vault
-
-**Implementation:**
-- [x] Update `gradle/libs.versions.toml` with EDC 0.15.1
-- [x] Rename DCP modules (`identity-trust-*` → `decentralized-claims-*`)
-- [x] Update package imports (`iam.identitytrust.spi` → `iam.decentralizedclaims.spi`)
-- [x] Remove deprecated `data-plane-public-api-v2` module
-- [x] Fix `getParticipantId()` API removal (use `@Setting` annotation)
-- [x] Fix `ParticipantManifest.Builder` API (`participantId()` → `participantContextId()`)
-- [x] Remove `RequestVersionPolicyContext` class registration
-- [x] Update `.github/copilot-instructions.md` with new version
-
-**Breaking Changes Addressed:**
-
-| Change | Before (0.14.1) | After (0.15.1) |
-|--------|-----------------|----------------|
-| DCP Modules | `identity-trust-service` | `decentralized-claims-service` |
-| DCP Core | `identity-trust-core` | `decentralized-claims-core` |
-| DCP SPI | `identity-trust-spi` | `decentralized-claims-spi` |
-| STS Client | `identity-trust-sts-remote-client` | `decentralized-claims-sts-remote-client` |
-| Package | `iam.identitytrust.spi.*` | `iam.decentralizedclaims.spi.*` |
-| Participant ID | `context.getParticipantId()` | `@Setting` annotation |
-| ParticipantManifest | `.participantId()` | `.participantContextId()` |
-| Dataplane V2 | `data-plane-public-api-v2` | Removed (use v3) |
-
-**Files Modified:**
-- `gradle/libs.versions.toml` - Version and module name updates
-- `extensions/catalog-node-resolver/src/.../ParticipantsResolverExtension.java`
-- `extensions/dcp-impl/src/.../DcpPatchExtension.java`
-- `extensions/dcp-impl/src/.../DataAccessCredentialScopeExtractor.java`
-- `extensions/superuser-seed/src/.../ParticipantContextSeedExtension.java`
-- `launchers/dataplane/build.gradle.kts`
-
-**Database Schema Changes:**
-- New `usage` column in credentials store table
-- **Requires fresh database volumes** - old Postgres data incompatible
-
-**Test Results:**
-- ✅ Java build: SUCCESS (114 tasks)
-- ✅ Java tests: 13 passed
-- ✅ Frontend tests: 69 passed
-- ✅ Backend-EDC tests: 120 passed
-- ✅ Docker stack: All containers healthy
-- ✅ Seeding: 21 assets, 4 policies, 2 contracts
-
-**Upgrade Command:**
-```bash
-# Rebuild with persistence (required for Vault/Postgres)
-./gradlew -Ppersistence=true clean build -x test
-
-# Remove old volumes (schema changed)
-docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml down -v
-
-# Start fresh
-docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up --build -d
-```
-
-**Known Issue:**
-The STS client authentication with HashiCorp Vault (Issue #16) is a separate configuration issue not related to the version upgrade. The vault secret path encoding inconsistency requires investigation.
-
----
-
 *Last Updated: 23 December 2025*
-*Version: 1.7*
+*Version: 1.8*
 *Status: 96% Complete (12/13 phases complete, Phase 8 in progress)*

@@ -185,11 +185,15 @@ store_vault_secret() {
   
   log "Storing secret '$key' in Vault..."
   
+  # Properly escape the value for JSON (handle newlines and special chars)
+  local escaped_value
+  escaped_value=$(printf '%s' "$value" | jq -Rs '.')
+  
   local response
   response=$(curl -sL -X POST "$VAULT_URL/v1/secret/data/$key" \
     -H "X-Vault-Token: $VAULT_TOKEN" \
     -H "Content-Type: application/json" \
-    -d "{\"data\": {\"content\": \"$value\"}}" 2>/dev/null || true)
+    -d "{\"data\": {\"content\": $escaped_value}}" 2>/dev/null || true)
   
   if echo "$response" | grep -q "created_time" 2>/dev/null; then
     print_status "ok" "Secret '$key' stored in Vault"
@@ -211,6 +215,30 @@ seed_superuser_key() {
   
   store_vault_secret "super-user-apikey" "$superuser_key"
 }
+
+# Seed participant private keys in Vault for STS JWT signing
+seed_private_keys() {
+  echo "Seeding participant private keys in Vault..."
+  
+  # Get the directory of this script
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  
+  # Consumer private key
+  if [ -f "$script_dir/deployment/assets/consumer_private.pem" ]; then
+    local consumer_key
+    consumer_key=$(cat "$script_dir/deployment/assets/consumer_private.pem")
+    store_vault_secret "consumer-key-1" "$consumer_key"
+  fi
+  
+  # Provider private key
+  if [ -f "$script_dir/deployment/assets/provider_private.pem" ]; then
+    local provider_key
+    provider_key=$(cat "$script_dir/deployment/assets/provider_private.pem")
+    store_vault_secret "provider-key-1" "$provider_key"
+  fi
+}
+
 # Convert PEM file to single line (works on macOS and Linux)
 pem_to_single_line() {
   awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' "$1"
@@ -334,7 +362,7 @@ create_participant() {
       "roles": [],
       "serviceEndpoints": $endpoints,
       "active": true,
-      "participantId": $did,
+      "participantContextId": $did,
       "did": $did,
       "key": {
         "keyId": ($did + "#key-1"),
@@ -419,7 +447,7 @@ create_issuer() {
         "id": "issuer-service-1"
       }],
       "active": true,
-      "participantId": $did,
+      "participantContextId": $did,
       "did": $did,
       "key": {
         "keyId": ($did + "#key-1"),
@@ -431,6 +459,7 @@ create_issuer() {
   local response
   response=$(curl -s --location "$ISSUER_IH_URL/api/identity/v1alpha/participants/" \
     --header 'Content-Type: application/json' \
+    --header "x-api-key: $API_KEY" \
     --data "$data")
   
   if echo "$response" | jq -e '.clientSecret' > /dev/null 2>&1; then
@@ -453,6 +482,7 @@ seed_issuer_data() {
   # Run newman with || true to continue even if assertions fail (500 errors may be expected for already-exists)
   newman run \
     --folder "Seed Issuer" \
+    --env-var "API_KEY=$API_KEY" \
     --env-var "ISSUER_ADMIN_URL=$ISSUER_ADMIN_URL" \
     --env-var "ISSUER_CONTEXT_ID=$issuer_context_id" \
     --env-var "CONSUMER_ID=$CONSUMER_DID" \
@@ -478,6 +508,9 @@ seed_identity() {
   
   # Seed superuser key in Vault first (required for IssuerService admin API)
   seed_superuser_key
+  
+  # Seed participant private keys in Vault (required for STS JWT signing)
+  seed_private_keys
   echo ""
   
   # Consumer

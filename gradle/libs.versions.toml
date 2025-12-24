@@ -67,6 +67,9 @@ edc-sql-pool = { module = "org.eclipse.edc:sql-pool-apache-commons", version.ref
 edc-sql-transactionlocal = { module = "org.eclipse.edc:transaction-local", version.ref = "edc" }
 edc-sql-dataplane-instancestore = { module = "org.eclipse.edc:data-plane-instance-store-sql", version.ref = "edc" }
 
+# EDC participant context config store SQL (for multi-tenant vault)
+edc-sql-participantcontext-config = { module = "org.eclipse.edc:participantcontext-config-store-sql", version.ref = "edc" }
+
 # identityhub SPI modules
 edc-ih-spi-did = { module = "org.eclipse.edc:did-spi", version.ref = "edc" }
 edc-ih-spi-credentials = { module = "org.eclipse.edc:verifiable-credential-spi", version.ref = "edc" }
