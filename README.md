@@ -34,19 +34,49 @@ This demo showcases how easy it is to create an **EHDS-compliant dataspace for h
 
 ## Quick Start
 
-### Option A: Mock Mode (No EDC Required)
+### Three API Modes
+
+The demo supports three modes for different use cases:
+
+| Mode | Backend | EDC Stack | Use Case |
+|------|---------|-----------|----------|
+| **mock** | Mock data in frontend | ❌ Not needed | Quick demo, development, CI/CD |
+| **hybrid** | backend-mock (FHIR) | ✅ Catalog only | Test EDC catalog integration |
+| **full** | backend-mock + backend-edc | ✅ Complete flow | Full dataspace protocol demo |
+
+### Option A: Mock Mode (Fastest - No EDC Required)
+
+Perfect for quick demos and frontend development:
 
 ```bash
-# Terminal 1: Backend
-cd backend-mock && npm install && npm run dev:health
+# Use the startup script
+./start-health-demo.sh --mode mock
 
-# Terminal 2: Frontend  
-cd frontend && npm install && npm run dev
+# OR manually:
+cd backend-mock && npm install && npm run dev:health  # Terminal 1
+cd frontend && npm install && npm run dev              # Terminal 2
+```
+
+Open http://localhost:4000 (local dev) or http://localhost:3000 (Docker)
+
+### Option B: Full EDC Mode (Complete Dataspace Protocol)
+
+For full dataspace demonstration with consent verification:
+
+```bash
+# Use the startup script (builds Java components automatically)
+./start-health-demo.sh --mode full -d
+
+# Wait for containers to be healthy
+docker ps
+
+# Seed the dataspace
+./seed-dataspace.sh --mode=docker --verbose
 ```
 
 Open http://localhost:3000
 
-### Option B: Full EDC Mode
+### Option C: Manual Full Setup
 
 ```bash
 # Build Java components (requires persistence flag for Docker/Vault support)
@@ -55,20 +85,19 @@ Open http://localhost:3000
 # Start all services
 docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up --build
 
-# Full Docker seeding (identity + health assets)
+# In another terminal, seed the dataspace
 ./seed-dataspace.sh --mode=docker --verbose
 ```
 
-Notes:
+Open http://localhost:3000
+
+**Notes:**
 - The script is macOS and Linux compatible (uses portable awk-based PEM handling).
 - Legacy compatibility wrappers remain for convenience:
   - `./seed.sh` (local wrapper)
   - `./seed-docker.sh` (docker wrapper)
 
-For details and advanced options, see `docs/USER-MANUAL.md#seeding-the-dataspace`.
-
-
-Open http://localhost:3000
+For details and advanced options, see [User Manual - Seeding](docs/USER-MANUAL.md#seeding-the-dataspace).
 
 ---
 

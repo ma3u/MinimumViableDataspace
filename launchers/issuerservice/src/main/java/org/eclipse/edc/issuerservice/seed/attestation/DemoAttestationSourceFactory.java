@@ -21,7 +21,7 @@ import org.eclipse.edc.issuerservice.spi.issuance.model.AttestationDefinition;
 public class DemoAttestationSourceFactory implements AttestationSourceFactory {
     @Override
     public AttestationSource createSource(AttestationDefinition definition) {
-        var config = definition.getConfiguration();
+        // var config = definition.getConfiguration();
         return new DemoAttestationSource();
     }
 

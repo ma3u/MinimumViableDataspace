@@ -35,9 +35,11 @@ public class ParticipantContextSeedExtension implements ServiceExtension {
     public static final String NAME = "MVD ParticipantContext Seed Extension";
     public static final String DEFAULT_SUPER_USER_PARTICIPANT_ID = "super-user";
 
+    @SuppressWarnings("deprecation")
     @Setting(value = "Explicitly set the initial API key for the Super-User")
     public static final String SUPERUSER_APIKEY_PROPERTY = "edc.ih.api.superuser.key";
 
+    @SuppressWarnings("deprecation")
     @Setting(value = "Config value to set the super-user's participant ID.", defaultValue = DEFAULT_SUPER_USER_PARTICIPANT_ID)
     public static final String SUPERUSER_PARTICIPANT_ID_PROPERTY = "edc.ih.api.superuser.id";
     private String superUserParticipantId;

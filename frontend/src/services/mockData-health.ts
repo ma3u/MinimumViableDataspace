@@ -4267,7 +4267,8 @@ export const healthParticipants = {
 
 export const healthDspPhases = {
   seeding: {
-    title: 'Dataspace Initialization',
+    icon: 'Shield',
+    title: '1. Dataspace Initialization',
     description: 'Before the DSP protocol can begin, the dataspace must be initialized. This includes creating participant identities in the Identity Hub, issuing Verifiable Credentials (MembershipCredential, DataProcessorCredential), configuring Vault secrets for secure key storage, creating ODRL policies for consent-gated access, registering EHR assets in the catalog, and creating contract definitions that link assets to policies.',
     specLink: 'https://github.com/eclipse-edc/MinimumViableDataspace',
     steps: [
@@ -4281,7 +4282,8 @@ export const healthDspPhases = {
     ]
   },
   catalog: {
-    title: 'Catalog Protocol (EHR Discovery)',
+    icon: 'Search',
+    title: '2. View Health Catalog',
     description: 'The Catalog Protocol enables the research institute to discover available anonymized EHR datasets from the hospital. The Consumer sends a CatalogRequestMessage and receives a DCAT Catalog containing available patient cohorts and their consent-based access policies. The catalog uses the HealthDCAT-AP profile for semantic interoperability.',
     specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#catalog-protocol',
     steps: [
@@ -4290,7 +4292,8 @@ export const healthDspPhases = {
     ]
   },
   negotiation: {
-    title: 'Contract Negotiation (Consent Verification)',
+    icon: 'Lock',
+    title: '3. Contract Negotiation',
     description: 'The Contract Negotiation Protocol ensures that the research institute presents valid credentials (MembershipCredential + DataProcessorCredential) and that patient consent covers the research purpose. The prohibition against re-identification is enforced.',
     specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#negotiation-protocol',
     steps: [
@@ -4303,7 +4306,8 @@ export const healthDspPhases = {
     ]
   },
   transfer: {
-    title: 'Transfer Process (EHR to EDC)',
+    icon: 'Send',
+    title: '4.Transfer Process',
     description: 'The Transfer Process delivers de-identified FHIR data to the research institute EDC system. The data undergoes k-anonymity transformation before transfer. Provenance metadata tracks all transformations applied.',
     specLink: 'https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#transfer-protocol',
     steps: [
@@ -4315,8 +4319,9 @@ export const healthDspPhases = {
     ]
   },
   compute: {
-    title: 'Confidential Compute (Secure Analysis)',
-    description: 'For highly sensitive data (e.g., Genomics), the data is never transferred in clear text. Instead, it is processed inside a Trusted Execution Environment (TEE/Enclave). The algorithm is sent to the data, and only the aggregate results are returned.',
+    icon: 'Code',
+    title: '5. Confidential Compute',
+    description: 'For highly sensitive data (e.g., Genomics), the data is never transferred in clear text. Instead, it is processed inside a Clean Data Room (TEE/Enclave). The algorithm is sent to the data, and only the aggregate results are returned. Sovereignty-by-Design: Governments use it to ensure cloud operators cannot view classified patient records. Hospitals use it to train AI models on shared datasets without exposing raw patient records to each other, maintaining compliance with medical privacy laws. ',
     specLink: 'https://confidentialcomputing.io/',
     steps: [
       { name: 'ComputeRequestMessage', direction: 'CRO → Hospital', description: 'CRO requests secure analysis in enclave' },
@@ -4324,6 +4329,17 @@ export const healthDspPhases = {
       { name: 'Encrypted Ingestion', direction: 'Hospital → Enclave', description: 'Load encrypted EHR into enclave memory' },
       { name: 'Secure Execution', direction: 'Enclave', description: 'Run analysis on decrypted data in memory' },
       { name: 'Result Delivery', direction: 'Enclave → CRO', description: 'Return aggregate results (encrypted)' }
+    ]
+  },
+  viewEHR: {
+    icon: 'FileJson',
+    title: '6. View Electronic Health Record',
+    description: 'Starting in 2025, Germany introduced the “ePA for all” as a central storage location for medical data based on the modern FHIR standard. This standard breaks down health information into structured, machine-readable building blocks, enabling seamless data exchange between different doctors\' offices, hospitals, and pharmacies. This interoperability allows the ePA to improve the quality of treatment, as important information such as medication plans or findings can be used immediately across systems.',
+    specLink: 'https://www.gematik.de/anwendungen/epa',
+    steps: [
+      { name: 'FHIR Data Access', direction: 'Provider/Consumer', description: 'Access and view structured EHR data via FHIR APIs' },
+      { name: 'Interoperable Exchange', direction: 'All Participants', description: 'Seamless data sharing between clinics, practices, and pharmacies' },
+      { name: 'Immediate Availability', direction: 'All Participants', description: 'Medication plans and findings are instantly usable across systems' }
     ]
   }
 };

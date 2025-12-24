@@ -33,6 +33,7 @@ public class AbstractCredentialEvaluationFunction {
         if (!(vcListClaim instanceof List)) {
             return Result.failure("ParticipantAgent contains a '%s' claim, but the type is incorrect. Expected %s, received %s.".formatted(VC_CLAIM, List.class.getName(), vcListClaim.getClass().getName()));
         }
+        //noinspection unchecked
         var vcList = (List<VerifiableCredential>) vcListClaim;
         if (vcList.isEmpty()) {
             return Result.failure("ParticipantAgent contains a '%s' claim but it did not contain any VerifiableCredentials.".formatted(VC_CLAIM));

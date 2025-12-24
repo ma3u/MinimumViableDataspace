@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Database, 
   ArrowRight,
@@ -34,6 +34,7 @@ import {
 import { EHRViewer } from './components/EHRViewer';
 import { DataspaceInsiderPanel, DataspaceInsiderTrigger } from './components/DataspaceInsiderPanel';
 import { CatalogCard } from './components/CatalogCard';
+import { CollapsibleSection } from './components/CollapsibleSection';
 import { DspEventLogProvider, useDspEventLog } from './contexts/DspEventLogContext';
 import { downloadHealthDCATAP } from './services/HealthDCATAPSerializer';
 import { api, getApiMode, isStaticDemo } from './services/apiFactory';
@@ -123,6 +124,8 @@ function getMockAsset(asset: CatalogAsset | MockEHRAsset | null): MockEHRAsset |
 
 function AppHealth() {
   const [phase, setPhase] = useState<DemoPhase>('intro');
+  // Protocol Phases hover effect state
+  // ...existing code...
   const [selectedAsset, setSelectedAsset] = useState<CatalogAsset | MockEHRAsset | null>(null);
   const [negotiationStep, setNegotiationStep] = useState(0);
   const [transferStep, setTransferStep] = useState(0);
@@ -620,8 +623,7 @@ function AppHealth() {
     setTransferEndTime(new Date());
     completePhase('transfer');
     setIsAnimating(false);
-    setPhase('complete');
-    loadEhrData();
+    // Removed auto-jump - user must click "View EHR Data" button
   };
 
   const loadEhrData = async () => {
@@ -657,6 +659,8 @@ function AppHealth() {
       }
     }
   };
+
+  const [hoveredPhase, setHoveredPhase] = useState<string | null>(null);
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 transition-all duration-300 ${showInsiderPanel ? 'mr-[420px]' : ''}`}>
@@ -728,16 +732,7 @@ function AppHealth() {
                 }`} />
                 {backendAvailable === null ? 'Checking...' : backendAvailable ? 'Backend Online' : 'Backend Offline'}
               </div>
-              <a 
-                href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              >
-                <BookOpen className="w-4 h-4" />
-                DSP 2025-1 Specification
-                <ExternalLink className="w-3 h-3" />
-              </a>
+
               {phase !== 'intro' && (
                 <button
                   onClick={resetDemo}
@@ -868,7 +863,124 @@ function AppHealth() {
               </div>
             </div>
 
-            {/* HealthDCAT-AP Compliance Highlight */}
+ 
+
+            {/* Technical Details - Collapsible */}
+            <CollapsibleSection
+              title="Technical Standards & Compliance Details"
+              defaultOpen={false}
+              className="mt-6"
+            >
+              {/* Compliance Badges */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Regulatory & Standards Compliance</h3>
+                <div className="flex gap-4 flex-wrap">
+                  {[
+                    { name: 'HealthDCAT-AP', desc: 'Health Data Catalog Application Profile', color: 'teal' },
+                    { name: 'EHDS 2025/327', desc: 'European Health Data Space Regulation', color: 'blue' },
+                    { name: 'EU CTR 536/2014', desc: 'Clinical Trials Regulation', color: 'green' },
+                    { name: 'GDPR', desc: 'General Data Protection Regulation', color: 'green' },
+                    { name: 'GDNG', desc: 'Gesundheitsdatennutzungsgesetz', color: 'green' },
+                    { name: 'FHIR R4', desc: 'HL7 Fast Healthcare Interoperability', color: 'purple' },
+                    { name: 'MedDRA v27.0', desc: 'Medical Dictionary for Regulatory Activities', color: 'purple' },
+                    { name: 'k-Anonymity', desc: 'De-identification Standard (k=5)', color: 'green' },
+                  ].map((badge) => (
+                    <div key={badge.name} className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                      badge.color === 'teal' ? 'bg-teal-50 border border-teal-200' :
+                      badge.color === 'blue' ? 'bg-blue-50 border border-blue-200' :
+                      badge.color === 'purple' ? 'bg-purple-50 border border-purple-200' :
+                      'bg-green-50 border border-green-200'
+                    }`}>
+                      <Shield className={`w-4 h-4 ${
+                        badge.color === 'teal' ? 'text-teal-600' :
+                        badge.color === 'blue' ? 'text-blue-600' :
+                        badge.color === 'purple' ? 'text-purple-600' :
+                        'text-green-600'
+                      }`} />
+                      <div>
+                        <div className={`font-medium ${
+                          badge.color === 'teal' ? 'text-teal-800' :
+                          badge.color === 'blue' ? 'text-blue-800' :
+                          badge.color === 'purple' ? 'text-purple-800' :
+                          'text-green-800'
+                        }`}>{badge.name}</div>
+                        <div className={`text-xs ${
+                          badge.color === 'teal' ? 'text-teal-600' :
+                          badge.color === 'blue' ? 'text-blue-600' :
+                          badge.color === 'purple' ? 'text-purple-600' :
+                          'text-green-600'
+                        }`}>{badge.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Protocol Overview */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Protocol Phases</h3>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {Object.entries(healthDspPhases).map(([key, phaseData]) => {
+                    const isHovered = hoveredPhase === key;
+                    return (
+                      <div
+                        key={key}
+                        className={`relative border rounded-lg p-4 transition-all duration-200 ${isHovered ? 'shadow-lg bg-blue-50 scale-105 z-10' : 'hover:shadow-md'} min-h-[180px]`}
+                        style={isHovered ? { minHeight: '260px' } : {}}
+                        onMouseEnter={() => setHoveredPhase(key)}
+                        onMouseLeave={() => setHoveredPhase(null)}
+                      >
+                        <div className="flex items-center gap-2 mb-3">
+                          {/* Dynamically render the Lucide icon for each phase */}
+                          {(() => {
+                            const iconMap = {
+                              Database: Database,
+                              ArrowRight: ArrowRight,
+                              CheckCircle: CheckCircle,
+                              Loader2: Loader2,
+                              BookOpen: BookOpen,
+                              ExternalLink: ExternalLink,
+                              ChevronRight: ChevronRight,
+                              ChevronDown: ChevronDown,
+                              Play: Play,
+                              RotateCcw: RotateCcw,
+                              Code: Code,
+                              Shield: Shield,
+                              Send: Send,
+                              Github: Github,
+                              Lock: Lock,
+                              Stethoscope: Stethoscope,
+                              Search: Search,
+                              FileJson: FileJson,
+                              AlertCircle: AlertCircle,
+                              Download: Download
+                            };
+                            const IconComponent = iconMap[phaseData.icon as keyof typeof iconMap];
+                            if (IconComponent) {
+                              return <IconComponent className="w-5 h-5 text-blue-600" />;
+                            }
+                            return null;
+                          })()}
+                          <h4 className="font-semibold text-gray-900">{phaseData.title}</h4>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {isHovered ? phaseData.description : (phaseData.description.length > 150 ? `${phaseData.description.substring(0, 150)}...` : phaseData.description)}
+                        </p>
+                        <a
+                          href={phaseData.specLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                        >
+                          View specification <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+           {/* HealthDCAT-AP Compliance Highlight */}
             <div className="bg-gradient-to-r from-teal-50 via-cyan-50 to-blue-50 rounded-xl p-6 shadow-sm border border-teal-200">
               <div className="flex items-start gap-4">
                 <div className="bg-teal-600 p-3 rounded-xl">
@@ -937,169 +1049,99 @@ function AppHealth() {
               </div>
             </div>
 
-            {/* Compliance Badges */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Regulatory & Standards Compliance</h3>
-              <div className="flex gap-4 flex-wrap">
-                {[
-                  { name: 'HealthDCAT-AP', desc: 'Health Data Catalog Application Profile', color: 'teal' },
-                  { name: 'EHDS 2025/327', desc: 'European Health Data Space Regulation', color: 'blue' },
-                  { name: 'EU CTR 536/2014', desc: 'Clinical Trials Regulation', color: 'green' },
-                  { name: 'GDPR', desc: 'General Data Protection Regulation', color: 'green' },
-                  { name: 'GDNG', desc: 'Gesundheitsdatennutzungsgesetz', color: 'green' },
-                  { name: 'FHIR R4', desc: 'HL7 Fast Healthcare Interoperability', color: 'purple' },
-                  { name: 'MedDRA v27.0', desc: 'Medical Dictionary for Regulatory Activities', color: 'purple' },
-                  { name: 'k-Anonymity', desc: 'De-identification Standard (k=5)', color: 'green' },
-                ].map((badge) => (
-                  <div key={badge.name} className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                    badge.color === 'teal' ? 'bg-teal-50 border border-teal-200' :
-                    badge.color === 'blue' ? 'bg-blue-50 border border-blue-200' :
-                    badge.color === 'purple' ? 'bg-purple-50 border border-purple-200' :
-                    'bg-green-50 border border-green-200'
-                  }`}>
-                    <Shield className={`w-4 h-4 ${
-                      badge.color === 'teal' ? 'text-teal-600' :
-                      badge.color === 'blue' ? 'text-blue-600' :
-                      badge.color === 'purple' ? 'text-purple-600' :
-                      'text-green-600'
-                    }`} />
-                    <div>
-                      <div className={`font-medium ${
-                        badge.color === 'teal' ? 'text-teal-800' :
-                        badge.color === 'blue' ? 'text-blue-800' :
-                        badge.color === 'purple' ? 'text-purple-800' :
-                        'text-green-800'
-                      }`}>{badge.name}</div>
-                      <div className={`text-xs ${
-                        badge.color === 'teal' ? 'text-teal-600' :
-                        badge.color === 'blue' ? 'text-blue-600' :
-                        badge.color === 'purple' ? 'text-purple-600' :
-                        'text-green-600'
-                      }`}>{badge.desc}</div>
-                    </div>
+              {/* HealthDCAT-AP Dataset Properties */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">HealthDCAT-AP Dataset Properties</h3>
+                    <p className="text-sm text-gray-500 mt-1">Each EHR dataset includes these mandatory and recommended properties for EHDS sensitive data compliance. You can export the meta data and develop your own data schema in <a target="_blank" style={{textDecoration: 'underline'}}  href="https://ehds.healthdataportal.eu/editor2/">HealthDCAT-AP editor</a>.</p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Protocol Overview */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Protocol Phases</h3>
-              <div className="grid md:grid-cols-3 gap-6">
-                {Object.entries(healthDspPhases).map(([key, phaseData]) => (
-                  <div key={key} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-2 mb-3">
-                      {key === 'catalog' && <Database className="w-5 h-5 text-blue-600" />}
-                      {key === 'negotiation' && <Lock className="w-5 h-5 text-purple-600" />}
-                      {key === 'transfer' && <Send className="w-5 h-5 text-green-600" />}
-                      <h4 className="font-semibold text-gray-900">{phaseData.title}</h4>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">{phaseData.description.substring(0, 150)}...</p>
-                    <a
-                      href={phaseData.specLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-                    >
-                      View specification <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* HealthDCAT-AP Dataset Properties */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">HealthDCAT-AP Dataset Properties</h3>
-                  <p className="text-sm text-gray-500 mt-1">Each EHR dataset includes these mandatory and recommended properties for EHDS compliance</p>
+                  <a
+                    href="https://healthdataeu.pages.code.europa.eu/healthdcat-ap/releases/release-5/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    Full Specification <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
-                <a
-                  href="https://healthdcat-ap.github.io/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-                >
-                  Full Specification <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  { 
-                    prop: 'dcat:contactPoint', 
-                    desc: 'Research Data Steward contact information',
-                    type: 'MANDATORY',
-                    example: 'vcard:Kind with email, phone, organization'
-                  },
-                  { 
-                    prop: 'dct:publisher', 
-                    desc: 'Publishing organization with full address',
-                    type: 'MANDATORY',
-                    example: 'foaf:Agent with name, homepage, address'
-                  },
-                  { 
-                    prop: 'healthdcatap:hdab', 
-                    desc: 'Health Data Access Body (HDAB)',
-                    type: 'MANDATORY',
-                    example: 'Forschungsdatenzentrum Gesundheit (FDZ)'
-                  },
-                  { 
-                    prop: 'healthdcatap:healthTheme', 
-                    desc: 'Wikidata URIs for health topics',
-                    type: 'MANDATORY',
-                    example: 'Q12206 (Diabetes), Q12078 (Cancer)...'
-                  },
-                  { 
-                    prop: 'dqv:hasQualityAnnotation', 
-                    desc: 'Data quality certificate',
-                    type: 'RECOMMENDED',
-                    example: 'Quality assessment with oa:hasTarget'
-                  },
-                  { 
-                    prop: 'healthdcatap:analytics', 
-                    desc: 'Pre-computed analytics distribution',
-                    type: 'RECOMMENDED',
-                    example: 'CSV/PDF reports with accessURL'
-                  },
-                  { 
-                    prop: 'dpv:hasPurpose', 
-                    desc: 'Data processing purposes',
-                    type: 'MANDATORY',
-                    example: 'AcademicResearch, ClinicalResearch'
-                  },
-                  { 
-                    prop: 'dpv:hasLegalBasis', 
-                    desc: 'GDPR legal basis for processing',
-                    type: 'MANDATORY',
-                    example: 'GDPR Art. 6(1)(a), Art. 9(2)(j)'
-                  },
-                  { 
-                    prop: 'dcatap:applicableLegislation', 
-                    desc: 'Applicable EU regulations',
-                    type: 'MANDATORY',
-                    example: 'EHDS 2025/327, GDPR, DGA'
-                  },
-                ].map((item) => (
-                  <div key={item.prop} className={`rounded-lg p-4 border ${
-                    item.type === 'MANDATORY' ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <code className={`text-sm font-medium ${
-                        item.type === 'MANDATORY' ? 'text-blue-800' : 'text-gray-800'
-                      }`}>{item.prop}</code>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        item.type === 'MANDATORY' 
-                          ? 'bg-blue-200 text-blue-800' 
-                          : 'bg-gray-200 text-gray-700'
-                      }`}>{item.type}</span>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { 
+                      prop: 'dcat:contactPoint', 
+                      desc: 'Research Data Steward contact information',
+                      type: 'MANDATORY',
+                      example: 'vcard:Kind with email, phone, organization'
+                    },
+                    { 
+                      prop: 'dct:publisher', 
+                      desc: 'Publishing organization with full address',
+                      type: 'MANDATORY',
+                      example: 'foaf:Agent with name, homepage, address'
+                    },
+                    { 
+                      prop: 'healthdcatap:hdab', 
+                      desc: 'Health Data Access Body (HDAB)',
+                      type: 'MANDATORY',
+                      example: 'Forschungsdatenzentrum Gesundheit (FDZ)'
+                    },
+                    { 
+                      prop: 'healthdcatap:healthTheme', 
+                      desc: 'Wikidata URIs for health topics',
+                      type: 'MANDATORY',
+                      example: 'Q12206 (Diabetes), Q12078 (Cancer)...'
+                    },
+                    { 
+                      prop: 'dqv:hasQualityAnnotation', 
+                      desc: 'Data quality certificate',
+                      type: 'RECOMMENDED',
+                      example: 'Quality assessment with oa:hasTarget'
+                    },
+                    { 
+                      prop: 'healthdcatap:analytics', 
+                      desc: 'Pre-computed analytics distribution',
+                      type: 'RECOMMENDED',
+                      example: 'CSV/PDF reports with accessURL'
+                    },
+                    { 
+                      prop: 'dpv:hasPurpose', 
+                      desc: 'Data processing purposes',
+                      type: 'MANDATORY',
+                      example: 'AcademicResearch, ClinicalResearch'
+                    },
+                    { 
+                      prop: 'dpv:hasLegalBasis', 
+                      desc: 'GDPR legal basis for processing',
+                      type: 'MANDATORY',
+                      example: 'GDPR Art. 6(1)(a), Art. 9(2)(j)'
+                    },
+                    { 
+                      prop: 'dcatap:applicableLegislation', 
+                      desc: 'Applicable EU regulations',
+                      type: 'MANDATORY',
+                      example: 'EHDS 2025/327, GDPR, DGA'
+                    },
+                  ].map((item) => (
+                    <div key={item.prop} className={`rounded-lg p-4 border ${
+                      item.type === 'MANDATORY' ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <code className={`text-sm font-medium ${
+                          item.type === 'MANDATORY' ? 'text-blue-800' : 'text-gray-800'
+                        }`}>{item.prop}</code>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          item.type === 'MANDATORY' 
+                            ? 'bg-blue-200 text-blue-800' 
+                            : 'bg-gray-200 text-gray-700'
+                        }`}>{item.type}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-1">{item.desc}</p>
+                      <p className="text-xs text-gray-500 italic">e.g., {item.example}</p>
                     </div>
-                    <p className="text-sm text-gray-600 mb-1">{item.desc}</p>
-                    <p className="text-xs text-gray-500 italic">e.g., {item.example}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            </CollapsibleSection>
           </div>
         )}
 
@@ -1477,11 +1519,7 @@ function AppHealth() {
                   return (
                     <div 
                       key={asset['@id']}
-                      className={`relative overflow-hidden border rounded-lg cursor-pointer transition-all group ${
-                        selectedAsset?.['@id'] === asset['@id']
-                          ? 'border-blue-500 ring-2 ring-blue-200'
-                          : 'hover:border-blue-300 hover:shadow-lg'
-                      }`}
+                        className={`relative overflow-hidden border rounded-lg cursor-pointer transition-all group hover:border-blue-300 hover:shadow-lg`}
                       onClick={() => setSelectedAsset(asset as MockEHRAsset)}
                     >
                       {/* Background Image */}
@@ -1619,73 +1657,7 @@ function AppHealth() {
               icon={<Lock className="w-6 h-6" />}
             />
 
-            {/* State Machine Visualization */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="font-semibold text-gray-900 mb-4">Contract Negotiation State Machine</h3>
-              <div className="flex items-center justify-between overflow-x-auto pb-4">
-                {mockNegotiationFlow.map((state, i) => (
-                  <div key={i} className="flex items-center">
-                    <div className={`flex flex-col items-center px-4 py-2 rounded-lg transition-all ${
-                      i < negotiationStep 
-                        ? 'bg-green-100 text-green-800'
-                        : i === negotiationStep
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-400'
-                    }`}>
-                      {i < negotiationStep ? (
-                        <CheckCircle className="w-6 h-6 mb-1" />
-                      ) : i === negotiationStep && isAnimating ? (
-                        <Loader2 className="w-6 h-6 mb-1 animate-spin" />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full border-2 mb-1" />
-                      )}
-                      <span className="text-xs font-medium whitespace-nowrap">
-                        {state['dspace:state']}
-                      </span>
-                    </div>
-                    {i < mockNegotiationFlow.length - 1 && (
-                      <ArrowRight className={`w-5 h-5 mx-1 ${
-                        i < negotiationStep ? 'text-green-500' : 'text-gray-300'
-                      }`} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Message Sequence */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="font-semibold text-gray-900 mb-4">Protocol Messages</h3>
-              <div className="space-y-3">
-                {healthDspPhases.negotiation.steps.map((step, i) => (
-                  <div 
-                    key={i}
-                    className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
-                      i <= negotiationStep
-                        ? 'bg-blue-50 border border-blue-200'
-                        : 'bg-gray-50 border border-gray-200 opacity-50'
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      i < negotiationStep
-                        ? 'bg-green-500 text-white'
-                        : i === negotiationStep
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-300 text-gray-600'
-                    }`}>
-                      {i < negotiationStep ? <CheckCircle className="w-4 h-4" /> : i + 1}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{step.name}</div>
-                      <div className="text-sm text-gray-600">{step.description}</div>
-                    </div>
-                    <div className="text-sm text-blue-600 font-mono">{step.direction}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Patient Consent Display */}
+            {/* Patient Consent Display - MOVED TO TOP */}
             {getMockAsset(selectedAsset)?.['healthdcatap:consent'] && (
               <div className="bg-white rounded-xl p-6 shadow-sm border">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -1697,13 +1669,13 @@ function AppHealth() {
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">✅</span>
                       <div>
-                        <div className="font-medium text-green-800">Consent Active</div>
-                        <div className="text-sm text-green-600">Granted by: {getMockAsset(selectedAsset)?.['healthdcatap:consent']?.grantor}</div>
+                        <div className="font-medium text-green-900">Consent Active</div>
+                        <div className="text-sm text-green-700">Granted by: {getMockAsset(selectedAsset)?.['healthdcatap:consent']?.grantor}</div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm text-gray-500">Valid Until</div>
-                      <div className="font-medium text-green-800">{getMockAsset(selectedAsset)?.['healthdcatap:consent']?.validUntil}</div>
+                      <div className="font-medium text-green-900">{getMockAsset(selectedAsset)?.['healthdcatap:consent']?.validUntil}</div>
                     </div>
                   </div>
                 </div>
@@ -1711,7 +1683,7 @@ function AppHealth() {
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Permitted Purposes */}
                   <div>
-                    <h4 className="text-sm font-semibold text-green-800 mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-green-900 mb-3 flex items-center gap-2">
                       ✓ Permitted Data Use Purposes
                     </h4>
                     <div className="space-y-2">
@@ -1721,8 +1693,8 @@ function AppHealth() {
                           <div key={purpose} className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
                             <span className="text-xl">{purposeInfo.icon}</span>
                             <div>
-                              <div className="font-medium text-green-800">{purposeInfo.label}</div>
-                              <div className="text-xs text-green-600">{purposeInfo.description}</div>
+                              <div className="font-medium text-green-900">{purposeInfo.label}</div>
+                              <div className="text-xs text-green-700">{purposeInfo.description}</div>
                             </div>
                           </div>
                         ) : null;
@@ -1732,7 +1704,7 @@ function AppHealth() {
 
                   {/* Restrictions */}
                   <div>
-                    <h4 className="text-sm font-semibold text-red-800 mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-red-900 mb-3 flex items-center gap-2">
                       ✗ Consent Restrictions
                     </h4>
                     <div className="space-y-2">
@@ -1742,8 +1714,8 @@ function AppHealth() {
                           <div key={restriction} className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-lg p-3">
                             <span className="text-xl">{restrictionInfo.icon}</span>
                             <div>
-                              <div className="font-medium text-red-800">{restrictionInfo.label}</div>
-                              <div className="text-xs text-red-600">{restrictionInfo.description}</div>
+                              <div className="font-medium text-red-900">{restrictionInfo.label}</div>
+                              <div className="text-xs text-red-700">{restrictionInfo.description}</div>
                             </div>
                           </div>
                         ) : null;
@@ -1754,35 +1726,111 @@ function AppHealth() {
               </div>
             )}
 
-            {/* Technical Policy (ODRL) */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Code className="w-5 h-5 text-purple-600" />
-                Technical Policy Enforcement (ODRL)
-              </h3>
-              <div className="bg-purple-50 rounded-lg p-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-purple-800 mb-2">Permission</h4>
-                    <div className="bg-white rounded p-3 text-sm">
-                      <code>MembershipCredential = active</code>
-                    </div>
+            {/* Technical Protocol Details - COLLAPSIBLE */}
+            <CollapsibleSection 
+              title="Technical Protocol Details" 
+              defaultOpen={false}
+              icon={<Code className="w-5 h-5" />}
+              className="border-purple-200"
+            >
+              <div className="space-y-6">
+                {/* State Machine Visualization */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">Contract Negotiation State Machine</h3>
+                  <div className="flex items-center justify-between overflow-x-auto pb-4">
+                    {mockNegotiationFlow.map((state, i) => (
+                      <div key={i} className="flex items-center">
+                        <div className={`flex flex-col items-center px-4 py-2 rounded-lg transition-all ${
+                          i < negotiationStep 
+                            ? 'bg-green-100 text-green-900'
+                            : i === negotiationStep
+                              ? 'bg-blue-600 text-white shadow-lg'
+                              : 'bg-gray-100 text-gray-400'
+                        }`}>
+                          {i < negotiationStep ? (
+                            <CheckCircle className="w-6 h-6 mb-1" />
+                          ) : i === negotiationStep && isAnimating ? (
+                            <Loader2 className="w-6 h-6 mb-1 animate-spin" />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full border-2 mb-1" />
+                          )}
+                          <span className="text-xs font-medium whitespace-nowrap">
+                            {state['dspace:state']}
+                          </span>
+                        </div>
+                        {i < mockNegotiationFlow.length - 1 && (
+                          <ArrowRight className={`w-5 h-5 mx-1 ${
+                            i < negotiationStep ? 'text-green-500' : 'text-gray-300'
+                          }`} />
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-purple-800 mb-2">Obligation</h4>
-                    <div className="bg-white rounded p-3 text-sm">
-                      <code>DataAccess.level = processing</code>
-                    </div>
+                </div>
+
+                {/* Message Sequence */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">Protocol Messages</h3>
+                  <div className="space-y-3">
+                    {healthDspPhases.negotiation.steps.map((step, i) => (
+                      <div 
+                        key={i}
+                        className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
+                          i <= negotiationStep
+                            ? 'bg-blue-50 border border-blue-200'
+                            : 'bg-gray-50 border border-gray-200 opacity-50'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          i < negotiationStep
+                            ? 'bg-green-500 text-white'
+                            : i === negotiationStep
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-300 text-gray-600'
+                        }`}>
+                          {i < negotiationStep ? <CheckCircle className="w-4 h-4" /> : i + 1}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900">{step.name}</div>
+                          <div className="text-sm text-gray-600">{step.description}</div>
+                        </div>
+                        <div className="text-sm text-blue-600 font-mono">{step.direction}</div>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-red-800 mb-2">Prohibition</h4>
-                    <div className="bg-white rounded p-3 text-sm border border-red-200">
-                      <code>Re-identification = forbidden</code>
+                </div>
+
+                {/* Technical Policy (ODRL) */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Code className="w-5 h-5 text-purple-600" />
+                    Technical Policy Enforcement (ODRL)
+                  </h3>
+                  <div className="bg-purple-50 rounded-lg p-4">
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-purple-900 mb-2">Permission</h4>
+                        <div className="bg-white rounded p-3 text-sm">
+                          <code>MembershipCredential = active</code>
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-purple-900 mb-2">Obligation</h4>
+                        <div className="bg-white rounded p-3 text-sm">
+                          <code>DataAccess.level = processing</code>
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-red-900 mb-2">Prohibition</h4>
+                        <div className="bg-white rounded p-3 text-sm border border-red-200">
+                          <code>Re-identification = forbidden</code>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </CollapsibleSection>
 
             {/* Contract Agreement Status (Real EDC) */}
             {contractAgreementId && (
@@ -1865,79 +1913,99 @@ function AppHealth() {
               icon={<Send className="w-6 h-6" />}
             />
 
-            {/* Transfer State Machine */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="font-semibold text-gray-900 mb-4">Transfer Process State Machine</h3>
-              <div className="flex items-center justify-center gap-4 overflow-x-auto pb-4">
-                {mockTransferFlow.map((state, i) => (
-                  <div key={i} className="flex items-center">
-                    <div className={`flex flex-col items-center px-6 py-3 rounded-lg transition-all ${
-                      i < transferStep 
-                        ? 'bg-green-100 text-green-800'
-                        : i === transferStep
-                          ? 'bg-green-600 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-400'
-                    }`}>
-                      {i < transferStep ? (
-                        <CheckCircle className="w-8 h-8 mb-1" />
-                      ) : i === transferStep && isAnimating ? (
-                        <Loader2 className="w-8 h-8 mb-1 animate-spin" />
-                      ) : (
-                        <Send className="w-8 h-8 mb-1" />
-                      )}
-                      <span className="text-sm font-medium whitespace-nowrap">
-                        {state['dspace:state']}
-                      </span>
-                    </div>
-                    {i < mockTransferFlow.length - 1 && (
-                      <ArrowRight className={`w-6 h-6 mx-2 ${
-                        i < transferStep ? 'text-green-500' : 'text-gray-300'
-                      }`} />
-                    )}
-                  </div>
-                ))}
+            {/* De-identification Notice - MOVED TO TOP */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <div className="flex items-center gap-2 text-yellow-900 font-medium">
+                <Shield className="w-5 h-5" />
+                De-identification Applied (k-anonymity, k=5)
               </div>
+              <p className="text-sm text-yellow-800 mt-2">
+                Data is processed through k-anonymity pipeline before transfer. All direct identifiers removed, 
+                indirect identifiers generalized to ensure patient privacy.
+              </p>
             </div>
 
-            {/* Transfer Details */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <h3 className="font-semibold text-gray-900 mb-4">Transfer Configuration</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-green-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-green-800 mb-2">Transfer Type</h4>
-                  <div className="bg-white rounded p-3">
-                    <code className="text-sm">HttpData-PULL (FHIR Bundle)</code>
+            {/* Transfer Protocol Details - COLLAPSIBLE */}
+            <CollapsibleSection 
+              title="Transfer Protocol Details" 
+              defaultOpen={false}
+              icon={<Send className="w-5 h-5" />}
+              className="border-green-200"
+            >
+              <div className="space-y-6">
+                {/* Transfer State Machine */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">Transfer Process State Machine</h3>
+                  <div className="flex items-center justify-center gap-4 overflow-x-auto pb-4">
+                    {mockTransferFlow.map((state, i) => (
+                      <div key={i} className="flex items-center">
+                        <div className={`flex flex-col items-center px-6 py-3 rounded-lg transition-all ${
+                          i < transferStep 
+                            ? 'bg-green-100 text-green-900'
+                            : i === transferStep
+                              ? 'bg-green-600 text-white shadow-lg'
+                              : 'bg-gray-100 text-gray-400'
+                        }`}>
+                          {i < transferStep ? (
+                            <CheckCircle className="w-8 h-8 mb-1" />
+                          ) : i === transferStep && isAnimating ? (
+                            <Loader2 className="w-8 h-8 mb-1 animate-spin" />
+                          ) : (
+                            <Send className="w-8 h-8 mb-1" />
+                          )}
+                          <span className="text-sm font-medium whitespace-nowrap">
+                            {state['dspace:state']}
+                          </span>
+                        </div>
+                        {i < mockTransferFlow.length - 1 && (
+                          <ArrowRight className={`w-6 h-6 mx-2 ${
+                            i < transferStep ? 'text-green-500' : 'text-gray-300'
+                          }`} />
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-xs text-green-700 mt-2">
-                    Research institute pulls de-identified EHR from Hospital&apos;s data plane
-                  </p>
                 </div>
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-teal-800 mb-2">Data Address</h4>
-                  <div className="bg-white rounded p-3 font-mono text-xs break-all">
-                    https://provider.rheinland-uklinikum.de/fhir/Bundle/{(selectedAsset['@id'] ?? '').split(':').pop()}
+
+                {/* Transfer Details */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">Transfer Configuration</h3>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-green-900 mb-2">Transfer Type</h4>
+                      <div className="bg-white rounded p-3">
+                        <code className="text-sm">HttpData-PULL (FHIR Bundle)</code>
+                      </div>
+                      <p className="text-xs text-green-700 mt-2">
+                        Research institute pulls de-identified EHR from Hospital&apos;s data plane
+                      </p>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-teal-900 mb-2">Data Address</h4>
+                      <div className="bg-white rounded p-3 font-mono text-xs break-all">
+                        https://provider.rheinland-uklinikum.de/fhir/Bundle/{(selectedAsset['@id'] ?? '').split(':').pop()}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              
-              {/* Real EDC Contract Reference */}
-              {contractAgreementId && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Contract Agreement:</span>
-                    <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono">
-                      {contractAgreementId.slice(0, 20)}...
-                    </code>
-                  </div>
-                  <div className="flex items-center justify-between text-sm mt-2">
-                    <span className="text-gray-600">Transfer Mode:</span>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      getApiMode() === 'full' 
-                        ? 'bg-purple-100 text-purple-700'
-                        : getApiMode() === 'hybrid'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700'
-                    }`}>
+                  
+                  {/* Real EDC Contract Reference */}
+                  {contractAgreementId && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Contract Agreement:</span>
+                        <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono">
+                          {contractAgreementId.slice(0, 20)}...
+                        </code>
+                      </div>
+                      <div className="flex items-center justify-between text-sm mt-2">
+                        <span className="text-gray-600">Transfer Mode:</span>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          getApiMode() === 'full' 
+                            ? 'bg-purple-100 text-purple-700'
+                            : getApiMode() === 'hybrid'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-100 text-gray-700'
+                        }`}>
                       {getApiMode() === 'full' ? 'Full EDC' : getApiMode() === 'hybrid' ? 'Hybrid' : 'Mock'}
                     </span>
                   </div>
@@ -1957,19 +2025,9 @@ function AppHealth() {
                   )}
                 </div>
               )}
-            </div>
-
-            {/* De-identification Notice */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-yellow-800">
-                <Shield className="w-5 h-5" />
-                <span className="font-medium">De-identification Applied</span>
+                </div>
               </div>
-              <p className="text-sm text-yellow-700 mt-2">
-                Data is processed through k-anonymity (k=5) pipeline before transfer. 
-                All direct identifiers removed, indirect identifiers generalized to ensure patient privacy.
-              </p>
-            </div>
+            </CollapsibleSection>
 
             {/* Action Button */}
             <div className="flex justify-end">
@@ -1991,7 +2049,18 @@ function AppHealth() {
                     </>
                   )}
                 </button>
-              ) : null}
+              ) : (
+                <button
+                  onClick={() => {
+                    setPhase('complete');
+                    loadEhrData();
+                  }}
+                  className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  View EHR Data
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -2338,38 +2407,31 @@ function AppHealth() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-12">
+      <footer className="bg-white border-t mt-6">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-gray-500">
-              Demo based on Eclipse Dataspace Protocol 2025-1 | Compliant with GDPR, EHDS, and German health data regulations
-            </div>
-            <div className="flex items-center gap-4">
-              <a 
-                href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/"
+          <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
+            <div className="text-sm text-gray-500 flex items-center gap-2 flex-shrink-0">
+              <a
+                href={GITHUB_REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
-                DSP Specification <ExternalLink className="w-3 h-3" />
+                <Github className="w-4 h-4" />Health Dataspace Demo</a>
+              <span>based on</span>
+              <a href="https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
+                <BookOpen className="w-4 h-4" /> Dataspace Protocol 2025-1
               </a>
-              <a 
+            </div>
+            <div className="flex items-center gap-4 flex-shrink-0">
+              <a
                 href="https://github.com/eclipse-edc/MinimumViableDataspace"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
               >
                 <Github className="w-4 h-4" />
-                EDC MVD
-              </a>
-              <a 
-                href={GITHUB_REPO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-              >
-                <Github className="w-4 h-4" />
-                Health Dataspace Demo
+                Eclipse Dataspace Components (Minimum Viable Dataspace)
               </a>
             </div>
           </div>

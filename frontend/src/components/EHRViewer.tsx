@@ -33,10 +33,10 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
   
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case 'active': return 'bg-yellow-100 text-yellow-800';
-      case 'remission': return 'bg-green-100 text-green-800';
-      case 'resolved': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'bg-yellow-100 text-yellow-900';
+      case 'remission': return 'bg-green-100 text-green-900';
+      case 'resolved': return 'bg-blue-100 text-blue-900';
+      default: return 'bg-gray-100 text-gray-900';
     }
   };
 
@@ -60,7 +60,7 @@ export function EHRViewer({ ehr }: EHRViewerProps) {
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-2xl font-bold">Electronic Health Record</h2>
-            <p className="text-teal-200 mt-1">FHIR Bundle - De-identified for Research</p>
+            <p className="text-teal-50 mt-1">FHIR Bundle - De-identified for Research</p>
           </div>
           <div className="text-right">
             <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(subject.conditionsNode.primaryDiagnosis.clinicalStatus)}`}>

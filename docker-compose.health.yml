@@ -10,12 +10,20 @@
 
 services:
   # Health Dataspace Frontend (EHR2EDC)
+  # 
+  # API Modes:
+  # - mock: Uses frontend mock data only (no backend needed, fast demo)
+  # - hybrid: EDC catalog + mock data (requires EDC stack)
+  # - full: Complete EDC integration (requires EDC stack + seeding)
+  #
+  # This file runs standalone with mock mode. For full/hybrid, run:
+  # docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up
   health-frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_MODE=full
+        - VITE_API_MODE=mock  # Changed from 'full' - use mock for standalone
     container_name: health-frontend
     ports:
       - "3000:80"
