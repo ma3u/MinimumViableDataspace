@@ -4,7 +4,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-**Minimum Viable Dataspace (MVD)** is a demonstration project showcasing Eclipse Dataspace Components (EDC) with the Decentralized Claims Protocol (DCP). It demonstrates how dataspace participants can perform credential exchange prior to DSP message exchanges.
+**Minimum Viable Dataspace (MVD)** is a demonstration project showcasing Eclipse Dataspace Components (EDC) with the [Dataspace Protocol 2025-01](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-err1/) (DSP) and [Decentralized Claims Protocol 1.0](https://eclipse-dataspace-dcp.github.io/decentralized-claims-protocol/v1.0.1/) (DCP). It demonstrates how dataspace participants can perform credential exchange prior to DSP message exchanges.
 
 **Important**: This is NOT a production-grade installation. It's a playground for developers to understand how DCP and EDC work together.
 

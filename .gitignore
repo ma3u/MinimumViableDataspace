@@ -42,5 +42,17 @@ node_modules/
 dist/
 
 
+# Demo content (should not be in main)
+demo-step*.png
+dpp-frontend*.png
+docker-compose.aerospace.yml
+health-demo/
+docs/wireframes/
+docs/architecture/
+
+# Generated files from spec (should be regenerated, not committed)
+.specify/plan.md
+.specify/tasks/
+
 # Ignore Coding Agents
 WARP.md
