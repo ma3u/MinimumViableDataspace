@@ -102,6 +102,30 @@ See [docs/cloud-deployment-options.md](docs/cloud-deployment-options.md) for det
    ./seed-edc.sh
    ```
 
+**Option A2: VS Code (Alternative IDE)**
+
+1. Open project in VS Code:
+   ```bash
+   code .
+   ```
+2. Install recommended extensions:
+   - Java Extension Pack
+   - Gradle for Java
+   - Docker (for container management)
+3. Use integrated terminal to run individual launchers:
+   ```bash
+   # Start each runtime in separate terminal windows
+   ./gradlew :launchers:consumer:run
+   ./gradlew :launchers:provider-qna:run
+   # ... or use deployment/docker-compose.yml
+   ```
+4. Run seeding script:
+   ```bash
+   ./seed-edc.sh
+   ```
+
+**Note**: IntelliJ provides the best Java development experience with compound run configurations. VS Code requires manual terminal management per runtime or Docker Compose usage.
+
 **Option B: Kubernetes (Production-like)**
 
 ```bash
@@ -355,6 +379,8 @@ brew install rancher-desktop
 **Alternative Cloud Providers:**
 - **AWS EKS**: Best if already on AWS
 - **Google GKE**: Best monitoring/observability
+- **StackIT (Schwarz IT)**: German sovereign cloud for German/EU dataspaces
+- **OVH Public Cloud**: European sovereign cloud, cost-effective
 
 See [docs/cloud-deployment-options.md](docs/cloud-deployment-options.md) for comprehensive comparison.
 

@@ -8,6 +8,8 @@ The cloud deployment templates provide production-ready configurations for:
 - **Azure AKS** (`azure/`) - Recommended for EHDS/GDPR compliance
 - **Amazon EKS** (`aws/`) - For AWS-native environments
 - **Google GKE** (`gcp/`) - For Google Cloud environments
+- **StackIT** (`stackit/`) - German sovereign cloud (Gaia-X, GDNG)
+- **OVH Public Cloud** (`ovh/`) - European sovereign cloud (cost-effective)
 
 ## Quick Start
 
@@ -36,6 +38,8 @@ cd /path/to/MinimumViableDataspace
    - **Azure**: See `azure/README.md`
    - **AWS**: See `aws/README.md`
    - **GCP**: See `gcp/README.md`
+   - **StackIT**: See `stackit/README.md`
+   - **OVH**: See `ovh/README.md`
 
 3. **Deploy**
 ```bash
@@ -59,15 +63,17 @@ kubectl get pods -n mvd  # Verify all pods are running
 
 ## Architecture Comparison
 
-| Feature | Azure AKS | AWS EKS | Google GKE |
-|---------|-----------|---------|------------|
-| **Control Plane Cost** | Free | $0.10/hour (~$73/month) | Free (Autopilot mode) |
-| **Node Cost** (3 nodes) | ~€150-200/month | ~$200-300/month | ~$250-400/month |
-| **EU Data Residency** | ✅ West Europe, Germany | ✅ Frankfurt, Ireland | ✅ Belgium, Netherlands |
-| **EHDS Compliance** | ✅ Excellent | ⚠️ Good | ✅ Good |
-| **EDC Integration** | ✅ Best (Azure Key Vault) | ✅ Good (AWS Secrets Manager) | ✅ Good (Secret Manager) |
-| **Managed PostgreSQL** | Azure Database for PostgreSQL | RDS for PostgreSQL | Cloud SQL for PostgreSQL |
-| **Monitoring** | Azure Monitor | CloudWatch | Cloud Monitoring |
+| Feature | Azure AKS | AWS EKS | Google GKE | StackIT | OVH |
+|---------|-----------|---------|------------|---------|-----|
+| **Control Plane Cost** | Free | $0.10/hour (~$73/month) | Free (Autopilot) | Free | Free |
+| **Node Cost** (3 nodes) | ~€150-200/month | ~$200-300/month | ~$250-400/month | ~€180-250/month | ~€120-180/month |
+| **EU Data Residency** | ✅ West Europe, Germany | ✅ Frankfurt, Ireland | ✅ Belgium, Netherlands | ✅ Germany only | ✅ FR, DE, PL, UK |
+| **Sovereign Cloud** | ❌ US company | ❌ US company | ❌ US company | ✅ German | ✅ French |
+| **US CLOUD Act** | ⚠️ Applies | ⚠️ Applies | ⚠️ Applies | ❌ No exposure | ❌ No exposure |
+| **EHDS Compliance** | ✅ Excellent | ⚠️ Good | ✅ Good | ✅ Excellent | ✅ Excellent |
+| **EDC Integration** | ✅ Best (Azure Key Vault) | ✅ Good (AWS Secrets Manager) | ✅ Good (Secret Manager) | ✅ Good | ✅ Good |
+| **Managed PostgreSQL** | Azure Database for PostgreSQL | RDS for PostgreSQL | Cloud SQL for PostgreSQL | StackIT PostgreSQL | OVH Databases |
+| **Monitoring** | Azure Monitor | CloudWatch | Cloud Monitoring | Prometheus-based | Logs Data Platform |
 
 ## Recommendation
 
