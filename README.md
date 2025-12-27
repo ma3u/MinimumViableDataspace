@@ -470,12 +470,26 @@ MinimumViableDataspace/
 
 ### Test
 ```bash
+# Run all unit tests
+./gradlew test
+
+# Run specific module tests
+./gradlew :extensions:dcp-impl:test
+
+# Run with coverage report
+./gradlew test jacocoRootReport
+
+# View coverage report
+ open build/reports/jacoco/jacocoRootReport/html/index.html
+
 # Run checkstyle
 ./gradlew checkstyleMain checkstyleTest
 
 # Run end-to-end tests (requires running dataspace)
 ./gradlew :tests:end2end:test
 ```
+
+See [docs/TESTING.md](docs/TESTING.md) for comprehensive testing guide.
 
 ### Deploy
 ```bash

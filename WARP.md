@@ -130,12 +130,39 @@ The `-Ppersistence=true` flag adds HashiCorp Vault and PostgreSQL modules to the
 ### Testing
 
 ```bash
+# Run all unit tests
+./gradlew test
+
+# Run specific module tests
+./gradlew :extensions:dcp-impl:test
+
+# Run with coverage report
+./gradlew test jacocoRootReport
+
+# View coverage (macOS)
+open build/reports/jacoco/jacocoRootReport/html/index.html
+
 # Run checkstyle
 ./gradlew checkstyleMain checkstyleTest
 
 # Run end-to-end tests (requires running dataspace)
 ./gradlew :tests:end2end:test
 ```
+
+**Test Framework**: JUnit 5 + Mockito + AssertJ + RestAssured
+
+**Coverage Goals**:
+- Policy functions: 90%+
+- Core extensions: 80%+
+- Utility classes: 85%+
+
+**CI/CD**: GitHub Actions runs tests automatically on push/PR with matrix testing (Java 17, 21)
+
+See [docs/TESTING.md](docs/TESTING.md) for:
+- Writing unit tests for extensions
+- Running integration tests
+- Debugging test failures
+- Test coverage best practices
 
 ## Local Development Setup
 
