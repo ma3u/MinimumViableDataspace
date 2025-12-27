@@ -1,0 +1,118 @@
+# Prometheus configuration for MVD observability
+# Scrapes metrics from all EDC runtimes (controlplane, dataplane, identityhub, catalog-server, issuerservice)
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'mvd'
+    environment: 'local'
+
+# Scrape configurations for EDC runtimes
+scrape_configs:
+  # Consumer Corporation
+  - job_name: 'consumer-controlplane'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:8086']
+        labels:
+          participant: 'consumer'
+          component: 'controlplane'
+          runtime_type: 'edc-controlplane'
+
+  - job_name: 'consumer-dataplane'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:8087']
+        labels:
+          participant: 'consumer'
+          component: 'dataplane'
+          runtime_type: 'edc-dataplane'
+
+  - job_name: 'consumer-identityhub'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:7084']
+        labels:
+          participant: 'consumer'
+          component: 'identityhub'
+          runtime_type: 'edc-identityhub'
+
+  # Provider Corporation - Q&A Department
+  - job_name: 'provider-qna-controlplane'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:8196']
+        labels:
+          participant: 'provider'
+          department: 'qna'
+          component: 'controlplane'
+          runtime_type: 'edc-controlplane'
+
+  - job_name: 'provider-qna-dataplane'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:8197']
+        labels:
+          participant: 'provider'
+          department: 'qna'
+          component: 'dataplane'
+          runtime_type: 'edc-dataplane'
+
+  # Provider Corporation - Manufacturing Department
+  - job_name: 'provider-manufacturing-controlplane'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:8296']
+        labels:
+          participant: 'provider'
+          department: 'manufacturing'
+          component: 'controlplane'
+          runtime_type: 'edc-controlplane'
+
+  - job_name: 'provider-manufacturing-dataplane'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:8297']
+        labels:
+          participant: 'provider'
+          department: 'manufacturing'
+          component: 'dataplane'
+          runtime_type: 'edc-dataplane'
+
+  # Provider Shared Infrastructure
+  - job_name: 'provider-catalog-server'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:8096']
+        labels:
+          participant: 'provider'
+          component: 'catalog-server'
+          runtime_type: 'edc-catalog-server'
+
+  - job_name: 'provider-identityhub'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:7094']
+        labels:
+          participant: 'provider'
+          component: 'identityhub'
+          runtime_type: 'edc-identityhub'
+
+  # Dataspace Infrastructure
+  - job_name: 'dataspace-issuerservice'
+    metrics_path: '/api/observability/metrics'
+    static_configs:
+      - targets: ['localhost:10086']
+        labels:
+          participant: 'dataspace-issuer'
+          component: 'issuerservice'
+          runtime_type: 'edc-issuerservice'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          component: 'prometheus'
+          runtime_type: 'observability'
