@@ -294,6 +294,50 @@ cd ..
 ```
 *Note: Docker Compose setup uses host networking for convenient access and reuses the standard `seed.sh` script.*
 
+### Observability Stack (Optional)
+
+**Enable monitoring and debugging** with Prometheus, Jaeger, and Grafana:
+
+```bash
+# Start observability stack
+docker compose -f deployment/observability/docker-compose.yml up -d
+
+# Access dashboards
+# Grafana:    http://localhost:3000 (admin/admin)
+# Prometheus: http://localhost:9090
+# Jaeger:     http://localhost:16686
+
+# Verify metrics collection
+curl http://localhost:8086/api/observability/metrics  # consumer controlplane
+```
+
+**Observability Endpoints:**
+
+| Runtime | Port | Metrics URL |
+|---------|------|-------------|
+| Consumer Controlplane | 8086 | http://localhost:8086/api/observability/metrics |
+| Consumer Dataplane | 8087 | http://localhost:8087/api/observability/metrics |
+| Consumer IdentityHub | 7084 | http://localhost:7084/api/observability/metrics |
+| Provider QnA Controlplane | 8196 | http://localhost:8196/api/observability/metrics |
+| Provider Mfg Controlplane | 8296 | http://localhost:8296/api/observability/metrics |
+| Provider Catalog Server | 8096 | http://localhost:8096/api/observability/metrics |
+
+**Health Checks:**
+```bash
+# Check runtime health
+curl http://localhost:8086/api/check/health
+curl http://localhost:8086/api/check/liveness
+curl http://localhost:8086/api/check/readiness
+```
+
+See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) for:
+- Complete observability architecture
+- Prometheus query examples
+- Distributed tracing setup (OpenTelemetry)
+- Grafana dashboard creation
+- Kubernetes observability deployment
+- Custom metrics instrumentation
+
 ---
 
 ## Cloud Deployment
