@@ -40,4 +40,289 @@ components:
           description: "Replace with your domain-specific data types"
 
     # Add more schemas for your domain
-    # See docs/03-PHASE2-SPECS.md for examples
+    # See REAL-WORLD-DATASPACE-EXAMPLES.md for patterns
+
+---
+# Example: Catena-X Quality Notification API (CX-0151)
+# This demonstrates the Traceability KIT notification pattern
+
+openapi: 3.1.0
+info:
+  title: "Catena-X Quality Notification API"
+  version: 2.0.0
+  description: |
+    Quality notification API following Catena-X CX-0151 (Industry Core) standard.
+    Supports quality investigations and alerts across the supply chain.
+  contact:
+    name: "Catena-X Traceability KIT"
+    url: "https://eclipse-tractusx.github.io/docs-kits/kits/Traceability%20Kit/"
+
+servers:
+  - url: "https://connector.example.com/api/v2"
+    description: "Provider EDC connector"
+
+paths:
+  /qualitynotifications/receive:
+    post:
+      summary: "Receive quality notification"
+      description: |
+        Receive quality investigation or alert from supply chain partner.
+        Notification is processed asynchronously. Status updates are sent via callback.
+      operationId: receiveQualityNotification
+      tags: [Notifications]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QualityNotification'
+            examples:
+              investigation:
+                summary: "Quality Investigation"
+                value:
+                  header:
+                    notificationId: "urn:uuid:12345678-1234-1234-1234-123456789012"
+                    senderBPN: "BPNL000000000001"
+                    senderAddress: "https://sender.example.com"
+                    recipientBPN: "BPNL000000000002"
+                    severity: "MAJOR"
+                    status: "SENT"
+                    targetDate: "2024-03-01T00:00:00Z"
+                    classification: "QualityInvestigation"
+                  content:
+                    information: "Potential quality issue detected in transmission gears"
+                    listOfAffectedItems:
+                      - catenaXId: "urn:uuid:580d3adf-1981-44a0-a214-13d6ceed9379"
+      responses:
+        '201':
+          description: "Notification received and queued for processing"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          description: "Invalid notification format"
+        '401':
+          description: "Missing or invalid authentication"
+        '403':
+          description: "BPN not authorized for this operation"
+
+  /qualitynotifications/update:
+    post:
+      summary: "Update notification status"
+      description: "Update status of previously sent notification"
+      operationId: updateQualityNotification
+      tags: [Notifications]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationUpdate'
+      responses:
+        '200':
+          description: "Status updated successfully"
+        '404':
+          description: "Notification not found"
+
+  /submodel/SerialPart/{catenaXId}:
+    get:
+      summary: "Get digital twin submodel for part instance"
+      description: |
+        Retrieve SerialPart aspect model for a specific part instance.
+        Follows Asset Administration Shell (AAS) / SAMM pattern.
+      operationId: getSerialPart
+      tags: [DigitalTwin]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: catenaXId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: "Catena-X unique identifier for the part instance"
+      responses:
+        '200':
+          description: "SerialPart aspect model"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SerialPart'
+        '404':
+          description: "Part instance not found"
+        '403':
+          description: "No valid contract for this asset"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        EDR (Endpoint Data Reference) token obtained via DSP transfer process.
+        Contains authorization claims validated against ODRL policies.
+
+  schemas:
+    QualityNotification:
+      type: object
+      required: [header, content]
+      properties:
+        header:
+          $ref: '#/components/schemas/NotificationHeader'
+        content:
+          $ref: '#/components/schemas/NotificationContent'
+
+    NotificationHeader:
+      type: object
+      required:
+        - notificationId
+        - senderBPN
+        - senderAddress
+        - recipientBPN
+        - severity
+        - status
+        - classification
+      properties:
+        notificationId:
+          type: string
+          format: uri
+          pattern: '^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          description: "Unique notification identifier"
+        senderBPN:
+          type: string
+          pattern: '^BPNL[0-9]{12}$'
+          description: "Business Partner Number of sender (Legal Entity)"
+        senderAddress:
+          type: string
+          format: uri
+          description: "EDC DSP endpoint of sender for callbacks"
+        recipientBPN:
+          type: string
+          pattern: '^BPNL[0-9]{12}$'
+          description: "Business Partner Number of recipient"
+        severity:
+          type: string
+          enum: [MINOR, MAJOR, CRITICAL, LIFE_THREATENING]
+          description: "Severity level of quality issue"
+        status:
+          type: string
+          enum: [SENT, RECEIVED, ACKNOWLEDGED, ACCEPTED, DECLINED, CLOSED]
+          description: "Current notification status"
+        targetDate:
+          type: string
+          format: date-time
+          description: "Expected response deadline (ISO 8601)"
+        classification:
+          type: string
+          enum: [QualityInvestigation, QualityAlert]
+          description: "Type of notification"
+
+    NotificationContent:
+      type: object
+      required: [information, listOfAffectedItems]
+      properties:
+        information:
+          type: string
+          maxLength: 5000
+          description: "Detailed description of quality issue"
+        listOfAffectedItems:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [catenaXId]
+            properties:
+              catenaXId:
+                type: string
+                format: uri
+                description: "Catena-X ID of affected part instance or batch"
+
+    NotificationResponse:
+      type: object
+      required: [notificationId, status]
+      properties:
+        notificationId:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [RECEIVED]
+        message:
+          type: string
+
+    NotificationUpdate:
+      type: object
+      required: [notificationId, status]
+      properties:
+        notificationId:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [RECEIVED, ACKNOWLEDGED, ACCEPTED, DECLINED, CLOSED]
+        reason:
+          type: string
+          description: "Optional reason for status change"
+
+    SerialPart:
+      type: object
+      description: "CX-0151 SerialPart aspect model for individual part instances"
+      required:
+        - catenaXId
+        - localIdentifiers
+        - partTypeInformation
+      properties:
+        catenaXId:
+          type: string
+          format: uri
+          pattern: '^urn:uuid:[0-9a-f-]+$'
+          description: "Catena-X unique identifier"
+        localIdentifiers:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [key, value]
+            properties:
+              key:
+                type: string
+                enum: [manufacturerPartId, partInstanceId, batchId, van]
+              value:
+                type: string
+        manufacturingInformation:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date-time
+              description: "Manufacturing date (ISO 8601)"
+            country:
+              type: string
+              pattern: '^[A-Z]{3}$'
+              description: "Manufacturing country (ISO 3166-1 alpha-3)"
+        partTypeInformation:
+          type: object
+          required: [manufacturerPartId]
+          properties:
+            manufacturerPartId:
+              type: string
+              description: "Part type identifier from manufacturer"
+            nameAtManufacturer:
+              type: string
+              description: "Part name as known by manufacturer"
+            classification:
+              type: string
+              enum: [product, software, assembly, component, raw-material]
+
+# Additional API Patterns:
+# - Energy-Data-X: Time-series smart meter readings (POST /readings)
+# - MDS: Real-time traffic updates (GET /traffic/live, POST /parking/availability)
+# - EONA-X: Multimodal booking (POST /bookings, GET /trips/{tripId})
+# - Prometheus-X: Credential issuance (POST /credentials/issue, GET /credentials/{credentialId})
