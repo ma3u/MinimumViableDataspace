@@ -137,6 +137,49 @@ The `-Ppersistence=true` flag adds HashiCorp Vault and PostgreSQL modules to the
 ./gradlew :tests:end2end:test
 ```
 
+## Local Development Setup
+
+### Container Runtime Recommendation
+
+**OrbStack** is the recommended container runtime for macOS development:
+
+#### Why OrbStack?
+- **3-5x faster** than Docker Desktop on macOS
+- **~500 MB idle memory** vs 2-4 GB for Docker Desktop
+- **5-10 second startup** vs 30-60 seconds
+- **Drop-in replacement** for Docker Desktop - no code changes needed
+- **Native KinD support** - works identically with existing deployment scripts
+- **Battery efficient** - significantly lower energy consumption on MacBooks
+
+#### Installing OrbStack
+```bash
+# Install via Homebrew
+brew install orbstack
+
+# Verify installation
+orbctl version
+docker version  # OrbStack provides Docker CLI compatibility
+```
+
+#### Alternative: Rancher Desktop
+For teams preferring 100% open source:
+```bash
+brew install rancher-desktop
+```
+
+**Trade-offs**: Slightly slower than OrbStack, more memory usage, but fully open source (Apache 2.0).
+
+#### Migrating from Docker Desktop
+1. Install OrbStack: `brew install orbstack`
+2. OrbStack auto-detects Docker Desktop and offers to import containers/volumes
+3. Stop Docker Desktop
+4. Verify: `docker ps` (should now use OrbStack)
+5. Optional: Uninstall Docker Desktop to free ~2-4 GB RAM
+
+No changes needed to MVD deployment scripts - KinD works identically with OrbStack.
+
+---
+
 ## Running the Dataspace
 
 ### IntelliJ Deployment (Recommended for Development)
@@ -223,6 +266,148 @@ cd ..
 ./seed.sh
 ```
 *Note: Docker Compose setup uses host networking for convenient access and reuses the standard `seed.sh` script.*
+
+---
+
+## Cloud Deployment
+
+For production deployments, MVD can be deployed to managed Kubernetes services. See `docs/cloud-deployment-options.md` for detailed analysis.
+
+### Recommended Cloud Platform: Azure AKS
+
+**Why Azure AKS?**
+- **EHDS/GDPR Compliance**: EU data residency (West Europe, Germany West Central)
+- **Cost-Effective**: ~€150-200/month for staging, ~€500-800/month for production
+- **Enterprise Readiness**: Azure AD integration, Azure Key Vault for secrets
+- **EDC Integration**: Best support for HashiCorp Vault and PostgreSQL persistence
+
+### Quick Start: AKS Deployment
+
+#### Prerequisites
+```bash
+# Install Azure CLI
+brew install azure-cli
+
+# Login to Azure
+az login
+
+# Install Terraform
+brew install terraform
+```
+
+#### Deploy to AKS
+```bash
+# 1. Build images with persistence
+./gradlew -Ppersistence=true build
+./gradlew -Ppersistence=true dockerize
+
+# 2. Create Azure Container Registry and push images
+az acr create --resource-group mvd-rg --name mvdregistry --sku Basic
+az acr login --name mvdregistry
+docker tag controlplane:latest mvdregistry.azurecr.io/controlplane:latest
+docker tag dataplane:latest mvdregistry.azurecr.io/dataplane:latest
+docker tag identity-hub:latest mvdregistry.azurecr.io/identity-hub:latest
+docker tag catalog-server:latest mvdregistry.azurecr.io/catalog-server:latest
+docker tag issuerservice:latest mvdregistry.azurecr.io/issuerservice:latest
+docker push mvdregistry.azurecr.io/controlplane:latest
+docker push mvdregistry.azurecr.io/dataplane:latest
+docker push mvdregistry.azurecr.io/identity-hub:latest
+docker push mvdregistry.azurecr.io/catalog-server:latest
+docker push mvdregistry.azurecr.io/issuerservice:latest
+
+# 3. Deploy with Terraform (from deployment/cloud/azure/)
+cd deployment/cloud/azure
+terraform init
+terraform apply  # Review plan and type 'yes'
+
+# 4. Seed the dataspace
+./seed-aks.sh  # Uses kubectl to seed deployed cluster
+```
+
+### Alternative Cloud Platforms
+
+#### Amazon EKS
+**When to use**: Existing AWS infrastructure, need for AWS-specific services (S3, DynamoDB)
+
+```bash
+# Deploy to EKS (from deployment/cloud/aws/)
+cd deployment/cloud/aws
+terraform init
+terraform apply
+```
+
+**Cost**: ~$250-400/month | **Region**: eu-central-1 (Frankfurt)
+
+#### Google GKE
+**When to use**: Best-in-class monitoring needs, Autopilot mode for zero cluster management
+
+```bash
+# Deploy to GKE (from deployment/cloud/gcp/)
+cd deployment/cloud/gcp
+terraform init
+terraform apply
+```
+
+**Cost**: ~$300-450/month | **Region**: europe-west4 (Netherlands)
+
+### Cloud Deployment Architecture
+
+#### Staging Environment
+```yaml
+Cloud: Azure AKS
+Region: Germany West Central (Frankfurt)
+Nodes: 3x Standard_D2s_v3 (2 vCPU, 8 GB RAM)
+Database: Azure PostgreSQL Flexible Server
+Secrets: Azure Key Vault
+Cost: ~€150-200/month
+Use Case: Integration testing, demos
+```
+
+#### Production Environment
+```yaml
+Cloud: Azure AKS
+Region: West Europe (Primary) + Germany West Central (DR)
+Nodes: 5x Standard_D4s_v3 (4 vCPU, 16 GB RAM)
+Database: Azure PostgreSQL HA with geo-replication
+Secrets: Azure Key Vault (HSM-backed)
+Monitoring: Azure Monitor + Log Analytics
+Backup: Azure Backup with cross-region replication
+Cost: ~€500-800/month
+Use Case: Production workloads, EHDS compliance
+```
+
+### Security Best Practices (Cloud)
+- ✅ Enable Azure RBAC for Kubernetes authorization
+- ✅ Use Azure Private Link for database/vault access
+- ✅ Enable Azure Defender for Kubernetes
+- ✅ Implement network policies (Calico or Azure Network Policies)
+- ✅ Enable audit logging to Azure Monitor
+- ✅ Rotate credentials regularly (automated with Key Vault)
+
+### Terraform Directory Structure
+
+Cloud deployment configurations are organized under `deployment/cloud/`:
+```
+deployment/cloud/
+├── azure/              # Azure AKS deployment
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── README.md
+├── aws/                # Amazon EKS deployment
+│   ├── main.tf
+│   ├── variables.tf
+│   └── README.md
+├── gcp/                # Google GKE deployment
+│   ├── main.tf
+│   ├── variables.tf
+│   └── README.md
+└── README.md           # Cloud deployment guide
+```
+
+**Note**: Cloud deployment templates are provided as starting points. Customize for your organization's security, compliance, and networking requirements.
+
+---
 
 ### Debugging in Kubernetes
 
