@@ -31,6 +31,7 @@ include(":extensions:dcp-impl")
 include(":extensions:superuser-seed")
 //include(":tests:performance")
 include(":tests:end2end")
+include(":tests:protocol-compliance")
 
 // launcher modules
 include(":launchers:identity-hub")
