@@ -18,12 +18,46 @@ plugins {
     `java-library`
     id("com.bmuschko.docker-remote-api") version "10.0.0"
     alias(libs.plugins.edc.build)
+    jacoco
 }
 
 val edcBuildId = libs.plugins.edc.build.get().pluginId
 
 allprojects {
     apply(plugin = edcBuildId)
+    apply(plugin = "jacoco")
+    
+    tasks.withType<Test> {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = false
+        }
+    }
+}
+
+// JaCoCo configuration
+tasks.register<JacocoReport>("jacocoRootReport") {
+    description = "Generates code coverage report for all modules"
+    group = "verification"
+    
+    dependsOn(subprojects.map { it.tasks.withType<Test>() })
+    
+    val sourceSets = subprojects
+        .filter { it.plugins.hasPlugin("java") }
+        .map { it.the<SourceSetContainer>()["main"] }
+    
+    sourceDirectories.from(sourceSets.map { it.allSource.srcDirs })
+    classDirectories.from(sourceSets.map { it.output })
+    executionData.from(subprojects.map { 
+        it.fileTree(it.buildDir).include("**/jacoco/*.exec")
+    })
+    
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+    }
 }
 
 
