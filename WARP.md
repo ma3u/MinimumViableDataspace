@@ -532,6 +532,207 @@ MVD includes several critical extensions that implement dataspace-specific funct
 ### DID Example Resolver (`extensions/did-example-resolver/`)
 - `SecretsExtension`: Pre-seeds secrets for IntelliJ deployment (memory vault workaround)
 
+## Extension Development
+
+MVD's custom extensions demonstrate how to implement dataspace-specific functionality using EDC's Service Provider Interface (SPI).
+
+### Extension Framework Overview
+
+Extensions in MVD follow the EDC service loader pattern:
+- Implement `ServiceExtension` interface
+- Register in `META-INF/services/org.eclipse.edc.spi.system.ServiceExtension`
+- Use `@Inject` for dependency injection
+- Declare dependencies in `build.gradle.kts`
+
+**Complete Guide**: See `docs/EXTENSION-DEVELOPMENT.md` for detailed documentation on:
+- Anatomy of all 4 existing MVD extensions (with code examples)
+- How to create custom extensions from scratch
+- Domain-specific extension templates (Healthcare, Energy, Mobility, Education)
+- EDC SPI extension points (PolicyEngine, DidResolverRegistry, etc.)
+- Debugging techniques for all deployment modes
+
+### Quick Start: Creating a Custom Extension
+
+1. **Create Extension Module**:
+```bash
+mkdir -p extensions/my-custom-extension/src/main/java/org/eclipse/edc/demo/custom
+mkdir -p extensions/my-custom-extension/src/main/resources/META-INF/services
+```
+
+2. **Implement ServiceExtension**:
+```java
+public class MyCustomExtension implements ServiceExtension {
+    @Inject
+    private PolicyEngine policyEngine;
+    
+    @Override
+    public void initialize(ServiceExtensionContext context) {
+        // Register policy functions, configure services, etc.
+    }
+}
+```
+
+3. **Register Extension**:
+```bash
+echo "org.eclipse.edc.demo.custom.MyCustomExtension" > \
+  extensions/my-custom-extension/src/main/resources/META-INF/services/org.eclipse.edc.spi.system.ServiceExtension
+```
+
+4. **Build Configuration** (`build.gradle.kts`):
+```kotlin
+plugins {
+    `java-library`
+}
+
+dependencies {
+    implementation(libs.edc.spi.core)
+    implementation(libs.edc.spi.policy)
+}
+```
+
+5. **Add to Launcher**:
+```kotlin
+// In launchers/controlplane/build.gradle.kts
+dependencies {
+    implementation(project(":extensions:my-custom-extension"))
+}
+```
+
+6. **Rebuild and Test**:
+```bash
+./gradlew :extensions:my-custom-extension:build
+./gradlew :launchers:controlplane:build
+# Restart runtime to load extension
+```
+
+### Debugging Extensions
+
+#### IntelliJ Deployment
+- Set breakpoints in extension code
+- Run "Debug" mode from `.run/` configurations
+- Extensions are loaded from local `build/` directories
+- Hot reload: Not supported - must rebuild and restart runtime
+
+#### Docker Compose Deployment
+1. Rebuild images with extension changes:
+```bash
+./gradlew -Ppersistence=true build
+./gradlew -Ppersistence=true dockerize
+```
+
+2. Enable remote debugging (add to `docker-compose.yml`):
+```yaml
+services:
+  consumer-controlplane:
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:1044
+    ports:
+      - "1044:1044"
+```
+
+3. Attach IntelliJ Remote JVM Debug on `localhost:1044`
+
+#### Kubernetes Deployment
+1. Rebuild and load images:
+```bash
+./gradlew -Ppersistence=true dockerize
+kind load docker-image controlplane:latest -n mvd
+kubectl delete pod -n mvd consumer-controlplane-<pod-id>  # Force recreate
+```
+
+2. Port-forward for debugging:
+```bash
+kubectl port-forward -n mvd service/consumer-controlplane 1044:1044
+```
+
+3. Attach IntelliJ Remote JVM Debug on `localhost:1044`
+
+### Common Extension Patterns
+
+#### Policy Evaluation Functions
+Extend ODRL policy evaluation with custom constraints:
+```java
+public class CustomPolicyFunction implements AtomicConstraintRuleFunction<Rule> {
+    @Override
+    public boolean evaluate(Operator operator, Object rightValue, 
+                            Permission rule, PolicyContext context) {
+        // Custom policy logic
+    }
+}
+```
+
+**Registration** (in ServiceExtension):
+```java
+policyEngine.registerFunction(NEGOTIATION_SCOPE, Permission.class, "my:custom:constraint", 
+    new CustomPolicyFunction());
+```
+
+#### DID Resolution
+Add support for custom DID methods:
+```java
+public class CustomDidResolver implements DidResolver {
+    @Override
+    public Result<DidDocument> resolve(String didUrl) {
+        // Custom DID resolution logic
+    }
+}
+```
+
+**Registration**:
+```java
+didResolverRegistry.register("did:custom", new CustomDidResolver());
+```
+
+#### Credential Validation
+Implement custom credential validation rules:
+```java
+public class CustomCredentialValidator implements CredentialServiceClient {
+    @Override
+    public Result<VerifiablePresentation> requestPresentation(PresentationQuery query) {
+        // Custom validation logic
+    }
+}
+```
+
+### Extension Deployment Notes
+
+- **IntelliJ**: Extensions loaded from source, no image rebuild needed
+- **Docker Compose**: Requires `dockerize` after extension changes
+- **Kubernetes**: Requires `dockerize` + `kind load` + pod restart
+- **Persistence Flag**: Always use `-Ppersistence=true` for Docker/K8s builds
+
+### Troubleshooting Extensions
+
+**Extension Not Loading**:
+- Verify `META-INF/services/org.eclipse.edc.spi.system.ServiceExtension` exists
+- Check launcher's `build.gradle.kts` includes extension dependency
+- Review startup logs for `ServiceExtension` initialization errors
+
+**Policy Function Not Evaluating**:
+- Confirm function registered with correct scope (CATALOG, NEGOTIATION, TRANSFER)
+- Verify constraint left operand matches registered key (e.g., `"membership:since"`)
+- Enable debug logging: `EDC_POLICY_MONITOR_LOGLEVEL=DEBUG`
+
+**DID Resolution Fails**:
+- Check DID method prefix matches registered resolver (e.g., `did:web`, `did:example`)
+- Verify DID document accessible at expected URL
+- Review `DidResolverRegistry` logs
+
+**Credential Validation Fails**:
+- Confirm issuer DID in `TrustedIssuerRegistry`
+- Verify credential signature with expected key from issuer's DID document
+- Check credential expiration/issuance dates
+
+### Real-World Extension Examples
+
+The `docs/EXTENSION-DEVELOPMENT.md` guide includes complete code examples for:
+- **Healthcare**: `HealthcareLicenseFunction` - validates medical license credentials
+- **Energy**: `GridOperatorLicenseFunction` - validates grid operator credentials
+- **Mobility**: `RealTimeDataWindowFunction` - enforces time-window constraints
+- **Education**: `LearnerConsentFunction` - validates learner consent credentials
+
+Each example demonstrates domain-specific policy evaluation patterns applicable to MVD.
+
 ## Testing with Postman
 
 Import collection from `deployment/postman/MVD.postman_collection.json` with appropriate environment:
