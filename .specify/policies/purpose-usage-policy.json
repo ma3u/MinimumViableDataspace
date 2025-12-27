@@ -1,0 +1,40 @@
+{
+  "@context": {
+    "odrl": "http://www.w3.org/ns/odrl/2/",
+    "cx-policy": "https://w3id.org/catenax/policy/",
+    "dct": "http://purl.org/dc/terms/"
+  },
+  "@type": "odrl:Set",
+  "@id": "purpose-usage-policy",
+  "odrl:profile": "cx-policy:profile:2025.1",
+  "odrl:permission": [
+    {
+      "odrl:action": "odrl:use",
+      "odrl:constraint": [
+        {
+          "@type": "odrl:Constraint",
+          "odrl:leftOperand": "cx-policy:UsagePurpose",
+          "odrl:operator": "odrl:eq",
+          "odrl:rightOperand": "cx.core.industrycore:1"
+        }
+      ],
+      "odrl:duty": [
+        {
+          "odrl:action": "odrl:delete",
+          "odrl:constraint": [
+            {
+              "@type": "odrl:Constraint",
+              "odrl:leftOperand": "odrl:dateTime",
+              "odrl:operator": "odrl:gteq",
+              "odrl:rightOperand": {
+                "@value": "contract-end-date-plus-30-days",
+                "@type": "xsd:dateTime"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dct:description": "This policy restricts data usage to Industry Core purpose (CX-0151) and requires deletion 30 days after contract end. Based on Catena-X CX-0152 Policy Constraints standard."
+}

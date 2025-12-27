@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://your-domain.com/schemas/your-entity.schema.json",
+  "title": "[ENTITY_NAME]",
+  "description": "JSON Schema template for domain-specific entities. Replace [ENTITY_NAME] with your entity type (e.g., PartInstance, EHRRecord, SmartMeterReading)",
+  "type": "object",
+  "required": ["id", "type"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uri",
+      "description": "Unique identifier for this entity"
+    },
+    "type": {
+      "type": "string",
+      "const": "[ENTITY_NAME]",
+      "description": "Entity type identifier"
+    },
+    "catenaXId": {
+      "type": "string",
+      "pattern": "^urn:uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "description": "Catena-X unique identifier (UUID v4 format). Use for manufacturing/automotive domains."
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Schema version"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp (ISO 8601)"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification timestamp (ISO 8601)"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "https://example.com/entities/12345",
+      "type": "[ENTITY_NAME]",
+      "catenaXId": "urn:uuid:550e8400-e29b-41d4-a716-446655440000",
+      "metadata": {
+        "version": "1.0.0",
+        "created": "2025-01-01T00:00:00Z",
+        "modified": "2025-01-01T00:00:00Z"
+      }
+    }
+  ]
+}
