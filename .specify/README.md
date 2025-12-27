@@ -12,7 +12,8 @@ Based on operational dataspaces, pick the pattern that matches your use case:
 |-------------|---------------------|---------------------|---------------|
 | **Automotive/Manufacturing** | [Catena-X](https://catenax-ev.github.io) | `manufacturing/automotive-*` | BPN auth, Industry Core, Traceability |
 | **Energy/Utilities** | [Energy-Data-X](https://energydata-x.eu) | `energy/smart-grid-*` | Smart meters, TSO/DSO, Real-time balancing |
-| **Mobility/Tourism** | [EONA-X](https://eona-x.eu) | `mobility/maas-*` | Multimodal transport, Booking systems |
+| **Mobility/Traffic (Germany)** | [MDS](https://mobility-dataspace.eu) | `mobility/traffic-*` | Real-time traffic, Parking, IDS-RAM |
+| **Mobility/Tourism (Multi-country)** | [EONA-X](https://eona-x.eu) | `mobility/maas-*` | Multimodal transport, Booking systems |
 | **Education/Skills** | [Prometheus-X](https://prometheus-x.org) | `education/learning-*` | Consent, Credentials, PDI |
 | **Health/Research** | MVD-health | `health/clinical-*` | FHIR, GDPR Art. 9, Consent |
 
@@ -28,7 +29,8 @@ Based on operational dataspaces, pick the pattern that matches your use case:
    # Examples:
    git checkout -b manufacturing/traceability-demo  # Catena-X pattern
    git checkout -b energy/grid-balancing           # Energy-Data-X pattern
-   git checkout -b mobility/trip-planner           # EONA-X pattern
+   git checkout -b mobility/traffic-optimization   # MDS pattern (Germany)
+   git checkout -b mobility/trip-planner           # EONA-X pattern (Multi-country)
    git checkout -b education/skills-matching       # Prometheus-X pattern
    ```
 
@@ -274,13 +276,13 @@ git checkout -b education/skills-matching
 
 ## Common Technical Patterns Across Dataspaces
 
-| Component | Catena-X | Energy-Data-X | EONA-X | Prometheus-X |
-|-----------|----------|---------------|---------|-------------|
-| **Connector** | EDC | IDS/EDC | EDC MVD | PDC (IDS-compliant) |
-| **Identity** | did:web, BPN | Gaia-X Identity | X.509 DAPS | Personal Data Intermediary |
-| **Catalog** | Federated Catalog | IDSA Metadata Broker | Federated Catalog | Catalog Service |
-| **Policies** | ODRL (CX-0152) | Gaia-X policies | Gaia-X + ODRL | ODRL + Consent |
-| **Standards** | DSP, DCP | IDSA, Gaia-X | DSP, IDSA | DSP, IDS |
+| Component | Catena-X | Energy-Data-X | MDS | EONA-X | Prometheus-X |
+|-----------|----------|---------------|-----|---------|-------------|
+| **Connector** | EDC | IDS/EDC | MDS Connector (EDC) | EDC MVD | PDC (IDS-compliant) |
+| **Identity** | did:web, BPN | Gaia-X Identity | IDSA Identity | X.509 DAPS | Personal Data Intermediary |
+| **Catalog** | Federated Catalog | IDSA Metadata Broker | Data Catalog | Federated Catalog | Catalog Service |
+| **Policies** | ODRL (CX-0152) | Gaia-X policies | Data Sovereignty | Gaia-X + ODRL | ODRL + Consent |
+| **Standards** | DSP, DCP | IDSA, Gaia-X | IDS-RAM, Gaia-X | DSP, IDSA | DSP, IDS |
 
 **All dataspaces share**:
 - Eclipse Dataspace Components (EDC) or IDS-compliant connectors
@@ -352,6 +354,7 @@ See Phase 4-6 of BLUEPRINT for:
    - Catena-X: https://catenax-ev.github.io/docs/next/standards/overview
    - Tractus-X KITs: https://eclipse-tractusx.github.io/Kits
    - Energy-Data-X: https://energydata-x.eu
+   - Mobility Data Space (MDS): https://mobility-dataspace.eu
    - EONA-X: https://eona-x.eu
    - Prometheus-X: https://prometheus-x.org
 
@@ -373,6 +376,7 @@ See Phase 4-6 of BLUEPRINT for:
 |----------------|-----------|------------------------|
 | `manufacturing/automotive-*` | Catena-X | BPN policies, Industry Core schemas, Notification API |
 | `energy/smart-grid-*` | Energy-Data-X | Smart meter schemas, TSO/DSO policies, Real-time API |
+| `mobility/traffic-*` | MDS (Germany) | Traffic/parking schemas, Data sovereignty policies, IDS-RAM |
 | `mobility/maas-*` | EONA-X | Trip schemas, Consent policies, Booking API |
 | `education/skills-*` | Prometheus-X | Credential schemas, Learner consent, Verification API |
 | `health/clinical-*` | MVD-health | FHIR resources, GDPR Art. 9 consent, Clinical trials |

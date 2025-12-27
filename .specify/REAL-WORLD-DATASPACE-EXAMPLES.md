@@ -85,7 +85,81 @@ extensions/              → Smart meter gateway connector, time-series aggregat
 
 ## Mobility & Tourism Dataspaces
 
-### EONA-X (Mobility, Transport & Tourism)
+### 1. Mobility Data Space (MDS) - Germany
+**Website**: https://mobility-dataspace.eu  
+**Operator**: DRM Datenraum Mobilität GmbH (non-profit)  
+**Founded**: 2021 (by acatech - German Academy of Science and Engineering)  
+**Stakeholders**: 200+ organizations (DHL Group, Volkswagen, HERE Technologies, Caruso Dataplace)
+
+**Purpose**: Open, decentralized data space for secure mobility data exchange in Germany and Europe
+
+**Key Features**:
+- **Gaia-X Lighthouse Project** (one of seven)
+- **IDSA-compliant architecture** (IDS Reference Architecture Model)
+- **Federal government backing** - German Ministry of Digital Affairs and Transport
+- **Linked to Mobilithek** - Public sector mobility data platform (2025)
+- **Data sovereignty** - Providers maintain full control over their data
+- **Eclipse Dataspace Components (EDC)** - MDS Connector based on EDC
+
+**Use Cases**:
+1. **Real-time traffic data** - Traffic flow optimization, congestion management
+2. **Parking information** - Parking search time reduction, smart parking
+3. **Multimodal mobility** - Integration of public transport, car/bike sharing, e-mobility
+4. **Autonomous driving** - Data for self-driving vehicle development
+5. **Smart traffic management** - Intelligent traffic light systems, route optimization
+
+**Technical Stack**:
+- **MDS Connector** - EDC-based distribution
+- **IDS Reference Architecture Model (IDS-RAM)** - International Data Spaces standard
+- **Central services**:
+  * Data Catalog (metadata directory)
+  * Vocabulary Provider
+  * Identity Provider
+  * Data App Store
+  * Clearing House (billing/payment)
+- **Connector-as-a-Service** - Ready-to-use solution for members
+- **Decentralized data exchange** - Direct P2P between participants
+
+**Regulatory Framework**:
+- GDPR compliance for personal mobility data
+- German data sovereignty requirements
+- Gaia-X trust framework alignment
+- ITS Directive (National Access Points)
+
+**Architecture Principles**:
+- **Decentralized** - No central data lake, P2P exchange
+- **Data sovereignty** - Providers control who accesses data and for what purpose
+- **Transparency** - All members have equal access under same conditions
+- **Interoperability** - Compatible with other Gaia-X data spaces
+- **No lock-in** - Based on open standards (IDSA)
+
+**MVD Application**:
+```bash
+# Create Mobility Data Space branch
+git checkout -b mobility/mds-germany-demo
+
+# Customize for German mobility ecosystem
+.specify/spec.md         → Real-time traffic, parking, multimodal routing
+.specify/spec.yaml       → Traffic data API, parking API, vehicle telemetry
+.specify/policies/       → Data sovereignty policies, usage constraints
+.specify/data-models/    → Traffic flow, parking spots, vehicle schemas
+.specify/constitution.md → GDPR, ITS Directive, German data sovereignty
+extensions/              → IDS connector, traffic data aggregators
+```
+
+**Governance**:
+- **Non-profit operator** - DRM Datenraum Mobilität GmbH
+- **acatech neutrality** - Independent governance from academy
+- **Multi-stakeholder** - Federal states, private companies, public transport
+- **Membership model** - Sign membership contract to join community
+
+**Integration with European Initiatives**:
+- Links to **European Mobility Data Space (EMDS)**
+- Part of **Gaia-X** cloud initiative
+- Compatible with **deployEMDS** project (9 cities, 38 partners)
+- Interoperable with **PrepDSpace4Mobility** (CSA initiative)
+
+### 2. EONA-X (Mobility, Transport & Tourism)
 **Website**: https://eona-x.eu  
 **Founded**: 2022 (non-profit association)  
 **Members**: Amadeus, Renault, Air France-KLM, Groupe ADP, Aéroport Marseille-Provence, Accor, SNCF
@@ -203,13 +277,14 @@ frontend/                → Learner dashboard, credential wallet, skills matche
 
 ### Common Technical Components
 
-| Component | Catena-X | Energy-Data-X | EONA-X | Prometheus-X |
-|-----------|----------|---------------|---------|--------------|
-| **Connector** | EDC | IDS/EDC | EDC MVD | PDC (IDS-compliant) |
-| **Identity** | did:web, BPN | Gaia-X Identity | X.509 DAPS | Personal Data Intermediary |
-| **Catalog** | Federated Catalog | IDSA Metadata Broker | Federated Catalog | Prometheus-X Catalog |
-| **Policies** | ODRL (CX-0152) | Gaia-X policies | Gaia-X + ODRL | ODRL + Consent |
-| **Standards** | DSP, DCP | IDSA, Gaia-X | DSP, IDSA | DSP, IDS |
+| Component | Catena-X | Energy-Data-X | MDS (Mobility) | EONA-X | Prometheus-X |
+|-----------|----------|---------------|----------------|---------|-------------|
+| **Connector** | EDC | IDS/EDC | MDS Connector (EDC) | EDC MVD | PDC (IDS-compliant) |
+| **Identity** | did:web, BPN | Gaia-X Identity | IDSA Identity | X.509 DAPS | Personal Data Intermediary |
+| **Catalog** | Federated Catalog | IDSA Metadata Broker | Data Catalog | Federated Catalog | Catalog Service |
+| **Policies** | ODRL (CX-0152) | Gaia-X policies | Data Sovereignty | Gaia-X + ODRL | ODRL + Consent |
+| **Standards** | DSP, DCP | IDSA, Gaia-X | IDS-RAM, Gaia-X | DSP, IDSA | DSP, IDS |
+| **Governance** | Catena-X e.V. | IDSA, TenneT | DRM GmbH (non-profit) | EONA-X Association | Prometheus-X Foundation |
 
 ### Common Use Case Patterns
 
@@ -238,7 +313,8 @@ frontend/                → Learner dashboard, credential wallet, skills matche
 | Your Domain | Similar Dataspace | Key Patterns to Adopt |
 |-------------|-------------------|----------------------|
 | **Energy/Utilities** | Energy-Data-X | Smart meter integration, TSO/DSO coordination, IEC 61850 |
-| **Transportation/Logistics** | EONA-X | Multimodal data, real-time tracking, booking systems |
+| **Mobility/Traffic (Germany)** | MDS (Mobility Data Space) | Real-time traffic, parking, IDS-RAM, data sovereignty |
+| **Mobility/Tourism (Multi-country)** | EONA-X | Multimodal travel, booking systems, traveler consent |
 | **Education/HR** | Prometheus-X | Consent management, credentials, personal data intermediary |
 | **Manufacturing/Automotive** | Catena-X | BPN authentication, traceability, part instance digital twins |
 | **Health/Research** | MVD-health | FHIR, consent (Art. 89), research data secondary use |
@@ -252,14 +328,21 @@ git checkout -b energy/smart-grid-demo
 # Reference: .specify/DOMAIN-BRANCHING-GUIDE.md
 ```
 
-### 2. Mobility Dataspace (EONA-X Pattern)
+### 2. Mobility Dataspace - Germany (MDS Pattern)
+```bash
+git checkout -b mobility/traffic-parking-demo
+# Implement German mobility data exchange
+# Reference: MDS Connector (EDC-based), IDS-RAM architecture
+```
+
+### 3. Mobility Dataspace - Tourism (EONA-X Pattern)
 ```bash
 git checkout -b mobility/maas-demo
 # Implement multimodal transport integration
 # Reference: EONA-X open-source components
 ```
 
-### 3. Education Dataspace (Prometheus-X Pattern)
+### 4. Education Dataspace (Prometheus-X Pattern)
 ```bash
 git checkout -b education/learning-analytics-demo
 # Implement PDI and consent management
@@ -269,13 +352,17 @@ git checkout -b education/learning-analytics-demo
 ## References
 
 ### Official Websites
+- [Catena-X](https://catenax-ev.github.io/docs/next/standards/overview)
 - [Energy-Data-X](https://www.energydata-x.eu)
 - [OMEGA-X](https://omega-x.eu)
 - [SYNERGIES Energy Data Space](https://energydataspaces.eu)
+- [Mobility Data Space (MDS)](https://mobility-dataspace.eu)
 - [EONA-X](https://eona-x.eu)
 - [Prometheus-X](https://prometheus-x.org)
 - [Gaia-X](https://gaia-x.eu)
 - [IDSA (International Data Spaces)](https://internationaldataspaces.org)
+- [European Mobility Data Space (EMDS)](https://digital-strategy.ec.europa.eu/en/policies/mobility-data)
+- [deployEMDS](https://deployemds.eu)
 
 ### Technical Documentation
 - [Eclipse Dataspace Components](https://eclipse-edc.github.io)
