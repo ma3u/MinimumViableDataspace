@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info:
+  title: "[DOMAIN] Dataspace API"
+  version: 1.0.0
+  description: "Replace [DOMAIN] with your specific domain"
+
+paths:
+  /catalog:
+    get:
+      summary: "List data assets available in this dataspace"
+      tags: [Catalog]
+      operationId: listAssets
+      responses:
+        '200':
+          description: "List of assets"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
+
+components:
+  schemas:
+    Asset:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+          description: "Unique asset identifier"
+        title:
+          type: string
+          description: "Asset title"
+        description:
+          type: string
+        dataType:
+          type: string
+          enum: [PLACEHOLDER]
+          description: "Replace with your domain-specific data types"
+
+    # Add more schemas for your domain
+    # See docs/03-PHASE2-SPECS.md for examples
