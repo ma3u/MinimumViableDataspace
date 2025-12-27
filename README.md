@@ -62,11 +62,22 @@ git checkout -b health-demo  # or aerospace-demo, manufacturing-demo, etc.
 |----------|---------|---------|
 | **Java** | 17+ (temurin-17 or temurin-22) | EDC runtimes |
 | **Node.js** | 18+ or 20+ | Frontend/backend (if building UI) |
+| **uv** | Latest | Python package manager for Spec Kit |
+| **GitHub Spec Kit** | Latest | Specification-driven development toolkit |
 | **Newman** | Latest | Postman CLI for seeding |
 | **jq** | Latest | JSON processing in scripts |
 | **Container Runtime** | OrbStack (recommended) or Docker Desktop | Local K8s development |
 
 ```bash
+# Install uv (Python package manager)
+brew install uv
+
+# Install GitHub Spec Kit (persistent installation - recommended)
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+
+# Verify Spec Kit installation
+specify --help
+
 # Install Newman and jq
 brew install newman jq
 
@@ -76,6 +87,15 @@ brew install orbstack
 # OR install Rancher Desktop (open source alternative)
 brew install rancher-desktop
 ```
+
+**GitHub Spec Kit** is used for specification-driven development:
+- `/speckit.constitution` - Define project principles
+- `/speckit.specify` - Create feature specifications
+- `/speckit.plan` - Generate technical implementation plans
+- `/speckit.tasks` - Break down into actionable tasks
+- `/speckit.implement` - Execute implementation
+
+See [GitHub Spec Kit documentation](https://github.com/github/spec-kit) for complete usage guide.
 
 See [docs/cloud-deployment-options.md](docs/cloud-deployment-options.md) for detailed comparison.
 
