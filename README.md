@@ -1,399 +1,110 @@
-# Aerospace Supply Chain Digital Product Passport Demo
+# Minimum Viable Dataspace (MVD)
 
-A comprehensive demonstration of sovereign data exchange for aerospace Digital Product Passports (DPP) using Eclipse Dataspace Components within the Aerospace Supply Chain initiative.
+## BLUEPRINT for Building Domain-Specific Dataspaces
 
----
+A reusable template and methodology for creating production-grade, compliant dataspaces across any domain using Eclipse Dataspace Components (EDC), Decentralized Claims Protocol (DCP), and specification-driven development.
 
-## Table of Contents
-
-1. [Introduction](#1-introduction)
-   - 1.1 [Purpose](#11-purpose)
-   - 1.2 [Aerospace Supply Chain Context](#12-aerospace-supply-chain-context)
-   - 1.3 [Demo Scenario](#13-demo-scenario)
-2. [Architecture Overview](#2-architecture-overview)
-   - 2.1 [System Components](#21-system-components)
-   - 2.2 [Component Interaction Diagram](#22-component-interaction-diagram)
-   - 2.3 [Data Flow Architecture](#23-data-flow-architecture)
-   - 2.4 [Identity & Trust Framework](#24-identity--trust-framework)
-3. [Technical Components](#3-technical-components)
-   - 3.1 [Eclipse Dataspace Components (EDC)](#31-eclipse-dataspace-components-edc)
-   - 3.2 [IdentityHub & Decentralized Claims Protocol](#32-identityhub--decentralized-claims-protocol)
-   - 3.3 [Demo Application Components](#33-demo-application-components)
-4. [Deployment Manual](#4-deployment-manual)
-   - 4.1 [Prerequisites](#41-prerequisites)
-   - 4.2 [Phase 1: Infrastructure Setup](#42-phase-1-infrastructure-setup)
-   - 4.3 [Phase 2: Start Eclipse Dataspace Components](#43-phase-2-start-eclipse-dataspace-components)
-   - 4.4 [Phase 3: Seed Identities and Credentials](#44-phase-3-seed-identities-and-credentials)
-   - 4.5 [Phase 4: Deploy Demo Application](#45-phase-4-deploy-demo-application)
-   - 4.6 [Phase 5: Seed Aerospace Assets](#46-phase-5-seed-aerospace-assets)
-   - 4.7 [Verification Checklist](#47-verification-checklist)
-5. [User Manual](#5-user-manual)
-   - 5.1 [Accessing the Demo](#51-accessing-the-demo)
-   - 5.2 [Consumer Workflow (Horizon Aviation Group)](#52-consumer-workflow-horizon-aviation-group)
-   - 5.3 [Provider Workflow (ApexPropulsion Systems)](#53-provider-workflow-apexpropulsion-systems)
-   - 5.4 [Understanding the DPP Data](#54-understanding-the-dpp-data)
-6. [Data Model Specification](#6-data-model-specification)
-   - 6.1 [Digital Product Passport Structure](#61-digital-product-passport-structure)
-   - 6.2 [EDC Asset Configuration](#62-edc-asset-configuration)
-   - 6.3 [Policy Definitions](#63-policy-definitions)
-7. [Credentials & Access Control](#7-credentials--access-control)
-   - 7.1 [Verifiable Credentials](#71-verifiable-credentials)
-   - 7.2 [Policy Evaluation Flow](#72-policy-evaluation-flow)
-8. [API Reference](#8-api-reference)
-   - 8.1 [EDC Management APIs](#81-edc-management-apis)
-   - 8.2 [DPP Backend APIs](#82-dpp-backend-apis)
-9. [Troubleshooting](#9-troubleshooting)
-10. [Future Extensions](#10-future-extensions)
+[![EDC](https://img.shields.io/badge/Eclipse-Dataspace%20Components-white)](https://eclipse-edc.github.io/docs/)
+[![DCP](https://img.shields.io/badge/Protocol-DCP-blue)](https://github.com/eclipse-tractusx/identity-trust)
+[![DSP](https://img.shields.io/badge/Dataspace-Protocol%202025-yellow)](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/)
 
 ---
 
-## 1. Introduction
+## What is MVD?
 
-### 1.1 Purpose
+**Minimum Viable Dataspace (MVD)** is a **template repository** that provides the essential infrastructure, patterns, and methodology for building domain-specific dataspaces. It is NOT a finished product—it's a foundation you customize and extend for your specific use case.
 
-This demonstration showcases the secure, sovereign exchange of aerospace Digital Product Passports between industry participants using Eclipse Dataspace Components. It illustrates how OEMs and suppliers can share critical component data—including airworthiness certificates, sustainability metrics, and operational history—while maintaining full control over their data assets.
+### Key Characteristics
 
-### 1.2 Aerospace Supply Chain Context
+- ✅ **Template, Not a Product**: Core EDC infrastructure without domain-specific implementations
+- ✅ **BLUEPRINT Methodology**: Phase-based development workflow with GitHub issue tracking
+- ✅ **Specification-Driven**: OpenAPI specs drive code generation and compliance testing
+- ✅ **Production-Ready Patterns**: Kubernetes deployment, observability, security best practices
+- ✅ **Multi-Domain Support**: Branch-based strategy for health, aerospace, manufacturing, etc.
 
-The Aerospace Supply Chain initiative represents a vision for a federated aerospace data ecosystem built on dataspace principles. This demo implements a key use case:
+### What You Get
 
-**Sovereign Data Exchange for Aerospace Supply Chain**
-- **Data Sovereignty**: Each participant maintains control over their data and access policies
-- **Interoperability**: Standardized protocols (DSP) enable seamless B2B data exchange
-- **Trust Framework**: Decentralized identity (DIDs) and Verifiable Credentials establish trust without central authorities
-- **Regulatory Compliance**: Supports EASA requirements for digital documentation and traceability
-
-### 1.3 Demo Scenario
-
-The demo simulates a real-world aerospace supply chain data exchange. This diagram shows how ApexPropulsion Systems manufactures engine components and creates Digital Product Passports, which are then shared with Horizon Aviation Group via the Dataspace Protocol (DSP). Horizon Aviation Group integrates this data into their fleet management platform.
-
-```mermaid
-flowchart LR
-    subgraph Provider["ApexPropulsion Systems - Provider"]
-        RR["Engine OEM"]
-        DPP["Digital Product Passports"]
-    end
-    
-    subgraph Consumer["Horizon Aviation Group - Consumer"]
-        AB["Airframe OEM"]
-        SKY["Fleet Management Platform"]
-    end
-    
-    RR --> |"Manufactures"| DPP
-    DPP --> |"DSP"| AB
-    AB --> |"Integrates"| SKY
-```
-
-**Participants:**
-- **ApexPropulsion Systems** (Provider): Manufactures Trent XWB engine components and provides Digital Product Passports
-- **Horizon Aviation Group** (Consumer): Procures engine components and requires DPP data for fleet management
-
-**Data Exchanged:**
-- Airworthiness certificates (EASA Form 1)
-- Product Carbon Footprint (PCF) data
-- Operational metrics (flight hours, cycles)
-- Technical specifications
-
-### 1.4 Demo User Journey
-
-![alt text](dpp-frontend1.png)
-Frontend interface showing catalog of DPP assets and detailed passport view.
-
-![choose a asset from the data catalog](demo-step1.png)
-In the first step the suer choose a asset from the data catalog to view its Digital Product Passport.
-
-![user negotiates a contract to access the DPP](demo-step2.png)
-In step 2 the user negotiates a contract to access the DPP data by presenting their Verifiable Credentials under one data access policy.
-
-![Start the transfer](demo-step3.png)
-In step 3 the user starts the data transfer to fetch the DPP data over HTTP-PULL.
-
-![Finally the DPP from the supplier will be displayed](demo-step4.png)
-Finally the DPP from the supplier will be displayed in a structured viewer format.
+| Component | Description | Customization Required |
+|-----------|-------------|------------------------|
+| **EDC Runtimes** | Controlplane, Dataplane, IdentityHub, Catalog Server, Issuer Service | Minimal - works out of box |
+| **Custom Extensions** | DCP implementation, catalog resolver, DID resolver | Configure for your identity model |
+| **Deployment Templates** | IntelliJ configs, Kubernetes/Terraform, Docker Compose | Adjust ports/resources |
+| **Specification Framework** | GitHub Spec Kit templates, ODRL policies, OpenAPI schemas | **Replace with your domain** |
+| **Documentation** | BLUEPRINT methodology, cloud deployment guide, SDD instructions | Extend with domain specifics |
+| **Seeding Scripts** | Identity/credential creation, asset registration | **Replace with your assets** |
 
 ---
 
-## 2. Architecture Overview
+## Quick Start: Create Your Domain-Specific Dataspace
 
-### 2.1 System Components
+### Step 1: Fork or Branch This Repository
 
-The demo architecture consists of three layers. The Presentation Layer contains the React frontend, the Dataspace Layer hosts the EDC connectors and IdentityHubs for both Consumer (Horizon Aviation Group) and Provider (ApexPropulsion Systems), plus a Trust Anchor with the Issuer Service. The Data Layer contains the DPP Backend that serves the actual product passport data.
-
-```mermaid
-flowchart TB
-    subgraph Presentation["Presentation Layer"]
-        FE["React Frontend :3000"]
-    end
-    
-    subgraph Dataspace["Dataspace Layer - MVD"]
-        subgraph Consumer["Consumer - Horizon Aviation Group"]
-            CC["Consumer Controlplane :8081"]
-            CD["Consumer Dataplane :11001"]
-            CIH["Consumer IdentityHub :7082"]
-        end
-        
-        subgraph Provider["Provider - ApexPropulsion Systems"]
-            PC["Provider Controlplane :8191"]
-            PD["Provider Dataplane :11002"]
-            PIH["Provider IdentityHub :7092"]
-        end
-        
-        subgraph Trust["Trust Anchor"]
-            ISS["Issuer Service :10016"]
-            NGINX["DID Server :9876"]
-        end
-    end
-    
-    subgraph Data["Data Layer"]
-        BE["DPP Backend :3001"]
-    end
-    
-    FE --> CC
-    FE --> PC
-    CC <--> |DSP| PC
-    CC --> CIH
-    PC --> PIH
-    CIH --> ISS
-    PIH --> ISS
-    PC --> BE
+**Option A: Fork for Independent Project**
+```bash
+# Fork on GitHub, then clone
+git clone https://github.com/YOUR_USERNAME/MinimumViableDataspace.git
+cd MinimumViableDataspace
 ```
 
-### 2.2 Component Interaction Diagram
+**Option B: Create Domain Branch (Recommended)**
+```bash
+# Clone this repo
+git clone https://github.com/ma3u/MinimumViableDataspace.git
+cd MinimumViableDataspace
 
-The following diagram shows the complete data exchange flow. It illustrates the three main phases: Catalog Discovery (where credentials are verified to access the catalog), Contract Negotiation (where policies are evaluated against presented credentials), and Data Transfer (where the actual DPP data is fetched using the negotiated access token).
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant User as Horizon Aviation Group User
-    participant FE as Frontend
-    participant CC as Consumer<br/>Controlplane
-    participant CIH as Consumer<br/>IdentityHub
-    participant PIH as Provider<br/>IdentityHub
-    participant PC as Provider<br/>Controlplane
-    participant PD as Provider<br/>Dataplane
-    participant BE as DPP Backend
-    participant ISS as Issuer Service
-
-    Note over User,ISS: Phase 1: Catalog Discovery
-    User->>FE: Browse Catalog
-    FE->>CC: POST /catalog/request
-    CC->>CIH: Get Credentials
-    CIH-->>CC: MembershipCredential VP
-    CC->>PC: DSP: CatalogRequest + VP
-    PC->>PIH: Verify Credential
-    PIH-->>PC: Credential Valid
-    PC-->>CC: Catalog Response
-    CC-->>FE: Asset List
-    FE-->>User: Display DPP Assets
-
-    Note over User,ISS: Phase 2: Contract Negotiation
-    User->>FE: Select Asset
-    FE->>CC: POST /contractnegotiations
-    CC->>CIH: Get DataProcessor Credential
-    CIH-->>CC: DataProcessorCredential VP
-    CC->>PC: DSP: ContractRequest + VP
-    PC->>PIH: Evaluate Policy
-    PIH->>ISS: Verify Credential Chain
-    ISS-->>PIH: Valid
-    PIH-->>PC: Policy Satisfied
-    PC-->>CC: ContractAgreement
-    CC-->>FE: Negotiation Complete
-
-    Note over User,ISS: Phase 3: Data Transfer
-    User->>FE: Request Transfer
-    FE->>CC: POST /transferprocesses
-    CC->>PC: DSP: TransferRequest
-    PC-->>CC: EndpointDataReference (EDR)
-    CC-->>FE: EDR with Token
-    FE->>PD: GET /public + Token
-    PD->>BE: Fetch DPP Data
-    BE-->>PD: JSON-LD DPP
-    PD-->>FE: DPP Data
-    FE-->>User: Display DPP Viewer
+# Create your domain branch
+git checkout -b health-demo  # or aerospace-demo, manufacturing-demo, etc.
 ```
 
-### 2.3 Data Flow Architecture
-
-This diagram shows how DPP data flows from source systems to consumers. External data sources (ERP, MES, PLM) feed into the DPP Backend where data is aggregated and serialized to JSON-LD. The Eclipse Dataspace manages assets, policies, and transfers, ultimately delivering the data to the Consumer's catalog browser and DPP viewer.
-
-```mermaid
-flowchart LR
-    subgraph External["External Data Sources"]
-        ERP["ERP Systems"]
-        MES["Manufacturing Execution"]
-        PLM["PLM Systems"]
-    end
-    
-    subgraph Backend["DPP Backend"]
-        AGG["Data Aggregator"]
-        JSONLD["JSON-LD Serializer"]
-    end
-    
-    subgraph EDC["Eclipse Dataspace"]
-        ASSET["Asset Registry"]
-        POLICY["Policy Engine"]
-        TRANSFER["Transfer Manager"]
-    end
-    
-    subgraph Consumer["Consumer Systems"]
-        CATALOG["Catalog Browser"]
-        VIEWER["DPP Viewer"]
-    end
-    
-    ERP --> AGG
-    MES --> AGG
-    PLM --> AGG
-    AGG --> JSONLD
-    JSONLD --> ASSET
-    ASSET --> POLICY
-    POLICY --> TRANSFER
-    TRANSFER --> CATALOG
-    CATALOG --> VIEWER
-```
-
-### 2.4 Identity & Trust Framework
-
-This diagram illustrates the decentralized identity infrastructure. The Issuer DID issues Verifiable Credentials (MembershipCredential and DataProcessorCredential) to both Consumer and Provider. These credentials are stored in the respective IdentityHubs and presented during DSP message exchanges to prove authorization.
-
-```mermaid
-flowchart TB
-    subgraph DID["Decentralized Identifiers"]
-        CDID["Consumer DID"]
-        PDID["Provider DID"]
-        IDID["Issuer DID"]
-    end
-    
-    subgraph VC["Verifiable Credentials"]
-        MC["MembershipCredential"]
-        DPC["DataProcessorCredential"]
-    end
-    
-    subgraph IH["IdentityHubs"]
-        CIH["Consumer IdentityHub"]
-        PIH["Provider IdentityHub"]
-    end
-    
-    IDID --> |issues| MC
-    IDID --> |issues| DPC
-    MC --> CIH
-    MC --> PIH
-    DPC --> CIH
-    DPC --> PIH
-    CDID --> CIH
-    PDID --> PIH
-```
-
----
-
-## 3. Technical Components
-
-### 3.1 Eclipse Dataspace Components (EDC)
-
-The EDC provides the core dataspace functionality:
-
-**Controlplane** - Handles protocol messages, contract negotiation, and policy enforcement
-- Consumer Controlplane: `http://localhost:8081`
-- Provider QNA Controlplane: `http://localhost:8191`
-
-**Dataplane** - Executes actual data transfers
-- Consumer Dataplane: `http://localhost:11001`
-- Provider QNA Dataplane: `http://localhost:11002`
-
-**Catalog Server** - Federated catalog for asset discovery
-- Provider Catalog Server: `http://localhost:8091`
-
-### 3.2 IdentityHub & Decentralized Claims Protocol
-
-The IdentityHub manages participant identities and credentials:
-
-**Consumer IdentityHub**: `http://localhost:7082`
-- Stores Consumer's DID document
-- Holds MembershipCredential and DataProcessorCredential
-- Issues Verifiable Presentations for DSP messages
-
-**Provider IdentityHub**: `http://localhost:7092`
-- Stores Provider's DID document
-- Verifies incoming credential presentations
-- Manages provider's own credentials
-
-**Issuer Service**: `http://localhost:10016`
-- Trusted third party issuing credentials
-- Signs credentials with issuer's private key
-- DID: `did:web:localhost%3A9876:issuer`
-
-### 3.3 Demo Application Components
-
-**Frontend** (React/TypeScript)
-- URL: `http://localhost:3000`
-- Features: Catalog browser, contract negotiation UI, DPP viewer
-- Technology: Vite, React 18, TailwindCSS
-
-**DPP Backend** (Node.js/Express)
-- URL: `http://localhost:3001`
-- Serves mock DPP data in JSON-LD format
-- Simulates ApexPropulsion Systems internal systems
-
----
-
-## 4. Deployment Manual
-
-### 4.1 Prerequisites
-
-Ensure the following are installed:
+### Step 2: Install Prerequisites
 
 | Software | Version | Purpose |
-|----------|---------|--------|
-| Java | 17+ (temurin-22 recommended) | EDC runtimes |
-| Node.js | 18+ or 20+ | Frontend & backend |
-| Docker | Latest | Container runtime |
-| Docker Compose | Latest | Container orchestration |
-| Newman | Latest | Postman CLI for seeding |
-| jq | Latest | JSON processing |
-| IntelliJ IDEA | 2023+ (recommended) | IDE with run configurations |
+|----------|---------|---------|
+| **Java** | 17+ (temurin-17 or temurin-22) | EDC runtimes |
+| **Node.js** | 18+ or 20+ | Frontend/backend (if building UI) |
+| **Newman** | Latest | Postman CLI for seeding |
+| **jq** | Latest | JSON processing in scripts |
+| **Container Runtime** | OrbStack (recommended) or Docker Desktop | Local K8s development |
 
-**Install Newman (if not present):**
 ```bash
-npm install -g newman
+# Install Newman and jq
+brew install newman jq
+
+# Install OrbStack (recommended for macOS)
+brew install orbstack
+
+# OR install Rancher Desktop (open source alternative)
+brew install rancher-desktop
 ```
 
-### 4.2 Phase 1: Infrastructure Setup
+See [docs/cloud-deployment-options.md](docs/cloud-deployment-options.md) for detailed comparison.
 
-**Step 1.1: Clone and Build MVD**
+### Step 3: Build Core MVD Infrastructure
+
 ```bash
-cd /path/to/MinimumViableDataspace
+# Build EDC components
 ./gradlew build
+
+# For Kubernetes/Docker deployment, build with persistence
+./gradlew -Ppersistence=true build
+./gradlew -Ppersistence=true dockerize
 ```
 
-**Step 1.2: Start NGINX for Issuer DID Document**
+### Step 4: Deploy MVD Infrastructure
 
-The issuer's DID document must be accessible via HTTP:
+**Option A: IntelliJ IDEA (Fastest for Development)**
 
-```bash
-docker run -d --name nginx -p 9876:80 --rm \
-  -v "$PWD"/deployment/assets/issuer/nginx.conf:/etc/nginx/nginx.conf:ro \
-  -v "$PWD"/deployment/assets/issuer/did.docker.json:/var/www/.well-known/did.json:ro \
-  nginx
-```
-
-**Verify:** `curl http://localhost:9876/.well-known/did.json` should return the issuer's DID document.
-
-### 4.3 Phase 2: Start Eclipse Dataspace Components
-
-**Option A: IntelliJ IDEA (Recommended for Development)**
-
-1. Open the project in IntelliJ IDEA
-2. Navigate to `.run/` directory
-3. Run the `dataspace` compound run configuration
-4. Wait for all 8 runtimes to start: consumer, consumer-identityhub, provider-qna, provider-manufacturing, provider-catalog-server, provider-identityhub, issuerservice
+1. Open project in IntelliJ IDEA
+2. Run `.run/dataspace` compound configuration (starts all 8 runtimes)
+3. Wait for all services to be healthy (~30-60 seconds)
+4. Run seeding script:
+   ```bash
+   ./seed-edc.sh
+   ```
 
 **Option B: Kubernetes (Production-like)**
 
 ```bash
-# Build with persistence
-./gradlew -Ppersistence=true build
-./gradlew -Ppersistence=true dockerize
-
 # Create KinD cluster
 kind create cluster -n mvd --config deployment/kind.config.yaml
 
@@ -407,489 +118,571 @@ terraform init
 terraform apply
 ```
 
-**Verify EDC is running:**
+See [WARP.md](WARP.md) for detailed deployment instructions.
+
+### Step 5: Customize for Your Domain
+
+Now you're ready to customize MVD for your specific domain. Follow the **BLUEPRINT methodology**:
+
+---
+
+## BLUEPRINT Methodology: Phase-Based Development
+
+The BLUEPRINT methodology is a structured, phase-based approach to building dataspaces. Each phase is tracked as a GitHub issue with clear acceptance criteria.
+
+### Phase-Based Development Workflow
+
+**Before starting ANY implementation:**
+
+1. **Create BLUEPRINT Issue**
+   - Title: `BLUEPRINT: Phase <X> - <Feature Name>`
+   - Define acceptance criteria
+   - Commit issue creation to `main` branch
+
+2. **Implement Phase**
+   - Update GitHub issue with progress
+   - Reference issue in all commits: `#<issue-number>`
+   - Document decisions and blockers
+
+3. **Complete Phase**
+   - Verify all acceptance criteria met
+   - Close issue with final summary
+
+### BLUEPRINT Phases for Domain-Specific Dataspace
+
+#### Phase 1: Cleanup and Setup ✅ (COMPLETE)
+**Status**: Complete (see [Issue #17](https://github.com/ma3u/MinimumViableDataspace/issues/17))
+- Clean repository (remove aerospace demo)
+- Research cloud deployment options
+- Establish development environment
+
+#### Phase 2: Domain Specification
+**Create**: `BLUEPRINT: Phase 2 - <Your Domain> Specification`
+
+**Deliverables:**
+- `.specify/spec.md` - Domain requirements and data models
+- `.specify/spec.yaml` - OpenAPI specification for your domain APIs
+- `.specify/constitution.md` - Non-negotiable rules (security, compliance)
+- `.specify/regulatory-inventory.md` - Domain compliance requirements (GDPR, HIPAA, etc.)
+- `.specify/policies/*.yaml` - ODRL policies for your domain
+
+**Example: Health Domain**
+```yaml
+# .specify/spec.yaml
+openapi: 3.1.0
+info:
+  title: Health Dataspace API
+  description: EHDS-compliant EHR data exchange
+paths:
+  /api/ehr:
+    get:
+      summary: List EHR records
+      responses:
+        '200':
+          description: FHIR R4 Patient bundle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FHIRBundle'
+```
+
+#### Phase 3: Frontend Development
+**Create**: `BLUEPRINT: Phase 3 - <Your Domain> Frontend`
+
+**Deliverables:**
+- React/TypeScript frontend for catalog browsing
+- Domain-specific data viewer (EHR viewer, DPP viewer, etc.)
+- Contract negotiation UI
+- Data transfer flow visualization
+
+**Reusable Components (from MVD-health branch):**
+- `CatalogCard.tsx` - Asset display component
+- `DataspaceInsiderPanel.tsx` - DSP protocol visualization
+- `useCatalog.ts` - Catalog fetching hook
+- `apiFactory.ts` - Multi-mode API interface (mock/hybrid/full)
+
+#### Phase 4: Backend Services
+**Create**: `BLUEPRINT: Phase 4 - <Your Domain> Backend`
+
+**Deliverables:**
+- Backend service serving domain-specific data
+- EDC proxy service (optional, for simplified frontend integration)
+- Mock data for development/testing
+- OpenTelemetry tracing, Prometheus metrics
+
+#### Phase 5: Testing & Compliance
+**Create**: `BLUEPRINT: Phase 5 - Testing & Compliance`
+
+**Deliverables:**
+- Unit tests (Vitest for frontend, JUnit for Java)
+- Contract tests (Pact/Newman)
+- E2E tests (Playwright for frontend, RestAssured for backend)
+- Compliance tests (GDPR, domain-specific regulations)
+- DSP/DCP protocol conformance tests
+
+#### Phase 6: Production Deployment
+**Create**: `BLUEPRINT: Phase 6 - Production Deployment`
+
+**Deliverables:**
+- Cloud deployment (AKS/EKS/GKE Terraform modules)
+- CI/CD pipelines (GitHub Actions)
+- Monitoring & alerting (Prometheus, Grafana, Jaeger)
+- Security hardening (network policies, RBAC, secrets management)
+- Disaster recovery plan
+
+---
+
+## Architecture
+
+MVD provides core dataspace infrastructure based on Eclipse EDC:
+
+### Core Components
+
+```
+┌─────────────────────────────────────────────────────┐
+│                 Your Domain Layer                    │
+│  (Frontend, Backend, Domain-Specific Extensions)    │
+└─────────────────────────────────────────────────────┘
+                         ↓ Uses
+┌─────────────────────────────────────────────────────┐
+│              MVD Core Infrastructure                 │
+│  ┌──────────────┐  ┌──────────────┐                │
+│  │   Consumer   │  │   Provider   │                │
+│  │ Controlplane │←→│ Controlplane │ (DSP)          │
+│  │  Dataplane   │  │  Dataplane   │                │
+│  │ IdentityHub  │  │ IdentityHub  │                │
+│  └──────────────┘  └──────────────┘                │
+│  ┌──────────────┐  ┌──────────────┐                │
+│  │Catalog Server│  │Issuer Service│                │
+│  └──────────────┘  └──────────────┘                │
+└─────────────────────────────────────────────────────┘
+```
+
+### Management Domains Architecture
+
+MVD implements **Management Domains** - a pattern where multiple departments/divisions share a common identity but maintain independent data policies:
+
+**Example: Provider Organization**
+- `provider-qna` - Q&A department connector
+- `provider-manufacturing` - Manufacturing department connector
+- `provider-catalog-server` - Federated catalog (shared)
+- `provider-identityhub` - Shared identity for all departments
+
+This architecture allows organizations to:
+- Maintain single organizational identity (`did:web:provider-identityhub`)
+- Enforce department-specific access policies
+- Share catalog metadata while protecting sensitive data
+- Scale horizontally by adding new department connectors
+
+### Key Design Patterns
+
+1. **Decentralized Identity (DCP)**
+   - `did:web` DIDs for each participant
+   - Verifiable Credentials (MembershipCredential, domain-specific credentials)
+   - Zero-trust credential verification
+
+2. **Policy-Based Access Control (ODRL)**
+   - Fine-grained access policies per asset
+   - Credential-based policy evaluation
+   - Domain-specific policy functions
+
+3. **Dataspace Protocol (DSP)**
+   - Catalog discovery
+   - Contract negotiation
+   - HTTP-PULL data transfer
+
+---
+
+## Example Domains
+
+This repository serves as a template. Here are example domain implementations:
+
+### Health Dataspace (MVD-health)
+**Branch**: `health-demo`  
+**Use Case**: EHDS-compliant Electronic Health Record exchange for clinical research
+
+**Domain-Specific Components:**
+- FHIR R4 EHR data with ISiK/KBV profiles
+- DCAT-AP for Health metadata
+- ConsentCredential for GDPR Art. 89 compliance
+- MedDRA v27.0 adverse event classification
+- Frontend: EHR viewer with clinical trial metadata
+
+**Regulatory Compliance:**
+- EHDS Regulation (EU 2025/327) Art. 50/51
+- GDPR Art. 9 (special categories) + Art. 89 (research)
+- German GDNG (Health Data Use Act)
+
+### Aerospace Supply Chain (Legacy)
+**Status**: Removed in Phase 1 cleanup (aerospace-specific code in separate branch)
+
+**Use Case**: Digital Product Passport exchange for aerospace components
+
+---
+
+## Deployment Options
+
+### Local Development
+
+**Recommended: OrbStack (macOS)**
+- 3-5x faster than Docker Desktop
+- ~500 MB idle memory vs 2-4 GB
+- Full KinD support
+
+**Alternative: Rancher Desktop**
+- Open source (Apache 2.0)
+- K3s lightweight Kubernetes
+
+**Installation:**
 ```bash
-# Consumer health check
-curl http://localhost:8081/api/check/health
+# OrbStack
+brew install orbstack
 
-# Provider health check  
-curl http://localhost:8191/api/check/health
+# Rancher Desktop
+brew install rancher-desktop
 ```
 
-### 4.4 Phase 3: Seed Identities and Credentials
+### Cloud Production Deployment
 
-This critical step creates participant contexts in the IdentityHubs and issues Verifiable Credentials.
+**Recommended: Azure Kubernetes Service (AKS)**
 
-```bash
-./seed.sh
-```
+**Why AKS?**
+- Best EHDS compliance (EU data residency)
+- Azure AD integration for EDC DCP
+- Azure Key Vault for secrets management
+- Cost-effective: €150-800/month depending on scale
 
-**What seed.sh does:**
+**Alternative Cloud Providers:**
+- **AWS EKS**: Best if already on AWS
+- **Google GKE**: Best monitoring/observability
 
-This diagram shows the six steps executed by the seed script. It seeds test assets and catalog links, creates participant contexts for Consumer and Provider in their IdentityHubs, registers the Issuer, and finally issues the required credentials to both participants.
+See [docs/cloud-deployment-options.md](docs/cloud-deployment-options.md) for comprehensive comparison.
 
-```mermaid
-flowchart TB
-    subgraph Seed["seed.sh Execution"]
-        S1[Seed Assets]
-        S2[Seed Catalog Links]
-        S3[Create Consumer Context]
-        S4[Create Provider Context]
-        S5[Create Issuer]
-        S6[Issue Credentials]
-    end
-    
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
-    
-    subgraph Result["Result"]
-        R1[Consumer DID + Credentials]
-        R2[Provider DID + Credentials]
-    end
-    
-    S6 --> R1
-    S6 --> R2
-```
-
-**Expected Output:**
-```
-Create consumer participant context in IdentityHub
-Create provider participant context in IdentityHub
-Create dataspace issuer
-```
-
-**Verify credentials were issued:**
-```bash
-# Check consumer credentials
-curl -s http://localhost:7082/api/identity/v1alpha/participants/ \
-  -H "x-api-key: c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo=" | jq
-```
-
-### 4.5 Phase 4: Deploy Demo Application
-
-**Step 4.1: Start DPP Backend**
-
-```bash
-cd backend-mock
-npm install
-npm run dev
-```
-
-The backend starts on port 3001 and serves DPP data.
-
-**Verify:** `curl http://localhost:3001/health`
-
-**Step 4.2: Start Frontend**
-
-**Option A: Development Mode**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-**Option B: Docker Compose**
-```bash
-docker-compose -f docker-compose.aerospace.yml up --build
-```
-
-This starts both the frontend (port 3000) and backend (port 3001).
-
-### 4.6 Phase 5: Seed Aerospace Assets
-
-After the dataspace is running and seeded, add the aerospace-specific assets:
-
-```bash
-# For local development
-DPP_BACKEND_URL=http://localhost:3001 ./seed-aerospace.sh
-
-# For Docker deployment
-DPP_BACKEND_URL=http://host.docker.internal:3001 ./seed-aerospace.sh
-```
-
-**What seed-aerospace.sh creates:**
-
-| Entity | ID | Description |
-|--------|-----|-------------|
-| Asset | `asset:propulsion:blade:98765` | HPT Blade DPP |
-| Asset | `asset:propulsion:blade:98766` | Compressor Blade DPP |
-| Asset | `asset:propulsion:combustor:98767` | Combustor Liner DPP |
-| Policy | `aerospace-membership-required` | Requires MembershipCredential |
-| Policy | `aerospace-dpp-access` | Requires DataProcessorCredential |
-| Contract | `aerospace-dpp-contract` | Links assets to policies |
-
-### 4.7 Verification Checklist
-
-Use this checklist to verify the deployment:
-
-| Check | Command | Expected Result |
-|-------|---------|----------------|
-| NGINX running | `curl http://localhost:9876/.well-known/did.json` | DID document JSON |
-| Consumer EDC | `curl http://localhost:8081/api/check/health` | `{"isSystemHealthy":true}` |
-| Provider EDC | `curl http://localhost:8191/api/check/health` | `{"isSystemHealthy":true}` |
-| DPP Backend | `curl http://localhost:3001/health` | `{"status":"healthy"}` |
-| Frontend | Open `http://localhost:3000` | React app loads |
-| Catalog Query | See API test below | Assets returned |
-
-**Test Catalog Query:**
-```bash
-curl -X POST http://localhost:8081/api/catalog/v1alpha/catalog/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "@context": {"edc": "https://w3id.org/edc/v0.0.1/ns/"},
-    "@type": "QuerySpec"
-  }'
+**Typical Production Setup:**
+```yaml
+Cluster: AKS (West Europe or Germany West Central)
+Nodes: 5x Standard_D4s_v3 (4 vCPU, 16 GB RAM)
+Database: Azure PostgreSQL Flexible Server (HA)
+Secrets: Azure Key Vault (HSM-backed)
+Registry: Azure Container Registry
+Monitoring: Azure Monitor + Prometheus + Grafana
+Cost: €500-800/month (with HA and DR)
 ```
 
 ---
 
-## 5. User Manual
+## Project Structure
 
-### 5.1 Accessing the Demo
-
-Open your browser and navigate to: **http://localhost:3000**
-
-The interface allows switching between Consumer (Horizon Aviation Group) and Provider (ApexPropulsion Systems) perspectives.
-
-### 5.2 Consumer Workflow (Horizon Aviation Group)
-
-This diagram shows the six-step workflow for consuming DPP data. Users select their role, browse the provider's catalog, select an asset, negotiate a contract based on their credentials, initiate the data transfer, and finally view the complete Digital Product Passport.
-
-```mermaid
-flowchart LR
-    A[Select Role]
-    B --> C[Select Asset]
-    C --> D[Negotiate]
-    D --> E[Transfer]
-    E --> F[View DPP]
 ```
-
-**Step 1: Select Consumer Role**
-- Click "Consumer (Horizon Aviation Group)" in the role switcher
-- The interface shows the consumer perspective
-
-**Step 2: Browse Catalog**
-- Click "Refresh Catalog" to fetch available DPPs
-- The catalog shows assets from ApexPropulsion Systems
-- Each asset displays: Name, Part Type, Serial Number
-
-**Step 3: Select Asset**
-- Click on an asset card to select it
-- View asset details including description and properties
-
-**Step 4: Negotiate Contract**
-
-Click "Negotiate Contract". The system automatically requests the asset's policy, presents required credentials (MembershipCredential, DataProcessorCredential), and completes the negotiation. Wait for status: "FINALIZED".
-
-**Step 5: Transfer Data**
-
-Click "Start Transfer". The system initiates an HTTP-PULL transfer, receives an Endpoint Data Reference (EDR), and fetches the DPP data. Wait for status: "STARTED".
-
-**Step 6: View DPP**
-
-The Digital Product Passport is displayed. Navigate through sections: **Identity** (Part number, serial number, manufacturer), **Airworthiness** (EASA Form 1 status, certifications), **Sustainability** (PCF value, material composition), **Operational** (Flight hours, cycles), and **Technical** (Specifications, dimensions).
-
-### 5.3 Provider Workflow (ApexPropulsion Systems)
-
-**Step 1: Select Provider Role**
-- Click "Provider (ApexPropulsion Systems)" in the role switcher
-
-**Step 2: View Registered Assets**
-- See all DPP assets registered in the provider's EDC
-- View asset metadata and data addresses
-
-**Step 3: Monitor Activity**
-- Check the backend logs for incoming requests:
-  ```bash
-  docker logs dpp-backend -f
-  ```
-
-### 5.4 Understanding the DPP Data
-
-The Digital Product Passport contains structured data following aerospace standards:
-
-**Identity Node** - Part identification per ATA Spec 2000
-- Manufacturer Name, CAGE Code
-- Part Number, Serial Number
-- Manufacturing Date & Location
-
-**Airworthiness Node** - Certification data per EASA regulations
-- Form Type (EASA Form 1)
-- Status: NEW, OVERHAULED, SERVICEABLE
-- Certification Authority, Approval Date
-
-**Sustainability Node** - Environmental data per IPC-1754
-- Product Carbon Footprint (PCF) in kgCO2e
-- Scope: Cradle-to-Gate
-- Material Composition percentages
-
-**Operational Node** - Lifecycle data per S5000F
-- Time Since New (hours)
-- Cycles Since New
-- Time/Cycles Since Overhaul
-
----
-
-## 6. Data Model Specification
-
-### 6.1 Digital Product Passport Structure
-
-The DPP follows a JSON-LD Verifiable Credential format:
-
-```json
-{
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
-    "https://w3id.org/aerospace/dpp/v1"
-  ],
-  "id": "did:web:apexpropulsion.com:parts:serial:98765-XYZ-123",
-  "type": ["VerifiableCredential", "AerospacePartPassport"],
-  "issuer": "did:web:apexpropulsion.com",
-  "issuanceDate": "2025-10-27T10:00:00Z",
-  "credentialSubject": {
-    "id": "did:web:apexpropulsion.com:parts:serial:98765-XYZ-123",
-    "partType": "HighPressureTurbineBlade",
-    "sku": "APEX-TrentXWB-HPT-Blade-001",
-    "identityNode": {
-      "manufacturerName": "ApexPropulsion Systems",
-      "cageCode": "K1039",
-      "partNumber": "FW12345",
-      "serialNumber": "HPT998877",
-      "batchNumber": "BATCH-2025-001",
-      "manufacturingDate": "2025-09-15",
-      "manufacturingLocation": "Derby, United Kingdom"
-    },
-    "airworthinessNode": {
-      "formType": "EASA_FORM_1",
-      "formTrackingNumber": "APEX-DERBY-2025-00451",
-      "status": "NEW",
-      "certificationAuthority": "EASA",
-      "qualityStandards": ["AS9100D", "ISO9001:2015"]
-    },
-    "sustainabilityNode": {
-      "pcfValue": 45.2,
-      "pcfUnit": "kgCO2e",
-      "scope": "Cradle-to-Gate",
-      "recyclableContent": 15,
-      "materialComposition": [
-        { "material": "Nickel Superalloy", "percentage": 85 },
-        { "material": "Thermal Barrier Coating", "percentage": 10 }
-      ]
-    },
-    "operationalNode": {
-      "timeSinceNew": 0,
-      "cyclesSinceNew": 0,
-      "maximumOperatingHours": 25000,
-      "maximumCycles": 15000
-    },
-    "technicalSpecifications": {
-      "engineModel": "Trent XWB-97",
-      "stage": "HP Turbine Stage 1",
-      "weight": { "value": 0.85, "unit": "kg" },
-      "operatingTemperature": { "max": 1700, "unit": "°C" }
-    }
-  }
-}
-```
-
-### 6.2 EDC Asset Configuration
-
-Assets are registered with the following structure:
-
-```json
-{
-  "@context": ["https://w3id.org/edc/connector/management/v0.0.1"],
-  "@id": "asset:propulsion:blade:98765",
-  "@type": "Asset",
-  "properties": {
-    "name": "Trent XWB HPT Blade - Digital Product Passport",
-    "description": "DPP for HPT Blade SN:HPT998877",
-    "contenttype": "application/ld+json",
-    "dct:type": "ids:DigitalProductPassport",
-    "aerospace:partType": "HighPressureTurbineBlade",
-    "aerospace:manufacturer": "ApexPropulsion Systems",
-    "aerospace:serialNumber": "HPT998877"
-  },
-  "dataAddress": {
-    "@type": "DataAddress",
-    "type": "HttpData",
-    "baseUrl": "http://localhost:3001/api/parts/98765"
-  }
-}
-```
-
-### 6.3 Policy Definitions
-
-**Access Policy (aerospace-membership-required):**
-```json
-{
-  "@id": "aerospace-membership-required",
-  "policy": {
-    "@type": "Set",
-    "permission": [{
-      "action": "use",
-      "constraint": {
-        "leftOperand": "MembershipCredential",
-        "operator": "eq",
-        "rightOperand": "active"
-      }
-    }]
-  }
-}
-```
-
-**Contract Policy (aerospace-dpp-access):**
-```json
-{
-  "@id": "aerospace-dpp-access",
-  "policy": {
-    "@type": "Set",
-    "obligation": [{
-      "action": "use",
-      "constraint": {
-        "leftOperand": "DataAccess.level",
-        "operator": "eq",
-        "rightOperand": "processing"
-      }
-    }]
-  }
-}
+MinimumViableDataspace/
+├── extensions/              # Custom EDC extensions
+│   ├── catalog-node-resolver/    # Federated catalog discovery
+│   ├── dcp-impl/                 # Decentralized Claims Protocol
+│   ├── did-example-resolver/     # DID resolution (demo)
+│   └── superuser-seed/           # IdentityHub bootstrap
+├── launchers/              # EDC runtime modules
+│   ├── controlplane/       # Management API, DSP protocol
+│   ├── dataplane/          # Data transfer execution
+│   ├── identity-hub/       # Identity & credential management
+│   ├── catalog-server/     # Federated catalog crawler
+│   └── issuerservice/      # Verifiable Credential issuer
+├── deployment/             # Deployment configurations
+│   ├── assets/             # Keys, DIDs, environment configs
+│   ├── postman/            # Newman seeding collections
+│   └── kind.config.yaml    # KinD cluster configuration
+├── .specify/               # Specification-Driven Development
+│   ├── constitution.md     # Governance rules
+│   ├── spec.md/spec.yaml   # OpenAPI specifications
+│   ├── regulatory-inventory.md  # Compliance checklist
+│   └── policies/           # ODRL policy templates
+├── docs/                   # Documentation
+│   ├── cloud-deployment-options.md
+│   └── spec-driven-dev-mvd-instructions.md
+├── tests/
+│   └── end2end/            # Integration tests
+├── .run/                   # IntelliJ run configurations
+├── WARP.md                 # AI assistant guidance
+├── seed-edc.sh             # Identity/credential seeding script
+└── README.md               # This file
 ```
 
 ---
 
-## 7. Credentials & Access Control
+## Common Development Commands
 
-### 7.1 Verifiable Credentials
+### Build
+```bash
+# Standard build
+./gradlew build
 
-The demo uses two types of credentials:
+# Build with persistence (for Docker/K8s)
+./gradlew -Ppersistence=true build
 
-**MembershipCredential**
-- Issued by: Dataspace Issuer
-- Purpose: Proves membership in the aerospace dataspace
-- Required for: Catalog access
+# Build Docker images
+./gradlew -Ppersistence=true dockerize
+```
 
-**DataProcessorCredential**
+### Test
+```bash
+# Run checkstyle
+./gradlew checkstyleMain checkstyleTest
 
-Issued by: Dataspace Issuer. Purpose: Proves authorization to process certain data types. Levels: `processing` (can access standard DPP data) and `sensitive` (can access restricted data, not used in demo). Required for: Contract negotiation.
+# Run end-to-end tests (requires running dataspace)
+./gradlew :tests:end2end:test
+```
 
-### 7.2 Policy Evaluation Flow
+### Deploy
+```bash
+# IntelliJ: Run .run/dataspace compound configuration, then:
+./seed-edc.sh
 
-This diagram shows how access decisions are made. When a DSP message with a Verifiable Presentation arrives, the system extracts the VP, verifies credential signatures, validates the issuer trust chain, and evaluates policy constraints. The request is allowed only if all checks pass.
-
-```mermaid
-flowchart TB
-    subgraph Request["Incoming Request"]
-        REQ["DSP Message + VP"]
-    end
-    
-    subgraph Eval["Policy Evaluation"]
-        VP["Extract VP"]
-        VC["Verify Signatures"]
-        CHAIN["Verify Trust Chain"]
-        POLICY["Evaluate Constraints"]
-    end
-    
-    subgraph Result["Decision"]
-        ALLOW["Allow"]
-        DENY["Deny"]
-    end
-    
-    REQ --> VP --> VC --> CHAIN --> POLICY
-    POLICY --> |Satisfied| ALLOW
-    POLICY --> |Not Satisfied| DENY
+# Kubernetes: See deployment/README.md (if exists) or WARP.md
 ```
 
 ---
 
-## 8. API Reference
+## Seeding the Dataspace
 
-### 8.1 EDC Management APIs
+**CRITICAL**: Always run seeding after starting EDC runtimes. This creates:
+- Participant contexts in IdentityHubs
+- DID documents
+- Verifiable Credentials (MembershipCredential, domain-specific credentials)
+- Assets, policies, contract definitions (domain-specific)
 
-**Consumer Endpoints (port 8081):**
+```bash
+# IntelliJ deployment
+./seed-edc.sh
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/management/v3/catalog/request` | POST | Request remote catalog |
-| `/api/catalog/v1alpha/catalog/query` | POST | Query cached catalog |
-| `/api/management/v3/contractnegotiations` | POST | Start negotiation |
-| `/api/management/v3/contractnegotiations/{id}` | GET | Get negotiation status |
-| `/api/management/v3/transferprocesses` | POST | Start transfer |
-| `/api/management/v3/edrs/{id}/dataaddress` | GET | Get data address |
-
-**Provider Endpoints (port 8191):**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/management/v3/assets` | POST | Create asset |
-| `/api/management/v3/assets/request` | POST | List assets |
-| `/api/management/v3/policydefinitions` | POST | Create policy |
-| `/api/management/v3/contractdefinitions` | POST | Create contract def |
-
-### 8.2 DPP Backend APIs
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/parts` | GET | List all DPPs |
-| `/api/parts/98765` | GET | HPT Blade DPP |
-| `/api/parts/98766` | GET | Compressor Blade DPP |
-| `/api/parts/98767` | GET | Combustor Liner DPP |
-| `/health` | GET | Health check |
+# Note: Domain-specific asset seeding is separate
+# Example: For health domain, run additional script after seed-edc.sh
+# ./seed-health-assets.sh
+```
 
 ---
 
-## 9. Troubleshooting
+## Specification-Driven Development (SDD)
 
-**Problem: "No DPP assets found in catalog"**
-- Ensure MVD runtimes are running
-- Run `./seed.sh` first
-- Run `./seed-aerospace.sh` after seed.sh
-- Wait 5-10 seconds for catalog sync
+MVD uses a specification-first approach where OpenAPI specifications drive code generation and testing:
 
-**Problem: "Contract negotiation TERMINATED"**
-- Check that credentials are properly issued
-- Verify the provider is healthy: `curl http://localhost:8191/api/check/health`
-- Check provider logs for policy evaluation errors
+### SDD Workflow
 
-**Problem: "Frontend can't reach APIs"**
-- In dev mode: Verify Vite proxy configuration
-- In Docker: Ensure `host.docker.internal` resolves correctly
-- Check CORS headers in responses
+```
+1. Define Spec (.specify/spec.yaml)
+    ↓
+2. Generate Mock API (Prism)
+    ↓
+3. Develop Frontend (against mock)
+    ↓
+4. Implement Backend (spec-compliant)
+    ↓
+5. Contract Tests (Newman/Pact)
+    ↓
+6. Compliance Tests (automated)
+    ↓
+7. Deploy (only if 100% compliant)
+```
 
-**Problem: "Credential verification failed"**
-- Verify NGINX is serving the issuer DID: `curl http://localhost:9876/.well-known/did.json`
-- Re-run `./seed.sh` to re-issue credentials
-- Check IdentityHub logs for signature verification errors
+### Tools
 
-**Problem: "Transfer stuck in STARTED"**
-- This is normal - HTTP-PULL transfers remain in STARTED state
-- Check if EDR was returned
-- Try fetching data directly using the EDR token
+- **GitHub Spec Kit**: Specification management & task generation
+- **Prism**: OpenAPI mock server
+- **Newman**: Postman CLI for contract testing
+- **Pact**: Consumer-driven contract testing
+- **dsp-tck/dcp-tck**: Protocol compliance testing
+
+See [docs/spec-driven-dev-mvd-instructions.md](docs/spec-driven-dev-mvd-instructions.md) for complete guide.
 
 ---
 
-## 10. Future Extensions
+## Domain-Specific Examples
 
-**Phase 2 Enhancements:**
-- Usage control policies (time-limited access)
-- Push transfers to cloud storage (S3, Azure Blob)
-- Real-time data updates via WebSocket
+### Health Dataspace Implementation
 
-**Phase 3 Enhancements:**
-- Multi-tier supply chain (sub-supplier DPPs)
-- Digital twin integration
-- Blockchain anchoring for audit trails
+**Repository**: [MVD-health branch](https://github.com/ma3u/MinimumViableDataspace/tree/health-demo)
 
-**Phase 4 Enhancements:**
-- AI-powered anomaly detection
-- Predictive maintenance integration
-- Full EASA compliance validation
+**Key Differences from Core MVD:**
+```
+MVD (Core)                      MVD-health (Domain Extension)
+├── seed-edc.sh                 ├── seed-dataspace.sh (enhanced)
+├── [No frontend]               ├── frontend/ (React + FHIR viewer)
+├── [No backend]                ├── backend-mock/ (FHIR R4 data)
+├── [Generic policies]          ├── backend-edc/ (EDC proxy)
+└── extensions/dcp-impl/        ├── docker-compose.health.yml
+    (base DCP)                  ├── docker-compose.edc.yml
+                                ├── docs/USER-MANUAL.md
+                                └── extensions/edc-health-client/
+                                    (health-specific extensions)
+```
+
+**To Create Your Domain:**
+1. Branch from `main`: `git checkout -b my-domain-demo`
+2. Copy structure from `health-demo` branch (if applicable)
+3. Replace health-specific components with your domain
+4. Follow BLUEPRINT phases
+
+---
+
+## Monitoring & Observability
+
+MVD is designed to integrate with standard observability tools:
+
+### Prometheus + Grafana
+
+```bash
+# See MVD-health branch for pre-configured observability stack
+# docker-compose.observability.yml includes:
+# - Prometheus (metrics)
+# - Grafana (dashboards)
+# - Jaeger (tracing)
+# - Loki (logs)
+```
+
+### OpenTelemetry
+
+All MVD components support OpenTelemetry for distributed tracing:
+- EDC connectors emit OTLP traces
+- Backend services instrumented with OpenTelemetry SDK
+- Traces visualized in Jaeger
+
+---
+
+## Security Considerations
+
+### Development (Local)
+- ⚠️ Uses in-memory databases and vaults
+- ⚠️ Simplified DID resolution (not production-grade)
+- ⚠️ Demo credentials (not secure)
+
+### Production (Cloud)
+- ✅ Azure Key Vault (HSM-backed)
+- ✅ PostgreSQL with encryption at rest
+- ✅ Network policies (Calico/Azure CNI)
+- ✅ RBAC for Kubernetes API
+- ✅ Private endpoints for all services
+- ✅ Regular credential rotation
+
+---
+
+## Regulatory Compliance
+
+MVD provides **patterns** for compliance, not compliance itself. Your domain implementation must ensure:
+
+### Built-in Compliance Patterns
+- ✅ Verifiable Credentials for access control
+- ✅ ODRL policies for fine-grained permissions
+- ✅ Audit logging (all DSP messages)
+- ✅ Credential-based access (zero-trust)
+
+### Domain-Specific Compliance (Your Responsibility)
+- GDPR (Art. 9, Art. 89 for health data)
+- HIPAA (US health data)
+- EHDS (EU health data)
+- Industry-specific regulations
+
+**Example: Health Domain Compliance**
+```yaml
+# .specify/regulatory-inventory.md
+- EHDS Regulation (EU 2025/327): Art. 50/51 health categories
+- GDPR Art. 9: Special categories of personal data
+- GDPR Art. 89: Safeguards for research
+- German GDNG: Health Data Use Act
+- FHIR R4: ISiK and KBV profiles
+- MedDRA: Adverse event classification
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**Runtimes fail to communicate**
+- Forgot to run seed script: `./seed-edc.sh`
+- DID documents not accessible (check IdentityHub logs)
+- Vault secrets not synchronized (IntelliJ memory vault limitation)
+
+**Contract negotiation fails**
+- Missing credentials: Check IdentityHub has issued MembershipCredential
+- Policy constraints not satisfied: Check ODRL policy in asset
+- Credential verification failure: Re-run seed script
+
+**Port conflicts**
+- IntelliJ deployment uses ports 7080-10100
+- Check no other services using these ports
+- See WARP.md for complete port mapping
+
+**Build failures**
+- Missing `-Ppersistence=true` flag for Docker/K8s builds
+- Java version < 17
+- Gradle wrapper issues: `./gradlew wrapper --gradle-version 8.5`
+
+---
+
+## Version & Stability
+
+- **`main` branch**: Latest development, uses `-SNAPSHOT` EDC versions
+- **Tagged releases**: Stable EDC release versions
+- **Domain branches**: `health-demo`, `aerospace-demo` (archived), etc.
+
+**Versioning Strategy:**
+- No backward compatibility guarantees (this is a template, not a product)
+- Bugfixes target `main` branch only
+- Domain branches maintained independently
+
+---
+
+## Contributing
+
+MVD is a template repository. Contributions should focus on:
+
+1. **Core EDC Infrastructure**: Extensions, deployment patterns, build improvements
+2. **Documentation**: BLUEPRINT methodology, deployment guides, troubleshooting
+3. **Domain Examples**: Reference implementations in domain branches
+
+**Not Accepted:**
+- Domain-specific code in `main` branch (use domain branches)
+- Breaking changes without migration guide
+- Untested code
+
+**Process:**
+1. Fork repository
+2. Create feature branch
+3. Submit pull request with:
+   - Clear description of change
+   - Tests for new functionality
+   - Documentation updates
+
+---
+
+## Resources
+
+### Documentation
+- [WARP.md](WARP.md) - AI assistant guidance & development workflow
+- [docs/cloud-deployment-options.md](docs/cloud-deployment-options.md) - Cloud K8s deployment guide
+- [docs/spec-driven-dev-mvd-instructions.md](docs/spec-driven-dev-mvd-instructions.md) - SDD methodology
+
+### External Links
+- [Eclipse Dataspace Components](https://eclipse-edc.github.io/docs/)
+- [Dataspace Protocol Specification](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/)
+- [IdentityHub Documentation](https://github.com/eclipse-edc/IdentityHub)
+- [DCP Specification](https://github.com/eclipse-tractusx/identity-trust)
+
+### Domain Examples
+- [Health Dataspace (MVD-health)](https://github.com/ma3u/MinimumViableDataspace/tree/health-demo)
+- Aerospace Dataspace (archived)
 
 ---
 
 ## License
 
-Apache License 2.0 - see LICENSE file
+This project is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
 
 ---
 
-*This demo is part of the Aerospace Supply Chain initiative for sovereign aerospace data exchange.*
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/ma3u/MinimumViableDataspace/issues)
+- **Discussions**: Use GitHub Discussions for questions
+- **Domain-Specific**: Check domain branch documentation
+
+**Note**: This is a demonstration template, not a supported product. Use at your own risk in production environments.
