@@ -1,6 +1,6 @@
-# Minimum Viable Dataspace (MVD)
+# Start from Minimum Viable Dataspace (MVD)
 
-## BLUEPRINT for Building Domain-Specific Dataspaces
+## A BLUEPRINT for Building Domain-Specific Dataspaces
 
 A reusable template and methodology for creating production-grade, compliant dataspaces across any domain using Eclipse Dataspace Components (EDC), Decentralized Claims Protocol (DCP), and specification-driven development.
 
@@ -228,15 +228,474 @@ The BLUEPRINT methodology is a structured, phase-based approach to building data
 - Health check endpoints
 - See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) for complete guide
 
-#### Phase 6: Production Deployment & Security 🚧 (IN PROGRESS)
-**Status**: In Progress (see [Issue #22](https://github.com/ma3u/MinimumViableDataspace/issues/22))
-- CI/CD pipeline with security scanning (Trivy) and SBOM generation ✅
+#### Phase 6: Production Deployment & Security ✅ (COMPLETE)
+**Status**: Complete (see [Issue #22](https://github.com/ma3u/MinimumViableDataspace/issues/22))
+- CI/CD pipelines (build + deploy) with security scanning ✅
 - Production deployment guides for AKS/EKS/GKE ✅
 - Security hardening documentation (NetworkPolicies, RBAC, compliance) ✅
 - Operational runbook (Day 1/Day 2, DR, troubleshooting) ✅
-- Kubernetes base manifests (in progress)
-- Kustomize overlays for environments (pending)
+- Kubernetes manifests for all 5 EDC components ✅
+- Environment overlays (dev, production) ✅
 - See [docs/PRODUCTION-DEPLOYMENT.md](docs/PRODUCTION-DEPLOYMENT.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/RUNBOOK.md](docs/RUNBOOK.md)
+
+---
+
+## Complete BLUEPRINT Implementation Guide
+
+All 6 phases of the BLUEPRINT methodology have been implemented in this repository. Use this as a reference implementation for building your own domain-specific dataspace.
+
+### Phase-by-Phase Guide
+
+Each phase includes:
+- 📋 **Linked GitHub Issue** with full acceptance criteria
+- 🎯 **Deliverables** and what was implemented
+- 💬 **AI Prompt Template** to guide your implementation
+- 📚 **Key Files** to review
+
+---
+
+### Phase 1: Cleanup and Setup
+**Issue**: [#17 - Cleanup and Setup](https://github.com/ma3u/MinimumViableDataspace/issues/17) ✅
+
+**What Was Delivered**:
+- Removed domain-specific code (aerospace demo)
+- Established clean MVD template
+- Research and documentation on cloud deployment options
+- Development environment setup guide
+
+**Key Files**:
+- `docs/cloud-deployment-options.md` - Cloud platform comparison
+- `WARP.md` - AI agent integration guide
+- `.gitignore`, build configuration cleanup
+
+**AI Prompt Template for Your Phase 1**:
+```
+I'm starting a new dataspace project based on MinimumViableDataspace.
+
+Create a GitHub issue for Phase 1: Cleanup and Setup with these tasks:
+1. Remove any existing domain-specific code
+2. Research cloud deployment options for [YOUR_DOMAIN]
+3. Set up development environment
+4. Document initial architecture decisions
+
+My domain is: [e.g., healthcare, supply chain, finance]
+Compliance requirements: [e.g., GDPR, HIPAA, SOC2]
+Target cloud platform: [e.g., Azure, AWS, GCP]
+
+Create the issue in GitHub with clear acceptance criteria.
+```
+
+---
+
+### Phase 2: Domain Specification Template
+**Issue**: [#18 - Domain Specification Template](https://github.com/ma3u/MinimumViableDataspace/issues/18) ✅
+
+**What Was Delivered**:
+- `.specify/` directory structure for specification-driven development
+- Template ODRL policies for access control
+- Regulatory inventory framework
+- Domain data model templates
+
+**Key Files**:
+- `.specify/README.md` - Specification framework guide
+- `.specify/policies/` - ODRL policy templates
+- `.specify/DOMAIN-BRANCHING-GUIDE.md` - Multi-domain strategy
+
+**AI Prompt Template for Your Phase 2**:
+```
+Implement Phase 2: Domain Specification for my [DOMAIN] dataspace.
+
+Create these deliverables:
+1. .specify/spec.md - Domain requirements for [YOUR_USE_CASE]
+2. .specify/spec.yaml - OpenAPI spec for [YOUR_APIS]
+3. .specify/constitution.md - Non-negotiable rules:
+   - Data residency: [e.g., EU only]
+   - Encryption: [e.g., AES-256]
+   - Compliance: [e.g., GDPR Art. 9]
+4. .specify/regulatory-inventory.md - Document:
+   - [REGULATION_1]: Requirements and controls
+   - [REGULATION_2]: Requirements and controls
+5. .specify/policies/*.yaml - ODRL policies for:
+   - [POLICY_1_PURPOSE]
+   - [POLICY_2_PURPOSE]
+
+Follow the template structure in MinimumViableDataspace/.specify/
+Create issue #[X] with acceptance criteria.
+```
+
+---
+
+### Phase 3: Core Extensions
+**Issue**: [#19 - Core Extensions](https://github.com/ma3u/MinimumViableDataspace/issues/19) ✅
+
+**What Was Delivered**:
+- DCP implementation extensions
+- Policy evaluation functions (MembershipCredential, DataAccessLevel)
+- Catalog node resolver
+- DID resolution for did:web
+
+**Key Files**:
+- `extensions/dcp-impl/` - DCP protocol implementation
+- `extensions/catalog-node-resolver/` - Participant directory
+- `extensions/did-example-resolver/` - DID resolution
+- `extensions/superuser-seed/` - Identity seeding
+
+**AI Prompt Template for Your Phase 3**:
+```
+Implement Phase 3: Core Extensions for [DOMAIN] dataspace.
+
+Customize these EDC extensions:
+1. DCP Implementation:
+   - Add [DOMAIN]Credential scope (extend MembershipCredential pattern)
+   - Implement policy function for [DOMAIN_SPECIFIC_RULE]
+   
+2. Catalog Node Resolver:
+   - Update participant list in deployment/assets/participants
+   - Add [ORGANIZATION] participants
+   
+3. Policy Evaluation:
+   - Create [DOMAIN]CredentialEvaluationFunction
+   - Verify [SPECIFIC_ATTRIBUTE] in credentials
+   - Example: Role, certification level, data category access
+
+Reference implementation: extensions/dcp-impl/
+Create issue #[X] with testing criteria.
+```
+
+---
+
+### Phase 4: Testing Infrastructure
+**Issue**: [#20 - Testing Infrastructure](https://github.com/ma3u/MinimumViableDataspace/issues/20) ✅
+
+**What Was Delivered**:
+- Unit testing framework (JUnit 5, Mockito, JaCoCo)
+- GitHub Actions CI/CD workflows
+- Protocol compliance testing setup (DSP-TCK, DCP-TCK)
+- Test documentation and examples
+
+**Key Files**:
+- `.github/workflows/` - CI/CD pipelines
+- `docs/TESTING.md` - Comprehensive testing guide
+- Test examples across all modules
+
+**AI Prompt Template for Your Phase 4**:
+```
+Implement Phase 4: Testing Infrastructure for [DOMAIN] dataspace.
+
+Set up comprehensive testing:
+1. Unit Tests:
+   - Test [DOMAIN]CredentialEvaluationFunction
+   - Test [CUSTOM_EXTENSION] logic
+   - Target: 80% code coverage
+   
+2. Integration Tests:
+   - DSP protocol flows (catalog, negotiation, transfer)
+   - DCP credential exchange
+   - [DOMAIN_SPECIFIC_WORKFLOW]
+   
+3. Compliance Tests:
+   - DSP-TCK: Verify protocol compliance
+   - DCP-TCK: Verify credential exchange
+   - [DOMAIN_REGULATION_TEST]: Verify [SPECIFIC_REQUIREMENT]
+   
+4. CI/CD Pipeline:
+   - GitHub Actions workflow
+   - Run tests on PR
+   - Block merge if tests fail
+
+Reference: docs/TESTING.md
+Create issue #[X] with coverage targets.
+```
+
+---
+
+### Phase 5: Observability & Monitoring
+**Issue**: [#21 - Observability & Monitoring](https://github.com/ma3u/MinimumViableDataspace/issues/21) ✅
+
+**What Was Delivered**:
+- Prometheus metrics collection (11 EDC runtime targets)
+- Jaeger distributed tracing
+- 3 Grafana dashboards (System Overview, DSP Protocol, DCP Credentials) with 24 panels
+- Health check endpoints
+- Complete observability documentation
+
+**Key Files**:
+- `deployment/observability/` - Prometheus, Grafana, Jaeger config
+- `deployment/observability/grafana/dashboards/` - 3 pre-built dashboards
+- `docs/OBSERVABILITY.md` - Complete observability guide
+
+**AI Prompt Template for Your Phase 5**:
+```
+Implement Phase 5: Observability & Monitoring for [DOMAIN] dataspace.
+
+Set up monitoring infrastructure:
+1. Deploy Observability Stack:
+   - Use deployment/observability/docker-compose.yml as template
+   - Add [DOMAIN_SPECIFIC_SERVICE] to Prometheus targets
+   
+2. Create Custom Metrics:
+   - [DOMAIN_METRIC_1]: Track [BUSINESS_METRIC]
+   - [DOMAIN_METRIC_2]: Track [PERFORMANCE_METRIC]
+   - Example: contract_value_total, data_transfer_volume_bytes
+   
+3. Create Custom Dashboards:
+   - Dashboard: [DOMAIN] Business Metrics
+   - Dashboard: [DOMAIN] Compliance Tracking
+   - Use existing dashboards as templates
+   
+4. Configure Alerts:
+   - Alert: [CRITICAL_CONDITION]
+   - Alert: [SLA_VIOLATION]
+   - Route to: [PAGERDUTY/SLACK/EMAIL]
+
+Reference: docs/OBSERVABILITY.md
+Create issue #[X] with dashboard requirements.
+```
+
+---
+
+### Phase 6: Production Deployment & Security
+**Issue**: [#22 - Production Deployment & Security](https://github.com/ma3u/MinimumViableDataspace/issues/22) ✅
+
+**What Was Delivered**:
+- Complete Kubernetes manifests for all 5 EDC components
+- Security hardening (Pod Security Standards, RBAC, NetworkPolicies)
+- CI/CD pipelines (build + deploy)
+- Multi-cloud deployment guides (Azure AKS, AWS EKS, GCP GKE)
+- Comprehensive security and operational documentation
+
+**Key Files**:
+- `deployment/k8s/base/` - Base Kubernetes manifests
+- `deployment/k8s/overlays/` - Environment-specific overlays
+- `.github/workflows/build-release.yml` - Build pipeline
+- `.github/workflows/deploy.yml` - Deployment pipeline
+- `docs/PRODUCTION-DEPLOYMENT.md` - Deployment guide
+- `docs/SECURITY.md` - Security hardening guide
+- `docs/RUNBOOK.md` - Operational procedures
+
+**AI Prompt Template for Your Phase 6**:
+```
+Implement Phase 6: Production Deployment for [DOMAIN] dataspace.
+
+Prepare for production:
+1. Kubernetes Configuration:
+   - Use deployment/k8s/base/ as template
+   - Adjust resource limits for [YOUR_LOAD_PROFILE]
+   - Add [DOMAIN_SERVICE] deployment if needed
+   
+2. Security Hardening:
+   - Review docs/SECURITY.md
+   - Implement [DOMAIN_SPECIFIC_CONTROL]
+   - Example: HIPAA audit logging, PCI DSS network segmentation
+   
+3. Cloud Deployment:
+   - Target: [AZURE/AWS/GCP]
+   - Region: [REGION] (data residency requirement)
+   - Follow docs/PRODUCTION-DEPLOYMENT.md for [CLOUD_PROVIDER]
+   
+4. Operational Readiness:
+   - Define RTO: [X] hours
+   - Define RPO: [Y] minutes
+   - Create DR plan following docs/RUNBOOK.md
+   - Set up monitoring alerts
+
+Create issue #[X] with deployment checklist.
+```
+
+---
+
+## AI-Assisted Development: Best Practices
+
+### Seamless Tool Switching with Symbolic Links
+
+Different AI coding assistants have different file conventions for context and rules. Use symbolic links to maintain one source of truth:
+
+```bash
+# Create a central rules file
+echo "# Development Rules" > RULES.md
+cat WARP.md >> RULES.md  # Add Warp-specific rules
+
+# Create symbolic links for different AI tools
+ln -s RULES.md .github/copilot-instructions.md  # GitHub Copilot
+ln -s RULES.md .cursorrules                      # Cursor
+ln -s RULES.md .aiderules                        # Aider
+ln -s RULES.md .clinerules                       # Cline (formerly Claude Code)
+
+# For Warp (keep WARP.md as primary)
+ln -s WARP.md .warp-context.md
+
+# For project-specific rules
+ln -s .specify/constitution.md .ai-constitution
+```
+
+**This Repository's Setup**:
+```bash
+# View current symbolic link setup
+ls -la | grep '^l'
+
+# WARP.md is the primary context file
+# Contains:
+# - Project architecture
+# - Development workflow  
+# - EDC component details
+# - Deployment procedures
+```
+
+### Recommended Tool Combinations
+
+| Phase | Primary Tool | Alternative | Why |
+|-------|-------------|-------------|-----|
+| **Phase 1-2** (Planning) | Warp Agent Mode | Claude/ChatGPT | Complex reasoning, research |
+| **Phase 3** (Extensions) | Cursor / GitHub Copilot | IntelliJ AI | Java code generation, EDC patterns |
+| **Phase 4** (Testing) | GitHub Copilot | Cursor | Test generation, mocking |
+| **Phase 5** (Observability) | Warp Agent Mode | Cline | Configuration files, YAML |
+| **Phase 6** (Deployment) | Warp Agent Mode | Cursor + Copilot | Kubernetes manifests, documentation |
+
+### Tool-Specific Tips
+
+**Warp Agent Mode** (Best for this project):
+- ✅ Excellent for: Multi-file operations, Git workflows, deployment
+- ✅ Use `WARP.md` for project context
+- ✅ Can execute commands directly
+- ⚠️ Limited inline code editing (uses diffs)
+
+**GitHub Copilot**:
+- ✅ Excellent for: Inline code completion, test generation
+- ✅ Use `.github/copilot-instructions.md` for context
+- ⚠️ Limited multi-file context
+
+**Cursor**:
+- ✅ Excellent for: Refactoring, multi-file edits
+- ✅ Use `.cursorrules` for project rules
+- ✅ Composer mode for complex changes
+
+**Cline (Claude Code)**:
+- ✅ Excellent for: Planning, documentation
+- ✅ Use `.clinerules` for context
+- ✅ Good at understanding complex requirements
+
+**Aider**:
+- ✅ Excellent for: CLI-based development, Git integration
+- ✅ Use `.aiderules` for context
+- ✅ Strong refactoring capabilities
+
+### Context Sharing Pattern
+
+1. **Maintain WARP.md as Source of Truth**
+2. **Link to it from other tools**:
+   ```markdown
+   # .github/copilot-instructions.md
+   
+   See WARP.md for complete project context.
+   
+   Quick reference:
+   - Architecture: See WARP.md ## Architecture
+   - Build: ./gradlew build
+   - Deploy: See deployment/k8s/
+   ```
+
+3. **Update WARP.md when architecture changes**
+4. **Symbolic links automatically reflect updates**
+
+---
+
+## Contributing & Feedback
+
+### Found a Bug? Have a Suggestion?
+
+We welcome contributions and feedback! Please help improve MVD:
+
+**🐛 Report a Bug**:
+1. Check [existing issues](https://github.com/ma3u/MinimumViableDataspace/issues)
+2. Create a new issue with:
+   - Clear title: `[BUG] Short description`
+   - Steps to reproduce
+   - Expected vs. actual behavior
+   - Environment (OS, Java version, EDC version)
+   - Logs or error messages
+
+**💡 Suggest an Improvement**:
+1. Create an issue with:
+   - Clear title: `[FEATURE] Short description`
+   - Use case: Why is this needed?
+   - Proposed solution (if you have one)
+   - Alternative approaches considered
+
+**📖 Documentation Issues**:
+1. Create an issue with:
+   - Title: `[DOCS] What's unclear/missing`
+   - Which document: `docs/FILE.md`
+   - What you expected to find
+   - Suggested improvement
+
+**🔧 Submit a Pull Request**:
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes following existing patterns
+4. Test your changes thoroughly
+5. Update documentation (WARP.md, relevant docs/)
+6. Commit with descriptive messages
+7. Push and create a PR with:
+   - Clear description of changes
+   - Link to related issue
+   - Screenshots (if UI changes)
+
+**Issue Templates**:
+```markdown
+## Bug Report Template
+**Title**: [BUG] Short description
+
+**Environment**:
+- OS: macOS 14.0 / Ubuntu 22.04 / Windows 11
+- Java: 17.0.8
+- EDC Version: (from build.gradle.kts)
+
+**Steps to Reproduce**:
+1. Start dataspace with `./seed.sh`
+2. Call API: `curl ...`
+3. Observe error: ...
+
+**Expected**: Should return 200 OK
+**Actual**: Returns 500 Internal Server Error
+
+**Logs**:
+```
+[paste relevant logs]
+```
+
+**Context**: Trying to implement [your use case]
+```
+
+```markdown
+## Feature Request Template  
+**Title**: [FEATURE] Short description
+
+**Use Case**:
+As a [dataspace operator/developer],
+I want to [do something],
+So that [achieve outcome].
+
+**Current Limitation**:
+Currently, MVD [does not support X / requires manual Y].
+
+**Proposed Solution**:
+1. Add [component/feature]
+2. Modify [existing functionality]
+3. Document [new capability]
+
+**Alternatives Considered**:
+- Option A: [description] - Why not chosen: [reason]
+- Option B: [description] - Why not chosen: [reason]
+
+**Additional Context**:
+- Related to [domain/regulation]:
+- Similar to [other project/standard]:
+```
+
+**Quick Links**:
+- 📋 [All Issues](https://github.com/ma3u/MinimumViableDataspace/issues)
+- 🎯 [Roadmap & Milestones](https://github.com/ma3u/MinimumViableDataspace/milestones)
+- 💬 [Discussions](https://github.com/ma3u/MinimumViableDataspace/discussions)
 
 #### Phase 2: Domain Specification
 **Create**: `BLUEPRINT: Phase 2 - <Your Domain> Specification`
