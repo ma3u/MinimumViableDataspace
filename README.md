@@ -167,375 +167,258 @@ Now you're ready to customize MVD for your specific domain. Follow the **BLUEPRI
 
 ---
 
-## BLUEPRINT Methodology: Phase-Based Development
+## Using the BLUEPRINT Methodology
 
-The BLUEPRINT methodology is a structured, phase-based approach to building dataspaces. Each phase is tracked as a GitHub issue with clear acceptance criteria.
+The BLUEPRINT methodology is a proven, phase-based approach to building production-grade dataspaces. All 6 phases have been implemented in this repository as a **complete reference implementation**.
 
-### Phase-Based Development Workflow
+### How to Use This Blueprint
 
-**Before starting ANY implementation:**
+**Each phase is documented as a closed GitHub issue** containing:
+- ✅ Acceptance criteria (all met)
+- 📋 Implementation details and decisions
+- 🎯 Deliverables and artifacts created
+- 💡 Lessons learned and recommendations
 
-1. **Create BLUEPRINT Issue**
-   - Title: `BLUEPRINT: Phase <X> - <Feature Name>`
-   - Define acceptance criteria
-   - Commit issue creation to `main` branch
-
-2. **Implement Phase**
-   - Update GitHub issue with progress
-   - Reference issue in all commits: `#<issue-number>`
-   - Document decisions and blockers
-
-3. **Complete Phase**
-   - Verify all acceptance criteria met
-   - Close issue with final summary
-
-### BLUEPRINT Phases for Domain-Specific Dataspace
-
-#### Phase 1: Cleanup and Setup ✅ (COMPLETE)
-**Status**: Complete (see [Issue #17](https://github.com/ma3u/MinimumViableDataspace/issues/17))
-- Clean repository (remove aerospace demo)
-- Research cloud deployment options
-- Establish development environment
-
-#### Phase 2: Domain Specification Template ✅ (COMPLETE)
-**Status**: Complete (see [Issue #18](https://github.com/ma3u/MinimumViableDataspace/issues/18))
-- Create `.specify/` structure for specification-driven development
-- Template ODRL policies for dataspace access control
-- Regulatory inventory framework
-
-#### Phase 3: Core Extensions ✅ (COMPLETE)
-**Status**: Complete (see [Issue #19](https://github.com/ma3u/MinimumViableDataspace/issues/19))
-- DCP implementation extensions
-- Policy evaluation functions
-- Catalog node resolver
-- DID resolution
-
-#### Phase 4: Testing Infrastructure ✅ (COMPLETE)
-**Status**: Complete (see [Issue #20](https://github.com/ma3u/MinimumViableDataspace/issues/20))
-- Unit testing framework (JUnit 5 + JaCoCo)
-- GitHub Actions CI/CD workflows
-- Protocol compliance testing infrastructure (DSP-TCK, DCP-TCK)
-- Comprehensive testing documentation
-
-#### Phase 5: Observability & Monitoring ✅ (COMPLETE)
-**Status**: Complete (see [Issue #21](https://github.com/ma3u/MinimumViableDataspace/issues/21))
-- Prometheus metrics collection
-- Jaeger distributed tracing
-- Grafana dashboards (3 dashboards with 24 panels)
-- Health check endpoints
-- See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) for complete guide
-
-#### Phase 6: Production Deployment & Security ✅ (COMPLETE)
-**Status**: Complete (see [Issue #22](https://github.com/ma3u/MinimumViableDataspace/issues/22))
-- CI/CD pipelines (build + deploy) with security scanning ✅
-- Production deployment guides for AKS/EKS/GKE ✅
-- Security hardening documentation (NetworkPolicies, RBAC, compliance) ✅
-- Operational runbook (Day 1/Day 2, DR, troubleshooting) ✅
-- Kubernetes manifests for all 5 EDC components ✅
-- Environment overlays (dev, production) ✅
-- See [docs/PRODUCTION-DEPLOYMENT.md](docs/PRODUCTION-DEPLOYMENT.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/RUNBOOK.md](docs/RUNBOOK.md)
+**Your approach**:
+1. Review each phase's GitHub issue to understand what was done
+2. Study the delivered artifacts (code, configs, docs)
+3. Adapt the patterns to your domain-specific needs
+4. Use the AI prompt templates below to guide your implementation
 
 ---
 
-## Complete BLUEPRINT Implementation Guide
+## BLUEPRINT Phases Reference
 
-All 6 phases of the BLUEPRINT methodology have been implemented in this repository. Use this as a reference implementation for building your own domain-specific dataspace.
+### Phase 1: Cleanup and Setup ✅
+**GitHub Issue**: [#17 - Cleanup and Setup](https://github.com/ma3u/MinimumViableDataspace/issues/17)
 
-### Phase-by-Phase Guide
+**What This Phase Delivers**:
+- Clean repository structure without domain-specific code
+- Cloud deployment research and documentation
+- Development environment setup
 
-Each phase includes:
-- 📋 **Linked GitHub Issue** with full acceptance criteria
-- 🎯 **Deliverables** and what was implemented
-- 💬 **AI Prompt Template** to guide your implementation
-- 📚 **Key Files** to review
+**Key Artifacts**:
+- `docs/cloud-deployment-options.md` - Multi-cloud comparison (Azure, AWS, GCP)
+- `WARP.md` - AI-assisted development guide
+- Clean build configuration
 
----
-
-### Phase 1: Cleanup and Setup
-**Issue**: [#17 - Cleanup and Setup](https://github.com/ma3u/MinimumViableDataspace/issues/17) ✅
-
-**What Was Delivered**:
-- Removed domain-specific code (aerospace demo)
-- Established clean MVD template
-- Research and documentation on cloud deployment options
-- Development environment setup guide
-
-**Key Files**:
-- `docs/cloud-deployment-options.md` - Cloud platform comparison
-- `WARP.md` - AI agent integration guide
-- `.gitignore`, build configuration cleanup
-
-**AI Prompt Template for Your Phase 1**:
+**Adapt for Your Domain**:
 ```
-I'm starting a new dataspace project based on MinimumViableDataspace.
+I'm building a [DOMAIN] dataspace (e.g., healthcare, supply chain, finance).
 
-Create a GitHub issue for Phase 1: Cleanup and Setup with these tasks:
-1. Remove any existing domain-specific code
-2. Research cloud deployment options for [YOUR_DOMAIN]
+Help me with Phase 1:
+1. Review requirements for [YOUR_DOMAIN]
+2. Research cloud options for [COMPLIANCE_REQUIREMENT] (e.g., GDPR, HIPAA)
 3. Set up development environment
-4. Document initial architecture decisions
+4. Document architecture decisions
 
-My domain is: [e.g., healthcare, supply chain, finance]
-Compliance requirements: [e.g., GDPR, HIPAA, SOC2]
-Target cloud platform: [e.g., Azure, AWS, GCP]
-
-Create the issue in GitHub with clear acceptance criteria.
+Target cloud: [Azure/AWS/GCP]
 ```
 
 ---
 
-### Phase 2: Domain Specification Template
-**Issue**: [#18 - Domain Specification Template](https://github.com/ma3u/MinimumViableDataspace/issues/18) ✅
+### Phase 2: Domain Specification Template ✅
+**GitHub Issue**: [#18 - Domain Specification Template](https://github.com/ma3u/MinimumViableDataspace/issues/18)
 
-**What Was Delivered**:
+**What This Phase Delivers**:
 - `.specify/` directory structure for specification-driven development
 - Template ODRL policies for access control
 - Regulatory inventory framework
-- Domain data model templates
 
-**Key Files**:
-- `.specify/README.md` - Specification framework guide
+**Key Artifacts**:
+- `.specify/README.md` - Spec-driven development guide
+- `.specify/constitution.md` - Governance template
+- `.specify/regulatory-inventory.md` - Compliance tracking
 - `.specify/policies/` - ODRL policy templates
-- `.specify/DOMAIN-BRANCHING-GUIDE.md` - Multi-domain strategy
 
-**AI Prompt Template for Your Phase 2**:
+**Adapt for Your Domain**:
 ```
-Implement Phase 2: Domain Specification for my [DOMAIN] dataspace.
+Customize Phase 2 specifications for [DOMAIN].
 
-Create these deliverables:
-1. .specify/spec.md - Domain requirements for [YOUR_USE_CASE]
-2. .specify/spec.yaml - OpenAPI spec for [YOUR_APIS]
-3. .specify/constitution.md - Non-negotiable rules:
-   - Data residency: [e.g., EU only]
-   - Encryption: [e.g., AES-256]
-   - Compliance: [e.g., GDPR Art. 9]
-4. .specify/regulatory-inventory.md - Document:
-   - [REGULATION_1]: Requirements and controls
-   - [REGULATION_2]: Requirements and controls
-5. .specify/policies/*.yaml - ODRL policies for:
-   - [POLICY_1_PURPOSE]
-   - [POLICY_2_PURPOSE]
+Create:
+1. .specify/spec.yaml - OpenAPI spec for [YOUR_API]
+2. .specify/constitution.md - Update with:
+   - Data residency: [YOUR_REQUIREMENT]
+   - Encryption standards: [YOUR_STANDARD]
+   - Compliance: [YOUR_REGULATIONS]
+3. .specify/policies/*.yaml - ODRL policies for [YOUR_USE_CASES]
 
-Follow the template structure in MinimumViableDataspace/.specify/
-Create issue #[X] with acceptance criteria.
+Reference: .specify/ directory in MVD
 ```
 
 ---
 
-### Phase 3: Core Extensions
-**Issue**: [#19 - Core Extensions](https://github.com/ma3u/MinimumViableDataspace/issues/19) ✅
+### Phase 3: Core Extensions ✅
+**GitHub Issue**: [#19 - Core Extensions](https://github.com/ma3u/MinimumViableDataspace/issues/19)
 
-**What Was Delivered**:
-- DCP implementation extensions
+**What This Phase Delivers**:
+- DCP (Decentralized Claims Protocol) implementation
 - Policy evaluation functions (MembershipCredential, DataAccessLevel)
-- Catalog node resolver
+- Catalog node resolver for participant discovery
 - DID resolution for did:web
 
-**Key Files**:
+**Key Artifacts**:
 - `extensions/dcp-impl/` - DCP protocol implementation
 - `extensions/catalog-node-resolver/` - Participant directory
 - `extensions/did-example-resolver/` - DID resolution
 - `extensions/superuser-seed/` - Identity seeding
 
-**AI Prompt Template for Your Phase 3**:
+**Adapt for Your Domain**:
 ```
-Implement Phase 3: Core Extensions for [DOMAIN] dataspace.
+Extend Phase 3 for [DOMAIN]-specific requirements.
 
-Customize these EDC extensions:
-1. DCP Implementation:
-   - Add [DOMAIN]Credential scope (extend MembershipCredential pattern)
-   - Implement policy function for [DOMAIN_SPECIFIC_RULE]
+1. Add custom credential type:
+   - Create [DOMAIN]Credential (e.g., HealthcareProviderCredential)
+   - Define required claims/attributes
    
-2. Catalog Node Resolver:
-   - Update participant list in deployment/assets/participants
-   - Add [ORGANIZATION] participants
+2. Implement policy functions:
+   - [DOMAIN]CredentialEvaluationFunction
+   - Verify [SPECIFIC_REQUIREMENTS]
    
-3. Policy Evaluation:
-   - Create [DOMAIN]CredentialEvaluationFunction
-   - Verify [SPECIFIC_ATTRIBUTE] in credentials
-   - Example: Role, certification level, data category access
+3. Update participant directory:
+   - Add [YOUR_ORGANIZATIONS] to deployment/assets/participants
 
-Reference implementation: extensions/dcp-impl/
-Create issue #[X] with testing criteria.
+Reference: extensions/ directory
 ```
 
 ---
 
-### Phase 4: Testing Infrastructure
-**Issue**: [#20 - Testing Infrastructure](https://github.com/ma3u/MinimumViableDataspace/issues/20) ✅
+### Phase 4: Testing Infrastructure ✅
+**GitHub Issue**: [#20 - Testing Infrastructure](https://github.com/ma3u/MinimumViableDataspace/issues/20)
 
-**What Was Delivered**:
+**What This Phase Delivers**:
 - Unit testing framework (JUnit 5, Mockito, JaCoCo)
 - GitHub Actions CI/CD workflows
-- Protocol compliance testing setup (DSP-TCK, DCP-TCK)
-- Test documentation and examples
+- Protocol compliance testing (DSP-TCK, DCP-TCK)
+- 80%+ code coverage
 
-**Key Files**:
-- `.github/workflows/` - CI/CD pipelines
-- `docs/TESTING.md` - Comprehensive testing guide
-- Test examples across all modules
+**Key Artifacts**:
+- `.github/workflows/test.yml` - Automated testing pipeline
+- `docs/TESTING.md` - Complete testing guide
+- Test examples in all modules
 
-**AI Prompt Template for Your Phase 4**:
+**Adapt for Your Domain**:
 ```
-Implement Phase 4: Testing Infrastructure for [DOMAIN] dataspace.
+Add [DOMAIN]-specific tests to Phase 4 infrastructure.
 
-Set up comprehensive testing:
-1. Unit Tests:
-   - Test [DOMAIN]CredentialEvaluationFunction
-   - Test [CUSTOM_EXTENSION] logic
-   - Target: 80% code coverage
-   
-2. Integration Tests:
-   - DSP protocol flows (catalog, negotiation, transfer)
-   - DCP credential exchange
-   - [DOMAIN_SPECIFIC_WORKFLOW]
-   
-3. Compliance Tests:
-   - DSP-TCK: Verify protocol compliance
-   - DCP-TCK: Verify credential exchange
-   - [DOMAIN_REGULATION_TEST]: Verify [SPECIFIC_REQUIREMENT]
-   
-4. CI/CD Pipeline:
-   - GitHub Actions workflow
-   - Run tests on PR
-   - Block merge if tests fail
+1. Unit tests for custom extensions
+2. Integration tests for [DOMAIN_WORKFLOW]
+3. Compliance tests for [REGULATION]
+4. Performance tests for [SLA_REQUIREMENT]
 
+Target: 80%+ coverage
 Reference: docs/TESTING.md
-Create issue #[X] with coverage targets.
 ```
 
 ---
 
-### Phase 5: Observability & Monitoring
-**Issue**: [#21 - Observability & Monitoring](https://github.com/ma3u/MinimumViableDataspace/issues/21) ✅
+### Phase 5: Observability & Monitoring ✅
+**GitHub Issue**: [#21 - Observability & Monitoring](https://github.com/ma3u/MinimumViableDataspace/issues/21)
 
-**What Was Delivered**:
-- Prometheus metrics collection (11 EDC runtime targets)
+**What This Phase Delivers**:
+- Prometheus metrics (11 EDC runtime targets)
 - Jaeger distributed tracing
-- 3 Grafana dashboards (System Overview, DSP Protocol, DCP Credentials) with 24 panels
+- 3 Grafana dashboards with 24 panels
 - Health check endpoints
-- Complete observability documentation
 
-**Key Files**:
-- `deployment/observability/` - Prometheus, Grafana, Jaeger config
-- `deployment/observability/grafana/dashboards/` - 3 pre-built dashboards
-- `docs/OBSERVABILITY.md` - Complete observability guide
+**Key Artifacts**:
+- `deployment/observability/` - Complete observability stack
+- `deployment/observability/grafana/dashboards/` - Pre-built dashboards
+- `docs/OBSERVABILITY.md` - Setup and usage guide
 
-**AI Prompt Template for Your Phase 5**:
+**Adapt for Your Domain**:
 ```
-Implement Phase 5: Observability & Monitoring for [DOMAIN] dataspace.
+Extend Phase 5 monitoring for [DOMAIN] metrics.
 
-Set up monitoring infrastructure:
-1. Deploy Observability Stack:
-   - Use deployment/observability/docker-compose.yml as template
-   - Add [DOMAIN_SPECIFIC_SERVICE] to Prometheus targets
+1. Add custom metrics:
+   - [BUSINESS_METRIC] (e.g., contract_value_total)
+   - [DOMAIN_METRIC] (e.g., patient_records_transferred)
    
-2. Create Custom Metrics:
-   - [DOMAIN_METRIC_1]: Track [BUSINESS_METRIC]
-   - [DOMAIN_METRIC_2]: Track [PERFORMANCE_METRIC]
-   - Example: contract_value_total, data_transfer_volume_bytes
+2. Create dashboards:
+   - [DOMAIN] Business Metrics
+   - [DOMAIN] Compliance Dashboard
    
-3. Create Custom Dashboards:
-   - Dashboard: [DOMAIN] Business Metrics
-   - Dashboard: [DOMAIN] Compliance Tracking
-   - Use existing dashboards as templates
-   
-4. Configure Alerts:
-   - Alert: [CRITICAL_CONDITION]
-   - Alert: [SLA_VIOLATION]
-   - Route to: [PAGERDUTY/SLACK/EMAIL]
+3. Configure alerts for [CRITICAL_CONDITIONS]
 
-Reference: docs/OBSERVABILITY.md
-Create issue #[X] with dashboard requirements.
+Reference: deployment/observability/
 ```
 
 ---
 
-### Phase 6: Production Deployment & Security
-**Issue**: [#22 - Production Deployment & Security](https://github.com/ma3u/MinimumViableDataspace/issues/22) ✅
+### Phase 6: Production Deployment & Security ✅
+**GitHub Issue**: [#22 - Production Deployment & Security](https://github.com/ma3u/MinimumViableDataspace/issues/22)
 
-**What Was Delivered**:
-- Complete Kubernetes manifests for all 5 EDC components
-- Security hardening (Pod Security Standards, RBAC, NetworkPolicies)
+**What This Phase Delivers**:
+- Complete Kubernetes manifests (base + overlays)
+- Security hardening (Pod Security, RBAC, NetworkPolicies)
 - CI/CD pipelines (build + deploy)
-- Multi-cloud deployment guides (Azure AKS, AWS EKS, GCP GKE)
-- Comprehensive security and operational documentation
+- Multi-cloud deployment guides (AKS, EKS, GKE)
+- Operational runbook
 
-**Key Files**:
-- `deployment/k8s/base/` - Base Kubernetes manifests
-- `deployment/k8s/overlays/` - Environment-specific overlays
+**Key Artifacts**:
+- `deployment/k8s/` - Production Kubernetes configs
 - `.github/workflows/build-release.yml` - Build pipeline
 - `.github/workflows/deploy.yml` - Deployment pipeline
-- `docs/PRODUCTION-DEPLOYMENT.md` - Deployment guide
+- `docs/PRODUCTION-DEPLOYMENT.md` - Cloud deployment guide
 - `docs/SECURITY.md` - Security hardening guide
-- `docs/RUNBOOK.md` - Operational procedures
+- `docs/RUNBOOK.md` - Operations manual
 
-**AI Prompt Template for Your Phase 6**:
+**Adapt for Your Domain**:
 ```
-Implement Phase 6: Production Deployment for [DOMAIN] dataspace.
+Prepare Phase 6 production deployment for [DOMAIN].
 
-Prepare for production:
-1. Kubernetes Configuration:
-   - Use deployment/k8s/base/ as template
-   - Adjust resource limits for [YOUR_LOAD_PROFILE]
-   - Add [DOMAIN_SERVICE] deployment if needed
+1. Cloud setup:
+   - Provider: [Azure/AWS/GCP]
+   - Region: [REGION] (for [COMPLIANCE_REQUIREMENT])
+   - Resources: Adjust deployment/k8s/base/ for [YOUR_SCALE]
    
-2. Security Hardening:
-   - Review docs/SECURITY.md
-   - Implement [DOMAIN_SPECIFIC_CONTROL]
-   - Example: HIPAA audit logging, PCI DSS network segmentation
+2. Security:
+   - Implement [DOMAIN_CONTROLS] from docs/SECURITY.md
+   - Add [REGULATION]-specific logging/audit
    
-3. Cloud Deployment:
-   - Target: [AZURE/AWS/GCP]
-   - Region: [REGION] (data residency requirement)
-   - Follow docs/PRODUCTION-DEPLOYMENT.md for [CLOUD_PROVIDER]
-   
-4. Operational Readiness:
-   - Define RTO: [X] hours
-   - Define RPO: [Y] minutes
-   - Create DR plan following docs/RUNBOOK.md
-   - Set up monitoring alerts
+3. Operations:
+   - Define RTO: [X] hours, RPO: [Y] minutes
+   - Disaster recovery: Customize docs/RUNBOOK.md
 
-Create issue #[X] with deployment checklist.
+Reference: docs/PRODUCTION-DEPLOYMENT.md
 ```
 
 ---
 
 ## AI-Assisted Development: Best Practices
 
-### Seamless Tool Switching with Symbolic Links
+### Seamless Tool Switching with Symbolic Links ✅
 
-Different AI coding assistants have different file conventions for context and rules. Use symbolic links to maintain one source of truth:
+This repository uses symbolic links to share context across different AI coding assistants. All links are **already implemented** and point to a single source of truth.
 
+**Implemented Symbolic Links**:
 ```bash
-# Create a central rules file
-echo "# Development Rules" > RULES.md
-cat WARP.md >> RULES.md  # Add Warp-specific rules
+# Root directory links (all point to WARP.md)
+.aiderules -> WARP.md              # For Aider
+.clinerules -> WARP.md             # For Cline (Claude Code)
+.cursorrules -> WARP.md            # For Cursor
+.warp-context.md -> WARP.md        # For Warp
 
-# Create symbolic links for different AI tools
-ln -s RULES.md .github/copilot-instructions.md  # GitHub Copilot
-ln -s RULES.md .cursorrules                      # Cursor
-ln -s RULES.md .aiderules                        # Aider
-ln -s RULES.md .clinerules                       # Cline (formerly Claude Code)
+# GitHub directory link
+.github/copilot-instructions.md -> ../WARP.md  # For GitHub Copilot
 
-# For Warp (keep WARP.md as primary)
-ln -s WARP.md .warp-context.md
-
-# For project-specific rules
-ln -s .specify/constitution.md .ai-constitution
+# Project governance link
+.ai-constitution -> .specify/constitution.md   # Non-negotiable rules
 ```
 
-**This Repository's Setup**:
+**Benefits**:
+- ✅ **Single source of truth**: Update `WARP.md` once, all tools see the changes
+- ✅ **Switch tools seamlessly**: Use Warp, Cursor, Copilot, Aider, or Cline interchangeably
+- ✅ **Consistent context**: All AI assistants have the same project understanding
+- ✅ **No duplication**: Never copy-paste documentation between tool config files
+
+**Verify Setup**:
 ```bash
-# View current symbolic link setup
+# View all symbolic links
 ls -la | grep '^l'
 
-# WARP.md is the primary context file
-# Contains:
-# - Project architecture
-# - Development workflow  
-# - EDC component details
-# - Deployment procedures
+# Check GitHub Copilot link
+ls -la .github/ | grep copilot
 ```
 
 ### Recommended Tool Combinations
@@ -693,80 +576,6 @@ Currently, MVD [does not support X / requires manual Y].
 - 📋 [All Issues](https://github.com/ma3u/MinimumViableDataspace/issues)
 - 🎯 [Roadmap & Milestones](https://github.com/ma3u/MinimumViableDataspace/milestones)
 - 💬 [Discussions](https://github.com/ma3u/MinimumViableDataspace/discussions)
-
-#### Phase 2: Domain Specification
-**Create**: `BLUEPRINT: Phase 2 - <Your Domain> Specification`
-
-**Deliverables:**
-- `.specify/spec.md` - Domain requirements and data models
-- `.specify/spec.yaml` - OpenAPI specification for your domain APIs
-- `.specify/constitution.md` - Non-negotiable rules (security, compliance)
-- `.specify/regulatory-inventory.md` - Domain compliance requirements (GDPR, HIPAA, etc.)
-- `.specify/policies/*.yaml` - ODRL policies for your domain
-
-**Example: Health Domain**
-```yaml
-# .specify/spec.yaml
-openapi: 3.1.0
-info:
-  title: Health Dataspace API
-  description: EHDS-compliant EHR data exchange
-paths:
-  /api/ehr:
-    get:
-      summary: List EHR records
-      responses:
-        '200':
-          description: FHIR R4 Patient bundle
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FHIRBundle'
-```
-
-#### Phase 3: Frontend Development
-**Create**: `BLUEPRINT: Phase 3 - <Your Domain> Frontend`
-
-**Deliverables:**
-- React/TypeScript frontend for catalog browsing
-- Domain-specific data viewer (EHR viewer, DPP viewer, etc.)
-- Contract negotiation UI
-- Data transfer flow visualization
-
-**Reusable Components (from MVD-health branch):**
-- `CatalogCard.tsx` - Asset display component
-- `DataspaceInsiderPanel.tsx` - DSP protocol visualization
-- `useCatalog.ts` - Catalog fetching hook
-- `apiFactory.ts` - Multi-mode API interface (mock/hybrid/full)
-
-#### Phase 4: Backend Services
-**Create**: `BLUEPRINT: Phase 4 - <Your Domain> Backend`
-
-**Deliverables:**
-- Backend service serving domain-specific data
-- EDC proxy service (optional, for simplified frontend integration)
-- Mock data for development/testing
-- OpenTelemetry tracing, Prometheus metrics
-
-#### Phase 5: Testing & Compliance
-**Create**: `BLUEPRINT: Phase 5 - Testing & Compliance`
-
-**Deliverables:**
-- Unit tests (Vitest for frontend, JUnit for Java)
-- Contract tests (Pact/Newman)
-- E2E tests (Playwright for frontend, RestAssured for backend)
-- Compliance tests (GDPR, domain-specific regulations)
-- DSP/DCP protocol conformance tests
-
-#### Phase 6: Production Deployment
-**Create**: `BLUEPRINT: Phase 6 - Production Deployment`
-
-**Deliverables:**
-- Cloud deployment (AKS/EKS/GKE Terraform modules)
-- CI/CD pipelines (GitHub Actions)
-- Monitoring & alerting (Prometheus, Grafana, Jaeger)
-- Security hardening (network policies, RBAC, secrets management)
-- Disaster recovery plan
 
 ---
 
