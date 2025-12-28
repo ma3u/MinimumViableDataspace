@@ -1,0 +1,265 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consumer-dataplane-config
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-dataplane
+    app.kubernetes.io/component: dataplane
+    app.kubernetes.io/part-of: mvd
+data:
+  # EDC Configuration
+  EDC_PARTICIPANT_ID: "consumer"
+  WEB_HTTP_PORT: "8081"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_PUBLIC_PORT: "8185"
+  WEB_HTTP_PUBLIC_PATH: "/public"
+  WEB_HTTP_CONTROL_PORT: "9999"
+  WEB_HTTP_CONTROL_PATH: "/control"
+  # Observability
+  EDC_METRICS_ENABLED: "true"
+  EDC_METRICS_SYSTEM_ENABLED: "true"
+  # Logging
+  EDC_LOG_LEVEL: "INFO"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: consumer-dataplane
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-dataplane
+    app.kubernetes.io/component: dataplane
+    app.kubernetes.io/part-of: mvd
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: consumer-dataplane
+  namespace: consumer
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+    resourceNames:
+      - consumer-credentials
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: consumer-dataplane
+  namespace: consumer
+subjects:
+  - kind: ServiceAccount
+    name: consumer-dataplane
+    namespace: consumer
+roleRef:
+  kind: Role
+  name: consumer-dataplane
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumer-dataplane
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-dataplane
+    app.kubernetes.io/component: dataplane
+    app.kubernetes.io/part-of: mvd
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+      protocol: TCP
+    - name: public
+      port: 8185
+      targetPort: public
+      protocol: TCP
+    - name: control
+      port: 9999
+      targetPort: control
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: consumer-dataplane
+    app.kubernetes.io/component: dataplane
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-dataplane
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-dataplane
+    app.kubernetes.io/component: dataplane
+    app.kubernetes.io/part-of: mvd
+    app.kubernetes.io/version: "latest"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: consumer-dataplane
+      app.kubernetes.io/component: dataplane
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: consumer-dataplane
+        app.kubernetes.io/component: dataplane
+        app.kubernetes.io/part-of: mvd
+        component: edc-runtime
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: consumer-dataplane
+      
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - consumer-dataplane
+                topologyKey: kubernetes.io/hostname
+      
+      containers:
+        - name: dataplane
+          image: ghcr.io/ma3u/dataplane:latest
+          imagePullPolicy: Always
+          
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+          
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+            - name: public
+              containerPort: 8185
+              protocol: TCP
+            - name: control
+              containerPort: 9999
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          
+          envFrom:
+            - configMapRef:
+                name: consumer-dataplane-config
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          
+          livenessProbe:
+            httpGet:
+              path: /api/check/liveness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          readinessProbe:
+            httpGet:
+              path: /api/check/readiness
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /var/cache
+      
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: consumer-dataplane-hpa
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-dataplane
+    app.kubernetes.io/component: dataplane
+    app.kubernetes.io/part-of: mvd
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: consumer-dataplane
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60

@@ -1,0 +1,77 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Reference base configuration
+resources:
+  - ../../base
+
+# Namespace for development
+namespace: consumer-dev
+
+# Common labels for dev environment
+commonLabels:
+  environment: dev
+
+# Patches for development (reduced resources)
+patches:
+  # Reduce controlplane replicas for dev
+  - target:
+      kind: Deployment
+      name: consumer-controlplane
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  
+  # Reduce controlplane resources for dev
+  - target:
+      kind: Deployment
+      name: consumer-controlplane
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 1Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 1000m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 2Gi
+  
+  # Reduce dataplane replicas and HPA limits
+  - target:
+      kind: Deployment
+      name: consumer-dataplane
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: consumer-dataplane-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3
+
+# ConfigMap overrides for dev
+configMapGenerator:
+  - name: consumer-controlplane-config
+    behavior: merge
+    literals:
+      - EDC_LOG_LEVEL=DEBUG
+      - ENVIRONMENT=dev
+
+# Use dev image tags
+images:
+  - name: ghcr.io/ma3u/controlplane
+    newTag: dev
+  - name: ghcr.io/ma3u/dataplane
+    newTag: dev

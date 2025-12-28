@@ -1,0 +1,32 @@
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: consumer-controlplane-pdb
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-controlplane
+    app.kubernetes.io/component: controlplane
+    app.kubernetes.io/part-of: mvd
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: consumer-controlplane
+      app.kubernetes.io/component: controlplane
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: consumer-dataplane-pdb
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-dataplane
+    app.kubernetes.io/component: dataplane
+    app.kubernetes.io/part-of: mvd
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: consumer-dataplane
+      app.kubernetes.io/component: dataplane

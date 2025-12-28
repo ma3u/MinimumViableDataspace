@@ -1,0 +1,172 @@
+---
+# Default deny-all policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+  namespace: consumer
+  labels:
+    app.kubernetes.io/part-of: mvd
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Allow DNS resolution
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: consumer
+  labels:
+    app.kubernetes.io/part-of: mvd
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+---
+# Allow controlplane to dataplane communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: controlplane-to-dataplane
+  namespace: consumer
+  labels:
+    app.kubernetes.io/part-of: mvd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: consumer-dataplane
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: consumer-controlplane
+      ports:
+        - protocol: TCP
+          port: 8081  # Dataplane API
+        - protocol: TCP
+          port: 9999  # Control API
+---
+# Allow controlplane egress to dataplane
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: controlplane-egress
+  namespace: consumer
+  labels:
+    app.kubernetes.io/part-of: mvd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: consumer-controlplane
+  policyTypes:
+    - Egress
+  egress:
+    # To dataplane
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: consumer-dataplane
+      ports:
+        - protocol: TCP
+          port: 8081
+        - protocol: TCP
+          port: 9999
+    # To IdentityHub
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: consumer-identityhub
+      ports:
+        - protocol: TCP
+          port: 7083
+    # To external services (provider connectors, issuer)
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443  # HTTPS for DSP protocol
+        - protocol: TCP
+          port: 8282  # DSP protocol port
+---
+# Allow ingress from NGINX Ingress Controller
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-nginx
+  namespace: consumer
+  labels:
+    app.kubernetes.io/part-of: mvd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: consumer-controlplane
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080  # Management API
+        - protocol: TCP
+          port: 8282  # DSP Protocol
+---
+# Allow egress to PostgreSQL
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-postgres-egress
+  namespace: consumer
+  labels:
+    app.kubernetes.io/part-of: mvd
+spec:
+  podSelector:
+    matchLabels:
+      component: edc-runtime
+  policyTypes:
+    - Egress
+  egress:
+    # Cloud-managed PostgreSQL (egress to any on port 5432)
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+# Allow Prometheus scraping
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus-scraping
+  namespace: consumer
+  labels:
+    app.kubernetes.io/part-of: mvd
+spec:
+  podSelector:
+    matchLabels:
+      component: edc-runtime
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090  # Metrics port

@@ -1,0 +1,91 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Reference base configuration
+resources:
+  - ../../base
+  - ingress.yaml
+
+# Namespace for production
+namespace: consumer
+
+# Common labels for production environment
+commonLabels:
+  environment: production
+
+# Patches for production (increased resources and replicas)
+patches:
+  # Increase controlplane replicas for HA
+  - target:
+      kind: Deployment
+      name: consumer-controlplane
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 5
+  
+  # Production resource limits
+  - target:
+      kind: Deployment
+      name: consumer-controlplane
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 2000m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 4Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 4000m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 8Gi
+  
+  # Increase dataplane HPA limits
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: consumer-dataplane-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  
+  # Add pod disruption budget for controlplane
+  - target:
+      kind: Deployment
+      name: consumer-controlplane
+    patch: |-
+      - op: add
+        path: /spec/template/spec/affinity/podAntiAffinity/requiredDuringSchedulingIgnoredDuringExecution
+        value:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - consumer-controlplane
+            topologyKey: topology.kubernetes.io/zone
+
+# ConfigMap overrides for production
+configMapGenerator:
+  - name: consumer-controlplane-config
+    behavior: merge
+    literals:
+      - EDC_LOG_LEVEL=INFO
+      - ENVIRONMENT=production
+      - EDC_METRICS_ENABLED=true
+
+# Use production image tags (semver)
+images:
+  - name: ghcr.io/ma3u/controlplane
+    newTag: v1.0.0
+  - name: ghcr.io/ma3u/dataplane
+    newTag: v1.0.0
+
+# Additional production resources
+resources:
+  - pod-disruption-budget.yaml

@@ -1,0 +1,69 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: consumer-ingress
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-ingress
+    app.kubernetes.io/part-of: mvd
+  annotations:
+    # cert-manager for automatic TLS
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    
+    # Security headers
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.3"
+    nginx.ingress.kubernetes.io/ssl-ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    
+    # Rate limiting
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+    
+    # Timeouts
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    
+    # CORS (if needed)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - consumer.mvd.yourdomain.com
+      secretName: consumer-tls-cert
+  rules:
+    - host: consumer.mvd.yourdomain.com
+      http:
+        paths:
+          # Management API
+          - path: /management
+            pathType: Prefix
+            backend:
+              service:
+                name: consumer-controlplane
+                port:
+                  number: 8081
+          
+          # Public API
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: consumer-controlplane
+                port:
+                  number: 8080
+          
+          # DSP Protocol
+          - path: /protocol
+            pathType: Prefix
+            backend:
+              service:
+                name: consumer-controlplane
+                port:
+                  number: 8282
