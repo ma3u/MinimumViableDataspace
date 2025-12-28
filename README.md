@@ -16,11 +16,11 @@ A reusable template and methodology for creating production-grade, compliant dat
 
 ### Key Characteristics
 
-- ✅ **Template, Not a Product**: Core EDC infrastructure without domain-specific implementations
-- ✅ **BLUEPRINT Methodology**: Phase-based development workflow with GitHub issue tracking
-- ✅ **Specification-Driven**: OpenAPI specs drive code generation and compliance testing
-- ✅ **Production-Ready Patterns**: Kubernetes deployment, observability, security best practices
-- ✅ **Multi-Domain Support**: Branch-based strategy for health, aerospace, manufacturing, etc.
+-  **Template, Not a Product**: Core EDC infrastructure without domain-specific implementations
+- **BLUEPRINT Methodology**: Phase-based development workflow with GitHub issue tracking
+- **Specification-Driven**: OpenAPI specs drive code generation and compliance testing
+- **Production-Ready Patterns**: Kubernetes deployment, observability, security best practices
+- **Multi-Domain Support**: Branch-based strategy for health, aerospace, manufacturing, etc.
 
 ### What You Get
 
@@ -28,7 +28,7 @@ A reusable template and methodology for creating production-grade, compliant dat
 |-----------|-------------|------------------------|
 | **EDC Runtimes** | Controlplane, Dataplane, IdentityHub, Catalog Server, Issuer Service | Minimal - works out of box |
 | **Custom Extensions** | DCP implementation, catalog resolver, DID resolver | Configure for your identity model |
-| **Deployment Templates** | IntelliJ configs, Kubernetes/Terraform, Docker Compose | Adjust ports/resources |
+| **Deployment Templates** | Kubernetes/Terraform, Docker Compose | Adjust ports/resources |
 | **Specification Framework** | GitHub Spec Kit templates, ODRL policies, OpenAPI schemas | **Replace with your domain** |
 | **Documentation** | BLUEPRINT methodology, cloud deployment guide, SDD instructions | Extend with domain specifics |
 | **Seeding Scripts** | Identity/credential creation, asset registration | **Replace with your assets** |
@@ -83,9 +83,6 @@ brew install newman jq
 
 # Install OrbStack (recommended for macOS)
 brew install orbstack
-
-# OR install Rancher Desktop (open source alternative)
-brew install rancher-desktop
 ```
 
 **GitHub Spec Kit** is used for specification-driven development:
