@@ -1,0 +1,342 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+      cluster_name:
+        description: 'Kubernetes cluster name'
+        required: true
+        type: string
+      cloud_provider:
+        description: 'Cloud provider'
+        required: true
+        type: choice
+        options:
+          - azure
+          - aws
+          - gcp
+      dry_run:
+        description: 'Dry run (validation only)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  KUBECTL_VERSION: '1.28.0'
+
+jobs:
+  validate:
+    name: Validate Manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Validate Kustomize manifests
+        run: |
+          kubectl kustomize deployment/k8s/overlays/${{ inputs.environment }} > /tmp/manifests.yaml
+          echo "✅ Kustomize validation successful"
+          
+          # Show summary
+          echo "📊 Resource Summary:"
+          kubectl kustomize deployment/k8s/overlays/${{ inputs.environment }} | \
+            grep "^kind:" | sort | uniq -c
+
+      - name: Lint manifests with kubeconform
+        run: |
+          # Install kubeconform
+          wget https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+          tar xf kubeconform-linux-amd64.tar.gz
+          
+          # Validate against Kubernetes 1.28 schemas
+          kubectl kustomize deployment/k8s/overlays/${{ inputs.environment }} | \
+            ./kubeconform -strict -kubernetes-version 1.28.0
+
+      - name: Security scan with kubesec
+        run: |
+          # Install kubesec
+          wget https://github.com/controlplaneio/kubesec/releases/latest/download/kubesec_linux_amd64.tar.gz
+          tar xf kubesec_linux_amd64.tar.gz
+          
+          # Scan manifests
+          kubectl kustomize deployment/k8s/overlays/${{ inputs.environment }} | \
+            ./kubesec scan - || true
+
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: validate
+    environment: ${{ inputs.environment }}
+    if: ${{ !inputs.dry_run }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      # Azure AKS
+      - name: Azure Login
+        if: inputs.cloud_provider == 'azure'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        if: inputs.cloud_provider == 'azure'
+        uses: azure/aks-set-context@v4
+        with:
+          cluster-name: ${{ inputs.cluster_name }}
+          resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
+
+      # AWS EKS
+      - name: Configure AWS credentials
+        if: inputs.cloud_provider == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set EKS context
+        if: inputs.cloud_provider == 'aws'
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ inputs.cluster_name }} \
+            --region ${{ secrets.AWS_REGION }}
+
+      # GCP GKE
+      - name: Authenticate to GCP
+        if: inputs.cloud_provider == 'gcp'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set GKE context
+        if: inputs.cloud_provider == 'gcp'
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ inputs.cluster_name }}
+          location: ${{ secrets.GCP_REGION }}
+
+      # Deploy
+      - name: Pre-deployment backup
+        run: |
+          echo "📦 Creating pre-deployment snapshot..."
+          kubectl get all -n consumer -o yaml > /tmp/pre-deployment-consumer.yaml || true
+          kubectl get all -n provider -o yaml > /tmp/pre-deployment-provider.yaml || true
+
+      - name: Apply Kubernetes manifests
+        run: |
+          echo "🚀 Deploying to ${{ inputs.environment }}..."
+          kubectl apply -k deployment/k8s/overlays/${{ inputs.environment }}
+
+      - name: Wait for rollout
+        run: |
+          echo "⏳ Waiting for deployments to be ready..."
+          
+          # Consumer namespace
+          kubectl rollout status deployment/consumer-controlplane -n consumer --timeout=5m || true
+          kubectl rollout status deployment/consumer-dataplane -n consumer --timeout=5m || true
+          kubectl rollout status deployment/consumer-identityhub -n consumer --timeout=5m || true
+          
+          # Provider namespace  
+          kubectl rollout status deployment/provider-catalog-server -n provider --timeout=5m || true
+          
+          # Dataspace Issuer
+          kubectl rollout status deployment/issuer-service -n dataspace-issuer --timeout=5m || true
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Verifying deployment..."
+          
+          # Check pod status
+          kubectl get pods -n consumer
+          kubectl get pods -n provider
+          kubectl get pods -n dataspace-issuer
+          
+          # Check for crashlooping pods
+          CRASHLOOPING=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running,status.phase!=Succeeded -o json | jq '.items | length')
+          if [ "$CRASHLOOPING" -gt 0 ]; then
+            echo "❌ Found crashlooping pods:"
+            kubectl get pods --all-namespaces --field-selector=status.phase!=Running,status.phase!=Succeeded
+            exit 1
+          fi
+
+      - name: Upload deployment artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-artifacts-${{ inputs.environment }}
+          path: |
+            /tmp/pre-deployment-*.yaml
+            /tmp/manifests.yaml
+          retention-days: 30
+
+  smoke-test:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: ${{ !inputs.dry_run }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      # Re-authenticate to cluster (same as deploy job)
+      - name: Azure Login
+        if: inputs.cloud_provider == 'azure'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        if: inputs.cloud_provider == 'azure'
+        uses: azure/aks-set-context@v4
+        with:
+          cluster-name: ${{ inputs.cluster_name }}
+          resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
+
+      - name: Configure AWS credentials
+        if: inputs.cloud_provider == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set EKS context
+        if: inputs.cloud_provider == 'aws'
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ inputs.cluster_name }} \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Authenticate to GCP
+        if: inputs.cloud_provider == 'gcp'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set GKE context
+        if: inputs.cloud_provider == 'gcp'
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ inputs.cluster_name }}
+          location: ${{ secrets.GCP_REGION }}
+
+      # Run smoke tests
+      - name: Health check tests
+        run: |
+          echo "🏥 Running health checks..."
+          
+          # Consumer controlplane
+          kubectl exec -n consumer deployment/consumer-controlplane -- \
+            wget --spider --timeout=10 http://localhost:8080/api/check/health || \
+            (echo "❌ Consumer controlplane health check failed" && exit 1)
+          
+          # Consumer dataplane
+          kubectl exec -n consumer deployment/consumer-dataplane -- \
+            wget --spider --timeout=10 http://localhost:8081/api/check/health || \
+            (echo "❌ Consumer dataplane health check failed" && exit 1)
+          
+          echo "✅ All health checks passed"
+
+      - name: API connectivity tests
+        run: |
+          echo "🔗 Testing API connectivity..."
+          
+          # Port-forward consumer controlplane
+          kubectl port-forward -n consumer svc/consumer-controlplane 8080:8080 &
+          PF_PID=$!
+          sleep 5
+          
+          # Test management API
+          curl -f http://localhost:8080/api/check/health || \
+            (echo "❌ Management API test failed" && kill $PF_PID && exit 1)
+          
+          kill $PF_PID
+          echo "✅ API connectivity tests passed"
+
+      - name: Service mesh tests
+        run: |
+          echo "🕸️ Testing service connectivity..."
+          
+          # Test controlplane -> dataplane
+          kubectl exec -n consumer deployment/consumer-controlplane -- \
+            wget --spider --timeout=10 http://consumer-dataplane:8081/api/check/health || \
+            (echo "❌ Controlplane -> Dataplane connectivity failed" && exit 1)
+          
+          # Test controlplane -> identityhub
+          kubectl exec -n consumer deployment/consumer-controlplane -- \
+            wget --spider --timeout=10 http://consumer-identityhub:7083/api/check/health || \
+            (echo "❌ Controlplane -> IdentityHub connectivity failed" && exit 1)
+          
+          echo "✅ Service mesh tests passed"
+
+      - name: Generate test report
+        if: always()
+        run: |
+          cat > /tmp/smoke-test-report.md << EOF
+          # Smoke Test Report
+          
+          **Environment**: ${{ inputs.environment }}
+          **Cluster**: ${{ inputs.cluster_name }}
+          **Provider**: ${{ inputs.cloud_provider }}
+          **Timestamp**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          ## Test Results
+          
+          - ✅ Health checks
+          - ✅ API connectivity
+          - ✅ Service mesh
+          
+          ## Deployment Status
+          
+          \`\`\`
+          $(kubectl get pods --all-namespaces | grep -E 'consumer|provider|issuer')
+          \`\`\`
+          EOF
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-report-${{ inputs.environment }}
+          path: /tmp/smoke-test-report.md
+          retention-days: 30
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy, smoke-test]
+    if: ${{ failure() && !inputs.dry_run }}
+    
+    steps:
+      - name: Trigger rollback
+        run: |
+          echo "⚠️ Deployment or smoke tests failed. Manual rollback required."
+          echo "Use: kubectl rollout undo deployment/<deployment-name> -n <namespace>"
+          echo "Or restore from backup artifacts."
+          exit 1

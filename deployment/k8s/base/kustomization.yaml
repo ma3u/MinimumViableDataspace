@@ -19,6 +19,9 @@ resources:
   # Core components
   - controlplane/consumer-controlplane.yaml
   - dataplane/consumer-dataplane.yaml
+  - identity-hub/consumer-identityhub.yaml
+  - catalog-server/provider-catalog-server.yaml
+  - issuerservice/issuer-service.yaml
   
   # Network policies
   - network-policies/consumer-network-policies.yaml
@@ -28,6 +31,12 @@ images:
   - name: ghcr.io/ma3u/controlplane
     newTag: latest
   - name: ghcr.io/ma3u/dataplane
+    newTag: latest
+  - name: ghcr.io/ma3u/identity-hub
+    newTag: latest
+  - name: ghcr.io/ma3u/catalog-server
+    newTag: latest
+  - name: ghcr.io/ma3u/issuerservice
     newTag: latest
 
 # ConfigMap generator options

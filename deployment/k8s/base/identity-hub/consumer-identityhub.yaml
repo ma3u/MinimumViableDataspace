@@ -1,0 +1,199 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consumer-identityhub-config
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-identityhub
+    app.kubernetes.io/component: identity-hub
+    app.kubernetes.io/part-of: mvd
+data:
+  EDC_PARTICIPANT_ID: "consumer"
+  WEB_HTTP_PORT: "7083"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_RESOLUTION_PORT: "7084"
+  WEB_HTTP_RESOLUTION_PATH: "/resolution"
+  EDC_IAM_DID_WEB_USE_HTTPS: "true"
+  EDC_LOG_LEVEL: "INFO"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: consumer-identityhub
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-identityhub
+    app.kubernetes.io/component: identity-hub
+    app.kubernetes.io/part-of: mvd
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: consumer-identityhub
+  namespace: consumer
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+    resourceNames:
+      - consumer-credentials
+      - consumer-identityhub-credentials
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: consumer-identityhub
+  namespace: consumer
+subjects:
+  - kind: ServiceAccount
+    name: consumer-identityhub
+    namespace: consumer
+roleRef:
+  kind: Role
+  name: consumer-identityhub
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumer-identityhub
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-identityhub
+    app.kubernetes.io/component: identity-hub
+    app.kubernetes.io/part-of: mvd
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 7083
+      targetPort: http
+      protocol: TCP
+    - name: resolution
+      port: 7084
+      targetPort: resolution
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: consumer-identityhub
+    app.kubernetes.io/component: identity-hub
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-identityhub
+  namespace: consumer
+  labels:
+    app.kubernetes.io/name: consumer-identityhub
+    app.kubernetes.io/component: identity-hub
+    app.kubernetes.io/part-of: mvd
+    app.kubernetes.io/version: "latest"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: consumer-identityhub
+      app.kubernetes.io/component: identity-hub
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: consumer-identityhub
+        app.kubernetes.io/component: identity-hub
+        app.kubernetes.io/part-of: mvd
+        component: edc-runtime
+    spec:
+      serviceAccountName: consumer-identityhub
+      
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - consumer-identityhub
+                topologyKey: kubernetes.io/hostname
+      
+      containers:
+        - name: identity-hub
+          image: ghcr.io/ma3u/identity-hub:latest
+          imagePullPolicy: Always
+          
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+          
+          ports:
+            - name: http
+              containerPort: 7083
+              protocol: TCP
+            - name: resolution
+              containerPort: 7084
+              protocol: TCP
+          
+          envFrom:
+            - configMapRef:
+                name: consumer-identityhub-config
+          
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          
+          livenessProbe:
+            httpGet:
+              path: /api/check/liveness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          readinessProbe:
+            httpGet:
+              path: /api/check/readiness
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /var/cache
+      
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
