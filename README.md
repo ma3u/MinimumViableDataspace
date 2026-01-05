@@ -61,6 +61,8 @@ Both deployment options support flexible operating modes:
 
 **Production-like deployment with full EDC stack and observability**
 
+![alt text](image-1.png)
+
 **✅ Full EDC Stack + Observability Deployed** - Complete production-like EHDS dataspace on Kubernetes:
 
 ```bash
