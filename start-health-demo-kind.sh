@@ -200,8 +200,29 @@ if [ "$MODE" == "full" ]; then
   kubectl wait --for=condition=ready pod -l app=health-vault -n health-dataspace --timeout=60s
 fi
 
-# Note: EDC components and application layer manifests would be applied here
-# This is a framework - full manifests to be completed in next iteration
+# Deploy application layer
+echo "  Deploying application layer..."
+kubectl apply -f deployment/k8s/application/
+
+echo "  Waiting for application to be ready..."
+kubectl wait --for=condition=ready pod -l app=ehr-backend -n health-dataspace --timeout=60s
+kubectl wait --for=condition=ready pod -l app=health-frontend -n health-dataspace --timeout=60s
+
+if [[ "$MODE" == "full" || "$MODE" == "hybrid" ]]; then
+  kubectl wait --for=condition=ready pod -l app=backend-edc -n health-dataspace --timeout=60s
+fi
+
+# Deploy EDC components (full mode only)
+if [ "$MODE" == "full" ]; then
+  echo "  Deploying EDC consumer components..."
+  kubectl apply -f deployment/k8s/edc-consumer/ 2>/dev/null || echo "  ⚠️  EDC consumer manifests not yet complete"
+  
+  echo "  Deploying EDC provider components..."
+  kubectl apply -f deployment/k8s/edc-provider/ 2>/dev/null || echo "  ⚠️  EDC provider manifests not yet complete"
+  
+  echo "  Deploying trust anchor..."
+  kubectl apply -f deployment/k8s/trust-anchor/ 2>/dev/null || echo "  ⚠️  Trust anchor manifests not yet complete"
+fi
 
 echo -e "${GREEN}✓ Deployment complete${NC}"
 echo ""

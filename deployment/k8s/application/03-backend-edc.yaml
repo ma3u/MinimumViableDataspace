@@ -1,0 +1,97 @@
+#
+#  Copyright (c) 2025 Health Dataspace Demo - EHR2EDC
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-edc-config
+  namespace: health-dataspace
+data:
+  PORT: "3002"
+  BACKEND_MODE: "full"
+  EDC_API_KEY: "password"
+  CONSUMER_MANAGEMENT_URL: "http://consumer-controlplane:8081"
+  CONSUMER_DSP_URL: "http://consumer-controlplane:8082/api/dsp"
+  CONSUMER_IDENTITY_HUB_URL: "http://consumer-identityhub:7082"
+  PROVIDER_MANAGEMENT_URL: "http://provider-controlplane:8191"
+  PROVIDER_DSP_URL: "http://provider-controlplane:8192/api/dsp"
+  PROVIDER_IDENTITY_HUB_URL: "http://provider-identityhub:7092"
+  PROVIDER_PARTICIPANT_ID: "provider"
+  MOCK_BACKEND_URL: "http://ehr-backend:3001"
+  EDC_CONSUMER_MANAGEMENT_URL: "http://consumer-controlplane:8081/api/management/v3"
+  EDC_CONSUMER_CATALOG_URL: "http://consumer-controlplane:8084/api/catalog/v1alpha"
+  EDC_CONSUMER_DSP_URL: "http://consumer-controlplane:8082/api/dsp"
+  EDC_PROVIDER_MANAGEMENT_URL: "http://provider-controlplane:8191/api/management/v3"
+  EDC_PROVIDER_DSP_URL: "http://provider-controlplane:8192/api/dsp"
+  EDC_PROVIDER_IDENTITYHUB_URL: "http://provider-identityhub:7092"
+  EDC_PROVIDER_PARTICIPANT_ID: "provider"
+  BACKEND_MOCK_URL: "http://ehr-backend:3001"
+  OTEL_SERVICE_NAME: "backend-edc"
+  OTEL_TRACES_EXPORTER: "none"
+  OTEL_RESOURCE_ATTRIBUTES: "service.namespace=health-dataspace,service.version=1.0.0,deployment.environment=k8s"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-edc
+  namespace: health-dataspace
+spec:
+  type: NodePort
+  selector:
+    app: backend-edc
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3002
+      targetPort: 3002
+      nodePort: 30002
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-edc
+  namespace: health-dataspace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-edc
+  template:
+    metadata:
+      labels:
+        app: backend-edc
+    spec:
+      containers:
+        - name: backend-edc
+          image: backend-edc:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3002
+              name: http
+          envFrom:
+            - configMapRef:
+                name: backend-edc-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5

@@ -1,0 +1,181 @@
+#
+#  Copyright (c) 2025 Health Dataspace Demo - EHR2EDC
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consumer-controlplane-config
+  namespace: health-dataspace
+data:
+  EDC_IAM_ISSUER_ID: "did:web:consumer-identityhub%3A7083"
+  WEB_HTTP_PORT: "8080"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_MANAGEMENT_PORT: "8081"
+  WEB_HTTP_MANAGEMENT_PATH: "/api/management/"
+  WEB_HTTP_MANAGEMENT_AUTH_TYPE: "tokenbased"
+  WEB_HTTP_MANAGEMENT_AUTH_KEY: "password"
+  WEB_HTTP_PROTOCOL_PORT: "8082"
+  WEB_HTTP_PROTOCOL_PATH: "/api/dsp"
+  WEB_HTTP_CONTROL_PORT: "8083"
+  WEB_HTTP_CONTROL_PATH: "/api/control"
+  WEB_HTTP_CATALOG_PORT: "8084"
+  WEB_HTTP_CATALOG_PATH: "/api/catalog"
+  WEB_HTTP_CATALOG_AUTH_TYPE: "tokenbased"
+  WEB_HTTP_CATALOG_AUTH_KEY: "password"
+  WEB_HTTP_VERSION_PORT: "8085"
+  WEB_HTTP_VERSION_PATH: "/api/version"
+  EDC_IAM_DID_WEB_USE_HTTPS: "false"
+  EDC_IAM_STS_PRIVATEKEY_ALIAS: "did:web:consumer-identityhub%3A7083-alias"
+  EDC_IAM_STS_PUBLICKEY_ID: "did:web:consumer-identityhub%3A7083#key-1"
+  EDC_DSP_CALLBACK_ADDRESS: "http://consumer-controlplane:8082/api/dsp"
+  EDC_PARTICIPANT_ID: "did:web:consumer-identityhub%3A7083"
+  EDC_CATALOG_CACHE_EXECUTION_DELAY_SECONDS: "5"
+  EDC_CATALOG_CACHE_EXECUTION_PERIOD_SECONDS: "10"
+  EDC_MVD_PARTICIPANTS_LIST_FILE: "/app/participants.json"
+  EDC_MANAGEMENT_CONTEXT_ENABLED: "true"
+  EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS: "did:web:consumer-identityhub:7083-sts-client-secret"
+  EDC_IAM_STS_OAUTH_CLIENT_ID: "did:web:consumer-identityhub:7083"
+  EDC_IAM_STS_OAUTH_TOKEN_URL: "http://consumer-identityhub:7086/api/sts/token"
+  EDC_RUNTIME_ID: "consumer-embedded-runtime"
+  EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS: "did:web:consumer-identityhub%3A7083#key-1"
+  EDC_TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS: "did:web:consumer-identityhub%3A7083-alias"
+  EDC_DPF_SELECTOR_URL: "http://consumer-controlplane:8083/api/control/v1/dataplanes"
+  WEB_HTTP_PUBLIC_PORT: "11001"
+  WEB_HTTP_PUBLIC_PATH: "/api/public"
+  EDC_VAULT_HASHICORP_URL: "http://health-vault:8200"
+  EDC_VAULT_HASHICORP_TOKEN: "root"
+  EDC_VAULT_HASHICORP_API_SECRET_PATH: "/v1/secret"
+  EDC_DATASOURCE_DEFAULT_URL: "jdbc:postgresql://health-postgres:5432/consumer"
+  EDC_DATASOURCE_DEFAULT_USER: "consumer"
+  EDC_DATASOURCE_DEFAULT_PASSWORD: "consumer"
+  EDC_SQL_SCHEMA_AUTOCREATE: "true"
+  OTEL_SERVICE_NAME: "consumer-controlplane"
+  OTEL_TRACES_EXPORTER: "none"
+  OTEL_METRICS_EXPORTER: "prometheus"
+  OTEL_LOGS_EXPORTER: "none"
+  OTEL_RESOURCE_ATTRIBUTES: "service.namespace=health-dataspace,service.version=1.0.0,deployment.environment=k8s"
+  EDC_METRICS_ENABLED: "true"
+  EDC_METRICS_SYSTEM_ENABLED: "true"
+  EDC_METRICS_OKHTTP_ENABLED: "true"
+  EDC_METRICS_EXECUTOR_ENABLED: "true"
+  EDC_METRICS_JETTY_ENABLED: "true"
+  EDC_METRICS_JERSEY_ENABLED: "true"
+  EDC_CALLBACK_INSIDER_URI: "http://backend-edc:3002/api/events/callback"
+  EDC_CALLBACK_INSIDER_EVENTS: "contract.negotiation,transfer.process"
+  EDC_CALLBACK_INSIDER_TRANSACTIONAL: "false"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumer-controlplane
+  namespace: health-dataspace
+spec:
+  type: NodePort
+  selector:
+    app: consumer-controlplane
+  ports:
+    - name: api
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
+    - name: management
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 30081
+    - name: dsp
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
+      nodePort: 30082
+    - name: control
+      protocol: TCP
+      port: 8083
+      targetPort: 8083
+      nodePort: 30083
+    - name: catalog
+      protocol: TCP
+      port: 8084
+      targetPort: 8084
+      nodePort: 30084
+    - name: version
+      protocol: TCP
+      port: 8085
+      targetPort: 8085
+      nodePort: 30085
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-controlplane
+  namespace: health-dataspace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer-controlplane
+  template:
+    metadata:
+      labels:
+        app: consumer-controlplane
+    spec:
+      containers:
+        - name: controlplane
+          image: controlplane:latest
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: consumer-controlplane-config
+          ports:
+            - containerPort: 8080
+              name: api
+            - containerPort: 8081
+              name: management
+            - containerPort: 8082
+              name: dsp
+            - containerPort: 8083
+              name: control
+            - containerPort: 8084
+              name: catalog
+            - containerPort: 8085
+              name: version
+          volumeMounts:
+            - name: participants
+              mountPath: /app/participants.json
+              subPath: participants.json
+              readOnly: true
+            - name: consumer-keys
+              mountPath: /app/keys
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /api/check/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/check/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+      volumes:
+        - name: participants
+          configMap:
+            name: participants-json
+        - name: consumer-keys
+          configMap:
+            name: consumer-keys
