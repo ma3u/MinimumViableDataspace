@@ -1,5 +1,10 @@
 # Health Data Exchange with High Privacy and Consent Management Demo
 
+[![EHDS Compliant](https://img.shields.io/badge/EHDS-EU%202025%2F327-blue)](https://eur-lex.europa.eu/eli/reg/2025/327)
+[![DCAT-AP Health](https://img.shields.io/badge/DCAT--AP-Health-green)](https://healthdcat-ap.github.io/)
+[![Dataspace Protocol](https://img.shields.io/badge/Dataspace-Protocol%202025-yellow)](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/)
+[![EDC](https://img.shields.io/badge/Eclipse-Dataspace%20Components-white)](https://eclipse-edc.github.io/docs/)
+
 A comprehensive demonstration of secure, interoperable, and consent-managed access to health data for research (secondary use), aligned with the European Health Data Space (EHDS) and German Health Data Use Act (GDNG).
 
 📚 **Documentation:**
@@ -12,10 +17,7 @@ A comprehensive demonstration of secure, interoperable, and consent-managed acce
 - [#10 - Phase 14: Monitoring & Debugging](https://github.com/ma3u/MinimumViableDataspace/issues/10)
 - [#8 - Dataspace Insider View - Real-time DSP Protocol Visualization](https://github.com/ma3u/MinimumViableDataspace/issues/8)
 
-[![EHDS Compliant](https://img.shields.io/badge/EHDS-EU%202025%2F327-blue)](https://eur-lex.europa.eu/eli/reg/2025/327)
-[![DCAT-AP Health](https://img.shields.io/badge/DCAT--AP-Health-green)](https://healthdcat-ap.github.io/)
-[![Dataspace Protocol](https://img.shields.io/badge/Dataspace-Protocol%202025-yellow)](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/)
-[![EDC](https://img.shields.io/badge/Eclipse-Dataspace%20Components-white)](https://eclipse-edc.github.io/docs/)
+
 
 ## Purpose
 
@@ -34,9 +36,20 @@ This demo showcases how easy it is to create an **EHDS-compliant dataspace for h
 
 ## Quick Start
 
+### Deployment Options
+
+The demo supports multiple deployment options:
+
+| Deployment | Platform | Use Case | Setup Time |
+|------------|----------|----------|------------|
+| **Local Dev** | Node.js | Frontend development | 2 min |
+| **Docker Compose** | Docker | Full stack testing | 10 min |
+| **OrbStack Kubernetes** | OrbStack | Cloud-native development | 5 min |
+| **KinD** | KinD + OrbStack | Kubernetes simulation | 15 min |
+
 ### Three API Modes
 
-The demo supports three modes for different use cases:
+All deployment options support three operating modes:
 
 | Mode | Backend | EDC Stack | Use Case |
 |------|---------|-----------|----------|
@@ -44,24 +57,99 @@ The demo supports three modes for different use cases:
 | **hybrid** | backend-mock (FHIR) | ✅ Catalog only | Test EDC catalog integration |
 | **full** | backend-mock + backend-edc | ✅ Complete flow | Full dataspace protocol demo |
 
-### Option A: Mock Mode (Fastest - No EDC Required)
+---
 
-Perfect for quick demos and frontend development:
+### Option A: OrbStack Kubernetes (Recommended for macOS)
+
+**✅ Currently Deployed** - Native Kubernetes on OrbStack with superior performance:
 
 ```bash
-# Use the startup script
-./start-health-demo.sh --mode mock
+# Prerequisites: OrbStack installed with Kubernetes enabled
 
-# OR manually:
-cd backend-mock && npm install && npm run dev:health  # Terminal 1
-cd frontend && npm install && npm run dev              # Terminal 2
+# 1. Build Docker images
+docker build -t health-ehr-backend:latest ./backend-mock
+docker build -t health-frontend:latest ./frontend
+docker build -t backend-edc:latest ./backend-edc
+
+# 2. Deploy to Kubernetes
+kubectl apply -f deployment/k8s/00-namespace.yaml
+kubectl apply -f deployment/k8s/application/
+
+# 3. Set up port forwarding
+kubectl port-forward -n health-dataspace svc/health-frontend 3000:80 &
+kubectl port-forward -n health-dataspace svc/ehr-backend 3001:3001 &
+kubectl port-forward -n health-dataspace svc/healthdcatap-editor 8880:8080 &
+
+# 4. Access the demo
+open http://localhost:3000
 ```
 
-Open http://localhost:4000 (local dev) or http://localhost:3000 (Docker)
+**Management commands:**
+```bash
+# View all resources
+kubectl get all -n health-dataspace
 
-### Option B: Full EDC Mode (Complete Dataspace Protocol)
+# View logs
+kubectl logs -f deployment/health-frontend -n health-dataspace
 
-For full dataspace demonstration with consent verification:
+# Restart deployment
+kubectl rollout restart deployment/health-frontend -n health-dataspace
+
+# Clean up
+kubectl delete namespace health-dataspace
+```
+
+📖 **See [ORBSTACK-DEPLOYMENT.md](ORBSTACK-DEPLOYMENT.md) for complete instructions**
+
+---
+
+### Option B: KinD (Kubernetes in Docker)
+
+For testing Kubernetes deployment with port mapping:
+
+```bash
+# Prerequisites: kind installed (brew install kind)
+
+# Quick start (all-in-one script)
+./start-health-demo-kind.sh --mode mock
+
+# Manual deployment
+kind create cluster --config deployment/kind.config.yaml --wait 2m
+
+# Build and load images
+docker build -t health-ehr-backend:latest ./backend-mock
+docker build -t health-frontend:latest ./frontend
+kind load docker-image health-ehr-backend:latest --name health-dataspace
+kind load docker-image health-frontend:latest --name health-dataspace
+
+# Deploy
+kubectl apply -f deployment/k8s/00-namespace.yaml
+kubectl apply -f deployment/k8s/application/
+
+# Access via NodePort (ports mapped by KinD)
+open http://localhost:3000  # Frontend
+open http://localhost:3001  # EHR Backend
+```
+
+**KinD cluster management:**
+```bash
+# View clusters
+kind get clusters
+
+# Delete cluster
+kind delete cluster --name health-dataspace
+
+# Export kubeconfig
+kind export kubeconfig --name health-dataspace
+```
+
+📖 **See [deployment/k8s/README.md](deployment/k8s/README.md) for KinD deployment details**
+
+---
+
+### Option C: Docker Compose (Full EDC Stack)
+
+For complete dataspace demonstration with consent verification:
 
 ```bash
 # Use the startup script (builds Java components automatically)
@@ -76,8 +164,7 @@ docker ps
 
 Open http://localhost:3000
 
-### Option C: Manual Full Setup
-
+**Manual setup:**
 ```bash
 # Build Java components (requires persistence flag for Docker/Vault support)
 ./gradlew -Ppersistence=true build -x test
@@ -89,13 +176,30 @@ docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up --build
 ./seed-dataspace.sh --mode=docker --verbose
 ```
 
-Open http://localhost:3000
+---
+
+### Option D: Local Development (Mock Mode)
+
+Perfect for quick demos and frontend development:
+
+```bash
+# Use the startup script
+./start-health-demo.sh --mode mock
+
+# OR manually:
+cd backend-mock && npm install && npm run dev:health  # Terminal 1
+cd frontend && npm install && npm run dev              # Terminal 2
+```
+
+Open http://localhost:4000 (local dev) or http://localhost:3000 (Docker)
+
+---
 
 **Notes:**
-- The script is macOS and Linux compatible (uses portable awk-based PEM handling).
-- Legacy compatibility wrappers remain for convenience:
-  - `./seed.sh` (local wrapper)
-  - `./seed-docker.sh` (docker wrapper)
+- The scripts are macOS and Linux compatible (uses portable awk-based PEM handling)
+- OrbStack provides better performance than Docker Desktop on macOS
+- KinD simulates production Kubernetes with local port mapping
+- Legacy compatibility wrappers remain for convenience: `./seed.sh`, `./seed-docker.sh`
 
 For details and advanced options, see [User Manual - Seeding](docs/USER-MANUAL.md#seeding-the-dataspace).
 
