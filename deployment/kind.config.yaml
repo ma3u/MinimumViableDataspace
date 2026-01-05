@@ -20,6 +20,7 @@
 ---
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+name: health-dataspace
 nodes:
   - role: control-plane
     kubeadmConfigPatches:
@@ -29,9 +30,176 @@ nodes:
           kubeletExtraArgs:
             node-labels: "ingress-ready=true"
     extraPortMappings:
+      # Standard ingress
       - containerPort: 80
         hostPort: 80
         protocol: TCP
       - containerPort: 443
         hostPort: 443
+        protocol: TCP
+      
+      # Application Layer
+      - containerPort: 30000  # health-frontend (NodePort)
+        hostPort: 3000
+        protocol: TCP
+      - containerPort: 30001  # ehr-backend (NodePort)
+        hostPort: 3001
+        protocol: TCP
+      - containerPort: 30002  # backend-edc (NodePort)
+        hostPort: 3002
+        protocol: TCP
+      - containerPort: 30880  # healthdcatap-editor (NodePort)
+        hostPort: 8880
+        protocol: TCP
+      
+      # Consumer EDC Control Plane
+      - containerPort: 30080  # Management API
+        hostPort: 8080
+        protocol: TCP
+      - containerPort: 30081
+        hostPort: 8081
+        protocol: TCP
+      - containerPort: 30082  # DSP API
+        hostPort: 8082
+        protocol: TCP
+      - containerPort: 30083
+        hostPort: 8083
+        protocol: TCP
+      - containerPort: 30084
+        hostPort: 8084
+        protocol: TCP
+      - containerPort: 30085
+        hostPort: 8085
+        protocol: TCP
+      
+      # Consumer EDC Data Plane
+      - containerPort: 31100  # Web/Health
+        hostPort: 11000
+        protocol: TCP
+      - containerPort: 31101  # Public API
+        hostPort: 11001
+        protocol: TCP
+      - containerPort: 31102  # Control
+        hostPort: 11002
+        protocol: TCP
+      
+      # Consumer Identity Hub
+      - containerPort: 30700  # API ports 7080-7086
+        hostPort: 7080
+        protocol: TCP
+      - containerPort: 30701
+        hostPort: 7081
+        protocol: TCP
+      - containerPort: 30702
+        hostPort: 7082
+        protocol: TCP
+      - containerPort: 30703
+        hostPort: 7083
+        protocol: TCP
+      - containerPort: 30705
+        hostPort: 7085
+        protocol: TCP
+      - containerPort: 30706
+        hostPort: 7086
+        protocol: TCP
+      
+      # Provider Identity Hub
+      - containerPort: 30710
+        hostPort: 7090
+        protocol: TCP
+      - containerPort: 30711
+        hostPort: 7091
+        protocol: TCP
+      - containerPort: 30712
+        hostPort: 7092
+        protocol: TCP
+      - containerPort: 30713
+        hostPort: 7093
+        protocol: TCP
+      - containerPort: 30715
+        hostPort: 7095
+        protocol: TCP
+      - containerPort: 30716
+        hostPort: 7096
+        protocol: TCP
+      
+      # Provider Catalog Server
+      - containerPort: 30090
+        hostPort: 8090
+        protocol: TCP
+      - containerPort: 30091
+        hostPort: 8091
+        protocol: TCP
+      - containerPort: 30092
+        hostPort: 8092
+        protocol: TCP
+      - containerPort: 30093
+        hostPort: 8093
+        protocol: TCP
+      
+      # Provider EDC Control Plane
+      - containerPort: 30190
+        hostPort: 8190
+        protocol: TCP
+      - containerPort: 30191
+        hostPort: 8191
+        protocol: TCP
+      - containerPort: 30192
+        hostPort: 8192
+        protocol: TCP
+      - containerPort: 30193
+        hostPort: 8193
+        protocol: TCP
+      - containerPort: 30194
+        hostPort: 8194
+        protocol: TCP
+      - containerPort: 30195
+        hostPort: 8195
+        protocol: TCP
+      
+      # Provider EDC Data Plane
+      - containerPort: 31200  # Web/Health
+        hostPort: 12000
+        protocol: TCP
+      - containerPort: 31201  # Public API
+        hostPort: 12001
+        protocol: TCP
+      - containerPort: 31203  # Control
+        hostPort: 12003
+        protocol: TCP
+      
+      # Issuer Service
+      - containerPort: 31010
+        hostPort: 10010
+        protocol: TCP
+      - containerPort: 31011
+        hostPort: 10011
+        protocol: TCP
+      - containerPort: 31012
+        hostPort: 10012
+        protocol: TCP
+      - containerPort: 31013
+        hostPort: 10013
+        protocol: TCP
+      - containerPort: 31014
+        hostPort: 10014
+        protocol: TCP
+      - containerPort: 31015
+        hostPort: 10015
+        protocol: TCP
+      
+      # Infrastructure
+      - containerPort: 30200  # Vault
+        hostPort: 8200
+        protocol: TCP
+      - containerPort: 30432  # PostgreSQL (optional external access)
+        hostPort: 5432
+        protocol: TCP
+      - containerPort: 30876  # DID NGINX server
+        hostPort: 9876
+        protocol: TCP
+      
+      # Contract Testing
+      - containerPort: 30292  # Pact Broker
+        hostPort: 9292
         protocol: TCP

@@ -1,0 +1,139 @@
+#
+#  Copyright (c) 2025 Health Dataspace Demo - EHR2EDC
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+  namespace: health-dataspace
+data:
+  init.sql: |
+    -- Consumer
+    CREATE USER consumer WITH ENCRYPTED PASSWORD 'consumer' SUPERUSER;
+    CREATE DATABASE consumer;
+
+    -- Provider
+    CREATE USER qna WITH ENCRYPTED PASSWORD 'provider-qna' SUPERUSER;
+    CREATE DATABASE provider_qna;
+
+    CREATE USER manufacturing WITH ENCRYPTED PASSWORD 'provider-manufacturing' SUPERUSER;
+    CREATE DATABASE provider_manufacturing;
+
+    CREATE USER identity WITH ENCRYPTED PASSWORD 'identity' SUPERUSER;
+    CREATE DATABASE identity;
+
+    CREATE USER catalog_server WITH ENCRYPTED PASSWORD 'catalog_server' SUPERUSER;
+    CREATE DATABASE catalog_server;
+
+    -- Issuer
+    CREATE USER issuer WITH ENCRYPTED PASSWORD 'issuer' SUPERUSER;
+    CREATE DATABASE issuer;
+
+    \c issuer issuer
+
+    create table if not exists membership_attestations
+    (
+        membership_type       integer   default 0,
+        holder_id             varchar                             not null,
+        membership_start_date timestamp default now()             not null,
+        id                    varchar   default gen_random_uuid() not null
+            constraint attestations_pk
+                primary key
+    );
+
+    create unique index if not exists membership_attestation_holder_id_uindex
+      on membership_attestations (holder_id);
+
+    -- Seed the consumer and provider into the attestations DB
+    INSERT INTO membership_attestations (membership_type, holder_id) VALUES (1, 'did:web:localhost%3A7083:consumer');
+    INSERT INTO membership_attestations (membership_type, holder_id) VALUES (2, 'did:web:localhost%3A7093:provider');
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-postgres
+  namespace: health-dataspace
+spec:
+  type: NodePort
+  selector:
+    app: health-postgres
+  ports:
+    - name: postgresql
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 30432
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: health-postgres
+  namespace: health-dataspace
+spec:
+  serviceName: health-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: health-postgres
+  template:
+    metadata:
+      labels:
+        app: health-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          env:
+            - name: POSTGRES_PASSWORD
+              value: "password"
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+              name: postgresql
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: init-sql
+          configMap:
+            name: postgres-init-sql
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

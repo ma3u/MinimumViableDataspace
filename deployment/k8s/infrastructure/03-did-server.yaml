@@ -1,0 +1,132 @@
+#
+#  Copyright (c) 2025 Health Dataspace Demo - EHR2EDC
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-did-server
+  namespace: health-dataspace
+spec:
+  type: NodePort
+  selector:
+    app: health-did-server
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30876
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: health-did-server
+  namespace: health-dataspace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: health-did-server
+  template:
+    metadata:
+      labels:
+        app: health-did-server
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: did-documents
+              mountPath: /var/www/.well-known
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /.well-known/did.json
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /.well-known/did.json
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: did-server-nginx-config
+        - name: did-documents
+          configMap:
+            name: did-documents
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: did-server-nginx-config
+  namespace: health-dataspace
+data:
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/json;
+
+        server {
+            listen 80;
+            server_name localhost;
+
+            location /.well-known/ {
+                root /var/www;
+                add_header Access-Control-Allow-Origin *;
+                add_header Content-Type application/json;
+            }
+        }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: did-documents
+  namespace: health-dataspace
+data:
+  did.json: |
+    {
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/suites/jws-2020/v1"
+      ],
+      "id": "did:web:localhost%3A9876",
+      "verificationMethod": [
+        {
+          "id": "did:web:localhost%3A9876#key-1",
+          "type": "JsonWebKey2020",
+          "controller": "did:web:localhost%3A9876",
+          "publicKeyJwk": {
+            "kty": "RSA",
+            "n": "placeholder",
+            "e": "AQAB"
+          }
+        }
+      ]
+    }
