@@ -1,0 +1,157 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: health-dataspace
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+        cluster: 'health-dataspace'
+        environment: 'kubernetes'
+
+    scrape_configs:
+      # Consumer CRO metrics
+      - job_name: 'cro-controlplane'
+        static_configs:
+          - targets: ['cro-controlplane:8080']
+            labels:
+              participant: 'cro'
+              component: 'controlplane'
+      
+      - job_name: 'cro-dataplane'
+        static_configs:
+          - targets: ['cro-dataplane:9080']
+            labels:
+              participant: 'cro'
+              component: 'dataplane'
+      
+      - job_name: 'cro-identityhub'
+        static_configs:
+          - targets: ['cro-identityhub:7080']
+            labels:
+              participant: 'cro'
+              component: 'identityhub'
+      
+      # Provider Hospital metrics
+      - job_name: 'hospital-ehr-controlplane'
+        static_configs:
+          - targets: ['hospital-ehr-controlplane:8190']
+            labels:
+              participant: 'hospital'
+              component: 'controlplane'
+      
+      - job_name: 'hospital-ehr-dataplane'
+        static_configs:
+          - targets: ['hospital-ehr-dataplane:9080']
+            labels:
+              participant: 'hospital'
+              component: 'dataplane'
+      
+      - job_name: 'hospital-identityhub'
+        static_configs:
+          - targets: ['hospital-identityhub:7090']
+            labels:
+              participant: 'hospital'
+              component: 'identityhub'
+      
+      - job_name: 'hospital-catalog-server'
+        static_configs:
+          - targets: ['hospital-catalog-server:8090']
+            labels:
+              participant: 'hospital'
+              component: 'catalog'
+      
+      # Trust Anchor
+      - job_name: 'issuer-service'
+        static_configs:
+          - targets: ['health-authority-issuer:10010']
+            labels:
+              component: 'issuer'
+      
+      # Application Layer
+      - job_name: 'ehr-backend'
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ['ehr-backend:3001']
+            labels:
+              component: 'ehr-backend'
+      
+      - job_name: 'backend-edc'
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ['backend-edc:3002']
+            labels:
+              component: 'backend-edc'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: health-dataspace
+  labels:
+    app: prometheus
+    component: observability
+spec:
+  type: ClusterIP
+  selector:
+    app: prometheus
+  ports:
+    - name: web
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: health-dataspace
+  labels:
+    app: prometheus
+    component: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        component: observability
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          args:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus'
+            - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+            - '--web.console.templates=/usr/share/prometheus/consoles'
+            - '--web.enable-lifecycle'
+          ports:
+            - name: web
+              containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: storage
+              mountPath: /prometheus
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+        - name: storage
+          emptyDir: {}
+      restartPolicy: Always

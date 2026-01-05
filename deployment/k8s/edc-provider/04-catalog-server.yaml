@@ -1,0 +1,141 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-server-env
+  namespace: health-dataspace
+data:
+  EDC_IAM_ISSUER_ID: "did:web:health-did-server%3A7093"
+  WEB_HTTP_PORT: "8090"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_MANAGEMENT_PORT: "8091"
+  WEB_HTTP_MANAGEMENT_PATH: "/api/management"
+  WEB_HTTP_MANAGEMENT_AUTH_TYPE: "tokenbased"
+  WEB_HTTP_MANAGEMENT_AUTH_KEY: "password"
+  WEB_HTTP_PROTOCOL_PORT: "8092"
+  WEB_HTTP_PROTOCOL_PATH: "/api/dsp"
+  WEB_HTTP_CONTROL_PORT: "8093"
+  WEB_HTTP_CONTROL_PATH: "/api/control"
+  EDC_IAM_DID_WEB_USE_HTTPS: "false"
+  EDC_IAM_STS_PRIVATEKEY_ALIAS: "did:web:health-did-server%3A7093-alias"
+  EDC_IAM_STS_PUBLICKEY_ID: "did:web:health-did-server%3A7093#key-1"
+  EDC_DSP_CALLBACK_ADDRESS: "http://hospital-catalog-server:8092/api/dsp"
+  EDC_PARTICIPANT_ID: "did:web:health-did-server%3A7093"
+  EDC_MANAGEMENT_CONTEXT_ENABLED: "true"
+  EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS: "did:web:health-did-server%3A7093-sts-client-secret"
+  EDC_IAM_STS_OAUTH_CLIENT_ID: "did:web:health-did-server%3A7093"
+  EDC_IAM_STS_OAUTH_TOKEN_URL: "http://hospital-identityhub:7096/api/sts/token"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospital-catalog-server
+  namespace: health-dataspace
+  labels:
+    app: hospital-catalog-server
+    component: edc
+    role: catalog
+spec:
+  type: ClusterIP
+  selector:
+    app: hospital-catalog-server
+  ports:
+    - name: api
+      port: 8090
+      targetPort: 8090
+      protocol: TCP
+    - name: management
+      port: 8091
+      targetPort: 8091
+      protocol: TCP
+    - name: protocol
+      port: 8092
+      targetPort: 8092
+      protocol: TCP
+    - name: control
+      port: 8093
+      targetPort: 8093
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hospital-catalog-server
+  namespace: health-dataspace
+  labels:
+    app: hospital-catalog-server
+    component: edc
+    role: catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hospital-catalog-server
+  template:
+    metadata:
+      labels:
+        app: hospital-catalog-server
+        component: edc
+        role: catalog
+    spec:
+      containers:
+        - name: catalog-server
+          image: catalog-server:latest
+          imagePullPolicy: Never
+          ports:
+            - name: api
+              containerPort: 8090
+            - name: management
+              containerPort: 8091
+            - name: protocol
+              containerPort: 8092
+            - name: control
+              containerPort: 8093
+          envFrom:
+            - configMapRef:
+                name: catalog-server-env
+          env:
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://health-postgres:5432/catalog_server"
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: "catalog_server"
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              value: "catalog_server"
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_VAULT_HASHICORP_URL
+              value: "http://health-vault:8200"
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: "root"
+          volumeMounts:
+            - name: participants
+              mountPath: /app/deployment/assets/participants
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /api/check/liveness
+              port: 8090
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/check/readiness
+              port: 8090
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      volumes:
+        - name: participants
+          configMap:
+            name: participants-json
+      restartPolicy: Always

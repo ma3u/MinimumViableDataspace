@@ -61,45 +61,81 @@ All deployment options support three operating modes:
 
 ### Option A: OrbStack Kubernetes (Recommended for macOS)
 
-**✅ Currently Deployed** - Native Kubernetes on OrbStack with superior performance:
+**✅ Full EDC Stack + Observability Deployed** - Complete production-like EHDS dataspace on Kubernetes:
 
 ```bash
 # Prerequisites: OrbStack installed with Kubernetes enabled
 
-# 1. Build Docker images
+# 1. Build all Docker images (EDC components + applications)
+./gradlew -Ppersistence=true build -x test  # Build EDC Java components
 docker build -t health-ehr-backend:latest ./backend-mock
 docker build -t health-frontend:latest ./frontend
 docker build -t backend-edc:latest ./backend-edc
 
-# 2. Deploy to Kubernetes
+# 2. Deploy complete stack (19 components total)
 kubectl apply -f deployment/k8s/00-namespace.yaml
-kubectl apply -f deployment/k8s/application/
+kubectl apply -f deployment/k8s/infrastructure/      # PostgreSQL, Vault, DID server
+kubectl apply -f deployment/k8s/application/         # Frontend, backends
+kubectl apply -f deployment/k8s/edc-consumer/        # Consumer: controlplane, dataplane, identityhub
+kubectl apply -f deployment/k8s/edc-provider/        # Provider: controlplane, dataplane, identityhub, catalog
+kubectl apply -f deployment/k8s/trust-anchor/        # Issuer service
+kubectl apply -f deployment/k8s/observability/       # Prometheus, Grafana, Jaeger, Loki
 
-# 3. Set up port forwarding
-kubectl port-forward -n health-dataspace svc/health-frontend 3000:80 &
-kubectl port-forward -n health-dataspace svc/ehr-backend 3001:3001 &
-kubectl port-forward -n health-dataspace svc/healthdcatap-editor 8880:8080 &
+# 3. Create participants ConfigMap (required for EDC components)
+kubectl create configmap participants-json \
+  --from-file=participants.json=deployment/assets/participants/participants.k8s.json \
+  -n health-dataspace
 
-# 4. Access the demo
-open http://localhost:3000
+# 4. Set up port forwarding for all services
+/tmp/port-forward-all.sh  # Script auto-generated during deployment
+
+# 5. Seed the dataspace with credentials and health assets
+./seed-dataspace.sh --mode=k8s --verbose
+
+# 6. Access the demo
+open http://localhost:3000              # Frontend
+open http://localhost:3003              # Grafana (admin/dataspace)
+open http://localhost:9090              # Prometheus
+open http://localhost:16686             # Jaeger
 ```
 
 **Management commands:**
 ```bash
-# View all resources
-kubectl get all -n health-dataspace
+# View all pods (19 components)
+kubectl get pods -n health-dataspace
 
-# View logs
-kubectl logs -f deployment/health-frontend -n health-dataspace
+# Check EDC component status
+kubectl get pods -n health-dataspace -l component=edc
 
-# Restart deployment
-kubectl rollout restart deployment/health-frontend -n health-dataspace
+# View logs from specific component
+kubectl logs -n health-dataspace -l app=consumer-controlplane --tail=50
+kubectl logs -n health-dataspace -l app=hospital-ehr-controlplane --tail=50
 
-# Clean up
+# View all EDC logs with pod prefixes
+kubectl logs -n health-dataspace -l component=edc --tail=20 --prefix
+
+# Check observability stack
+kubectl get pods -n health-dataspace -l component=observability
+
+# Restart specific deployment
+kubectl rollout restart deployment/consumer-controlplane -n health-dataspace
+
+# Clean up entire dataspace
 kubectl delete namespace health-dataspace
 ```
 
-📖 **See [ORBSTACK-DEPLOYMENT.md](ORBSTACK-DEPLOYMENT.md) for complete instructions**
+**Deployed Components (19 total):**
+- **Infrastructure (3)**: PostgreSQL, Vault, DID server
+- **EDC Consumer (3)**: Control plane, data plane, identity hub
+- **EDC Provider (4)**: Control plane, data plane, identity hub, catalog server
+- **Trust Anchor (1)**: Issuer service for verifiable credentials
+- **Application (3)**: Frontend, EHR backend, EDC proxy
+- **Observability (5)**: Prometheus, Grafana, Jaeger, Loki, Promtail
+
+📖 **Complete documentation:**
+- [ORBSTACK-DEPLOYMENT.md](ORBSTACK-DEPLOYMENT.md) - Basic OrbStack setup
+- [K8S-DEPLOYMENT-STATUS.md](K8S-DEPLOYMENT-STATUS.md) - Full deployment status and troubleshooting
+- [deployment/k8s/README.md](deployment/k8s/README.md) - Kubernetes manifest details
 
 ---
 

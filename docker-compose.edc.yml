@@ -47,6 +47,14 @@ services:
       - PROVIDER_IDENTITY_HUB_URL=http://provider-identityhub:7092
       - PROVIDER_PARTICIPANT_ID=provider
       - MOCK_BACKEND_URL=http://ehr-backend:3001
+      - EDC_CONSUMER_MANAGEMENT_URL=http://consumer-controlplane:8081/api/management/v3
+      - EDC_CONSUMER_CATALOG_URL=http://consumer-controlplane:8084/api/catalog/v1alpha
+      - EDC_CONSUMER_DSP_URL=http://consumer-controlplane:8082/api/dsp
+      - EDC_PROVIDER_MANAGEMENT_URL=http://provider-controlplane:8191/api/management/v3
+      - EDC_PROVIDER_DSP_URL=http://provider-controlplane:8192/api/dsp
+      - EDC_PROVIDER_IDENTITYHUB_URL=http://provider-identityhub:7092
+      - EDC_PROVIDER_PARTICIPANT_ID=provider
+      - BACKEND_MOCK_URL=http://ehr-backend:3001
       # OpenTelemetry tracing configuration
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tools-jaeger:4318/v1/traces
       - OTEL_SERVICE_NAME=backend-edc

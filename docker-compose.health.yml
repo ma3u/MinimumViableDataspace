@@ -23,7 +23,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_MODE=mock  # Changed from 'full' - use mock for standalone
+        - VITE_API_MODE=full  # Use full EDC integration when EDC stack is running
     container_name: health-frontend
     ports:
       - "3000:80"

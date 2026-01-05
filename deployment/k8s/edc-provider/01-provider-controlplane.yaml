@@ -1,0 +1,169 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: provider-controlplane-env
+  namespace: health-dataspace
+data:
+  EDC_IAM_ISSUER_ID: "did:web:health-did-server%3A7093"
+  WEB_HTTP_PORT: "8190"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_MANAGEMENT_PORT: "8191"
+  WEB_HTTP_MANAGEMENT_PATH: "/api/management/"
+  WEB_HTTP_MANAGEMENT_AUTH_TYPE: "tokenbased"
+  WEB_HTTP_MANAGEMENT_AUTH_KEY: "password"
+  WEB_HTTP_PROTOCOL_PORT: "8192"
+  WEB_HTTP_PROTOCOL_PATH: "/api/dsp"
+  WEB_HTTP_CONTROL_PORT: "8193"
+  WEB_HTTP_CONTROL_PATH: "/api/control"
+  WEB_HTTP_CATALOG_PORT: "8194"
+  WEB_HTTP_CATALOG_PATH: "/api/catalog"
+  WEB_HTTP_CATALOG_AUTH_TYPE: "tokenbased"
+  WEB_HTTP_CATALOG_AUTH_KEY: "password"
+  WEB_HTTP_VERSION_PORT: "8195"
+  WEB_HTTP_VERSION_PATH: "/api/version"
+  EDC_IAM_DID_WEB_USE_HTTPS: "false"
+  EDC_IAM_STS_PRIVATEKEY_ALIAS: "did:web:health-did-server%3A7093-alias"
+  EDC_IAM_STS_PUBLICKEY_ID: "did:web:health-did-server%3A7093#key-1"
+  EDC_DSP_CALLBACK_ADDRESS: "http://hospital-ehr-controlplane:8192/api/dsp"
+  EDC_PARTICIPANT_ID: "did:web:health-did-server%3A7093"
+  EDC_CATALOG_CACHE_EXECUTION_DELAY_SECONDS: "5"
+  EDC_CATALOG_CACHE_EXECUTION_PERIOD_SECONDS: "10"
+  EDC_MVD_PARTICIPANTS_LIST_FILE: "/app/deployment/assets/participants/participants.json"
+  EDC_MANAGEMENT_CONTEXT_ENABLED: "true"
+  EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS: "did:web:health-did-server%3A7093-sts-client-secret"
+  EDC_IAM_STS_OAUTH_CLIENT_ID: "did:web:health-did-server%3A7093"
+  EDC_IAM_STS_OAUTH_TOKEN_URL: "http://hospital-identityhub:7096/api/sts/token"
+  EDC_RUNTIME_ID: "provider-qna-embedded-runtime"
+  EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS: "did:web:health-did-server%3A7093#key-1"
+  EDC_TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS: "did:web:health-did-server%3A7093-alias"
+  EDC_DPF_SELECTOR_URL: "http://hospital-ehr-controlplane:8193/api/control/v1/dataplanes"
+  WEB_HTTP_PUBLIC_PORT: "12001"
+  WEB_HTTP_PUBLIC_PATH: "/api/public"
+  EDC_VAULT_HASHICORP_API_SECRET_PATH: "/v1/secret"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospital-ehr-controlplane
+  namespace: health-dataspace
+  labels:
+    app: hospital-ehr-controlplane
+    component: edc
+    role: controlplane
+spec:
+  type: ClusterIP
+  selector:
+    app: hospital-ehr-controlplane
+  ports:
+    - name: api
+      port: 8190
+      targetPort: 8190
+      protocol: TCP
+    - name: management
+      port: 8191
+      targetPort: 8191
+      protocol: TCP
+    - name: protocol
+      port: 8192
+      targetPort: 8192
+      protocol: TCP
+    - name: control
+      port: 8193
+      targetPort: 8193
+      protocol: TCP
+    - name: catalog
+      port: 8194
+      targetPort: 8194
+      protocol: TCP
+    - name: version
+      port: 8195
+      targetPort: 8195
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hospital-ehr-controlplane
+  namespace: health-dataspace
+  labels:
+    app: hospital-ehr-controlplane
+    component: edc
+    role: controlplane
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hospital-ehr-controlplane
+  template:
+    metadata:
+      labels:
+        app: hospital-ehr-controlplane
+        component: edc
+        role: controlplane
+    spec:
+      containers:
+        - name: controlplane
+          image: controlplane:latest
+          imagePullPolicy: Never
+          ports:
+            - name: api
+              containerPort: 8190
+            - name: management
+              containerPort: 8191
+            - name: protocol
+              containerPort: 8192
+            - name: control
+              containerPort: 8193
+            - name: catalog
+              containerPort: 8194
+            - name: version
+              containerPort: 8195
+          envFrom:
+            - configMapRef:
+                name: provider-controlplane-env
+          env:
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://health-postgres:5432/provider_qna"
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: "qna"
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              value: "provider-qna"
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_VAULT_HASHICORP_URL
+              value: "http://health-vault:8200"
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: "root"
+          volumeMounts:
+            - name: participants
+              mountPath: /app/deployment/assets/participants
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /api/check/liveness
+              port: 8190
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/check/readiness
+              port: 8190
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      volumes:
+        - name: participants
+          configMap:
+            name: participants-json
+      restartPolicy: Always

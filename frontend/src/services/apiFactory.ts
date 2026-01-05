@@ -34,11 +34,13 @@ export function getBaseUrl(): string {
   const mode = getApiMode();
   
   if (mode === 'mock') {
-    return import.meta.env.VITE_MOCK_API_URL ?? 'http://localhost:3001';
+    const mockUrl = import.meta.env.VITE_MOCK_API_URL;
+    return mockUrl && mockUrl.trim() !== '' ? mockUrl : 'http://localhost:3001';
   }
   
   // hybrid and full both use backend-edc
-  return import.meta.env.VITE_EDC_API_URL ?? 'http://localhost:3002';
+  const edcUrl = import.meta.env.VITE_EDC_API_URL;
+  return edcUrl && edcUrl.trim() !== '' ? edcUrl : 'http://localhost:3002';
 }
 
 // API Response types

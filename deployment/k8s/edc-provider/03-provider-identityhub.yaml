@@ -1,0 +1,145 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: provider-identityhub-env
+  namespace: health-dataspace
+data:
+  WEB_HTTP_PORT: "7090"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_CREDENTIALS_PORT: "7091"
+  WEB_HTTP_CREDENTIALS_PATH: "/api/credentials/"
+  WEB_HTTP_IDENTITY_PORT: "7092"
+  WEB_HTTP_IDENTITY_PATH: "/api/identity"
+  WEB_HTTP_DID_PORT: "7093"
+  WEB_HTTP_DID_PATH: "/"
+  WEB_HTTP_VERSION_PORT: "7095"
+  WEB_HTTP_VERSION_PATH: "/api/version"
+  WEB_HTTP_STS_PORT: "7096"
+  WEB_HTTP_STS_PATH: "/api/sts"
+  EDC_IAM_DID_WEB_USE_HTTPS: "false"
+  EDC_IAM_STS_PRIVATEKEY_ALIAS: "key-1"
+  EDC_IAM_STS_PUBLICKEY_ID: "did:web:health-did-server%3A7093#key-1"
+  EDC_IH_IAM_PUBLICKEY_PATH: "./deployment/assets/provider_public.pem"
+  EDC_IH_IAM_ID: "did:web:health-did-server%3A7093"
+  EDC_IH_API_SUPERUSER_KEY: "c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo="
+  EDC_MVD_CREDENTIALS_PATH: "deployment/assets/credentials/local/provider/"
+  EDC_VAULT_HASHICORP_API_SECRET_PATH: "/v1/secret"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospital-identityhub
+  namespace: health-dataspace
+  labels:
+    app: hospital-identityhub
+    component: edc
+    role: identity
+spec:
+  type: ClusterIP
+  selector:
+    app: hospital-identityhub
+  ports:
+    - name: api
+      port: 7090
+      targetPort: 7090
+      protocol: TCP
+    - name: credentials
+      port: 7091
+      targetPort: 7091
+      protocol: TCP
+    - name: identity
+      port: 7092
+      targetPort: 7092
+      protocol: TCP
+    - name: did
+      port: 7093
+      targetPort: 7093
+      protocol: TCP
+    - name: version
+      port: 7095
+      targetPort: 7095
+      protocol: TCP
+    - name: sts
+      port: 7096
+      targetPort: 7096
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hospital-identityhub
+  namespace: health-dataspace
+  labels:
+    app: hospital-identityhub
+    component: edc
+    role: identity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hospital-identityhub
+  template:
+    metadata:
+      labels:
+        app: hospital-identityhub
+        component: edc
+        role: identity
+    spec:
+      containers:
+        - name: identityhub
+          image: identity-hub:latest
+          imagePullPolicy: Never
+          ports:
+            - name: api
+              containerPort: 7090
+            - name: credentials
+              containerPort: 7091
+            - name: identity
+              containerPort: 7092
+            - name: did
+              containerPort: 7093
+            - name: version
+              containerPort: 7095
+            - name: sts
+              containerPort: 7096
+          envFrom:
+            - configMapRef:
+                name: provider-identityhub-env
+          env:
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://health-postgres:5432/identity"
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: "identity"
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              value: "identity"
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_VAULT_HASHICORP_URL
+              value: "http://health-vault:8200"
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: "root"
+          livenessProbe:
+            httpGet:
+              path: /api/check/liveness
+              port: 7090
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/check/readiness
+              port: 7090
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      restartPolicy: Always

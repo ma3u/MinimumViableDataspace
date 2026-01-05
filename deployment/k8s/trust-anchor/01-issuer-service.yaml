@@ -1,0 +1,141 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: issuer-service-env
+  namespace: health-dataspace
+data:
+  EDC_ISSUER_STATUSLIST_SIGNING_KEY_ALIAS: "signing-key-alias"
+  WEB_HTTP_PORT: "10010"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_STS_PORT: "10011"
+  WEB_HTTP_STS_PATH: "/api/sts"
+  WEB_HTTP_ISSUANCE_PORT: "10012"
+  WEB_HTTP_ISSUANCE_PATH: "/api/issuance"
+  WEB_HTTP_ISSUERADMIN_PORT: "10013"
+  WEB_HTTP_ISSUERADMIN_PATH: "/api/admin"
+  WEB_HTTP_VERSION_PORT: "10014"
+  WEB_HTTP_VERSION_PATH: "/.well-known/api"
+  WEB_HTTP_IDENTITY_PORT: "10015"
+  WEB_HTTP_IDENTITY_PATH: "/api/identity"
+  EDC_IAM_DID_WEB_USE_HTTPS: "false"
+  EDC_IH_API_SUPERUSER_KEY: "c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo="
+  EDC_VAULT_HASHICORP_API_SECRET_PATH: "/v1/secret"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-authority-issuer
+  namespace: health-dataspace
+  labels:
+    app: health-authority-issuer
+    component: trust-anchor
+    role: issuer
+spec:
+  type: ClusterIP
+  selector:
+    app: health-authority-issuer
+  ports:
+    - name: api
+      port: 10010
+      targetPort: 10010
+      protocol: TCP
+    - name: sts
+      port: 10011
+      targetPort: 10011
+      protocol: TCP
+    - name: issuance
+      port: 10012
+      targetPort: 10012
+      protocol: TCP
+    - name: admin
+      port: 10013
+      targetPort: 10013
+      protocol: TCP
+    - name: version
+      port: 10014
+      targetPort: 10014
+      protocol: TCP
+    - name: identity
+      port: 10015
+      targetPort: 10015
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: health-authority-issuer
+  namespace: health-dataspace
+  labels:
+    app: health-authority-issuer
+    component: trust-anchor
+    role: issuer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: health-authority-issuer
+  template:
+    metadata:
+      labels:
+        app: health-authority-issuer
+        component: trust-anchor
+        role: issuer
+    spec:
+      containers:
+        - name: issuerservice
+          image: issuerservice:latest
+          imagePullPolicy: Never
+          ports:
+            - name: api
+              containerPort: 10010
+            - name: sts
+              containerPort: 10011
+            - name: issuance
+              containerPort: 10012
+            - name: admin
+              containerPort: 10013
+            - name: version
+              containerPort: 10014
+            - name: identity
+              containerPort: 10015
+          envFrom:
+            - configMapRef:
+                name: issuer-service-env
+          env:
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://health-postgres:5432/issuer"
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: "issuer"
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              value: "issuer"
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_VAULT_HASHICORP_URL
+              value: "http://health-vault:8200"
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: "root"
+          livenessProbe:
+            httpGet:
+              path: /api/check/liveness
+              port: 10010
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/check/readiness
+              port: 10010
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      restartPolicy: Always

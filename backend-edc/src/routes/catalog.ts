@@ -115,7 +115,7 @@ catalogRouter.get('/assets', async (req: Request, res: Response) => {
   try {
     if (useEnhanced) {
       // Use enhanced catalog service with full DCAT properties
-      const result = await getEnhancedCatalogAssets({ offset, limit, useEdcFirst: true });
+      const result = await getEnhancedCatalogAssets({ offset, limit, useEdcFirst: false }); // Always use mock for demo
       
       return res.json({
         assets: result.assets,

@@ -1,0 +1,103 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-collector
+  namespace: health-dataspace
+  labels:
+    app: jaeger
+    component: collector
+spec:
+  type: ClusterIP
+  selector:
+    app: jaeger
+  ports:
+    - name: grpc
+      port: 14250
+      targetPort: 14250
+      protocol: TCP
+    - name: http
+      port: 14268
+      targetPort: 14268
+      protocol: TCP
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-query
+  namespace: health-dataspace
+  labels:
+    app: jaeger
+    component: query
+spec:
+  type: ClusterIP
+  selector:
+    app: jaeger
+  ports:
+    - name: ui
+      port: 16686
+      targetPort: 16686
+      protocol: TCP
+    - name: grpc
+      port: 16685
+      targetPort: 16685
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  namespace: health-dataspace
+  labels:
+    app: jaeger
+    component: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+        component: observability
+    spec:
+      containers:
+        - name: jaeger
+          image: jaegertracing/all-in-one:latest
+          ports:
+            - name: collector-grpc
+              containerPort: 14250
+            - name: collector-http
+              containerPort: 14268
+            - name: otlp-grpc
+              containerPort: 4317
+            - name: otlp-http
+              containerPort: 4318
+            - name: query-ui
+              containerPort: 16686
+            - name: query-grpc
+              containerPort: 16685
+          env:
+            - name: COLLECTOR_ZIPKIN_HOST_PORT
+              value: ":9411"
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
+            - name: SPAN_STORAGE_TYPE
+              value: "memory"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+      restartPolicy: Always

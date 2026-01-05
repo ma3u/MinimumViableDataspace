@@ -1,0 +1,142 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consumer-identityhub-env
+  namespace: health-dataspace
+data:
+  EDC_PARTICIPANT_ID: "did:web:health-did-server:cro"
+  WEB_HTTP_PORT: "7080"
+  WEB_HTTP_PATH: "/api"
+  WEB_HTTP_MANAGEMENT_PORT: "7081"
+  WEB_HTTP_MANAGEMENT_PATH: "/api/management"
+  WEB_HTTP_PROTOCOL_PORT: "7083"
+  WEB_HTTP_PROTOCOL_PATH: "/api/v1"
+  EDC_API_AUTH_KEY: "c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo="
+  EDC_WEB_REST_CORS_ENABLED: "true"
+  EDC_WEB_REST_CORS_HEADERS: "origin,content-type,accept,authorization,x-api-key"
+  WEB_HTTP_RESOLUTION_PORT: "7082"
+  WEB_HTTP_RESOLUTION_PATH: "/api/identity"
+  WEB_HTTP_PRESENTATION_PORT: "7085"
+  WEB_HTTP_PRESENTATION_PATH: "/api/presentation"
+  EDC_IAM_DID_WEB_USE_HTTPS: "false"
+  EDC_VAULT_NAME: "consumer"
+  EDC_MVD_CREDENTIALS_PATH: "deployment/assets/credentials/local/consumer/"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cro-identityhub
+  namespace: health-dataspace
+  labels:
+    app: cro-identityhub
+    component: edc
+    role: identity
+spec:
+  type: ClusterIP
+  selector:
+    app: cro-identityhub
+  ports:
+    - name: api
+      port: 7080
+      targetPort: 7080
+      protocol: TCP
+    - name: management
+      port: 7081
+      targetPort: 7081
+      protocol: TCP
+    - name: resolution
+      port: 7082
+      targetPort: 7082
+      protocol: TCP
+    - name: protocol
+      port: 7083
+      targetPort: 7083
+      protocol: TCP
+    - name: presentation
+      port: 7085
+      targetPort: 7085
+      protocol: TCP
+    - name: credentials
+      port: 7086
+      targetPort: 7086
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cro-identityhub
+  namespace: health-dataspace
+  labels:
+    app: cro-identityhub
+    component: edc
+    role: identity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cro-identityhub
+  template:
+    metadata:
+      labels:
+        app: cro-identityhub
+        component: edc
+        role: identity
+    spec:
+      containers:
+        - name: identityhub
+          image: identity-hub:latest
+          imagePullPolicy: Never
+          ports:
+            - name: api
+              containerPort: 7080
+            - name: management
+              containerPort: 7081
+            - name: resolution
+              containerPort: 7082
+            - name: protocol
+              containerPort: 7083
+            - name: presentation
+              containerPort: 7085
+            - name: credentials
+              containerPort: 7086
+          envFrom:
+            - configMapRef:
+                name: consumer-identityhub-env
+          env:
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://health-postgres:5432/consumer"
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: "consumer"
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              value: "consumer"
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_VAULT_HASHICORP_URL
+              value: "http://health-vault:8200"
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: "root"
+          livenessProbe:
+            httpGet:
+              path: /api/check/liveness
+              port: 7080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/check/readiness
+              port: 7080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      restartPolicy: Always

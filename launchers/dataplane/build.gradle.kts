@@ -28,9 +28,8 @@ dependencies {
     runtimeOnly(libs.edc.jersey.micrometer)
 
     if (project.properties.getOrDefault("persistence", "false") == "true") {
-        runtimeOnly(libs.edc.vault.hashicorp)
         runtimeOnly(libs.edc.bom.dataplane.sql)
-        println("This runtime compiles with a remote STS client, Hashicorp Vault and PostgreSQL. You will need properly configured Postgres and HCV instances.")
+        println("This runtime compiles with PostgreSQL support for data plane instance store.")
     }
 }
 
