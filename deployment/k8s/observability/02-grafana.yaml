@@ -34,11 +34,13 @@ data:
   dashboards.yaml: |
     apiVersion: 1
     providers:
-      - name: 'Health Dataspace'
+      - name: 'Health Dataspace Dashboards'
         orgId: 1
-        folder: ''
+        folder: 'Health Dataspace'
+        folderUid: 'health-dataspace'
         type: file
         disableDeletion: false
+        editable: true
         updateIntervalSeconds: 10
         allowUiUpdates: true
         options:
@@ -103,6 +105,8 @@ spec:
               mountPath: /etc/grafana/provisioning/datasources
             - name: dashboards-config
               mountPath: /etc/grafana/provisioning/dashboards
+            - name: dashboards
+              mountPath: /var/lib/grafana/dashboards
             - name: storage
               mountPath: /var/lib/grafana
           resources:
@@ -119,6 +123,10 @@ spec:
         - name: dashboards-config
           configMap:
             name: grafana-dashboards-config
+        - name: dashboards
+          hostPath:
+            path: /Users/mbuchhorn/projects/dataspaces/MVD-health/observability/grafana/dashboards
+            type: Directory
         - name: storage
           emptyDir: {}
       restartPolicy: Always
