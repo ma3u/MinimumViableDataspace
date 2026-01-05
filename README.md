@@ -38,28 +38,28 @@ This demo showcases how easy it is to create an **EHDS-compliant dataspace for h
 
 ### Deployment Options
 
-The demo supports multiple deployment options:
+The demo supports two deployment approaches:
 
 | Deployment | Platform | Use Case | Setup Time |
 |------------|----------|----------|------------|
-| **Local Dev** | Node.js | Frontend development | 2 min |
-| **Docker Compose** | Docker | Full stack testing | 10 min |
-| **OrbStack Kubernetes** | OrbStack | Cloud-native development | 5 min |
-| **KinD** | KinD + OrbStack | Kubernetes simulation | 15 min |
+| **Local Dev** | Node.js | Quick demos, frontend development | 2 min |
+| **OrbStack Kubernetes** | OrbStack + Kubernetes | Full EDC stack with observability | 15 min |
 
-### Three API Modes
+### Three Operating Modes
 
-All deployment options support three operating modes:
+Both deployment options support flexible operating modes:
 
 | Mode | Backend | EDC Stack | Use Case |
 |------|---------|-----------|----------|
-| **mock** | Mock data in frontend | ❌ Not needed | Quick demo, development, CI/CD |
+| **mock** | Mock data in frontend | ❌ Not needed | Quick demo, frontend development |
 | **hybrid** | backend-mock (FHIR) | ✅ Catalog only | Test EDC catalog integration |
-| **full** | backend-mock + backend-edc | ✅ Complete flow | Full dataspace protocol demo |
+| **full** | backend-mock + backend-edc | ✅ Complete flow | Full dataspace protocol, production-like |
 
 ---
 
-### Option A: OrbStack Kubernetes (Recommended for macOS)
+### Option 1: OrbStack Kubernetes (Recommended)
+
+**Production-like deployment with full EDC stack and observability**
 
 **✅ Full EDC Stack + Observability Deployed** - Complete production-like EHDS dataspace on Kubernetes:
 
@@ -139,105 +139,61 @@ kubectl delete namespace health-dataspace
 
 ---
 
-### Option B: KinD (Kubernetes in Docker)
+### Option 2: Local Development (Mock Mode)
 
-For testing Kubernetes deployment with port mapping:
+**Perfect for quick demos and frontend development** - no EDC required:
 
 ```bash
-# Prerequisites: kind installed (brew install kind)
+# Terminal 1: Start backend mock (FHIR R4 EHR data)
+cd backend-mock
+npm install
+npm run dev:health
 
-# Quick start (all-in-one script)
-./start-health-demo-kind.sh --mode mock
-
-# Manual deployment
-kind create cluster --config deployment/kind.config.yaml --wait 2m
-
-# Build and load images
-docker build -t health-ehr-backend:latest ./backend-mock
-docker build -t health-frontend:latest ./frontend
-kind load docker-image health-ehr-backend:latest --name health-dataspace
-kind load docker-image health-frontend:latest --name health-dataspace
-
-# Deploy
-kubectl apply -f deployment/k8s/00-namespace.yaml
-kubectl apply -f deployment/k8s/application/
-
-# Access via NodePort (ports mapped by KinD)
-open http://localhost:3000  # Frontend
-open http://localhost:3001  # EHR Backend
+# Terminal 2: Start frontend
+cd frontend
+npm install
+npm run dev
 ```
 
-**KinD cluster management:**
+**Access the demo:**
 ```bash
-# View clusters
-kind get clusters
-
-# Delete cluster
-kind delete cluster --name health-dataspace
-
-# Export kubeconfig
-kind export kubeconfig --name health-dataspace
+open http://localhost:4000  # Frontend (local dev uses port 4000)
 ```
 
-📖 **See [deployment/k8s/README.md](deployment/k8s/README.md) for KinD deployment details**
+**Features in Mock Mode:**
+- 20 synthetic EHR records (FHIR R4) with clinical trial metadata
+- MedDRA v27.0 adverse event classifications
+- GDPR Art. 89 compliant anonymization
+- No EDC stack needed - instant startup
+- Perfect for frontend development and demos
 
 ---
 
-### Option C: Docker Compose (Full EDC Stack)
+## API Endpoints
 
-For complete dataspace demonstration with consent verification:
+### OrbStack Kubernetes (Full EDC Mode)
 
-```bash
-# Use the startup script (builds Java components automatically)
-./start-health-demo.sh --mode full -d
+**Application:**
+- Frontend: http://localhost:3000
+- EHR Backend: http://localhost:3001
+- Backend EDC: http://localhost:3002
 
-# Wait for containers to be healthy
-docker ps
+**EDC Management APIs:**
+- Consumer Control Plane: http://localhost:8081
+- Provider Control Plane: http://localhost:8191
+- Issuer Service: http://localhost:10012
+- Catalog Server: http://localhost:8091
 
-# Seed the dataspace
-./seed-dataspace.sh --mode=docker --verbose
-```
+**Observability:**
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3003 (admin/dataspace)
+- Jaeger: http://localhost:16686
+- Loki: http://localhost:3100
 
-Open http://localhost:3000
+### Local Development (Mock Mode)
 
-**Manual setup:**
-```bash
-# Build Java components (requires persistence flag for Docker/Vault support)
-./gradlew -Ppersistence=true build -x test
-
-# Start all services
-docker-compose -f docker-compose.health.yml -f docker-compose.edc.yml up --build
-
-# In another terminal, seed the dataspace
-./seed-dataspace.sh --mode=docker --verbose
-```
-
----
-
-### Option D: Local Development (Mock Mode)
-
-Perfect for quick demos and frontend development:
-
-```bash
-# Use the startup script
-./start-health-demo.sh --mode mock
-
-# OR manually:
-cd backend-mock && npm install && npm run dev:health  # Terminal 1
-cd frontend && npm install && npm run dev              # Terminal 2
-```
-
-Open http://localhost:4000 (local dev) or http://localhost:3000 (Docker)
-
----
-
-**Notes:**
-- The scripts are macOS and Linux compatible (uses portable awk-based PEM handling)
-- OrbStack provides better performance than Docker Desktop on macOS
-- KinD simulates production Kubernetes with local port mapping
-- Legacy compatibility wrappers remain for convenience: `./seed.sh`, `./seed-docker.sh`
-
-For details and advanced options, see [User Manual - Seeding](docs/USER-MANUAL.md#seeding-the-dataspace).
+- Frontend: http://localhost:4000
+- EHR Backend API: http://localhost:3001/api/ehr
 
 ---
 
